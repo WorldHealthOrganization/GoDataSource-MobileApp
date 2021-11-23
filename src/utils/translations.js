@@ -48,6 +48,12 @@ const followUpFilter = {
     chooseLocationLabel: 'LNG_FILTER_SCREEN_CHOOSE_LOCATIONS_MESSAGE',
 };
 
+const personFilter = {
+    vaccine: 'LNG_ENTITY_FIELD_LABEL_VACCINE',
+    vaccineStatus: 'LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS',
+    pregnancyStatus: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS'
+}
+
 const helpFilter = {
     filterTitle: 'LNG_SIDE_FILTERS_TITLE',
     sortTitle: 'LNG_SIDE_FILTERS_SECTION_SORT_TITLE',
@@ -206,7 +212,9 @@ const contactSingleScreen = {
 
     contactId: 'LNG_CONTACT_FIELD_LABEL_CONTACT_ID',
     followUpFinalStatus: 'LNG_MOBILE_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
-    followUpTeamId: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID'
+    followUpTeamId: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+
+    contactIdMaskError: 'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK',
 };
 
 const exposureScreen = {
@@ -357,6 +365,8 @@ const alertMessages = {
     warningLabel: 'LNG_DIALOG_WARNING_TITLE_LABEL',
     saveAnywayLabel: 'LNG_DIALOG_SAVE_ANYWAY_LABEL',
     areYouSureDelete: 'LNG_DIALOG_CONFIRM_DELETE_ITEM',
+
+    invalidMaskAlert: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
 
     //not used with translation
     invalidCredentials: 'Invalid credentials',
@@ -672,5 +682,6 @@ export default {
     languageModalComponentLabels,
     labResultsScreen,
     labResultsSingleScreen,
-    labResultsFilter
+    labResultsFilter,
+    personFilter
 };

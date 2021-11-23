@@ -31,6 +31,9 @@ class FilterScreen extends Component {
                     selectedLocations: [],
                     classification: [],
                     categories: [],
+                    vaccines: [],
+                    vaccineStatuses: [],
+                    pregnancyStatuses: [],
                     type: {
                         [translations.personTypes.cases]: false,
                         [translations.personTypes.contacts]: false
@@ -55,7 +58,7 @@ class FilterScreen extends Component {
 
         const { tabsValuesRoutes, localTranslationTokens } = config;
         const { sortOrderDropDownItems, sortCriteriaDropDownItems, helpItemsSortCriteriaDropDownItems } = config;
-        const { followUpsFilterScreen, casesFilterScreen, helpFilterScreen, labResultsFilterScreen, labResultsFilterScreenNoContactPermission } = config;
+        const { followUpsFilterScreen,personFilterScreen, casesFilterScreen, helpFilterScreen, labResultsFilterScreen, labResultsFilterScreenNoContactPermission } = config;
 
         let filterClone = cloneDeep(filter.filter);
         let sortClone = cloneDeep(filter.sort);
@@ -73,6 +76,9 @@ class FilterScreen extends Component {
                 } else if (activeFilters.gender === localTranslationTokens.female && filterClone.gender[localTranslationTokens.female] === false) {
                     filterClone.gender[localTranslationTokens.female] = true
                     filterClone.gender[localTranslationTokens.male] = false
+                } else if(activeFilters.gender.$in) {
+                    filterClone.gender[localTranslationTokens.female] = true
+                    filterClone.gender[localTranslationTokens.male] = true
                 }
             }
 
@@ -102,6 +108,15 @@ class FilterScreen extends Component {
             if (activeFilters.categories && Array.isArray(activeFilters.categories)) {
                 filterClone.categories = activeFilters.categories;
             }
+            if (activeFilters.vaccines && Array.isArray(activeFilters.vaccines)) {
+                filterClone.vaccines = activeFilters.vaccines;
+            }
+            if (activeFilters.vaccineStatuses && Array.isArray(activeFilters.vaccineStatuses)) {
+                filterClone.vaccineStatuses = activeFilters.vaccineStatuses;
+            }
+            if (activeFilters.pregnancyStatuses && Array.isArray(activeFilters.pregnancyStatuses)) {
+                filterClone.pregnancyStatuses = activeFilters.pregnancyStatuses;
+            }
 
             if (activeFilters.sort && activeFilters.sort !== undefined && Array.isArray(activeFilters.sort) && activeFilters.sort.length > 0) {
                 sortClone = activeFilters.sort
@@ -110,9 +125,10 @@ class FilterScreen extends Component {
 
         switch (screen) {
             case 'ContactsScreen':
+            case 'ContactsOfContactsScreen':
                 screenTitle = getTranslation(translations.followUpFilter.contactFilterTitle, translation);
-                routes = tabsValuesRoutes.followUpsFilter;
-                configFilterScreen = followUpsFilterScreen;
+                routes = tabsValuesRoutes.personFilter;
+                configFilterScreen = personFilterScreen;
                 mySortCriteriaDropDownItems = sortCriteriaDropDownItems;
                 break;
             case 'FollowUpsScreen':
@@ -335,6 +351,11 @@ class FilterScreen extends Component {
         if (filterStateClone.gender[localTranslationTokens.female] && !filterStateClone.gender[localTranslationTokens.male]) {
             filterClone.gender = localTranslationTokens.female
         }
+        if (filterStateClone.gender[localTranslationTokens.female] && filterStateClone.gender[localTranslationTokens.male]){
+            filterClone.gender = {
+                $in: [localTranslationTokens.male, localTranslationTokens.female]
+            };
+        }
         filterClone.type = []
         Object.keys(filterStateClone.type).forEach(k=>{
             if(filterStateClone.type[k]){
@@ -355,6 +376,16 @@ class FilterScreen extends Component {
         if (filterStateClone.categories) {
             filterClone.categories = filterStateClone.categories;
         }
+        if (filterStateClone.vaccines) {
+            filterClone.vaccines = filterStateClone.vaccines;
+        }
+        if (filterStateClone.vaccineStatuses) {
+            filterClone.vaccineStatuses = filterStateClone.vaccineStatuses;
+        }
+        if (filterStateClone.pregnancyStatuses) {
+            filterClone.pregnancyStatuses = filterStateClone.pregnancyStatuses;
+        }
+
         if (filterSortClone && filterSortClone.length > 0) {
             filterClone.sort = filterSortClone;
         }

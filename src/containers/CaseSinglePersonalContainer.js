@@ -104,18 +104,16 @@ class CaseSinglePersonalContainer extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
         let fields = item.fields.map((field) => {
-            field.isEditMode = field.id === 'visualId' ? false : this.props.isEditMode;
+            field.isEditMode = this.props.isEditMode;
             return field;
-            // return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
     };
 
     handleRenderItemForDocumentsList = (item, index) => {
         let fields = config.caseSingleScreen.document.fields.map((field) => {
-            field.isEditMode = field.id === 'visualId' ? false : this.props.isEditMode;
+            field.isEditMode = this.props.isEditMode;
             return field;
-            // return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
     };
@@ -204,6 +202,7 @@ class CaseSinglePersonalContainer extends Component {
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
                 permissionsList={item.permissionsList}
+                mask={this.props.outbreak?.caseIdMask}
             />
         )
     };
@@ -347,7 +346,8 @@ function mapStateToProps(state) {
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         role: _.get(state, 'role', []),
         referenceData: _.get(state, 'referenceData', []),
-        translation: _.get(state, 'app.translation')
+        translation: _.get(state, 'app.translation'),
+        outbreak: _.get(state, 'outbreak', null)
     };
 }
 

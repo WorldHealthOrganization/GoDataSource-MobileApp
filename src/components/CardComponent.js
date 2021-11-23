@@ -6,7 +6,7 @@
 import React, { Component} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {WebView} from 'react-native-webview';
-import {calculateDimension, getTranslation, createDate} from './../utils/functions';
+import {calculateDimension, getTranslation, createDate, getMaskRegExpStringForSearch} from './../utils/functions';
 import {connect} from "react-redux";
 import DropdownInput from './DropdownInput';
 import DropDown from './DropDown';
@@ -72,6 +72,16 @@ class CardComponent extends Component {
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
 
+        let mask = null;
+        let editMode = this.props.item.isEditMode;
+        if(this.props.item.id === 'visualId'){
+            if(this.props.mask.includes('9')){
+                editMode = false;
+            } else {
+                mask = getMaskRegExpStringForSearch(this.props.mask);
+            }
+        }
+
         switch(this.props.item.type) {
             case 'Section':
                 return (
@@ -90,7 +100,7 @@ class CardComponent extends Component {
                         label={get(this.props, 'item.label', null)}
                         index={this.props.index}
                         value={this.props.value}
-                        isEditMode={this.props.item.isEditMode}
+                        isEditMode={editMode}
                         isRequired={this.props.item.isRequired}
                         multiline={this.props.item.multiline}
                         style={{width: width, marginHorizontal: marginHorizontal}}
@@ -100,6 +110,8 @@ class CardComponent extends Component {
                         onChange={this.props.onChangeText}
                         onFocus={this.props.onFocus}
                         onBlur={this.props.onBlur}
+                        mask={mask}
+                        outbreakMask={this.props.mask}
                     />
                 );
             case 'DropdownInput':
@@ -339,7 +351,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         locations: get(state, `locations.locations`, []),
         userLocations: get(state, `locations.userLocations`, []),
-        translation: state.app.translation,
+        translation: state.app.translation
     };
 }
 

@@ -1041,7 +1041,16 @@ function extractQuestions(questions) {
     // console.log('extract le questions:  ', returnedQuestions);
     return returnedQuestions;
 }
+export function getMaskRegExpStringForSearch(mask) {
+    mask = mask.replace('0','[0-9]');
+    mask = mask.replace('YYYY', '\\d{4}');
+    mask = mask.replace('@', '[A-Za-z]');
+    mask = mask.replace('&','.');
+    //Doing this for my sanity
+    mask = mask.replace('*', '(.*?)');
 
+    return new RegExp(`^${mask}$`);
+}
 export function reMapAnswers(answers) {
     let returnedAnswers = answers;
     // Map to flat structure

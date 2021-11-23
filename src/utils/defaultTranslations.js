@@ -207,6 +207,12 @@ export default {
 
     'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID': 'Follow-up assigned team',
 
+    'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK': 'Invalid ID (accepted: {{mask}})',
+
+    'LNG_ENTITY_FIELD_LABEL_VACCINE': 'Vaccine',
+    'LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS': 'Vaccine status',
+    'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
+
 
     //exposureScreen
     'LNG_RELATIONSHIP_SCREEN_EDIT_EXPOSURE_TITLE': 'Edit exposure',
@@ -334,6 +340,8 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_THERE_WAS_AN_ISSUE_GETTING_YOUR_LOCATION': 'There was an issue with getting your location',
     'LNG_DIALOG_ALERT_MESSAGE_MAKE_SURE_YOU_COMPLETE_ALL_FIELDS': 'Please make sure you have completed the fields',
     'LNG_DIALOG_ALERT_MESSAGE_ERROR_OCCURED_WHILE_GETTING_CONTACTS': 'An error occurred while getting contacts',
+
+    'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION': "The ID should match the pattern defined for this outbreak: {{mask}}",
 
     //TODO add to backend
     "LNG_MOBILE_DIALOG_ALERT_MESSAGE_INVALID_EMAIL_ADDRESSES": "Invalid email addresses",

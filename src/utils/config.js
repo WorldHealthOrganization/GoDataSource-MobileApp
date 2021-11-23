@@ -67,6 +67,10 @@ const tabsValuesRoutes = {
         {key: 'filters', title: translations.followUpFilter.filterTitle},
         {key: 'sort', title: translations.followUpFilter.sortTitle}
     ],
+    personFilter: [
+        {key: 'filters', title: translations.followUpFilter.filterTitle},
+        {key: 'sort', title: translations.followUpFilter.sortTitle}
+    ],
     helpFilter: [
         {key: 'filters', title: translations.followUpFilter.filterTitle},
         {key: 'sort', title: translations.followUpFilter.sortTitle}
@@ -1165,6 +1169,171 @@ const caseSingleScreen = {
     },
 };
 
+const personFilterScreen = {
+    filter: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    label: translations.followUpFilter.gender,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 1,
+                    id: 'gender',
+                    type: 'Selector',
+                    shouldTranslate: true,
+                    value: '',
+                    data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 2,
+                    label: translations.followUpFilter.ageRange,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 2,
+                    id: 'age',
+                    type: 'IntervalPicker',
+                    value: '',
+                    min: 0,
+                    max: 150
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 3,
+                    label: translations.followUpFilter.area,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 3,
+                    id: 'selectedLocations',
+                    label: translations.followUpFilter.chooseLocationLabel,
+                    type: 'DropDownSectioned',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 4,
+                    label: translations.personFilter.vaccine,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },{
+                    cardNumber: 4,
+                    id: 'vaccines',
+                    label: translations.personFilter.vaccine,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 5,
+                    label: translations.personFilter.vaccineStatus,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },{
+                    cardNumber: 5,
+                    id: 'vaccineStatuses',
+                    label: translations.personFilter.vaccineStatus,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 6,
+                    label: translations.personFilter.pregnancyStatus,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },{
+                    cardNumber: 6,
+                    id: 'pregnancyStatuses',
+                    label: translations.personFilter.pregnancyStatus,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+    ],
+    sort: {
+        fields: [
+            {
+                cardNumber: 1,
+                label: translations.sortTab.SortBy,
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortCriteria,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortOrder,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
+};
+
 const followUpsFilterScreen = {
     filter: [
         {
@@ -1411,6 +1580,66 @@ const casesFilterScreen = {
                     id: 'selectedLocations',
                     label: translations.casesFilter.chooseLocationLabel,
                     type: 'DropDownSectioned',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 5,
+                    label: translations.personFilter.vaccine,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },{
+                    cardNumber: 5,
+                    id: 'vaccines',
+                    label: translations.personFilter.vaccine,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 6,
+                    label: translations.personFilter.vaccineStatus,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },{
+                    cardNumber: 6,
+                    id: 'vaccineStatuses',
+                    label: translations.personFilter.vaccineStatus,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 67,
+                    label: translations.personFilter.pregnancyStatus,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },{
+                    cardNumber: 7,
+                    id: 'pregnancyStatuses',
+                    label: translations.personFilter.pregnancyStatus,
+                    type: 'DropDown',
                     value: '',
                     isRequired: false,
                     isEditMode: true,
@@ -1857,7 +2086,7 @@ const contactsOfContactsPersonal = [
                 type: 'TextInput',
                 value: '',
                 isRequired: false,
-                isEditMode: false,
+                isEditMode: true,
                 multiline: false,
                 objectType: 'Contact'
             }
@@ -2026,7 +2255,7 @@ const contactsSingleScreen = {
                     type: 'TextInput',
                     value: '',
                     isRequired: false,
-                    isEditMode: false,
+                    isEditMode: true,
                     multiline: false,
                     objectType: 'Contact'
                 },
@@ -2471,5 +2700,6 @@ export default {
     whocdCredentials,
     contactsOfContactsPersonal,
     addressFields,
-    labResultsFilterScreenNoContactPermission
+    labResultsFilterScreenNoContactPermission,
+    personFilterScreen
 };

@@ -103,6 +103,15 @@ class ContactsScreen extends Component {
             if (checkArrayAndLength(get(mainFilter, 'selectedLocations', null))) {
                 ++filterNumbers
             }
+            if (checkArrayAndLength(get(mainFilter, 'vaccines', null))) {
+                ++filterNumbers
+            }
+            if (checkArrayAndLength(get(mainFilter, 'vaccineStatuses', null))) {
+                ++filterNumbers
+            }
+            if (checkArrayAndLength(get(mainFilter, 'pregnancyStatuses', null))) {
+                ++filterNumbers
+            }
         }
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `(${filterNumbers})`;
 

@@ -147,7 +147,8 @@ export function getPersonsByName(outbreakId, search, type) {
             {'firstName': {'$like': `%${search}%`}},
             {'lastName': {'$like': `%${search}%`}},
             {'visualId': {'$like': `%${search}%`}},
-        ]
+        ],
+        deleted: false
     };
     // if type is contacts, search both cases and events
     if (type === 'Contact' || type === 'Case' || type === 'Event') {

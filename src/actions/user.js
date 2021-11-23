@@ -54,7 +54,11 @@ export function storeUser(user) {
 
 export function loginUser(credentials) {
     // All dispatches will be done from here
-    return async function (dispatch) {
+    return async function (dispatch, getState) {
+        const loginState = getState().app.loginState;
+        if(loginState === 'Loading....'){
+            return;
+        }
         dispatch(setLoginState('Loading....'));
         loginUserRequest(credentials, async (errorLogin, user) => {
             if (errorLogin) {
@@ -70,6 +74,7 @@ export function loginUser(credentials) {
                 ]))
             }
             if (user) {
+                dispatch(setLoginState('Success'));
                 // If we have the user, proceed to load all the necessary data
                 dispatch(computeCommonData(true, user));
             }

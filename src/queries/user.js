@@ -148,6 +148,7 @@ export function getTeamsForUserRequest(callback) {
                         $gte: `team.json_`,
                         $lte: `team.json_\uffff`,
                     },
+                    deleted: false
                 }
             })
                 .then((result) => {
