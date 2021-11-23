@@ -142,7 +142,8 @@ class ContactsOfContactsSingleScreen extends Component {
             isEditMode: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.contact && this.props.contact.age && this.props.contact.age.years !== undefined && this.props.contact.age.years !== null && this.props.contact.age.years > 0) ? 0 : 1, //default age dropdown value
-            showAddFollowUpScreen: false
+            showAddFollowUpScreen: false,
+            maskError: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         // this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -782,12 +783,13 @@ class ContactsOfContactsSingleScreen extends Component {
             }
         }
     };
-    handleOnChangeText = (value, id, objectTypeOrIndex, objectType) => {
+    handleOnChangeText = (value, id, objectTypeOrIndex, objectType, maskError) => {
         console.log("onChangeText: ", value, id, objectTypeOrIndex);
         if (objectTypeOrIndex === 'Contact') {
             this.setState(
                 (prevState) => ({
                     contact: Object.assign({}, prevState.contact, {[id]: value}),
+                    maskError,
                     isModified: true
                 }))
         } else if (objectTypeOrIndex === 'Exposure' && this.props.isNew === true) {
@@ -795,6 +797,7 @@ class ContactsOfContactsSingleScreen extends Component {
             relationshipsClone[0][id] = value && value.value ? value.value : value;
             this.setState(prevState => ({
                 contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
+                maskError,
                 isModified: true
             }))
         } else if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
@@ -835,6 +838,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 }
                 this.setState(prevState => ({
                     contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                    maskError,
                     isModified: true
                 }))
             } else if (objectType && objectType === 'Documents') {
@@ -843,6 +847,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 console.log('documentsClone', documentsClone);
                 this.setState(prevState => ({
                     contact: Object.assign({}, prevState.contact, {documents: documentsClone}),
+                    maskError,
                     isModified: true
                 }))
             }
@@ -1294,6 +1299,20 @@ class ContactsOfContactsSingleScreen extends Component {
         this.setState({
             loading: true
         }, () => {
+            if (this.state.maskError){
+                this.setState({loading: false}, () => {
+                    Alert.alert(getTranslation(translations.alertMessages.invalidMaskAlert, this.props.translation).replace('{{mask}}', `${this.props.outbreak?.contactIdMask}`),
+                        getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
+                        {
+                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                            onPress: () => {
+                                console.log("OK pressed")
+                            }
+                        }
+                    ])
+                })
+                return;
+            }
             let relationshipsMissingFields = this.checkFields();
             let invalidEmails = validateRequiredFields(_.get(this.state, 'contact.addresses', []), config?.addressFields?.fields, (dataToBeValidated, fields, defaultFunction) => {
                 if (fields.id === 'emailAddress') {

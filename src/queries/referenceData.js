@@ -7,7 +7,7 @@ import {rawSQLQuery} from "./sqlHelper";
 // Credentials: {email, encryptedPassword}
 export function getReferenceDataRequest (token, callback) {
 
-    rawSQLQuery(config.mongoCollections.referenceData, `${config.rawSQLQueryString}`, [])
+    rawSQLQuery(config.mongoCollections.referenceData, `${config.rawSQLQueryString} WHERE deleted like false`, [])
         .then((result) => {
             callback(null, result);
         })

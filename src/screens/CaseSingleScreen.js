@@ -153,6 +153,7 @@ class CaseSingleScreen extends Component {
             // used for adding new multi-frequency answers
             showAddSingleAnswerModalScreen: false,
             newItem: null,
+            maskError: false,
 
 
             relations: []
@@ -709,6 +710,18 @@ class CaseSingleScreen extends Component {
 
     //Save case
     handleOnPressSave = () => {
+        if(this.state.maskError){
+            Alert.alert(
+                getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
+                getTranslation(translations.alertMessages.invalidMaskAlert, this.props.translation).replace('{{mask}}', this.props.outbreak?.caseIdMask), [
+                    {
+                        text: 'Ok', onPress: () => {
+                            console.log('Invalid emails')
+                        }
+                    }
+                ])
+            return;
+        }
         let missingFields = this.checkRequiredFields().map((e) => getTranslation(e, this.props.translation));
         let invalidEmails = validateRequiredFields(_.get(this.state, 'case.addresses', []), config?.addressFields?.fields, (dataToBeValidated, fields, defaultFunction) => {
             if (fields.id === 'emailAddress') {
@@ -1566,11 +1579,12 @@ class CaseSingleScreen extends Component {
     };
 
     // onChangeStuff functions
-    onChangeText = (value, id, objectTypeOrIndex, objectType) => {
+    onChangeText = (value, id, objectTypeOrIndex, objectType,maskError) => {
         if (objectTypeOrIndex === 'Case') {
             this.setState(
                 (prevState) => ({
                     case: Object.assign({}, prevState.case, { [id]: value }),
+                    maskError,
                     isModified: true
                 }));
         } else {
@@ -1615,6 +1629,7 @@ class CaseSingleScreen extends Component {
                     }
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, { addresses: addressesClone }),
+                        maskError,
                         isModified: true
                     }))
                 } else if (objectType && objectType === 'Documents') {
@@ -1622,6 +1637,7 @@ class CaseSingleScreen extends Component {
                     documentsClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
                     this.setState(prevState => ({
                         case: Object.assign({}, prevState.case, { documents: documentsClone }),
+                        maskError,
                         isModified: true
                     }))
                 } else {
@@ -1630,6 +1646,7 @@ class CaseSingleScreen extends Component {
                         dateRangesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
                         this.setState(prevState => ({
                             case: Object.assign({}, prevState.case, { dateRanges: dateRangesClone }),
+                            maskError,
                             isModified: true
                         }))
                     }

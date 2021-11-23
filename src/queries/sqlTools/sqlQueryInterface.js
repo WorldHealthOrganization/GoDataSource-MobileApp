@@ -57,45 +57,50 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
 
     // Take care of inner query conditions. This will do the preliminary filtering of the data, before moving to relationships, searching and sorting
     let innerCondition = {
-        '$or': [
+        '$and': [
             {
-                [`${innerQueryAlias}.deleted`]: 0,
+                '$or': [
+                    {
+                        [`${innerQueryAlias}.deleted`]: 0,
+                    },
+                    {
+                        [`${innerQueryAlias}.deleted`]: {'$is': null}
+                    }
+                ]
             },
-            {
-                [`${innerQueryAlias}.deleted`]: {'$is': null}
-            }
-        ],
-        [`${innerQueryAlias}.type`]: type,
-        [`${innerQueryAlias}.outbreakId`]: outbreakId,
+            {[`${innerQueryAlias}.type`]: type},
+            {[`${innerQueryAlias}.outbreakId`]: outbreakId},
+        ]
     };
+    const innerAnd = innerCondition.$and;
 
     if (checkArrayAndLength(lodashGet(innerFilter, 'age', null)) && innerFilter.age.length === 2) {
-        innerCondition[`${innerQueryAlias}.age`] = {
+        innerAnd.push({[`${innerQueryAlias}.age`] : {
             ['$gte']: lodashGet(innerFilter, 'age[0]', 0),
             ['$lte']: lodashGet(innerFilter, 'age[1]', 150)
-        };
+        }});
     }
     if (lodashGet(innerFilter, 'gender', null) !== null) {
-        innerCondition[`${innerQueryAlias}.gender`] = innerFilter.gender;
+        innerAnd.push({[`${innerQueryAlias}.gender`] : innerFilter.gender});
     }
     if (checkArrayAndLength(lodashGet(innerFilter, 'categories', null))) {
-        innerCondition[`${innerQueryAlias}.categoryId`] = {
+        innerAnd.push({[`${innerQueryAlias}.categoryId`] : {
             ['$in']: innerFilter.categories
-        };
+        }});
     }
     if (checkArrayAndLength(lodashGet(innerFilter, 'classification', null))) {
-        innerCondition[`${innerQueryAlias}.classification`] = {
+        innerAnd.push({[`${innerQueryAlias}.classification`] : {
             ['$in']: innerFilter.classification
-        };
+        }});
     }
     if (checkArrayAndLength(lodashGet(innerFilter, 'selectedLocations', null))) {
-        innerCondition[`${innerQueryAlias}.locationId`] = {
+        innerAnd.push({[`${innerQueryAlias}.locationId`] : {
             ['$in']: innerFilter.selectedLocations
-        };
+        }});
     }
 
     // Take care of the outer query conditions like searching
-    let mainCondition = {
+    let deletedCheck = {
         $or: [
             {
                 [`${filteredExposuresAlias}.deleted`]: 0
@@ -112,20 +117,23 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         ]
     };
 
+    let searchCondition = {
+        $or:[]
+    };
     // TODO handle email
     let shouldSearchEmail = false;
     if (search && search.text) {
         shouldSearchEmail = true;
-        mainCondition['$or'] = [
+        searchCondition['$or'] = [
             {[`${innerQueryAlias}.firstName`]: {'$like': `%${search.text}%`}},
             {[`${innerQueryAlias}.lastName`]: {'$like': `%${search.text}%`}},
             {[`${innerQueryAlias}.visualId`]: {'$like': `%${search.text}%`}},
             {[`${innerQueryAlias}.locationId`]: {'$in': search.locations}},
-            {$expression: `json_extract(json_each.value, '$.emailAddress') like '%${search.text}%'`}
+            // {$expression: `json_extract(${innerQueryAlias}.json, '$.emailAddress') like '%${search.text}%'`}
         ];
 
         if (type !== translations.personTypes.cases) {
-            mainCondition['$or'] = mainCondition['$or'].concat([
+            searchCondition['$or'] = searchCondition['$or'].concat([
                 {[`${filteredExposuresAlias}.firstName`]: {'$like': `%${search.text}%`}},
                 {[`${filteredExposuresAlias}.lastName`]: {'$like': `%${search.text}%`}},
                 {[`${filteredExposuresAlias}.visualId`]: {'$like': `%${search.text}%`}},
@@ -133,6 +141,31 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         }
     }
 
+    let filterCondition = {
+        $and:[]
+    }
+
+    if (checkArrayAndLength(lodashGet(innerFilter, 'vaccines', null))) {
+        filterCondition.$and.push({
+                $expression: `json_extract(vaccinesReceived.value, '$.vaccine') in (${innerFilter.vaccines.map(vax=>`"${vax.value}"`).join(', ')})`
+            }
+        )
+    }
+    if (checkArrayAndLength(lodashGet(innerFilter, 'vaccineStatuses', null))) {
+        filterCondition.$and.push({
+                $expression: `json_extract(vaccinesReceived.value, '$.status') in (${innerFilter.vaccineStatuses.map(vax=>`"${vax.value}"`).join(', ')})`
+            }
+        )
+    }
+    if (checkArrayAndLength(lodashGet(innerFilter, 'pregnancyStatuses', null))) {
+        filterCondition.$and.push({
+            $expression: `json_extract(${innerQueryAlias}.json, '$.pregnancyStatus') in (${innerFilter.pregnancyStatuses.map(vax=>`"${vax.value}"`).join(', ')})`
+        })
+    }
+
+    let mainCondition = {
+        $and: [deletedCheck, searchCondition, filterCondition]
+    }
     // Take care of sorting
     let sort = {};
     if (checkArrayAndLength(lodashGet(innerFilter, 'sort', null))) {
@@ -261,11 +294,19 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
     };
 
     // TODO handle email
-    if (shouldSearchEmail) {
+    if (shouldSearchEmail || checkArrayAndLength(lodashGet(innerFilter, 'vaccines', null)) || checkArrayAndLength(lodashGet(innerFilter, 'vaccineStatuses', null))) {
         delete mainQuery.query;
         delete mainQuery.alias;
+        let pattern = `(${jsonSql.build(innerQuery).query.slice(0, -1)}) as ${innerQueryAlias}`;
+
+        if (checkArrayAndLength(lodashGet(innerFilter, 'vaccines', null)) ||
+            checkArrayAndLength(lodashGet(innerFilter, 'vaccineStatuses', null))
+        ) {
+            pattern = `${pattern}, json_each(${innerQueryAlias}.json, '$.vaccinesReceived') as "vaccinesReceived"`;
+        }
         mainQuery.expression = {
-            pattern: `(${jsonSql.build(innerQuery).query.slice(0, -1)}) as ${innerQueryAlias}, json_each(${innerQueryAlias}.json, '$.addresses')`
+            pattern: pattern
+            // pattern: `(${jsonSql.build(innerQuery).query.slice(0, -1)}) as ${innerQueryAlias}, json_each(${innerQueryAlias}.json, '$.addresses')`
         }
     }
 

@@ -181,6 +181,18 @@ class FiltersContainer extends PureComponent {
             return filter(this.props.helpCategory, (o) => {
                 return o.deleted === false && o.fileType === 'helpCategory.json'
             }).map((o) => { return { label: getTranslation(o.name, this.props.translation), value: o._id } })
+        } else if (item.id === 'vaccines') {
+            return filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === "LNG_REFERENCE_DATA_CATEGORY_VACCINE" })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        } else if (item.id === 'vaccineStatuses') {
+            return filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === "LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS" })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        } else if (item.id === 'pregnancyStatuses') {
+            return filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === "LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS" })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
 
         return [];

@@ -162,7 +162,9 @@ class ContactsSingleScreen extends Component {
             //Questionnaire features
             previousAnswers: {},
             currentAnswers: {},
-            mappedQuestions: []
+            mappedQuestions: [],
+
+            maskError: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         // this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
@@ -982,12 +984,13 @@ class ContactsSingleScreen extends Component {
             }
         }
     };
-    handleOnChangeText = (value, id, objectTypeOrIndex, objectType) => {
+    handleOnChangeText = (value, id, objectTypeOrIndex, objectType, maskError) => {
         console.log("onChangeText: ", value, id, objectTypeOrIndex);
         if (objectTypeOrIndex === 'Contact') {
                 this.setState(
                     (prevState) => ({
                         contact: Object.assign({}, prevState.contact, {[id]: value}),
+                        maskError,
                         isModified: true
                     }))
             } else if (objectTypeOrIndex === 'Exposure' && this.props.isNew === true) {
@@ -995,6 +998,7 @@ class ContactsSingleScreen extends Component {
                 relationshipsClone[0][id] = value && value.value ? value.value : value;
                 this.setState(prevState => ({
                     contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
+                    maskError,
                     isModified: true
                 }))
             } else if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
@@ -1035,6 +1039,7 @@ class ContactsSingleScreen extends Component {
                     }
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                        maskError,
                         isModified: true
                     }))
                 } else if (objectType && objectType === 'Documents') {
@@ -1043,6 +1048,7 @@ class ContactsSingleScreen extends Component {
                     console.log('documentsClone', documentsClone);
                     this.setState(prevState => ({
                         contact: Object.assign({}, prevState.contact, {documents: documentsClone}),
+                        maskError,
                         isModified: true
                     }))
                 }
@@ -1511,6 +1517,9 @@ class ContactsSingleScreen extends Component {
         }, async () => {
             let functionsArray = [this.checkFields, this.checkRequiredFields, this.checkAgeYearsRequirements, this.checkAgeMonthsRequirements, this.checkPlaceOfResidence, this.checkRequiredFieldsQuestionnaire, this.checkForInvalidEmails];
             let message = null;
+            if (this.state.maskError){
+                message = getTranslation(translations.alertMessages.invalidMaskAlert, this.props.translation).replace('{{mask}}', `${this.props.outbreak?.contactIdMask}`);
+            }
             for (let i=0; i<functionsArray.length; i++) {
                 let response = await functionsArray[i]();
                 if (checkArrayAndLength(response)) {

@@ -11,6 +11,7 @@ import {TextField} from 'react-native-material-textfield';
 import TooltipComponent from './TooltipComponent';
 import lodashGet from 'lodash/get';
 import lodashDebounce from 'lodash/debounce';
+import translations from "../utils/translations";
 
 class TextInput extends Component {
     fieldRef = React.createRef();
@@ -18,7 +19,8 @@ class TextInput extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            value: lodashGet(this.props, 'value', ' ')
+            value: lodashGet(this.props, 'value', ' '),
+            maskError: false
         };
 
         this.handleSubmitEditingDB = lodashDebounce(this.handleSubmitEditing, 300);
@@ -81,6 +83,7 @@ class TextInput extends Component {
                         onChangeText={this.handleOnChangeText}
                         textColor='rgb(0,0,0)'
                         fontSize={15}
+                        error={this.state.maskError ? getTranslation(translations.contactSingleScreen.contactIdMaskError, this.props.translation).replace('{{mask}}', this.props.outbreakMask) : null}
                         labelFontSize={15}
                         // labelHeight={30}
                         labelTextStyle={{
@@ -169,7 +172,12 @@ class TextInput extends Component {
         return text;
     }
     handleOnChangeText = (value) => {
+        let maskError = false;
+        if(this.props.mask){
+            maskError = !this.props.mask.test(value);
+        }
         this.setState({
+            maskError,
             value
         }, ()=>{
             this.handleSubmitEditingDB();
@@ -192,7 +200,8 @@ class TextInput extends Component {
                 this.state.value,
                 this.props.id,
                 this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'Documents' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
-                this.props.objectType
+                this.props.objectType,
+                this.state.maskError
             )
         }
         if ( this.props.onSubmitEditing !== undefined) {
