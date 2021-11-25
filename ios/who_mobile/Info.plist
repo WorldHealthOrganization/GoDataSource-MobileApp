@@ -51,16 +51,8 @@
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Some description</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Some description</string>
-	<key>NSCalendarsUsageDescription</key>
-	<string>Some description</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera is needed in order to scan QR code</string>
-	<key>NSContactsUsageDescription</key>
-	<string>Some description</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Enabling Face ID allows you quick and secure access to your account.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
@@ -69,13 +61,9 @@
 	<string>Your location is needed to retrieve contact/cases' coordinates</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Your location is needed to retrieve contacts/cases' coordinates</string>
-	<key>NSMotionUsageDescription</key>
-	<string>Some description</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Some description</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Some description</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Some description</string>
 	<key>UIAppFonts</key>
 	<array>
@@ -106,6 +94,7 @@
 		<string>FontAwesome5_Brands.ttf</string>
 		<string>FontAwesome5_Regular.ttf</string>
 		<string>FontAwesome5_Solid.ttf</string>
+		<string>Fontisto.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
@@ -125,6 +114,6 @@
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
+	<true/>
 </dict>
 </plist>

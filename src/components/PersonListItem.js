@@ -7,6 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
+import moment from 'moment/min/moment.min';
 import {InteractionManager, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import styles from './../styles';
@@ -58,7 +59,7 @@ class PersonListItem extends Component {
                         onPressName={this.props.onPressNameProp}
                     />
                 }
-                secondComponent={this.props.type !== 'Case' && this.props.type !== 'User' ? (
+                secondComponent={this.props.type !== 'Case' && this.props.type !== 'User' && this.props.type !== 'LabResult' ? (
                     <PermissionComponent
                         render={() => (
                             <PersonListItemExposuresComponent
@@ -95,7 +96,14 @@ class PersonListItem extends Component {
             status: null,
             institutionName: '',
             telephoneNumbers: '',
-            emails: ''
+            emails: '',
+            //Lab Result
+            classification: '',
+            dateSampleTaken: '',
+            dateOfResult: '',
+            labName: '',
+            result: '',
+            labResultStatus: ''
         };
         // the new implementation
         let person = get(itemToRender, 'mainData', null);
@@ -120,7 +128,7 @@ class PersonListItem extends Component {
             }
         }
         // Address
-        if (person && person.addresses && Array.isArray(person.addresses) && person.addresses.length > 0) {
+        if (type !== 'LabResult' && person && person.addresses && Array.isArray(person.addresses) && person.addresses.length > 0) {
             let personPlaceOfResidence = person.addresses.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
             if (personPlaceOfResidence) {
                 returnValues.addressString = getAddress(personPlaceOfResidence, true, this.props.locations);
@@ -131,7 +139,7 @@ class PersonListItem extends Component {
             }
         }
         // Emails
-        if (checkArrayAndLength(person?.addresses)) {
+        if (checkArrayAndLength(person?.addresses) && type !== 'LabResult') {
             returnValues.emails = person?.addresses.filter((e) => e.emailAddress).map((e) => e?.emailAddress).join(', ')
         }
         // Visual Id
@@ -143,7 +151,7 @@ class PersonListItem extends Component {
             returnValues.id = person._id;
         }
         // Followup final status
-        if (type !== 'Case' && person && person.followUp){
+        if (type !== 'Case' && type !== 'LabResult' && person && person.followUp){
             returnValues.status = person.followUp.status ? getTranslation(person.followUp.status, this.props.translation) : null;
         }
         // User institution and phone number
@@ -153,6 +161,18 @@ class PersonListItem extends Component {
         // Replaces address telephone number
         if (person &&  person.hasOwnProperty('telephoneNumbers')){
             returnValues.telephoneNumbers = person.telephoneNumbers[translations.usersScreen.primaryPhone];
+        }
+        //Classification
+        if (type === 'LabResult' && person && person.classification){
+            returnValues.classification = person.classification ? getTranslation(person.classification, this.props.translation) : null;
+        }
+        if(type === 'LabResult'){
+            const labResultData =  get(itemToRender, 'labResultData', null);
+            returnValues.result = labResultData.result ? getTranslation(labResultData.result, this.props.translation) : null;
+            returnValues.dateSampleTaken = labResultData.dateSampleTaken ? moment(labResultData.dateSampleTaken).format('YYYY-MM-DD') : undefined;
+            returnValues.dateOfResult = labResultData.dateOfResult ? moment(labResultData.dateOfResult).format('YYYY-MM-DD') : undefined;
+            returnValues.labName = labResultData.labName;
+            returnValues.labResultStatus = labResultData.status ? getTranslation(labResultData.status, this.props.translation) : null;
         }
         return returnValues;
     };
@@ -166,6 +186,9 @@ class PersonListItem extends Component {
             if (type === 'FollowUp') {
                 returnedValues.followUpDay = get(itemToRender, 'followUpData.index', null);
             }
+        }
+        if(type === 'LabResult') {
+
         }
 
         return returnedValues;

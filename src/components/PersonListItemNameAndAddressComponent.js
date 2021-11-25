@@ -93,9 +93,82 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                                     </Ripple>
                                 ) : (null)
                         }
+                        {
+                            firstComponentRenderData.classification ?
+                                (
+                                    <Text style={[style.secondaryText, {
+                                        flex: 1,
+                                        marginHorizontal: 7,
+                                        display: firstComponentRenderData.classification ? 'flex' : 'none'
+                                    }]}>
+                                        {'\u2022 ' + getTranslation(translations.caseSingleScreen.classification, translation) + ": " + firstComponentRenderData.classification}
+                                    </Text>
+                                ) : (null)
+                        }
+                        {
+                            firstComponentRenderData.labName ?
+                                (
+                                    <Text style={[style.secondaryText, {
+                                        flex: 1,
+                                        marginHorizontal: 7,
+                                        display: firstComponentRenderData.labName ? 'flex' : 'none'
+                                    }]}>
+                                        {'\u2022 ' + getTranslation(translations.labResultsScreen.labName, translation) + ": " + getTranslation(firstComponentRenderData.labName, translation)}
+                                    </Text>
+                                ) : (null)
+                        }
+                        {
+                            firstComponentRenderData.dateSampleTaken ?
+                                (
+                                    <Text style={[style.secondaryText, {
+                                        flex: 1,
+                                        marginHorizontal: 7,
+                                        display: firstComponentRenderData.dateSampleTaken ? 'flex' : 'none'
+                                    }]}>
+                                        {'\u2022 ' + getTranslation(translations.labResultsScreen.sampleTaken, translation) + ": " + firstComponentRenderData.dateSampleTaken}
+                                    </Text>
+                                ) : (null)
+                        }
+                        {
+                            firstComponentRenderData.dateOfResult ?
+                                (
+                                    <Text style={[style.secondaryText, {
+                                        flex: 1,
+                                        marginHorizontal: 7,
+                                        display: firstComponentRenderData.dateOfResult ? 'flex' : 'none'
+                                    }]}>
+                                        {'\u2022 ' + getTranslation(translations.labResultsScreen.dateOfResult, translation) + ": " + firstComponentRenderData.dateOfResult}
+                                    </Text>
+                                ) : (null)
+                        }
+                        {
+                            firstComponentRenderData.result ?
+                                (
+                                    <Text style={[style.secondaryText, {
+                                        flex: 1,
+                                        marginHorizontal: 7,
+                                        display: firstComponentRenderData.result ? 'flex' : 'none'
+                                    }]}>
+                                        {'\u2022 ' + getTranslation(translations.labResultsScreen.result, translation) + ": " + firstComponentRenderData.result}
+                                    </Text>
+                                ) : (null)
+                        }
+                        {
+                            firstComponentRenderData.labResultStatus ?
+                                (
+                                    <Text style={[style.secondaryText, {
+                                        flex: 1,
+                                        marginHorizontal: 7,
+                                        display: firstComponentRenderData.labResultStatus ? 'flex' : 'none'
+                                    }]}>
+                                        {'\u2022 ' + getTranslation(translations.labResultsScreen.status, translation) + ": " + firstComponentRenderData.labResultStatus}
+                                    </Text>
+                                ) : (null)
+                        }
                     </View>
                     {
-                        this.props.type !== 'User' ? (
+                        (this.props.type !== 'User' &&
+                            this.props.type !== 'LabResult') ? (
                             <Ripple key={'secondView'} style={{width: 35, height: 35}} onPress={this.props.onPressMapIcon}>
                                 <Image source={{uri: 'map_icon'}} style={{width: 35, height: 35}}/>
                             </Ripple>

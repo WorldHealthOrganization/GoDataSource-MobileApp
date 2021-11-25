@@ -15,8 +15,13 @@ import uniqueId from 'lodash/uniqueId';
 import get from 'lodash/get';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
-import constants from "./../utils/constants";
+import constants, {
+    PERMISSION_CREATE_CONTACT,
+    PERMISSION_CREATE_CONTACT_OF_CONTACT, PERMISSION_EDIT_CONTACT,
+    PERMISSION_EDIT_CONTACT_OF_CONTACT
+} from "./../utils/constants";
 import config from "./../utils/config";
+import translations from "../utils/translations";
 
 class ContactsSingleQuestionnaire extends Component {
 
@@ -40,8 +45,13 @@ class ContactsSingleQuestionnaire extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        let permissionsList = [];
+        if (this.props.isNew) {
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_CREATE_CONTACT_OF_CONTACT : PERMISSION_CREATE_CONTACT;
+        } else {
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_EDIT_CONTACT_OF_CONTACT : PERMISSION_EDIT_CONTACT;
+        }
         // Get all additional questions recursively
-
         // Logic moved from the getDerivedStateFromProps
         let previousAnswers = {};
         if (this.props.previousAnswers) {
@@ -83,11 +93,7 @@ class ContactsSingleQuestionnaire extends Component {
                                 onPressPreviousButton={this.handleBackButton}
                             />
                         )}
-                        permissionsList={[
-                            constants.PERMISSIONS_CONTACT.contactAll,
-                            constants.PERMISSIONS_CONTACT.contactCreate,
-                            constants.PERMISSIONS_CONTACT.contactModify
-                        ]}
+                        permissionsList={permissionsList}
                     />
                     <ScrollView
                         style={style.containerScrollView}
@@ -110,7 +116,7 @@ class ContactsSingleQuestionnaire extends Component {
         if (item.inactive === false) {
             return (
                 <QuestionCard
-                    key={uniqueId('key_')}
+                    key={index}
                     item={item}
                     isEditMode={this.props.isEditMode}
                     index={index + 1}

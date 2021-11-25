@@ -1,4 +1,44 @@
 export default {
+
+    'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL': "Lab Results",
+    //labResultsScreen
+    'LNG_PAGE_LIST_LAB_RESULTS_TITLE': "Lab Results",
+    //TODO: Needs new translation
+    'LNG_COMMON_LABEL_EMPTY_TABLE': "There are no records to be displayed",
+    'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME': "Lab name",
+    'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT': "Date of the result",
+    'LNG_LAB_RESULT_FIELD_LABEL_STATUS': "Status",
+    'LNG_LAB_RESULT_FIELD_LABEL_RESULT': "Result",
+    'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN': "Sample taken",
+
+    //labResultSingleScreen
+    'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID': "Sample lab ID",
+    'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED': "Sample delivered to lab",
+    'LNG_LAB_RESULT_FIELD_LABEL_NOTES': "Notes",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE': 'Variant / Strain',
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE': "Has variant / strain?",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON': "Reason",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT': "Date sample sent for determining variant / strain",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB': "Laboratory",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT': "Variant / Strain result date",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT': "Variant / Strain result",
+    'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING': "Sample tested",
+    'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE': "Sample type",
+    'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE': "Test type",
+    'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR': "Tested for",
+    'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT': "Quantitative result",
+    'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT': "Modify lab result",
+    //TODO: needs change - to lab resultS
+    'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_VIEW_LAB_RESULT': "View lab result",
+    'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': "Are you sure you want to delete this lab result?",
+    'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_LAB_RESULT': "Delete lab result",
+    'LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON': "Create lab result",
+    'LNG_DIALOG_CONFIRM_DELETE_ITEM': 'Are you sure you want to delete this item?',
+
+    //labResultsFilter
+    'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_TYPE': "Person type",
+
+
     //navigationDrawer
     'LNG_NAVIGATION_DRAWER_ACTIVE_OUTBREAK': 'Active outbreak',
     'LNG_NAVIGATION_DRAWER_FOLLOW_UPS': 'Follow-ups',
@@ -96,6 +136,9 @@ export default {
     'LNG_ISOLATION_ADD_ANOTHER_ISOLATION_MESSAGE': 'Add another isolation date range',
     'LNG_DOCUMENT_ADD_NEW_DOCUMENT_MESSAGE': 'Add document',
     'LNG_DOCUMENT_ADD_ANOTHER_DOCUMENT_MESSAGE': 'Add another document',
+    'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT_OF_CONTACT': 'Delete contact of contact',
+
+    'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE': 'Delete case',
 
     'LNG_CASE_FIELD_LABEL_FIRST_NAME': 'First name',
     'LNG_CASE_FIELD_LABEL_MIDDLE_NAME': 'Middle name',
@@ -164,6 +207,12 @@ export default {
 
     'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID': 'Follow-up assigned team',
 
+    'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK': 'Invalid ID (accepted: {{mask}})',
+
+    'LNG_ENTITY_FIELD_LABEL_VACCINE': 'Vaccine',
+    'LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS': 'Vaccine status',
+    'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
+
 
     //exposureScreen
     'LNG_RELATIONSHIP_SCREEN_EDIT_EXPOSURE_TITLE': 'Edit exposure',
@@ -188,7 +237,7 @@ export default {
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_QUESTIONNAIRE_TAB': 'Questionnaire',
 
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_MISSING': 'Missing',
-    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE': 'Deleted',
+    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE': 'Delete follow-up',
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE': 'Deceased',
 
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT': 'View contact',
@@ -291,6 +340,8 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_THERE_WAS_AN_ISSUE_GETTING_YOUR_LOCATION': 'There was an issue with getting your location',
     'LNG_DIALOG_ALERT_MESSAGE_MAKE_SURE_YOU_COMPLETE_ALL_FIELDS': 'Please make sure you have completed the fields',
     'LNG_DIALOG_ALERT_MESSAGE_ERROR_OCCURED_WHILE_GETTING_CONTACTS': 'An error occurred while getting contacts',
+
+    'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION': "The ID should match the pattern defined for this outbreak: {{mask}}",
 
     //TODO add to backend
     "LNG_MOBILE_DIALOG_ALERT_MESSAGE_INVALID_EMAIL_ADDRESSES": "Invalid email addresses",

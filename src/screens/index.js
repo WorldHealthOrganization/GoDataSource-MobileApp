@@ -23,7 +23,10 @@ import HelpScreen from './HelpScreen';
 import HelpSingleScreen from './HelpSingleScreen';
 import QRScanScreen from './QRScanScreen';
 import HubConfigScreen from './HubConfigScreen';
-import UsersScreen from './UsersScreen';
+import UsersScreen  from "./UsersScreen";
+import React from "react";
+import LabResultsScreen from "./LabResultsScreen";
+import LabResultsSingleScreen from "./LabResultsSingleScreen";
 
 const screens = [
     {screen: constants.appScreens.loginScreen, component: LoginScreen},
@@ -40,6 +43,8 @@ const screens = [
     {screen: constants.appScreens.contactSingleScreen, component: ContactsSingleScreen},
     {screen: constants.appScreens.contactsOfContactsScreen, component: ContactsOfContactsScreen},
     {screen: constants.appScreens.contactsOfContactsSingleScreen, component: ContactsOfContactsSingleScreen},
+    {screen: constants.appScreens.labResultsScreen, component: LabResultsScreen},
+    {screen: constants.appScreens.labResultsSingleScreen, component: LabResultsSingleScreen},
     {screen: constants.appScreens.inAppNotificationScreen, component: InAppNotificationScreen},
     {screen: constants.appScreens.exposureScreen, component: ExposureScreen},
     {screen: constants.appScreens.helpScreen, component: HelpScreen},
@@ -51,6 +56,19 @@ const screens = [
 
 export function registerScreens(store, Provider) {
     screens.forEach((screen) => {
-        Navigation.registerComponent(screen.screen, () => screen.component, store, Provider);
-    })
+        Navigation.registerComponent(screen.screen,
+            () => {
+                if(store && Provider){
+                    const Screen = screen.component;
+                    console.log("Judge", screen.screen, Screen);
+                    return (props)=>
+                        <Provider store={store}>
+                            <Screen {...props}/>
+                        </Provider>
+                } else {
+                    return screen.component;
+                }
+            },
+            ()=>screen.component);
+    });
 }

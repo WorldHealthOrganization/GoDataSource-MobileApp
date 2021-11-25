@@ -56,6 +56,12 @@ class NavigationDrawerListItem extends PureComponent {
                     constants.PERMISSIONS_CASE.caseList
                 ];
                 break;
+            case sideMenuKeys[4]:
+                permissionElement = [
+                    constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                    constants.PERMISSIONS_LAB_RESULT.labResultList
+                ];
+                break;
             case 'users':
                 permissionElement = [
                     constants.PERMISSIONS_USER.userAll,
@@ -72,6 +78,13 @@ class NavigationDrawerListItem extends PureComponent {
                 constants.PERMISSIONS_CASE.caseCreate
             ]
        }
+
+        if (this.props.addButton && this.props.itemKey === sideMenuKeys[4]) {
+            permissionAddButton = [
+                constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                constants.PERMISSIONS_LAB_RESULT.labResultCreate
+            ]
+        }
 
         return (
             <PermissionComponent

@@ -3,7 +3,7 @@
  */
 import styles from './../styles';
 import {Platform} from 'react-native';
-import translations, {contactsOfContactsScreen} from './translations';
+import translations from './translations';
 import {createDate} from './../utils/functions';
 import constants from './../utils/constants';
 
@@ -17,7 +17,7 @@ const designScreenSize = {
     height: 667
 };
 
-export const sideMenuKeys = ["followups", 'contacts', 'contactsOfContacts', 'cases', 'users', 'help'];
+export const sideMenuKeys = ["followups", 'contacts', 'contactsOfContacts', 'cases', 'labResults', 'users', 'help'];
 
 const sideMenuItems = {
     [sideMenuKeys[0]]: {
@@ -30,13 +30,17 @@ const sideMenuItems = {
     },
     [sideMenuKeys[2]]: {
         name: 'people',
-        label: contactsOfContactsScreen.contactsTitle,
+        label: translations.contactsOfContactsScreen.contactsTitle,
         // addButton: true
     },
     [sideMenuKeys[3]]: {
         name: 'create-new-folder',
         label: translations.navigationDrawer.casesLabel,
         addButton: true
+    },
+    [sideMenuKeys[4]]: {
+        name: 'science',
+        label: translations.navigationDrawer.labResultsLabel
     }
 };
 
@@ -63,6 +67,10 @@ const tabsValuesRoutes = {
         {key: 'filters', title: translations.followUpFilter.filterTitle},
         {key: 'sort', title: translations.followUpFilter.sortTitle}
     ],
+    personFilter: [
+        {key: 'filters', title: translations.followUpFilter.filterTitle},
+        {key: 'sort', title: translations.followUpFilter.sortTitle}
+    ],
     helpFilter: [
         {key: 'filters', title: translations.followUpFilter.filterTitle},
         {key: 'sort', title: translations.followUpFilter.sortTitle}
@@ -74,6 +82,17 @@ const tabsValuesRoutes = {
     followUpsSingle: [
         {key: 'genInfo', title: translations.followUpsSingleScreen.detailsiTitle},
         {key: 'quest', title: translations.followUpsSingleScreen.questionnaireTitle}
+    ],
+    labResultsSingle: [
+        {key: 'genInfo', title: translations.followUpsSingleScreen.detailsiTitle},
+        {key: 'quest', title: translations.followUpsSingleScreen.questionnaireTitle}
+    ],
+    labResultsFilter: [
+        {key: 'filters', title: translations.casesFilter.filterTitle},
+        {key: 'sort', title: translations.casesFilter.sortTitle}
+    ],
+    labResultsFilterNoFilter: [
+        {key: 'sort', title: translations.casesFilter.sortTitle}
     ],
     helpSingle: [
         {key: 'details', title: translations.helpScreen.helpSingleScreenTab},
@@ -154,7 +173,7 @@ const addressFields = {
             value: '',
             isRequired: false,
             isEditMode: true,
-            keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
+            keyboardType: 'phone-pad',
             objectType: 'Address'
         },
         {
@@ -325,7 +344,336 @@ const followUpsSingleScreen = {
     ],
     address: addressFields
 };
-
+const labResultsSingleScreen = {
+    generalInfo: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'sampleIdentifier',
+                    label: translations.labResultsSingleScreen.sampleLabId,
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateSampleTaken',
+                    label: translations.labResultsSingleScreen.sampleTaken,
+                    type: 'DatePicker',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'LabResult',
+                    skipNone: true
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateSampleDelivered',
+                    label: translations.labResultsSingleScreen.sampleDelivered,
+                    type: 'DatePicker',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateTesting',
+                    label: translations.labResultsSingleScreen.dateSampleTested,
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateOfResult',
+                    label: translations.labResultsSingleScreen.dateOfResult,
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'labName',
+                    label: translations.labResultsSingleScreen.labName,
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'sampleType',
+                    label: translations.labResultsSingleScreen.sampleType,
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'testType',
+                    label: translations.labResultsSingleScreen.testType,
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'result',
+                    label: translations.labResultsSingleScreen.result,
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'testedFor',
+                    label: translations.labResultsSingleScreen.testedFor,
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'status',
+                    label: translations.labResultsSingleScreen.status,
+                    labelValue: '',
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'quantitativeResult',
+                    label: translations.labResultsSingleScreen.quantResult,
+                    labelValue: '',
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'notes',
+                    label: translations.labResultsSingleScreen.notes,
+                    labelValue: '',
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                }
+            ],
+        },
+        {
+            fields:[
+                {
+                    cardNumber: 2,
+                    id: 'sequence.hasSequence',
+                    label: translations.labResultsSingleScreen.hasVariantStrain,
+                    labelValue: '',
+                    value: false,
+                    type: "SwitchInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.noSequenceReason',
+                    label: translations.labResultsSingleScreen.sequenceReason,
+                    labelValue: '',
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: false
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.dateSampleSent',
+                    label: translations.labResultsSingleScreen.dateSampleSentSeq,
+                    labelValue: '',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: true,
+                    format: 'MM/dd/YYYY'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.labId',
+                    label: translations.labResultsSingleScreen.labNameSeq,
+                    labelValue: '',
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: true,
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.dateResult',
+                    label: translations.labResultsSingleScreen.dateResultSeq,
+                    labelValue: '',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: true,
+                    format: 'MM/dd/YYYY'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.resultId',
+                    label: translations.labResultsSingleScreen.resultSeq,
+                    labelValue: '',
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: true,
+                }
+            ]
+        }
+    ]
+};
+const labResultsFilterScreenNoContactPermission = {
+    sort: {
+        fields: [
+            {
+                cardNumber: 1,
+                label: translations.sortTab.SortBy,
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortCriteria,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortOrder,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
+};
+const labResultsFilterScreen = {
+    filter: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    label: translations.labResultsFilter.personType,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 1,
+                    id: 'type',
+                    type: 'Selector',
+                    value: '',
+                    shouldTranslate: true,
+                    data: [{value: translations.personTypes.cases, selected: true}, {value: translations.personTypes.contacts, selected: true}]
+                }
+            ]
+        }
+    ],
+    sort: {
+        fields: [
+            {
+                cardNumber: 1,
+                label: translations.sortTab.SortBy,
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortCriteria,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortOrder,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
+};
 const caseSingleScreen = {
     personal: [
         {
@@ -821,6 +1169,171 @@ const caseSingleScreen = {
     },
 };
 
+const personFilterScreen = {
+    filter: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    label: translations.followUpFilter.gender,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 1,
+                    id: 'gender',
+                    type: 'Selector',
+                    shouldTranslate: true,
+                    value: '',
+                    data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 2,
+                    label: translations.followUpFilter.ageRange,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 2,
+                    id: 'age',
+                    type: 'IntervalPicker',
+                    value: '',
+                    min: 0,
+                    max: 150
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 3,
+                    label: translations.followUpFilter.area,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 3,
+                    id: 'selectedLocations',
+                    label: translations.followUpFilter.chooseLocationLabel,
+                    type: 'DropDownSectioned',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 4,
+                    label: translations.personFilter.vaccine,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },{
+                    cardNumber: 4,
+                    id: 'vaccines',
+                    label: translations.personFilter.vaccine,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 5,
+                    label: translations.personFilter.vaccineStatus,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },{
+                    cardNumber: 5,
+                    id: 'vaccineStatuses',
+                    label: translations.personFilter.vaccineStatus,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 6,
+                    label: translations.personFilter.pregnancyStatus,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },{
+                    cardNumber: 6,
+                    id: 'pregnancyStatuses',
+                    label: translations.personFilter.pregnancyStatus,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+    ],
+    sort: {
+        fields: [
+            {
+                cardNumber: 1,
+                label: translations.sortTab.SortBy,
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortCriteria,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortOrder,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
+};
+
 const followUpsFilterScreen = {
     filter: [
         {
@@ -836,6 +1349,7 @@ const followUpsFilterScreen = {
                     cardNumber: 1,
                     id: 'gender',
                     type: 'Selector',
+                    shouldTranslate: true,
                     value: '',
                     data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
                 }
@@ -1007,6 +1521,7 @@ const casesFilterScreen = {
                     cardNumber: 1,
                     id: 'gender',
                     type: 'Selector',
+                    shouldTranslate: true,
                     value: '',
                     data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
                 }
@@ -1065,6 +1580,66 @@ const casesFilterScreen = {
                     id: 'selectedLocations',
                     label: translations.casesFilter.chooseLocationLabel,
                     type: 'DropDownSectioned',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 5,
+                    label: translations.personFilter.vaccine,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },{
+                    cardNumber: 5,
+                    id: 'vaccines',
+                    label: translations.personFilter.vaccine,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 6,
+                    label: translations.personFilter.vaccineStatus,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },{
+                    cardNumber: 6,
+                    id: 'vaccineStatuses',
+                    label: translations.personFilter.vaccineStatus,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 67,
+                    label: translations.personFilter.pregnancyStatus,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },{
+                    cardNumber: 7,
+                    id: 'pregnancyStatuses',
+                    label: translations.personFilter.pregnancyStatus,
+                    type: 'DropDown',
                     value: '',
                     isRequired: false,
                     isEditMode: true,
@@ -1511,7 +2086,7 @@ const contactsOfContactsPersonal = [
                 type: 'TextInput',
                 value: '',
                 isRequired: false,
-                isEditMode: false,
+                isEditMode: true,
                 multiline: false,
                 objectType: 'Contact'
             }
@@ -1680,7 +2255,7 @@ const contactsSingleScreen = {
                     type: 'TextInput',
                     value: '',
                     isRequired: false,
-                    isEditMode: false,
+                    isEditMode: true,
                     multiline: false,
                     objectType: 'Contact'
                 },
@@ -1910,16 +2485,18 @@ const mongoCollections = {
     team: 'team',
     helpCategory: 'helpCategory',
     helpItem: 'helpItem',
-    user: 'user'
+    user: 'user',
+    common: 'common'
 };
 
 const changingMongoCollections = [
-    'labResult',
+    // 'labResult',
     'user'
 ];
 
 const changingSQLiteCollections = [
     'followUp',
+    'labResult',
     'person',
     'relationship'
 ];
@@ -2074,7 +2651,7 @@ const whocdCredentials = {
     hubUrl: 'http://whocd.clarisoft.com/api',
     clientId: 'test',
     clientSecret: 'test',
-    userEmail: 'florin.popa@clarisoft.com',
+    userEmail: 'andrei.postelnicu@clarisoft.com',
     encryptedConnection: false,
     numberOfData: 5000
 };
@@ -2086,6 +2663,8 @@ export default {
     tabsValuesRoutes,
     followUpsSingleScreen,
     followUpsFilterScreen,
+    labResultsSingleScreen,
+    labResultsFilterScreen,
     helpFilterScreen,
     casesFilterScreen,
     caseSingleScreen,
@@ -2120,5 +2699,7 @@ export default {
     rawSQLQueryWhereString,
     whocdCredentials,
     contactsOfContactsPersonal,
-    addressFields
+    addressFields,
+    labResultsFilterScreenNoContactPermission,
+    personFilterScreen
 };

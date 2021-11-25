@@ -13,27 +13,30 @@ import styles from './../styles';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {loginUser} from './../actions/user';
+import { setSyncState } from './../actions/app';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Ripple from 'react-native-material-ripple';
 import lodashGet from 'lodash/get';
 import translations from './../utils/translations';
 import config from './../utils/config';
-import {getTranslation} from './../utils/functions';
+import {createStackFromComponent, getTranslation} from './../utils/functions';
 import VersionNumber from 'react-native-version-number';
 import withPincode from "../components/higherOrderComponents/withPincode";
 import {compose} from "redux";
+import {Navigation} from "react-native-navigation";
+import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 
 class FirstConfigScreen extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
-
     constructor(props) {
+        console.log("Constructor");
         super(props);
         this.state = {
         };
         // Bind here methods, or at least don't declare methods in the render method
+    }
+    componentDidMount() {
+        console.log("Comp did mount")
     }
 
     // Please add here the react lifecycle methods that you need
@@ -42,6 +45,7 @@ class FirstConfigScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log("Rendering first config screen");
         return (
             <KeyboardAwareScrollView
                 style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
@@ -95,31 +99,34 @@ class FirstConfigScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleOnPressBack = () => {
-        this.props.navigator.pop();
+        Navigation.pop(this.props.componentId)
+            .catch(reason => {
+
+            })
     };
 
     handleOnPressForward = () => {
-        this.props.navigator.push({
-            screen: 'ManualConfigScreen',
-            passProps: {
-                allowBack: this.props.allowBack,
-                isMultipleHub: this.props.isMultipleHub
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'ManualConfigScreen',
+                passProps: {
+                    allowBack: this.props.allowBack,
+                    isMultipleHub: this.props.isMultipleHub
+                }
             }
-            // animationType: 'fade',
-            // animated: true
         })
     };
 
     handlePressScanQR = () => {
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
+        console.log("Press scan QR", this.props.allowBack, this.props.isMultipleHub);
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
             passProps: {
                 pushNewScreen: this.pushNewScreen,
                 allowBack: this.props.allowBack,
                 isMultipleHub: this.props.isMultipleHub
             }
-        })
+        }))
     };
 
     handlePressImport = () => {
@@ -131,17 +138,20 @@ class FirstConfigScreen extends Component {
     };
 
     handlePressManual = () => {
-        console.log("Here change screen");
-        this.props.navigator.push({
-            screen: 'ManualConfigScreen',
-            // animated: true,
-            // animationType: 'fade',
-            passProps: {
-                isNewHub: true,
-                allowBack: this.props.allowBack,
-                isMultipleHub: this.props.isMultipleHub
+        console.log("Here change screen", this.props.componentId, this.props.navigator);
+        Navigation.push(this.props.componentId, {
+            component:{
+                name: 'ManualConfigScreen',
+                // animated: true,
+                // animationType: 'fade',
+                passProps: {
+                    isNewHub: true,
+                    allowBack: this.props.allowBack,
+                    isMultipleHub: this.props.isMultipleHub
+                }
             }
-        })
+        }).then((res)=>{console.log("navpush res", res)})
+            .catch((err)=>{console.log("catch error", err)});
     };
 
     pushNewScreen = (QRCodeInfo, allowBack, skipEdit, isMultipleHub) => {
@@ -151,18 +161,26 @@ class FirstConfigScreen extends Component {
                 let QRCodeInfoData = JSON.parse(QRCodeInfo.data);
                 if (QRCodeInfoData && QRCodeInfoData.url && QRCodeInfoData.clientId && QRCodeInfoData.clientSecret) {
                     // this.props.navigator.dismissAllModals();
+                    this.props.setSyncState(null);
                     setTimeout(() => {
-                        this.props.navigator.push({
-                            screen: 'ManualConfigScreen',
-                            animated: true,
-                            animationType: 'fade',
-                            passProps: {
-                                QRCodeInfo: QRCodeInfo,
-                                allowBack: allowBack,
-                                isNewHub: true,
-                                skipEdit: skipEdit,
-                                isMultipleHub: isMultipleHub
+                        Navigation.push(this.props.componentId,{
+                            component:{
+                                name: 'ManualConfigScreen',
+                                options:{
+                                    animations:{
+                                        push:fadeInAnimation,
+                                        pop:fadeOutAnimation
+                                    }
+                                },
+                                passProps: {
+                                    QRCodeInfo: QRCodeInfo,
+                                    allowBack: allowBack,
+                                    isNewHub: true,
+                                    skipEdit: skipEdit,
+                                    isMultipleHub: isMultipleHub
+                                }
                             }
+
                         })
                     }, 250);
                 } else {
@@ -247,7 +265,8 @@ function mapStateToProps(state) {
 
 function matchDispatchToProps(dispatch) {
     return bindActionCreators({
-        loginUser
+        loginUser,
+        setSyncState
     }, dispatch);
 }
 

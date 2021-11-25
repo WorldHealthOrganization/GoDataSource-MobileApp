@@ -8,7 +8,7 @@ import config from './../utils/config';
 // Credentials: {email, encryptedPassword}
 export function loginUserRequest (credentials, callback) {
     let start = new Date().getTime();
-    getDatabase(config.mongoCollections.user)
+    getDatabase(config.mongoCollections.user, true)
         .then((database) => {
             database.find({
                 selector: {
@@ -148,6 +148,7 @@ export function getTeamsForUserRequest(callback) {
                         $gte: `team.json_`,
                         $lte: `team.json_\uffff`,
                     },
+                    deleted: false
                 }
             })
                 .then((result) => {

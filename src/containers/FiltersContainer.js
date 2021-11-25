@@ -20,6 +20,7 @@ class FiltersContainer extends PureComponent {
     };
 
     render() {
+        console.log("Excuse me?", this.props.filter?.filter);
         const { configFilterScreen } = this.props
         const { handleMoveToNextScreenButton, onPressResetFilters, onPressApplyFilters } = this.props
         const { screenSize, translation } = this.props
@@ -120,11 +121,13 @@ class FiltersContainer extends PureComponent {
         let value = '';
         let data = [];
 
-        if (item.type === 'Selector' && item.id === 'gender') {
+        if (item.type === 'Selector') {
+            item = Object.assign({}, item);
             item.data = item.data.map((e) => {
+                console.log("Help", item.id, filter.filter);
                 return {
-                    value: getTranslation(e.value, translation),
-                    selected: filter && filter.filter && filter.filter.gender && filter.filter.gender[e.value] ? true : false
+                    value: e.value,
+                    selected: !!(filter && filter.filter && filter.filter[item.id] && filter.filter[item.id][e.value])
                 }
             })
         }
@@ -153,11 +156,11 @@ class FiltersContainer extends PureComponent {
 
         return (
             <CardComponent
+                key={item}
                 item={item}
                 isEditMode={true}
                 isEditModeForDropDownInput={true}
                 value={value}
-                filter={filter}
                 data={data}
 
                 onChangeSectionedDropDown={onChangeSectionedDropDown}
@@ -178,6 +181,18 @@ class FiltersContainer extends PureComponent {
             return filter(this.props.helpCategory, (o) => {
                 return o.deleted === false && o.fileType === 'helpCategory.json'
             }).map((o) => { return { label: getTranslation(o.name, this.props.translation), value: o._id } })
+        } else if (item.id === 'vaccines') {
+            return filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === "LNG_REFERENCE_DATA_CATEGORY_VACCINE" })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        } else if (item.id === 'vaccineStatuses') {
+            return filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === "LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS" })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        } else if (item.id === 'pregnancyStatuses') {
+            return filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === "LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS" })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
 
         return [];

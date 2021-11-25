@@ -202,7 +202,6 @@ class ContactsSingleAddress extends Component {
                 item={item}
                 isEditMode={this.props.isEditMode}
                 isEditModeForDropDownInput={this.props.isEditMode}
-                contact={this.props.contact}
                 value={value}
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}

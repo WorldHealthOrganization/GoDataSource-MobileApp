@@ -11,10 +11,11 @@ import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import HelpListItem from './../components/HelpListItem';
-import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen} from './../actions/app'
+import {setDisableOutbreakChange} from './../actions/outbreak'
 import _ from 'lodash';
 import {
-    calculateDimension,
+    calculateDimension, createStackFromComponent,
     filterItemsForEachPage,
     getTranslation,
     localSortHelpItem,
@@ -26,6 +27,7 @@ import RNExitApp from 'react-native-exit-app';
 import withPincode from './../components/higherOrderComponents/withPincode';
 import config from "../utils/config";
 import PermissionComponent from './../components/PermissionComponent';
+import {Navigation} from "react-native-navigation";
 
 let AnimatedListView = Animated.createAnimatedComponent(FlatList);
 
@@ -33,10 +35,6 @@ const scrollAnim = new Animated.Value(0);
 const offsetAnim = new Animated.Value(0);
 
 class HelpScreen extends Component {
-
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -55,7 +53,7 @@ class HelpScreen extends Component {
         };
 
         // Bind here methods, or at least don't declare methods in the render method
-        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+        // this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
         this.renderHelp = this.renderHelp.bind(this);
         this.keyExtractor = this.keyExtractor.bind(this);
         this.renderSeparatorComponent = this.renderSeparatorComponent.bind(this);
@@ -82,6 +80,14 @@ class HelpScreen extends Component {
                 console.log ('filter removed')
             })
         }
+
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setDisableOutbreakChange(false);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
     };
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -94,6 +100,7 @@ class HelpScreen extends Component {
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+        this.navigationListener.remove();
     }
 
     handleBackButtonClick() {
@@ -186,14 +193,14 @@ class HelpScreen extends Component {
                             </View>
                         }
                             title={null}
-                            navigator={this.props.navigator}
+                            componentId={this.props.componentId}
                             iconName="close"
                             handlePressNavbarButton={this.handlePressNavbarButton}
                         />
                     ) : (
                     <NavBarCustom
                         title={helpTitle[1]}
-                        navigator={this.props.navigator || null}
+                        componentId={this.props.componentId || null}
                         iconName="menu"
                         handlePressNavbarButton={this.handlePressNavbarButton}
                     >
@@ -242,16 +249,18 @@ class HelpScreen extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
         this.state.displayModalFormat === true ? (
-            this.props.navigator.dismissModal()
+            Navigation.dismissModal(this.props.componentId)
         ) : (
             this.setState({
                 calendarPickerOpen: false
             }, () => {
-                this.props.navigator.toggleDrawer({
-                    side: 'left',
-                    animated: true,
-                    to: 'open'
-                })
+                Navigation.mergeOptions(this.props.componentId, {
+                    sideMenu: {
+                        left: {
+                            visible: true,
+                        },
+                    },
+                });
             })
         )
     };
@@ -316,13 +325,15 @@ class HelpScreen extends Component {
         console.log("### handlePressFollowUp: ", item);
 
         let itemClone = Object.assign({}, item);
-        this.props.navigator.push({
-            screen: 'HelpSingleScreen',
-            passProps: {
-                isNew: false,
-                item: itemClone,
-                filter: this.state.filter,
-                startLoadingScreen: this.startLoadingScreen
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'HelpSingleScreen',
+                passProps: {
+                    isNew: false,
+                    item: itemClone,
+                    filter: this.state.filter,
+                    startLoadingScreen: this.startLoadingScreen
+                }
             }
         })
     };
@@ -334,6 +345,9 @@ class HelpScreen extends Component {
 
         if (this.state.pageAskingHelpFrom === 'followUps') {
             pageAskingHelpFromNameToDisplay = getTranslation(translations.followUpsScreen.followUpsTitle, this.props.translation)
+        }
+        if (this.state.pageAskingHelpFrom === 'labResults') {
+            pageAskingHelpFromNameToDisplay = getTranslation(translations.labResultsScreen.labResultsTitle, this.props.translation)
         }
         else if (this.state.pageAskingHelpFrom === 'contacts') {
             pageAskingHelpFromNameToDisplay = getTranslation(translations.contactsScreen.contactsTitle, this.props.translation)
@@ -347,6 +361,9 @@ class HelpScreen extends Component {
         else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenAdd') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
         }
+        else if (this.state.pageAskingHelpFrom === 'labResultSingleScreenAdd') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.labResultsSingleScreen.title, this.props.translation)}`
+        }
         else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenAdd') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
         }
@@ -356,6 +373,9 @@ class HelpScreen extends Component {
         else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenEdit') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
         }
+        else if (this.state.pageAskingHelpFrom === 'labResultSingleScreenEdit') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.labResultsSingleScreen.title, this.props.translation)}`
+        }
         else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenEdit') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
         }
@@ -364,6 +384,9 @@ class HelpScreen extends Component {
         } 
         else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenView') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
+        }
+        else if(this.state.pageAskingHelpFrom === 'labResultSingleScreenView') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.labResultsSingleScreen.title, this.props.translation)}`
         }
         else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenView') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
@@ -423,15 +446,14 @@ class HelpScreen extends Component {
     };
 
     handlePressFilter = () => {
-        this.props.navigator.showModal({
-            screen: 'FilterScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'FilterScreen',
             passProps: {
                 activeFilters: this.state.filterFromFilterScreen || null,
                 onApplyFilters: this.handleOnApplyFilters,
                 screen: 'HelpFilterScreen'
             }
-        })
+        }))
     };
 
     handleOnChangeText = (text) => {
@@ -518,6 +540,7 @@ function matchDispatchProps(dispatch) {
     return bindActionCreators({
         addFilterForScreen,
         removeFilterForScreen,
+        setDisableOutbreakChange
     }, dispatch);
 }
 

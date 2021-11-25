@@ -34,7 +34,7 @@ import {
     unzipFile
 } from './../utils/functions';
 import RNFetchBlobFs from 'rn-fetch-blob/fs';
-import {createDatabase, getDatabase} from './../queries/database';
+import {createDatabase, DATABASE_VERSION, getDatabase} from './../queries/database';
 import AsyncStorage from '@react-native-community/async-storage';
 import {getUserById} from './user';
 import get from 'lodash/get';
@@ -46,6 +46,7 @@ import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import sqlConstants from './../queries/sqlTools/constants';
 import {initTables} from './../queries/sqlTools/helperMethods';
 import {initIndexes} from "../queries/sqlTools/helperMethods";
+import DeviceInfo from "react-native-device-info";
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function changeAppRoot(root) {
@@ -399,6 +400,7 @@ function saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfi
             } else {
                 let pairArray = [];
                 pairArray.push(['activeDatabase', hubConfiguration.url]);
+                pairArray.push(['databaseVersioningToken', `${hubConfiguration.url}${DeviceInfo.getVersion()}${DATABASE_VERSION}`]);
                 if (!checkArrayAndLength(languagePacks)) {
                     pairArray.push([hubConfiguration.url, createDate(null, null, true).toISOString()]);
                 }
@@ -514,17 +516,24 @@ export function sendDatabaseToServer () {
         let internetCredentialsGlobal = null;
         let lastSyncDateGlobal = null;
         let skipZip = true;
+        let noDateFilter = false;
         // Get activeDatabase
         Promise.resolve()
             .then(() => AsyncStorage.getItem('activeDatabase'))
             .then((activeDatabase) => {
+                let dbVersionTokenPromise =  AsyncStorage.getItem('databaseVersioningToken');
                 let lastSyncDatePromise = AsyncStorage.getItem(activeDatabase);
                 let internetCredentialsPromise = getInternetCredentials(activeDatabase);
                 let cleanupPromise = deleteFile(constants.FILES_LOCATIONS, true);
 
-                return Promise.all([lastSyncDatePromise, internetCredentialsPromise, Promise.resolve(activeDatabase), cleanupPromise])
+                return Promise.all([dbVersionTokenPromise, lastSyncDatePromise, internetCredentialsPromise, Promise.resolve(activeDatabase), cleanupPromise])
             })
-            .then(async ([lastSyncDate, internetCredentials, activeDatabase, cleanUpResult]) => {
+            .then(async ([dbVersionToken, lastSyncDate, internetCredentials, activeDatabase, cleanUpResult]) => {
+                if(dbVersionToken !== `${activeDatabase}${DeviceInfo.getVersion()}${DATABASE_VERSION}`){
+                    noDateFilter = true;
+                    AsyncStorage.setItem('databaseVersioningToken', `${activeDatabase}${DeviceInfo.getVersion()}${DATABASE_VERSION}`)
+                }
+
                 internetCredentialsGlobal = internetCredentials;
                 lastSyncDateGlobal = lastSyncDate;
                 let statusArray = [];
@@ -538,6 +547,7 @@ export function sendDatabaseToServer () {
                         statusArray.push(status);
                     } catch (errorGetDatabaseFromFile) {
                         console.log('ErrorGetDatabaseFromFile: ', errorGetDatabaseFromFile);
+                        noDateFilter = true;
                         dispatch(setSyncState({
                             id: 'createFile',
                             status: 'Error',
@@ -553,6 +563,7 @@ export function sendDatabaseToServer () {
                         statusArray.push(status);
                     } catch(errorGetSQLite) {
                         console.log('ErrorGetDatabaseFromFile: ', errorGetSQLite);
+                        noDateFilter = true;
                         dispatch(setSyncState({
                             id: 'createFile',
                             status: 'Error',
@@ -598,33 +609,32 @@ export function sendDatabaseToServer () {
             .then((resultPostDatabase) => {
                 if (resultPostDatabase && !resultPostDatabase.includes('Finished')) {
                     dispatch(setSyncState({id: 'sendData', status: 'Error', error: JSON.stringify(resultPostDatabase)}));
-                } else {
-                    if (!skipZip) {
-                        dispatch(setSyncState({id: 'sendData', status: 'Success'}));
-                    }
-                    getDatabaseSnapshotRequestNew(
-                        {
-                            url: internetCredentialsGlobal.server ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
+                    noDateFilter = true;
+                } else if (!skipZip) {
+                    dispatch(setSyncState({id: 'sendData', status: 'Success'}));
+                }
+                getDatabaseSnapshotRequestNew(
+                    {
+                        url: internetCredentialsGlobal.server ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
+                        clientId: internetCredentialsGlobal.username,
+                        clientSecret: internetCredentialsGlobal.password
+                    },
+                    noDateFilter ? null : lastSyncDateGlobal,
+                    dispatch,null, noDateFilter)
+                    .then((databasePath) => {
+                        dispatch(processFilesForSyncNew(null, databasePath, {
+                            url: Platform.OS === 'ios' ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
                             clientId: internetCredentialsGlobal.username,
                             clientSecret: internetCredentialsGlobal.password
-                        },
-                        lastSyncDateGlobal,
-                        dispatch)
-                        .then((databasePath) => {
-                            dispatch(processFilesForSyncNew(null, databasePath, {
-                                url: Platform.OS === 'ios' ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
-                                clientId: internetCredentialsGlobal.username,
-                                clientSecret: internetCredentialsGlobal.password
-                            }, null, true, false, null));
-                        })
-                        .catch((errorGetDatabase) => {
-                            if (errorGetDatabase === 'No data to export') {
-                                dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
-                            } else {
-                                dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(errorGetDatabase)}));
-                            }
-                        })
-                }
+                        }, null, true, false, null));
+                    })
+                    .catch((errorGetDatabase) => {
+                        if (errorGetDatabase === 'No data to export') {
+                            dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
+                        } else {
+                            dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(errorGetDatabase)}));
+                        }
+                    })
             })
             .catch((errorSendDatabase) => {
                 dispatch(setSyncState({id: 'sendData', status: 'Error', error: JSON.stringify(errorSendDatabase)}));
@@ -785,6 +795,7 @@ export function appInitialized(nativeEventEmitter) {
                                 try {
                                     let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                     if (database) {
+                                        console.log("Login 2")
                                         dispatch(changeAppRoot('login'));
                                         console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
                                         console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
@@ -828,7 +839,7 @@ export function appInitialized(nativeEventEmitter) {
                             }
                         }
                     } else {
-                        console.log("We don't have an active database, and we don't have logged user. Proceed to config screen");
+                        console.log("We don't have an active database, and we don't have logged user. Proceed to config screen1");
                         dispatch(changeAppRoot('config'));
                         console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
                         console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
@@ -862,6 +873,7 @@ export function appInitialized(nativeEventEmitter) {
                             try {
                                 let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                 if (database) {
+                                    console.log("Login")
                                     dispatch(changeAppRoot('login'));
                                     console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
                                     console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
@@ -905,7 +917,7 @@ export function appInitialized(nativeEventEmitter) {
                         }
                     }
                 } else {
-                    console.log("We don't have an active database, and we don't have logged user. Proceed to config screen");
+                    console.log("We don't have an active database, and we don't have logged user. Proceed to config screen2");
                     dispatch(changeAppRoot('config'));
                     console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
                     console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);

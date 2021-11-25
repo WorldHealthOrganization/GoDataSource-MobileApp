@@ -96,8 +96,8 @@ class ContactsSinglePersonal extends Component {
                     >
                     <View style={style.container}>
                         {
-                            this.state.fields.map((item) => {
-                                return this.handleRenderItem(item)
+                            this.state.fields.map((item, i) => {
+                                return this.handleRenderItem(item, i)
                             })
                         }
 
@@ -156,30 +156,30 @@ class ContactsSinglePersonal extends Component {
     };
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
+    handleRenderItem = (item, i) => {
         let fields = item.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+            return Object.assign({}, field, { isEditMode:  this.props.isEditMode }, {key: i})
         });
-        return this.renderItemCardComponent(fields);
+        return this.renderItemCardComponent(fields, i);
     };
 
     handleRenderItemForDocumentsList = (item, index) => {
         let fields = config.caseSingleScreen.document.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+            return Object.assign({}, field, { isEditMode:  this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
     };
 
     handleRenderItemForVaccinesList = (item, index) => {
         let fields = config.caseSingleScreen.vaccinesReceived.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView key={cardIndex} elevation={3} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
                 marginVertical: 4,
@@ -250,7 +250,6 @@ class ContactsSinglePersonal extends Component {
             <CardComponent
                 item={item}
                 isEditMode={this.props.isEditMode}
-                contact={this.props.contact}
                 isEditModeForDropDownInput={this.props.isEditMode}
                 selectedItemIndexForAgeUnitOfMeasureDropDown={this.props.selectedItemIndexForAgeUnitOfMeasureDropDown}
                 onChangeextInputWithDropDown={this.props.onChangeTextInputWithDropDown}
@@ -266,6 +265,7 @@ class ContactsSinglePersonal extends Component {
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
                 permissionsList={item.permissionsList}
+                mask={this.props.type === translations.personTypes.contactsOfContacts ? this.props.outbreak?.contactOfContactIdMask : this.props.outbreak?.contactIdMask}
             />
         )
     };
@@ -407,7 +407,8 @@ function mapStateToProps(state) {
     return {
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         translation: _.get(state, 'app.translation', []),
-        referenceData: _.get(state, 'referenceData', [])
+        referenceData: _.get(state, 'referenceData', []),
+        outbreak: _.get(state, 'outbreak', null)
     };
 }
 

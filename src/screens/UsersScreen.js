@@ -8,7 +8,7 @@ import {StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
@@ -16,6 +16,7 @@ import ElevatedView from 'react-native-elevated-view';
 import Breadcrumb from './../components/Breadcrumb';
 import {getUsersForOutbreakId} from './../actions/user';
 import {setLoaderState} from './../actions/app';
+import {setDisableOutbreakChange} from  './../actions/outbreak';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations';
@@ -24,6 +25,7 @@ import {enhanceListWithGetData} from './../components/higherOrderComponents/with
 import call from 'react-native-phone-call';
 import get from 'lodash/get';
 import withPincode from './../components/higherOrderComponents/withPincode';
+import {Navigation} from "react-native-navigation";
 
 class UsersScreen extends Component {
 
@@ -32,6 +34,19 @@ class UsersScreen extends Component {
         this.state = {
             refreshing: false
         };
+
+
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setDisableOutbreakChange(false);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+    }
+
+    componentWillUnmount() {
+        this.navigationListener.remove();
     }
 
     // Please add here the react lifecycle methods that you need
@@ -64,7 +79,7 @@ class UsersScreen extends Component {
                                 <Breadcrumb
                                     key="userKey"
                                     entities={usersTitle}
-                                    navigator={this.props.navigator}
+                                    componentId={this.props.componentId}
                                 />
                             </View>
                             <View style={{ flex: 0.15 }}>
@@ -90,7 +105,7 @@ class UsersScreen extends Component {
                             </View>
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
@@ -116,11 +131,13 @@ class UsersScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
     //Refresh list of users
@@ -134,13 +151,12 @@ class UsersScreen extends Component {
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'users';
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
             passProps: {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     handleCallUsers = (mainData) => {
@@ -191,13 +207,15 @@ function mapStateToProps(state) {
         loaderState:    get(state, 'app.loaderState', false),
         location:       get(state, 'locations.locationsList'),
         teams:          get(state, 'teams', []),
-        user:           get(state, 'user', {activeOutbreakId: null})
+        user:           get(state, 'user', {activeOutbreakId: null}),
+        outbreak:       get(state, 'outbreak', {activeOutbreakId: null})
     };
 }
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        setLoaderState
+        setLoaderState,
+        setDisableOutbreakChange
     }, dispatch);
 }
 

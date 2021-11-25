@@ -10,7 +10,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import AnimatedListView from './../components/AnimatedListView';
 import {getContactsForOutbreakId} from './../actions/contacts';
@@ -19,6 +19,7 @@ import {Popup} from 'react-native-map-link';
 import translations from './../utils/translations';
 import config from './../utils/config';
 import Breadcrumb from './../components/Breadcrumb';
+import {setDisableOutbreakChange} from "../actions/outbreak";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
@@ -31,6 +32,7 @@ import PermissionComponent from './../components/PermissionComponent';
 import withPincode from "../components/higherOrderComponents/withPincode";
 import {getFollowUpsForOutbreakId} from "../actions/followUps";
 import {compose} from "redux";
+import {Navigation} from "react-native-navigation";
 
 class ContactsScreen extends Component {
 
@@ -60,6 +62,20 @@ class ContactsScreen extends Component {
         this.setState({
             riskColors: riskColors
         })
+
+
+        const listener = {
+            componentDidAppear: () => {
+                console.log("Outbreak stuff Contact did appear")
+                this.props.setDisableOutbreakChange(false);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+    }
+
+    componentWillUnmount() {
+        this.navigationListener.remove();
     }
 
     componentDidUpdate(prevProps) {
@@ -87,6 +103,15 @@ class ContactsScreen extends Component {
             if (checkArrayAndLength(get(mainFilter, 'selectedLocations', null))) {
                 ++filterNumbers
             }
+            if (checkArrayAndLength(get(mainFilter, 'vaccines', null))) {
+                ++filterNumbers
+            }
+            if (checkArrayAndLength(get(mainFilter, 'vaccineStatuses', null))) {
+                ++filterNumbers
+            }
+            if (checkArrayAndLength(get(mainFilter, 'pregnancyStatuses', null))) {
+                ++filterNumbers
+            }
         }
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `(${filterNumbers})`;
 
@@ -108,7 +133,7 @@ class ContactsScreen extends Component {
                                 <Breadcrumb
                                     key="contactKey"
                                     entities={contactTitle}
-                                    navigator={this.props.navigator}
+                                    componentId={this.props.componentId}
                                 />
                             </View>
                             <View style={{flex: 0.15, marginRight: 10}}>
@@ -143,7 +168,7 @@ class ContactsScreen extends Component {
 
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
@@ -243,34 +268,34 @@ class ContactsScreen extends Component {
     };
 
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-                side: 'left',
-                animated: true,
-                to: 'open'
-            })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'contacts';
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
             passProps: {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     handleOnPressQRCode = () => {
         console.log('handleOnPressQRCode');
 
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
             passProps: {
                 pushNewScreen: this.pushNewEditScreenLocal
             }
-        })
+        }))
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {
@@ -279,11 +304,11 @@ class ContactsScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.navigator, get(this.props, 'user', null), get(this.props, 'translation', null), (error, itemType, record) => {
+            pushNewEditScreen(QRCodeInfo, this.props.componentId, get(this.props, 'user', null), get(this.props, 'outbreak', null), get(this.props, 'translation', null), (error, itemType, record) => {
                 this.setState({
                     loading: false
                 }, () => {
-                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
+                    handleQRSearchTransition(this.props.componentId, error, itemType, record, get(this.props, 'user', null), get(this.props, 'outbreak', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
                 });
             })
         });
@@ -333,13 +358,15 @@ function mapStateToProps(state) {
         loaderState:    get(state, 'app.loaderState', false),
         referenceData:  get(state, 'referenceData', []),
         role:           get(state, 'role', []),
-        location:       get(state, 'locations.locationsList')
+        location:       get(state, 'locations.locationsList'),
+        outbreak:       get(state, 'outbreak')
     };
 }
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        setLoaderState
+        setLoaderState,
+        setDisableOutbreakChange
     }, dispatch);
 }
 

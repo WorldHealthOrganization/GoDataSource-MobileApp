@@ -19,10 +19,8 @@ class PermissionComponent extends Component {
         if (!checkArrayAndLength(permissionsList)) {
             return true;
         }
-
         if (permissionsList.every((e) => checkArrayAndLength(e))) {
             for (let elem of permissionsList) {
-                // console.log("intersection: ", lodashIntersection(elem, this.props.permissions));
                 if (checkArrayAndLength(elem) && lodashIsEqual(lodashIntersection(elem, this.props.permissions), elem)) {
                     return true;
                 }

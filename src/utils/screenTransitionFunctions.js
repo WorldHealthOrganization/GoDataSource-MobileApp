@@ -5,14 +5,16 @@ import translations from './translations';
 import {getItemByIdRequest} from './../actions/cases';
 import lodashIntersection from 'lodash/intersection';
 import {checkArrayAndLength} from './typeCheckingFunctions';
-import {generatePermissionMessage, getTranslation} from "./functions";
+import {createStackFromComponent, generatePermissionMessage, getTranslation} from "./functions";
 import {Alert} from "react-native";
 import get from "lodash/get";
 import isFunction from "lodash/isFunction";
 import config from "./config";
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './constants';
+import {Navigation} from "react-native-navigation";
+import {fadeInAnimation, fadeOutAnimation} from "./animations";
 
-export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, callback) {
+export function pushNewEditScreen(QRCodeInfo, componentId, user, outbreak, translation, callback) {
     console.log('pushNewEditScreen QRCodeInfo', QRCodeInfo);
 
     let itemId = null;
@@ -56,7 +58,7 @@ export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, call
     }
 
     console.log('pushNewEditScreen', itemId, itemType, outbreakId);
-    if (itemId && itemType && outbreakId && outbreakId === user.activeOutbreakId) {
+    if (itemId && itemType && outbreakId && outbreakId === outbreak._id) {
         // let itemPouchId = null;
         // if (itemType === 'case') {
         //     itemPouchId = `${itemId}`
@@ -83,24 +85,22 @@ export function pushNewEditScreen(QRCodeInfo, navigator, user, translation, call
     }
 }
 
-export function screenTransition(navigator, transition, nextScreen, passProps, userPermissions, requiredPermissions) {
+export function screenTransition(componentId, transition, nextScreen, passProps, userPermissions, requiredPermissions) {
     if (checkArrayAndLength(lodashIntersection(userPermissions, requiredPermissions))) {
         switch (transition) {
             case 'push':
-                navigator.push({
-                    screen: nextScreen,
-                    animated: true,
-                    // animationType: 'fade',
-                    passProps: passProps
+                Navigation.push(componentId, {
+                    component:{
+                        name: nextScreen,
+                        passProps: passProps
+                    }
                 });
                 break;
             case 'showModal':
-                navigator.showModal({
-                    screen: nextScreen,
-                    animated: true,
-                    // animationType: 'fade',
+                Navigation.showModal(createStackFromComponent({
+                    name: nextScreen,
                     passProps: passProps
-                });
+                }));
                 break;
             default:
                 break
@@ -108,7 +108,7 @@ export function screenTransition(navigator, transition, nextScreen, passProps, u
     }
 }
 
-export function handleQRSearchTransition (navigator, error, itemType, record, user, translation, userPermissions, refresh) {
+export function handleQRSearchTransition (componentId, error, itemType, record, user, outbreak, translation, userPermissions, refresh) {
     if (!refresh || !isFunction(refresh)) {
         refresh = () => {console.log('Default refresh function for scan qrCode')}
     }
@@ -130,19 +130,26 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                         onPress: () => {
                             console.log('Yes pressed');
                             let caseToSave = Object.assign({}, record, {
-                                outbreakId: get(user, 'activeOutbreakId', null),
+                                outbreakId: get(outbreak, '_id', null),
                             }, config.caseBlueprint);
 
-                            navigator.push({
-                                screen: 'CaseSingleScreen',
-                                animated: true,
-                                animationType: 'fade',
-                                passProps: {
-                                    case: caseToSave,
-                                    forceNew: true,
-                                    isNew: true,
-                                    refresh: refresh
+                            Navigation.push(componentId,{
+                                component:{
+                                    name: 'CaseSingleScreen',
+                                    options:{
+                                        animations:{
+                                            push: fadeInAnimation,
+                                            pop: fadeOutAnimation
+                                        }
+                                    },
+                                    passProps: {
+                                        case: caseToSave,
+                                        forceNew: true,
+                                        isNew: true,
+                                        refresh: refresh
+                                    }
                                 }
+
                             })
                         }
                     },
@@ -177,15 +184,21 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                     constants.PERMISSIONS_CASE.caseAll,
                     constants.PERMISSIONS_CASE.caseView
                 ], userPermissions))) {
-                        navigator.push({
-                            screen: 'CaseSingleScreen',
-                            animated: true,
-                            animationType: 'fade',
+                    Navigation.push(componentId, {
+                        component: {
+                            name: 'CaseSingleScreen',
+                            options: {
+                                animations: {
+                                    push: fadeInAnimation,
+                                    pop: fadeOutAnimation
+                                }
+                            },
                             passProps: {
                                 case: record,
                                 refresh: refresh
                             }
-                        })
+                        }
+                    })
                 } else {
                     // user doesn't have permission to view case
                     Alert.alert(
@@ -194,7 +207,9 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                         [
                             {
                                 text: getTranslation(translations.alertMessages.okButtonLabel),
-                                onPress: () => {console.log('Ok pressed')}
+                                onPress: () => {
+                                    console.log('Ok pressed')
+                                }
                             }
                         ]
                     )
@@ -204,15 +219,21 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                     constants.PERMISSIONS_CONTACT.contactAll,
                     constants.PERMISSIONS_CONTACT.contactView
                 ], userPermissions))) {
-                        navigator.push({
-                            screen: 'ContactsSingleScreen',
-                            animated: true,
-                            animationType: 'fade',
+                    Navigation.push(componentId, {
+                        component: {
+                            name: 'ContactsSingleScreen',
+                            options: {
+                                animations: {
+                                    push: fadeInAnimation,
+                                    pop: fadeOutAnimation
+                                }
+                            },
                             passProps: {
                                 contact: record,
                                 refresh: refresh
                             }
-                        })
+                        }
+                    })
                 } else {
                     // user doesn't have permission to view contact
                     Alert.alert(
@@ -221,7 +242,9 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                         [
                             {
                                 text: getTranslation(translations.alertMessages.okButtonLabel),
-                                onPress: () => {console.log('Ok pressed')}
+                                onPress: () => {
+                                    console.log('Ok pressed')
+                                }
                             }
                         ]
                     )
@@ -231,27 +254,56 @@ export function handleQRSearchTransition (navigator, error, itemType, record, us
                     PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
                     PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsView
                 ], userPermissions))) {
-                    navigator.push({
-                        screen: constants.appScreens.contactsOfContactsSingleScreen,
-                        animated: true,
-                        animationType: 'fade',
-                        passProps: {
-                            contact: record,
-                            refresh: refresh
+                    Navigation.push(componentId, {
+                        component: {
+                            options: {
+                                animations: {
+                                    push: fadeInAnimation,
+                                    pop: fadeOutAnimation
+                                }
+                            },
+                            name: constants.appScreens.contactsOfContactsSingleScreen,
+                            passProps: {
+                                contact: record,
+                                refresh: refresh
+                            }
                         }
                     })
-                } else {
-                    // user doesn't have permission to view contact
-                    Alert.alert(
-                        getTranslation(translations.alertMessages.alertLabel, translation),
-                        generatePermissionMessage(translations.helpScreen.viewMessage, translations.personTypes.contactsOfContacts, translation),
-                        [
-                            {
-                                text: getTranslation(translations.alertMessages.okButtonLabel),
-                                onPress: () => {console.log('Ok pressed')}
+                } else if (itemType === 'labResult') {
+                    if (checkArrayAndLength(lodashIntersection([
+                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                        constants.PERMISSIONS_LAB_RESULT.labResultView
+                    ], userPermissions))) {
+                        Navigation.push(componentId, {
+                            component: {
+                                options: {
+                                    animations: {
+                                        push: fadeInAnimation,
+                                        pop: fadeOutAnimation
+                                    }
+                                },
+                                name: constants.appScreens.labResultsSingleScreen,
+                                passProps: {
+                                    contact: record,
+                                    refresh: refresh
+                                }
                             }
-                        ]
-                    )
+                        })
+                    } else {
+                        // user doesn't have permission to view contact
+                        Alert.alert(
+                            getTranslation(translations.alertMessages.alertLabel, translation),
+                            generatePermissionMessage(translations.helpScreen.viewMessage, translations.personTypes.contactsOfContacts, translation),
+                            [
+                                {
+                                    text: getTranslation(translations.alertMessages.okButtonLabel),
+                                    onPress: () => {
+                                        console.log('Ok pressed')
+                                    }
+                                }
+                            ]
+                        )
+                    }
                 }
             }
         }

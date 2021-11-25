@@ -55,9 +55,7 @@ class SwitchInput extends PureComponent {
                             this.props.onChange(
                                 state,
                                 this.props.id,
-                                this.props.objectType ? (this.props.objectType === 'Address' ? this.props.index : (
-                                    this.props.objectType === 'LabResult' ? this.props.index : this.props.objectType
-                                )) : null,
+                                this.props.objectType ? (this.props.objectType === 'Address' ? this.props.index : this.props.objectType) : null,
                                 this.props.objectType
                             )
                         }

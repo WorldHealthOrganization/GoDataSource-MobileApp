@@ -17,25 +17,28 @@ import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
 import {removeErrors} from './../actions/errors';
-import {calculateDimension, extractIdFromPouchId, getTranslation, updateRequiredFields} from './../utils/functions';
+import {
+    calculateDimension,
+    createStackFromComponent,
+    extractIdFromPouchId,
+    getTranslation,
+    updateRequiredFields
+} from './../utils/functions';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ExposureContainer from '../containers/ExposureContainer';
 import get from 'lodash/get';
 import {insertOrUpdateExposure} from "../actions/exposure";
 import withPincode from './../components/higherOrderComponents/withPincode';
+import {Navigation} from "react-native-navigation";
 
 class ExposureScreen extends Component {
-
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
         this.state = {
             exposure: this.props.exposure || {
-                outbreakId: this.props.user.activeOutbreakId,
+                outbreakId: this.props.outbreak._id,
                 contactDate: new Date(),
                 contactDateEstimated: false,
                 certaintyLevelId: '',
@@ -58,7 +61,7 @@ class ExposureScreen extends Component {
     // Please add here the react lifecycle methods that you need
     componentDidUpdate(prevProps) {
         if (this.state.savePressed) {
-            this.props.navigator.dismissModal();
+            Navigation.dismissModal(this.props.componentId);
         }
     }
 
@@ -105,7 +108,7 @@ class ExposureScreen extends Component {
                                 </View>
                             }
                             title={null}
-                            navigator={this.props.navigator}
+                            componentId={this.props.componentId}
                             iconName="close"
                             handlePressNavbarButton={this.handlePressNavbarButton}
                         />
@@ -150,7 +153,7 @@ class ExposureScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.dismissModal();
+                        Navigation.dismissModal(this.props.componentId);
                     }
                 },
                 {
@@ -160,7 +163,7 @@ class ExposureScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.dismissModal();
+            Navigation.dismissModal(this.props.componentId);
         }
     };
 
@@ -295,15 +298,16 @@ class ExposureScreen extends Component {
             }, () => {
                 if (this.props.type === 'Contact' || this.props.type === 'ContactOfContact') {
                     let operation = this.props.exposure ? 'update' : 'create';
-                    let exposure = updateRequiredFields(get(this.props, 'user.activeOutbreakId', null), get(this.props, 'user._id', null), Object.assign({}, this.state.exposure), operation, 'relationship');
+                    let exposure = updateRequiredFields(get(this.props, 'outbreak._id', null), get(this.props, 'user._id', null), Object.assign({}, this.state.exposure), operation, 'relationship');
 
 
                     if (this.props.exposure) {
                         if (!this.props.contact) {
                             this.setState(prevState => ({
                                 exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
-                            }), () => {
-                                this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure, true));
+                            }), async () => {
+                                await Navigation.dismissModal(this.props.componentId);
+                                this.props.saveExposure(this.state.exposure, true);
                             })
                         } else {
                             let exposure = updateRequiredFields(get(this.props, 'outbreakId', null), get(this.props, 'user._id', null), this.state.exposure, 'update');
@@ -316,18 +320,19 @@ class ExposureScreen extends Component {
                             Promise.all([promise])
                                 .then((result) => {
                                     this.props.refreshRelations();
-                                    this.props.navigator.dismissModal();
+                                    Navigation.dismissModal(this.props.componentId);
                                 })
                         }
                     } else {
                         if (!this.props.contact) {
                             this.setState(prevState => ({
                                 exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
-                            }), () => {
-                              this.props.navigator.dismissModal(this.props.saveExposure(this.state.exposure));
+                            }), async () => {
+                              await Navigation.dismissModal(this.props.componentId);
+                                this.props.saveExposure(this.state.exposure);
                             })
                         } else {
-                            let exposure = updateRequiredFields(outbreakId = this.props.user.activeOutbreakId, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'create', fileType = 'relationship.json')
+                            let exposure = updateRequiredFields(outbreakId = this.props.outbreak._id, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'create', fileType = 'relationship.json')
                             let promise = null;
                             if (this.props.type === 'Contact') {
                                 promise = addExposureForContact(exposure, this.props.contact, this.props.periodOfFollowUp, get(this.props, 'user._id', null));
@@ -338,7 +343,7 @@ class ExposureScreen extends Component {
                                 .then((result) => {
                                     console.log('Successful at adding exposures');
                                     this.props.refresh();
-                                    this.props.navigator.dismissModal();
+                                    Navigation.dismissModal(this.props.componentId);
                                 })
                                 .catch((errorAddExposure) => {
                                     console.log(errorAddExposure)
@@ -347,11 +352,11 @@ class ExposureScreen extends Component {
                     }
                 } else {
                     let operation = this.props.exposure ? 'update' : 'create';
-                    let exposure = updateRequiredFields(get(this.props, 'user.activeOutbreakId', null), get(this.props, 'user._id', null), Object.assign({}, this.state.exposure), operation, 'relationship');
+                    let exposure = updateRequiredFields(get(this.props, 'outbreak._id', null), get(this.props, 'user._id', null), Object.assign({}, this.state.exposure), operation, 'relationship');
                     insertOrUpdateExposure(exposure)
                         .then((resultInsertUpdateExposure) => {
                             this.props.refreshRelations();
-                            this.props.navigator.dismissModal();
+                            Navigation.dismissModal(this.props.componentId);
                         })
                         .catch((errorInsertUpdateExposure) => {
                             console.log('ErrorInsertUpdateExposure: ', errorInsertUpdateExposure);
@@ -399,13 +404,12 @@ class ExposureScreen extends Component {
             pageAskingHelpFrom = 'exposureAdd'
         }
 
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
             passProps: {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 }
 
@@ -464,6 +468,7 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         user: get(state, 'user', null),
+        outbreak: get(state, 'outbreak', null),
         screenSize: get(state, 'app.screenSize', config.designScreenSize),
         translation: get(state, 'app.translation', []),
         periodOfFollowUp: get(state, 'outbreak.periodOfFollowup', null),

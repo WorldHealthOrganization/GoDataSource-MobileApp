@@ -11,7 +11,6 @@ import {useSelector} from "react-redux";
 import {calculateDimension, getTranslation} from "../utils/functions";
 import {selectScreenSize, selectTranslations} from './../utils/selectors';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import {languageModalComponentLabels} from './../utils/translations';
 import translations from "../utils/translations";
 
 const selectLanguageModalComponentReduxProps = createSelector(
@@ -60,7 +59,7 @@ const LanguageModalComponent = React.memo(({availableLanguages, showModal, onCan
                     style={style.titleText}>{getTranslation(translations.navigationDrawer.languagesLabel, translation)}</Text>
                 <ScrollView>
                     <Text
-                        style={style.subText}>{getTranslation(languageModalComponentLabels.infoMessage, translation)}</Text>
+                        style={style.subText}>{getTranslation(translations.languageModalComponentLabels.infoMessage, translation)}</Text>
                     <SelectMultiple
                         style={{width: '100%'}}
                         items={availableLanguages}
@@ -72,12 +71,12 @@ const LanguageModalComponent = React.memo(({availableLanguages, showModal, onCan
                     showError ? (
                         <Text
                             style={style.alertStyle}
-                        >{getTranslation(languageModalComponentLabels.alertNoLanguage, translation)}</Text>
+                        >{getTranslation(translations.languageModalComponentLabels.alertNoLanguage, translation)}</Text>
                     ) : (null)
                 }
 
                 <LocalButton
-                    title={getTranslation(getTranslation(languageModalComponentLabels.downloadButton, translation))}
+                    title={getTranslation(getTranslation(translations.languageModalComponentLabels.downloadButton, translation))}
                     onPress={onPressContinue}
                     color={styles.buttonGreen}
                     titleColor={'white'}

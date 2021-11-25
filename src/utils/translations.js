@@ -5,6 +5,7 @@ const navigationDrawer = {
     contactsOfContactsLabel: 'LNG_NAVIGATION_DRAWER_CONTACTS_OF_CONTACTS',
 
     casesLabel: 'LNG_NAVIGATION_DRAWER_CASES',
+    labResultsLabel: 'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
     syncHubManually: 'LNG_NAVIGATION_DRAWER_SYNC_HUB_MANUAL',
     changeHubConfig: 'LNG_NAVIGATION_DRAWER_CHANGE_HUB_CONFIG',
     usersLabel: 'LNG_NAVIGATION_DRAWER_USERS',
@@ -46,6 +47,12 @@ const followUpFilter = {
     area: 'LNG_FILTER_SCREEN_AREA_LABEL',
     chooseLocationLabel: 'LNG_FILTER_SCREEN_CHOOSE_LOCATIONS_MESSAGE',
 };
+
+const personFilter = {
+    vaccine: 'LNG_ENTITY_FIELD_LABEL_VACCINE',
+    vaccineStatus: 'LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS',
+    pregnancyStatus: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS'
+}
 
 const helpFilter = {
     filterTitle: 'LNG_SIDE_FILTERS_TITLE',
@@ -171,6 +178,8 @@ const caseSingleScreen = {
     isolationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     isolationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
 
+    deleteCase: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE'
+
 };
 
 const contactSingleScreen = {
@@ -203,7 +212,9 @@ const contactSingleScreen = {
 
     contactId: 'LNG_CONTACT_FIELD_LABEL_CONTACT_ID',
     followUpFinalStatus: 'LNG_MOBILE_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
-    followUpTeamId: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID'
+    followUpTeamId: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+
+    contactIdMaskError: 'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK',
 };
 
 const exposureScreen = {
@@ -230,7 +241,7 @@ const followUpsSingleScreen = {
 
     missingButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_MISSING',
     deceasedButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE',
-    deleteButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE',
+    deleteButton: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_FOLLOW_UP',
     editContactButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT',
 
     deleteFollowUpAlertError: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_FOLLOW_UP',
@@ -248,6 +259,51 @@ const casesScreen = {
     contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS'
 };
 
+const labResultsScreen = {
+    labResultsTitle: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+    noLabResults: 'LNG_COMMON_LABEL_EMPTY_TABLE',
+    labName: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+    dateOfResult: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+    status: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+    result: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
+    sampleTaken: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
+}
+
+const labResultsSingleScreen = {
+    title: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+    sampleLabId: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
+    sampleTaken: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
+    sampleDelivered: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
+    dateOfResult: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+    labName: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+    result: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
+    status: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+    notes: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+    variantStrain: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE',
+    hasVariantStrain: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+    sequenceReason: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+    dateSampleSentSeq: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+    labNameSeq: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+    dateResultSeq: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+    resultSeq: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+    dateSampleSent: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+    dateSampleTested: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+    sampleType: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
+    testType: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
+    testedFor: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+    quantResult: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+    modifyLabResult: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
+    viewLabResult: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
+    deleteAlertMessage: 'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT',
+    deleteLabResult: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_LAB_RESULT',
+    createLabResult: 'LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON',
+}
+
+const labResultsFilter = {
+    filterTitle: 'LNG_FILTER_SCREEN_FILTER_TAB',
+    personType: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_TYPE'
+}
+
 const usersScreen = {
     usersTitle: 'LNG_USER_LIST_SCREEN_TITLE',
     phoneButtonLabel: 'LNG_USER_LIST_SCREEN_PHONE_BUTTON',
@@ -260,13 +316,15 @@ const contactsScreen = {
     contactsTitle: 'LNG_CONTACT_LIST_SCREEN_TITLE',
     addFollowupsButton: 'LNG_CONTACT_LIST_SCREEN_ADD_FOLLOW_UP_BUTTON',
     editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
-    noContacts: 'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS'
+    noContacts: 'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS',
+    delete: 'LNG_CONTACT_SINGLE_SCREEN_DELETE_CONTACT_ACTION'
 };
 
-export const contactsOfContactsScreen = {
+const contactsOfContactsScreen = {
     contactsTitle: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_TITLE',
     // editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
-    noContacts: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_NO_CONTACTS'
+    noContacts: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_NO_CONTACTS',
+    deleteCoC: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT_OF_CONTACT'
 };
 
 const followUpsScreen = {
@@ -306,6 +364,9 @@ const alertMessages = {
     validationErrorLabel: 'LNG_DIALOG_VALIDATION_ERROR_TITLE_LABEL',
     warningLabel: 'LNG_DIALOG_WARNING_TITLE_LABEL',
     saveAnywayLabel: 'LNG_DIALOG_SAVE_ANYWAY_LABEL',
+    areYouSureDelete: 'LNG_DIALOG_CONFIRM_DELETE_ITEM',
+
+    invalidMaskAlert: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
 
     //not used with translation
     invalidCredentials: 'Invalid credentials',
@@ -570,7 +631,7 @@ const personListItem = {
     dayOfFollowUp: 'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP'
 };
 
-export const languageModalComponentLabels = {
+const languageModalComponentLabels = {
     infoMessage: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_INFO_MESSAGE',
     downloadButton: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_DOWNLOAD_BUTTON',
     alertNoLanguage: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_ALERT_NO_LANGUAGE'
@@ -616,5 +677,11 @@ export default {
     hubConfigScreen,
     sortTab,
     followUpAgenda,
-    personListItem
+    personListItem,
+    contactsOfContactsScreen,
+    languageModalComponentLabels,
+    labResultsScreen,
+    labResultsSingleScreen,
+    labResultsFilter,
+    personFilter
 };

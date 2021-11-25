@@ -5,17 +5,31 @@ import {
     ACTION_TYPE_STORE_LOCATIONS,
     ACTION_TYPE_STORE_LOCATIONS_LIST,
     ACTION_TYPE_STORE_OUTBREAK,
+    ACTION_TYPE_OUTBREAK_CHANGE,
     ACTION_TYPE_STORE_USER_LOCATIONS,
     ACTION_TYPE_STORE_USER_LOCATIONS_LIST
 } from './../utils/enums';
+import constants from './../utils/constants';
 import {getOutbreakByIdRequest} from './../queries/outbreak';
 import errorTypes from './../utils/errorTypes';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeOutbreak(outbreak) {
+    if(outbreak?._id.includes("outbreak.json_")){
+        outbreak._id = outbreak._id.substring(14, outbreak._id.length);
+    }
+    constants.PERMISSIONS_LAB_RESULT = constants.PERMISSIONS_LAB_RESULT_CONSTANT;
+
     return {
         type: ACTION_TYPE_STORE_OUTBREAK,
         payload: outbreak
+    }
+}
+
+export function setDisableOutbreakChange(disableOutbreakChange) {
+    return {
+        type: ACTION_TYPE_OUTBREAK_CHANGE,
+        payload: disableOutbreakChange
     }
 }
 

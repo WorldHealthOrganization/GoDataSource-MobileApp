@@ -5,6 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {View, Text, ActivityIndicator, Animated, FlatList, Alert, StyleSheet} from 'react-native';
+import geolocation from '@react-native-community/geolocation';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import styles from './../styles';
 import {connect} from "react-redux";
@@ -33,6 +34,7 @@ class AnimatedListView extends Component {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
+        console.log("Animated  list view constructor call", props.dataType);
         super(props);
         this.state = {
             searchText: ''
@@ -310,6 +312,26 @@ class AnimatedListView extends Component {
                     }];
                 titleColor = 'black';
                 break;
+            case 'LabResult':
+                const labResultData = get(item, 'labResultData', null);
+                mainData = get(item, 'mainData', null);
+                textsArray = [
+                    getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation)
+                ];
+                textsStyleArray = [
+                    [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}]
+                ];
+                onPressTextsArray = [
+                    () => {
+                        this.props.onPressView(labResultData,mainData);
+                    }];
+                arrayPermissions = [
+                    [
+                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                        constants.PERMISSIONS_LAB_RESULT.labResultView
+                    ]
+                ];
+                break;
             default:
                 textsArray = [];
                 textsStyleArray = [];
@@ -349,8 +371,11 @@ class AnimatedListView extends Component {
             case 'User':
                 message = translations.usersScreen.noUsers;
                 break;
+            case 'LabResult':
+                message = translations.labResultsScreen.noLabResults;
+                break;
             default:
-                message = translations.followUpsScreen.noFollowupsMessage;
+                message = translations.labResultsScreen.noLabResults;
         }
         return (
             <View style={[style.emptyComponent, { height: calculateDimension((667 - 152), true, this.props.screenSize) }]}>
@@ -373,6 +398,8 @@ class AnimatedListView extends Component {
                 return get(item, 'mainData._id', null);
             case 'User':
                 return get(item, 'mainData._id', null);
+            case 'LabResult':
+                return get(item, 'labResultData._id', null);
             default:
                 return get(item, 'mainData._id', null);
         }
@@ -411,7 +438,7 @@ class AnimatedListView extends Component {
             });
             let placeOfResidenceLatitude = get(placeOfResidence, 'geoLocation.coordinates[1]', 0);
             let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[0]', 0);
-            navigator.geolocation.getCurrentPosition(
+            geolocation.getCurrentPosition(
                 (position) => {
                     this.props.onPressMap({
                         latitude: placeOfResidenceLatitude,

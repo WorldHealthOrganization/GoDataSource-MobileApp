@@ -12,9 +12,11 @@ const appScreens = {
     casesScreen: 'CasesScreen',
     caseSingleScreen: 'CaseSingleScreen',
     contactsScreen: 'ContactsScreen',
+    labResultsScreen: 'LabResultsScreen',
     contactSingleScreen: 'ContactsSingleScreen',
     contactsOfContactsScreen: 'ContactsOfContactsScreen',
     contactsOfContactsSingleScreen: 'ContactsOfContactsSingleScreen',
+    labResultsSingleScreen: 'LabResultsSingleScreen',
     exposureScreen: 'ExposureScreen',
     helpScreen: 'HelpScreen',
     helpSingleScreen: 'HelpSingleScreen',
@@ -93,6 +95,23 @@ const PERMISSIONS_CASE = {
     caseModifyRelationshipExposures: 'case_modify_relationship_exposures',
     caseDeleteRelationshipExposures: 'case_delete_relationship_exposures',
 };
+
+const PERMISSIONS_LAB_RESULT_CONSTANT = {
+    labResultAll: 'lab_result_all',
+    labResultView: 'lab_result_view',
+    labResultList: 'lab_result_list',
+    labResultCreate: 'lab_result_create',
+    labResultModify: 'lab_result_modify',
+    labResultDelete: 'lab_result_delete',
+    labResultCreateContact: 'lab_result_create_contact',
+    labResultListRelationshipContacts: 'lab_result_list_relationship_contacts',
+    labResultViewRelationshipContacts: 'lab_result_view_relationship_contacts',
+    labResultCreateRelationshipContacts: 'lab_result_create_relationship_contacts',
+    labResultModifyRelationshipContacts: 'lab_result_modify_relationship_contacts',
+    labResultDeleteRelationshipContacts: 'lab_result_delete_relationship_contacts',
+};
+
+let PERMISSIONS_LAB_RESULT = PERMISSIONS_LAB_RESULT_CONSTANT;
 
 const PERMISSIONS_FOLLOW_UP = {
     followUpAll: 'follow_up_all',
@@ -176,5 +195,7 @@ export default {
     PERMISSIONS_USER,
     PERMISSIONS_HELP,
     PERMISSIONS_COMMON,
-    PERMISSIONS_TEAMS
+    PERMISSIONS_TEAMS,
+    PERMISSIONS_LAB_RESULT,
+    PERMISSIONS_LAB_RESULT_CONSTANT
 }

@@ -3,6 +3,7 @@
  */
 import errorTypes from './errorTypes';
 import config, {sideMenuKeys} from './config';
+import geolocation from '@react-native-community/geolocation';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import {unzip, zip} from 'react-native-zip-archive';
 import {processBulkDocs, updateFileInDatabase} from './../queries/database';
@@ -67,7 +68,7 @@ export function handleResponseFromRNFetchBlob(response) {
                 })
                 .catch((errorParseError) => {
                     if (status) {
-                        reject ({message: `The mobile received the status ${status} from the API but the error could not be parsed`});
+                        reject({message: `The mobile received the status ${status} from the API but the error could not be parsed`});
                     }
                     reject({message: typeof errorParseError === 'string' ? errorParseError : JSON.stringify(errorParseError)});
                 })
@@ -125,6 +126,79 @@ export function getAddress(address, returnString, locationsList) {
     return returnString ? addressArray.join(', ') : addressArray;
 }
 
+export function mapSideMenuKeysToScreenName(sideMenuKey){
+    let screenToSwitchTo = null;
+    let addScreen = false;
+    switch(sideMenuKey) {
+        case sideMenuKeys[0]:
+            screenToSwitchTo = constants.appScreens.followUpScreen;
+            break;
+        case sideMenuKeys[1]:
+            screenToSwitchTo = constants.appScreens.contactsScreen;
+            break;
+        case `${sideMenuKeys[1]}-add`:
+            screenToSwitchTo = constants.appScreens.contactsScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[2]:
+            screenToSwitchTo = constants.appScreens.contactsOfContactsScreen;
+            break;
+        case `${sideMenuKeys[2]}-add`:
+            screenToSwitchTo = constants.appScreens.contactsOfContactsSingleScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[3]:
+            screenToSwitchTo = constants.appScreens.casesScreen;
+            break;
+        case `${sideMenuKeys[3]}-add`:
+            screenToSwitchTo = constants.appScreens.caseSingleScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[4]:
+            screenToSwitchTo = constants.appScreens.labResultsScreen;
+            break;
+        case `${sideMenuKeys[4]}-add`:
+            screenToSwitchTo = constants.appScreens.labResultsSingleScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[5]:
+            screenToSwitchTo = constants.appScreens.usersScreen;
+            break;
+        case sideMenuKeys[6]:
+            screenToSwitchTo = constants.appScreens.helpScreen;
+            break;
+        default:
+            screenToSwitchTo = constants.appScreens.followUpScreen;
+            break;
+    }
+    return{
+        screenToSwitchTo,
+        addScreen
+    }
+}
+
+export function createStackFromComponent(component) {
+    return({
+        stack:{
+            children:[
+                {
+                    component: component
+                }
+            ],
+            options: {
+                layout: {
+                    orientation: ['portrait']
+                },
+                topBar: {
+                    visible: false,
+                },
+                modalPresentationStyle: "fullScreen"
+            }
+        }
+
+    })
+}
+
 export function navigation(event, navigator) {
     // console.log('Event: ', event);
     if (event.type === 'DeepLink') {
@@ -160,9 +234,16 @@ export function navigation(event, navigator) {
                         addScreen = constants.appScreens.caseSingleScreen;
                         break;
                     case sideMenuKeys[4]:
-                        screenToSwitchTo = constants.appScreens.usersScreen;
+                        screenToSwitchTo = constants.appScreens.labResultsScreen;
+                        break;
+                    case `${sideMenuKeys[4]}-add`:
+                        screenToSwitchTo = constants.appScreens.labResultsSingleScreen;
+                        addScreen = constants.appScreens.labResultsSingleScreen;
                         break;
                     case sideMenuKeys[5]:
+                        screenToSwitchTo = constants.appScreens.usersScreen;
+                        break;
+                    case sideMenuKeys[6]:
                         screenToSwitchTo = constants.appScreens.helpScreen;
                     break;
                     default:
@@ -180,7 +261,6 @@ export function navigation(event, navigator) {
                         }
                     });
                 } else {
-
                     navigator.resetTo({
                         screen: screenToSwitchTo,
                     });
@@ -213,13 +293,12 @@ export function computeFullName(person) {
         return '';
     }
     if (person.type === translations.personTypes.events) {
-        return person.name;
+        return person.name || person.firstName;
     }
     return (person.firstName || '') + ' ' + (person.lastName || '');
 }
 
 export function unzipFile(source, dest, password, clientCredentials) {
-    console.log('Stuff: ', source, dest, password, clientCredentials);
     return function(dispatch) {
         return new Promise((resolve, reject) => {
             RNFetchBlobFS.exists(source)
@@ -227,7 +306,6 @@ export function unzipFile(source, dest, password, clientCredentials) {
                     if (exists) {
                         unzip(source, dest, 'UTF-8')
                             .then((path) => {
-                                console.log(`unzip completed at ${path}`);
                                 // Delete the zip file after unzipping
                                 deleteFile(source, true)
                                     .then(() => {
@@ -427,7 +505,6 @@ export function getDataFromDatabaseFromFileSql (table, lastSyncDate, password) {
             return handleDataForZip(response, table, password, true);
         })
         .catch((errorGetDataFromDatabaseFromFileSql) => {
-            console.log('getDataFromDatabaseFromFileSql: ', errorGetDataFromDatabaseFromFileSql);
             return Promise.reject(errorGetDataFromDatabaseFromFileSql)
         })
 }
@@ -625,6 +702,8 @@ export function computeIdForFileType (fileType, outbreakId, file, type) {
             return generateId();
         // return (type + '_' + file.outbreakId + '_' + file._id);
         case 'relationship.json':
+            return generateId();
+        case 'labResult':
             return generateId();
         default:
             return (fileType + '_' + generateId());
@@ -962,7 +1041,16 @@ function extractQuestions(questions) {
     // console.log('extract le questions:  ', returnedQuestions);
     return returnedQuestions;
 }
+export function getMaskRegExpStringForSearch(mask) {
+    mask = mask.replace('0','[0-9]');
+    mask = mask.replace('YYYY', '\\d{4}');
+    mask = mask.replace('@', '[A-Za-z]');
+    mask = mask.replace('&','.');
+    //Doing this for my sanity
+    mask = mask.replace('*', '(.*?)');
 
+    return new RegExp(`^${mask}$`);
+}
 export function reMapAnswers(answers) {
     let returnedAnswers = answers;
     // Map to flat structure
@@ -1009,7 +1097,7 @@ export function checkRequiredQuestions(questions, previousAnswers) {
     for (let i = 0; i < questions.length; i++) {
         if (questions[i].required && questions[i].inactive === false) {
             if (!previousAnswers || !previousAnswers[questions[i].variable] || !Array.isArray(previousAnswers[questions[i].variable]) || previousAnswers[questions[i].variable].findIndex((e) => {
-                return !e.value || e.value === ''
+                return !e.value && e.value !== 0
             }) > -1) {
                 requiredQuestions.push(questions[i].text);
             }
@@ -1046,6 +1134,10 @@ export function getTranslation (value, allTransactions) {
     let valueToBeReturned = value;
     if (value && typeof value === 'string' && value.includes('LNG')) {
         let item = null;
+
+        // if(value===translations.contactsOfContactsScreen.contactsTitle){
+        //     console.log("What's this?", allTransactions);
+        // }
         if (value && allTransactions && Array.isArray(allTransactions)) {
             item = allTransactions.find(e => {return e && e.token === value})
         }
@@ -1132,6 +1224,9 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             if (pageAskingHelpFrom === 'followUps') {
                 return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'labResults') {
+                return e.page.toLowerCase().includes('lab-results') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'contacts') {
                 return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
@@ -1141,6 +1236,9 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             }
             else if (pageAskingHelpFrom === 'followUpSingleScreenAdd') {
                 return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
+            } else if (pageAskingHelpFrom === 'labResultSingleScreenAdd') {
+                return e.page.toLowerCase().includes('lab-results') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
             } else if (pageAskingHelpFrom === 'contactsSingleScreenAdd') {
                 return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
@@ -1152,6 +1250,9 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             else if (pageAskingHelpFrom === 'followUpSingleScreenEdit') {
                 return e.page.toLowerCase().includes('followups') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'labResultSingleScreenEdit') {
+                return e.page.toLowerCase().includes('lab-results') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'contactsSingleScreenEdit') {
                 return e.page.toLowerCase().includes('contacts') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
@@ -1161,6 +1262,9 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             }
             else if (pageAskingHelpFrom === 'followUpSingleScreenView') {
                 return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'labResultSingleScreenView') {
+                return e.page.toLowerCase().includes('lab-results') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'contactsSingleScreenView') {
                 return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
@@ -1439,7 +1543,7 @@ export function extractLocationId (person) {
 // Promise wrapper around getCurrentPosition from react-native
 export function getLocationAccurate () {
     return new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
+        geolocation.getCurrentPosition(
             (position) => {
                 return resolve({
                     lat: get(position, 'coords.latitude', null),

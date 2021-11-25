@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Animated, FlatList, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {calculateDimension, computeFullName, getTranslation} from './../utils/functions';
+import {calculateDimension, computeFullName, createStackFromComponent, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
@@ -19,6 +19,7 @@ import get from 'lodash/get';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
+import {Navigation} from "react-native-navigation";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -197,16 +198,15 @@ class ContactsSingleExposures extends Component {
     };
 
     onPressAddExposure = () => {
-        this.props.navigator.showModal({
-            screen: "ExposureScreen",
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: "ExposureScreen",
             passProps: {
                 case: this.props.case,
                 type: 'Case',
                 saveExposure: this.props.saveExposure,
                 refreshRelations: this.props.refreshRelations
             }
-        })
+        }))
     };
 }
 

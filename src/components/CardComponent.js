@@ -3,10 +3,10 @@
  */
 /** Since this app is based around the material ui is better to use the components from
  the material ui library, since it provides design and animations out of the box */
-import React, {PureComponent} from 'react';
+import React, { Component} from 'react';
 import {View, Text, StyleSheet, Linking, Alert} from 'react-native';
 import {WebView} from 'react-native-webview';
-import {calculateDimension, getTranslation, createDate, callPhone} from './../utils/functions';
+import {calculateDimension, getTranslation, createDate, callPhone, getMaskRegExpStringForSearch} from './../utils/functions';
 import {connect} from "react-redux";
 import DropdownInput from './DropdownInput';
 import DropDown from './DropDown';
@@ -18,6 +18,7 @@ import SwitchInput from './SwitchInput';
 import DatePicker from './DatePicker';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import Section from './Section';
 import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
@@ -26,7 +27,7 @@ import translations from './../utils/translations';
 import SearchableDropdown from './SearchableDropdown';
 import PermissionComponent from './PermissionComponent';
 
-class CardComponent extends PureComponent {
+class CardComponent extends Component {
 
     /** This will be a dumb component, so it's best not to put any business logic in it */
     constructor(props) {
@@ -34,6 +35,22 @@ class CardComponent extends PureComponent {
         this.state = {
             showDropdown: false
         };
+    }
+
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        let answer = false;
+        for (const [key, value] of Object.entries(nextProps)) {
+            if(!isEqual(this.props[key], value)){
+                if(!(key==='item' && this.props[key].id === value.id)) {
+                    answer = true;
+                    break;
+                }
+                if(nextProps.item.type === 'Selector' && this.props.item !== nextProps.item){
+                    return true;
+                }
+            }
+        }
+        return answer;
     }
 
     /** Please add here the react lifecycle methods that you need
@@ -55,6 +72,16 @@ class CardComponent extends PureComponent {
         let width = calculateDimension(315, false, this.props.screenSize);
         let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
 
+        let mask = null;
+        let editMode = this.props.item.isEditMode;
+        if(this.props.item.id === 'visualId'){
+            if(this.props.mask.includes('9')){
+                editMode = false;
+            } else {
+                mask = getMaskRegExpStringForSearch(this.props.mask);
+            }
+        }
+
         switch(this.props.item.type) {
             case 'Section':
                 return (
@@ -73,7 +100,7 @@ class CardComponent extends PureComponent {
                         label={get(this.props, 'item.label', null)}
                         index={this.props.index}
                         value={this.props.value}
-                        isEditMode={this.props.item.isEditMode}
+                        isEditMode={editMode}
                         isRequired={this.props.item.isRequired}
                         multiline={this.props.item.multiline}
                         style={{width: width, marginHorizontal: marginHorizontal}}
@@ -83,6 +110,8 @@ class CardComponent extends PureComponent {
                         onChange={this.props.onChangeText}
                         onFocus={this.props.onFocus}
                         onBlur={this.props.onBlur}
+                        mask={mask}
+                        outbreakMask={this.props.mask}
                         onClickAction={this.props.item.id === 'phoneNumber' ? callPhone : null}
                     />
                 );
@@ -201,11 +230,13 @@ class CardComponent extends PureComponent {
                     />
                 );
             case 'Selector':
+                console.log("What data", this.props.item.data);
                 return (
                     <Selector
                         id={this.props.item.id}
                         key={this.props.item.id}
                         data={this.props.item.data}
+                        shouldTranslate={this.props.item.shouldTranslate}
                         selectItem={this.props.onSelectItem}
                         style={{width: width, height: '100%', marginHorizontal: marginHorizontal}}
                         objectType={this.props.item.objectType}
@@ -321,7 +352,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         locations: get(state, `locations.locations`, []),
         userLocations: get(state, `locations.userLocations`, []),
-        translation: state.app.translation,
+        translation: state.app.translation
     };
 }
 

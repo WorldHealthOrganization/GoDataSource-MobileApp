@@ -39,6 +39,7 @@ class ExposureContainer extends PureComponent {
         return (
             <ScrollView
                 style={style.containerScrollView}
+                nestedScrollEnabled={true}
                 contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
             >
                 <View style={style.container}>
@@ -70,7 +71,8 @@ class ExposureContainer extends PureComponent {
                 marginVertical: 4,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+                <ScrollView scrollEnabled={false}
+                            nestedScrollEnabled={true} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -139,7 +141,6 @@ class ExposureContainer extends PureComponent {
             <CardComponent
                 item={item}
                 isEditMode={this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true}
-                exposure={this.props.exposure}
                 isEditModeForDropDownInput={isEditModeForDropDownInput}
                 value={value}
                 minimumDate={minimumDate}

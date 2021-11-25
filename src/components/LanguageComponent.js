@@ -10,18 +10,19 @@ import {updateRequiredFields, getTranslation} from "../utils/functions";
 import {updateUser} from './../actions/user';
 import {getTranslationsAsync, addLanguagePacks} from './../actions/app';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import {selectTranslations, selectUserLanguage, selectUser, selectAllLanguages} from './../utils/selectors';
+import {selectTranslations, selectUserLanguage, selectUser, selectAllLanguages, selectOutbreak} from './../utils/selectors';
 import {useSetStateWithCallback} from "../utils/hooks";
 import translations from './../utils/translations';
+import {Navigation} from "react-native-navigation";
 
 
 const selectReduxDataForLanguageComponent = createSelector(
-    [selectTranslations, selectUserLanguage, selectAllLanguages, selectUser],
-    (translation, userLanguage, allLanguages, user) => [translation, userLanguage, allLanguages, user]
+    [selectTranslations, selectUserLanguage, selectAllLanguages, selectUser, selectOutbreak],
+    (translation, userLanguage, allLanguages, user, outbreak) => [translation, userLanguage, allLanguages, user, outbreak]
 );
 
-const LanguageComponent = React.memo(({style, navigator}) => {
-    const [translation, userLanguage, {apiLanguages, deviceLanguages}, user] = useSelector(selectReduxDataForLanguageComponent);
+const LanguageComponent = React.memo(({style, componentId}) => {
+    const [translation, userLanguage, {apiLanguages, deviceLanguages}, user, outbreak] = useSelector(selectReduxDataForLanguageComponent);
     const [showModal, setShowModal] = useSetStateWithCallback(false);
     const [selectedLanguage, setSelectedLanguage] = useState(userLanguage);
     const [availableLanguages, setAvailableLanguages] = useState(deviceLanguages);
@@ -38,11 +39,14 @@ const LanguageComponent = React.memo(({style, navigator}) => {
     function setUserLanguage(value) {
         // console.log('value', value)
         if (value === 'addLanguagePack') {
-            navigator.toggleDrawer({
-                    side: 'left',
-                    animated: true,
-                    to: 'closed'
-                });
+            Navigation.mergeOptions(componentId, {
+                sideMenu: {
+                    left: {
+                        visible: false,
+                    },
+                },
+            });
+            //Timeout?
             setTimeout(() => {
                 setShowModal(true);
                 setSelectedLanguage(value);
@@ -51,9 +55,9 @@ const LanguageComponent = React.memo(({style, navigator}) => {
             if (value !== selectedLanguage) {
                 let userClone = Object.assign({}, user);
                 userClone.languageId = value;
-                dispatch(getTranslationsAsync(value, userClone?.activeOutbreakId));
+                dispatch(getTranslationsAsync(value, outbreak._id));
 
-                userClone = updateRequiredFields(userClone.activeOutbreakId, userClone._id, userClone, 'update');
+                userClone = updateRequiredFields(outbreak._id, userClone._id, userClone, 'update');
                 setSelectedLanguage(value);
 
                 dispatch(updateUser(userClone));
@@ -97,12 +101,12 @@ const LanguageComponent = React.memo(({style, navigator}) => {
 });
 
 LanguageComponent.propTypes = {
-    navigator: PropTypes.object.isRequired,
+    componentId: PropTypes.string.isRequired,
     style: PropTypes.object.isRequired
 };
 
 LanguageComponent.defaultProps = {
-    navigator: {},
+    componentId: {},
     style: {}
 };
 

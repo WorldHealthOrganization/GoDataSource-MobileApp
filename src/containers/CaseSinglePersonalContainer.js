@@ -30,10 +30,11 @@ class CaseSinglePersonalContainer extends Component {
 
     // Please add here the react lifecycle methods that you need
     shouldComponentUpdate(nextProps, nextState) {
+        let should = false;
         if (nextProps.isEditMode !== this.props.isEditMode || nextProps.routeKey === 'personal') {
-            return true;
+            should = true;
         }
-        return false;
+        return should;
     }
 
     // The render method should have at least business logic as possible,
@@ -103,14 +104,16 @@ class CaseSinglePersonalContainer extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
         let fields = item.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+            field.isEditMode = this.props.isEditMode;
+            return field;
         });
         return this.renderItemCardComponent(fields, index)
     };
 
     handleRenderItemForDocumentsList = (item, index) => {
         let fields = config.caseSingleScreen.document.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+            field.isEditMode = this.props.isEditMode;
+            return field;
         });
         return this.renderItemCardComponent(fields, index)
     };
@@ -161,6 +164,9 @@ class CaseSinglePersonalContainer extends Component {
         } else {
             value = this.computeValueForCasesSingleScreen(item, cardIndex);
         }
+        if (item.type === 'DatePicker' && value === '') {
+            value = null
+        }
 
         if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null) {
             let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => { return e.value }).indexOf(item.id);
@@ -169,9 +175,6 @@ class CaseSinglePersonalContainer extends Component {
                     return
                 }
             }
-        }
-        if (item.type === 'DatePicker' && value === '') {
-            value = null
         }
 
         let dateValidation = this.setDateValidations(item);
@@ -183,7 +186,6 @@ class CaseSinglePersonalContainer extends Component {
                 item={item}
                 isEditMode={this.props.isEditMode}
                 isEditModeForDropDownInput={this.props.isEditMode}
-                case={this.props.case}
                 selectedItemIndexForAgeUnitOfMeasureDropDown={this.props.selectedItemIndexForAgeUnitOfMeasureDropDown}
                 onChangeextInputWithDropDown={this.props.onChangeextInputWithDropDown}
                 value={value}
@@ -200,6 +202,7 @@ class CaseSinglePersonalContainer extends Component {
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
                 permissionsList={item.permissionsList}
+                mask={this.props.outbreak?.caseIdMask}
             />
         )
     };
@@ -343,7 +346,8 @@ function mapStateToProps(state) {
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         role: _.get(state, 'role', []),
         referenceData: _.get(state, 'referenceData', []),
-        translation: _.get(state, 'app.translation')
+        translation: _.get(state, 'app.translation'),
+        outbreak: _.get(state, 'outbreak', null)
     };
 }
 

@@ -23,6 +23,8 @@ PouchDB.plugin(SQLiteAdapter);
 PouchDB.plugin(PouchUpsert);
 PouchDB.plugin(PouchFind);
 
+// Change version for manual sync
+export const DATABASE_VERSION = 1;
 
 // PouchDB wrapper over SQLite uses one database per user, so we will store all documents from all the mongo collection to a single database.
 // We will separate the records by adding a new property called type: <collection_name>
@@ -65,12 +67,12 @@ export function createDesignDoc(name, mapFunction) {
     return ddoc;
 }
 
-export function getDatabase(collectionName) {
+export function getDatabase(collectionName, noCache) {
     return new Promise((resolve, reject) => {
         // Define the design documents that tells the database to build indexes in order to query
 
         // Check first if the database is cached
-        if (databaseCache && databaseCache.name.includes(collectionName)) {
+        if (!noCache && databaseCache && databaseCache.name.includes(collectionName)) {
             return resolve(databaseCache);
         }
         // After that, check if there is already a database with the name and return that

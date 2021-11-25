@@ -11,6 +11,7 @@ import {getPersonWithRelationsForOutbreakId} from './../queries/sqlTools/sqlQuer
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, lastElement, offset}, computeCount) {
+    console.log("Important cases things", casesFilter);
     return getPersonWithRelationsForOutbreakId({
         outbreakId,
         filter: casesFilter,
@@ -146,14 +147,12 @@ export function getPersonsByName(outbreakId, search, type) {
             {'firstName': {'$like': `%${search}%`}},
             {'lastName': {'$like': `%${search}%`}},
             {'visualId': {'$like': `%${search}%`}},
-        ]
+        ],
+        deleted: false
     };
     // if type is contacts, search both cases and events
-    if (type === 'Contact') {
-        condition['type'] = {'$ne': translations.personTypes.contacts};
-    }
-    if (type === 'Case') {
-        condition['type'] = translations.personTypes.contacts;
+    if (type === 'Contact' || type === 'Case' || type === 'Event') {
+        condition['type'] = {'$in': [translations.personTypes.events,translations.personTypes.cases ]};
     }
     if (type === 'ContactOfContact') {
         condition['type'] = translations.personTypes.contacts;
@@ -188,7 +187,8 @@ export function getPersonsByName(outbreakId, search, type) {
                 alias: 'type',
             }
         ],
-        condition: condition
+        condition: condition,
+        sort: {'firstName': 1, 'lastName': 2}
     };
 
     return Promise.resolve()

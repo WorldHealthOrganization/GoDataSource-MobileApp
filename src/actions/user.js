@@ -41,6 +41,7 @@ import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {updateRequiredFields} from "../utils/functions";
 import {sideMenuKeys} from './../utils/config';
+import AsyncStorage from '@react-native-community/async-storage';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory
@@ -53,7 +54,11 @@ export function storeUser(user) {
 
 export function loginUser(credentials) {
     // All dispatches will be done from here
-    return async function (dispatch) {
+    return async function (dispatch, getState) {
+        const loginState = getState().app.loginState;
+        if(loginState === 'Loading....'){
+            return;
+        }
         dispatch(setLoginState('Loading....'));
         loginUserRequest(credentials, async (errorLogin, user) => {
             if (errorLogin) {
@@ -69,6 +74,7 @@ export function loginUser(credentials) {
                 ]))
             }
             if (user) {
+                dispatch(setLoginState('Success'));
                 // If we have the user, proceed to load all the necessary data
                 dispatch(computeCommonData(true, user));
             }
@@ -116,10 +122,58 @@ export function getUserById(userId, skipLoad) {
     }
 }
 
-export function computeCommonData(storeUserBool, user, skipLoad) {
+export function computeOutbreakSwitch(user, outbreakId){
+    return async function (dispatch, getState) {
+        try{
+            dispatch(setLoaderState(true));
+            let outbreakAndLocationInfo = await getOutbreakById(outbreakId);
+            const locations = await getLocations(outbreakAndLocationInfo.locationIds || null);
+            // If there is a difference between user language and the device available languages, update user
+            let availableLanguages = await getAvailableLanguages();
+            let userTeams = await getUserTeams(user._id);
+            if (!availableLanguages.deviceLanguages.find((e) => e.value === user.languageId)) {
+                user = updateRequiredFields(outbreakId, user._id, user, 'update');
+                await updateUserRequest(user);
+            }
+            const clusters = await getClusters(outbreakId);
+            await getTranslations(user.languageId, outbreakId);
+
+            let arrayOfActions = [
+                storeUser(user),
+                storeOutbreak(outbreakAndLocationInfo || null),
+                storeLocationsList(get(locations, 'locations.locationsList', null)),
+                storeLocations(get(locations, 'locations.treeLocationsList', null)),
+                storeUserLocationsList(get(locations, 'locations.locationsList', null)),
+                storeUserLocations(filterByUser(get(locations, 'locations.treeLocationsList', null), userTeams)),
+                saveAvailableLanguages(availableLanguages),
+                storeClusters(get(clusters,  'clusters', null))
+            ];
+
+            dispatch(batchActions(arrayOfActions));
+            dispatch(setLoaderState(false));
+        } catch (e) {
+            console.log("Error switching outbreaks", e);
+        }
+
+    }
+}
+
+
+export function computeCommonData(storeUserBool, user, skipLoad, outbreakId) {
     return async function (dispatch, getState) {
         try {
-            let outbreakAndLocationInfo = await getOutbreakById(user.activeOutbreakId);
+            if(!outbreakId) {
+                const storageOutbreakId = await AsyncStorage.getItem("outbreakId");
+                console.log("Storage outbreak Id", storageOutbreakId);
+                console.log("User outbreak Id", user.activeOutbreakId);
+                if(storageOutbreakId  && !storeUserBool) {outbreakId = storageOutbreakId}
+                else if(user.activeOutbreakId){outbreakId = user.activeOutbreakId}
+                else {
+                    //TODO: in case there is no outbreak, select first from list
+                }
+            }
+            console.log("All user data", user);
+            let outbreakAndLocationInfo = await getOutbreakById(outbreakId);
             if (outbreakAndLocationInfo) {
                 let promises = [];
 
@@ -129,16 +183,17 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
 
                 // If there is a difference between user language and the device available languages, update user
                 if (!availableLanguages.deviceLanguages.find((e) => e.value === user.languageId)) {
+                    //? modify a property of the object and then just modify the object entirely?
                     user.languageId = get(availableLanguages, 'deviceLanguages[0].value', user.languageId);
-                    user = updateRequiredFields(user.activeOutbreakId, user._id, user, 'update');
+                    user = updateRequiredFields(outbreakId, user._id, user, 'update');
 
                     promises.push(updateUserRequest(user));
                 }
 
-                promises.push(getClusters(user.activeOutbreakId));
+                promises.push(getClusters(outbreakId));
                 // promises.push(getAvailableLanguages(dispatch));
                 promises.push(getReferenceData());
-                promises.push(getTranslations(user.languageId, user?.activeOutbreakId));
+                promises.push(getTranslations(user.languageId, outbreakId));
                 promises.push(getLocations(outbreakAndLocationInfo.locationIds || null));
                 promises.push(getHelpCategory());
                 promises.push(getHelpItem());
@@ -175,8 +230,15 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                             ])
                         )) {
                             selectedScreen = sideMenuKeys[2];
-                        } else {
+                        } else if (checkArrayAndLength(
+                            lodashIntersection(userRoles, [
+                                constants.PERMISSIONS_CASE.caseAll,
+                                constants.PERMISSIONS_CASE.caseList
+                            ])
+                        )) {
                             selectedScreen = sideMenuKeys[3];
+                        } else {
+                            selectedScreen = sideMenuKeys[4]
                         }
                     }
                 }
@@ -210,7 +272,9 @@ export function computeCommonData(storeUserBool, user, skipLoad) {
                             PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
                             PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsList,
                             constants.PERMISSIONS_CASE.caseAll,
-                            constants.PERMISSIONS_CASE.caseList
+                            constants.PERMISSIONS_CASE.caseList,
+                            constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                            constants.PERMISSIONS_LAB_RESULT.labResultList
                         ]))) {
 
                             let arrayOfActions = [
