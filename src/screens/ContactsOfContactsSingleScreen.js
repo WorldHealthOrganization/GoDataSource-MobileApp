@@ -1299,6 +1299,9 @@ class ContactsOfContactsSingleScreen extends Component {
         this.setState({
             loading: true
         }, () => {
+            if(this.state.contact.deleted){
+                return this.saveContactAction();
+            }
             if (this.state.maskError){
                 this.setState({loading: false}, () => {
                     Alert.alert(getTranslation(translations.alertMessages.invalidMaskAlert, this.props.translation).replace('{{mask}}', `${this.props.outbreak?.contactIdMask}`),
