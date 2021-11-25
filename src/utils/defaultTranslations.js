@@ -301,6 +301,8 @@ export default {
     'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_ATTEMPTED': 'Not Attempted',
     'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED': 'Missed',
 
+    'LNG_DIAL_NUMBER_DESCRIPTION': 'Are you sure you want to dial this number?',
+
 
     //alertMessages
     // alert general

@@ -11,6 +11,7 @@ import {TextField} from 'react-native-material-textfield';
 import TooltipComponent from './TooltipComponent';
 import lodashGet from 'lodash/get';
 import lodashDebounce from 'lodash/debounce';
+import Ripple from "react-native-material-ripple";
 import translations from "../utils/translations";
 
 class TextInput extends Component {
@@ -128,14 +129,16 @@ class TextInput extends Component {
                             </Text>
                         )
                     }
-                    <Text style={{
-                        fontFamily: 'Roboto-Light',
-                        fontSize: 15,
-                        textAlign: 'left',
-                        color: 'rgb(60,60,60)',
-                    }}>
-                        {localValue}
-                    </Text>
+                    <Ripple disabled={!this.props.onClickAction} onPress={()=>{this.props.onClickAction(localValue)}}>
+                        <Text style={{
+                            fontFamily: 'Roboto-Light',
+                            fontSize: 15,
+                            textAlign: 'left',
+                            color: 'rgb(60,60,60)',
+                        }}>
+                            {localValue}
+                        </Text>
+                    </Ripple>
                 </View>
                 {
                     tooltip.hasTooltip === true ? (
@@ -219,7 +222,8 @@ TextInput.propTypes = {
     onChange: PropTypes.func.isRequired,
     style: PropTypes.object,
     multiline: PropTypes.bool,
-    skipLabel: PropTypes.bool
+    skipLabel: PropTypes.bool,
+    onClickAction: PropTypes.func
 };
 
 export default TextInput;

@@ -132,6 +132,10 @@ class PersonListItem extends Component {
             let personPlaceOfResidence = person.addresses.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
             if (personPlaceOfResidence) {
                 returnValues.addressString = getAddress(personPlaceOfResidence, true, this.props.locations);
+                if(personPlaceOfResidence.phoneNumber){
+                    // !IMPORTANT - this gets replaced if there's a person telephone number to show!
+                    returnValues.telephoneNumbers = personPlaceOfResidence.phoneNumber;
+                }
             }
         }
         // Emails
@@ -154,6 +158,7 @@ class PersonListItem extends Component {
         if (person &&  person.hasOwnProperty('institutionName')){
             returnValues.institutionName =  getTranslation(person.institutionName, this.props.translation);
         }
+        // Replaces address telephone number
         if (person &&  person.hasOwnProperty('telephoneNumbers')){
             returnValues.telephoneNumbers = person.telephoneNumbers[translations.usersScreen.primaryPhone];
         }

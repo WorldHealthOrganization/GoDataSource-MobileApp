@@ -4,9 +4,9 @@
 /** Since this app is based around the material ui is better to use the components from
  the material ui library, since it provides design and animations out of the box */
 import React, { Component} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Linking, Alert} from 'react-native';
 import {WebView} from 'react-native-webview';
-import {calculateDimension, getTranslation, createDate, getMaskRegExpStringForSearch} from './../utils/functions';
+import {calculateDimension, getTranslation, createDate, callPhone, getMaskRegExpStringForSearch} from './../utils/functions';
 import {connect} from "react-redux";
 import DropdownInput from './DropdownInput';
 import DropDown from './DropDown';
@@ -112,6 +112,7 @@ class CardComponent extends Component {
                         onBlur={this.props.onBlur}
                         mask={mask}
                         outbreakMask={this.props.mask}
+                        onClickAction={this.props.item.id === 'phoneNumber' ? callPhone(this.props.translation) : null}
                     />
                 );
             case 'DropdownInput':
