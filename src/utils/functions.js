@@ -1517,18 +1517,25 @@ export function extractMainAddress (addressesArray) {
     return addressesArray.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
 }
 
-export function callPhone(number){
-    Alert.alert('Calling number', `Are you sure you want to call ${number}`, [
+export function callPhone(translation) {
+    return number => {
+    Alert.alert(
+      getTranslation(translations.alertMessages.alertLabel, translation),
+      `${getTranslation(
+        translations.alertMessages.dialNumberAlertDescription,
+        translation
+      )} (${number})`,
+      [
         {
-            text: 'Yes',
+            text: getTranslation(translations.alertMessages.yesButtonLabel, translation),
             onPress: ()=>{Linking.openURL(`tel:${number}`);}
         },
         {
-            text: 'No'
+            text: getTranslation(translations.alertMessages.cancelButtonLabel, translation)
         }
     ],{cancelable: true});
 
-}
+}}
 
 export function extractLocationId (person) {
     let locationId = null;

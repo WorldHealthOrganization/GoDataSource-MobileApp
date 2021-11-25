@@ -424,7 +424,9 @@ const alertMessages = {
     copyAddress: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_COPY_THE_ADDRESS_FROM_THE_PARENT_ENTITY',
 
     // Permissions alert messages
-    permission: 'LNG_MOBILE_DIALOG_ALERT_MESSAGE_PERMISSION'
+    permission: 'LNG_MOBILE_DIALOG_ALERT_MESSAGE_PERMISSION',
+
+    dialNumberAlertDescription: 'LNG_DIAL_NUMBER_DESCRIPTION'
 };
 
 const loadingScreenMessages = {

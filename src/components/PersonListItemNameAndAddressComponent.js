@@ -82,7 +82,7 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                         {
                             firstComponentRenderData.telephoneNumbers ?
                                 (
-                                    <Ripple onPress={() => {callPhone(firstComponentRenderData.telephoneNumbers)}}>
+                                    <Ripple onPress={() => {callPhone(translation)(firstComponentRenderData.telephoneNumbers)}}>
                                         <Text style={[style.secondaryText, {
                                             flex: 1,
                                             marginHorizontal: 7,

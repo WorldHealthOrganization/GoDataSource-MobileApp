@@ -112,7 +112,7 @@ class CardComponent extends Component {
                         onBlur={this.props.onBlur}
                         mask={mask}
                         outbreakMask={this.props.mask}
-                        onClickAction={this.props.item.id === 'phoneNumber' ? callPhone : null}
+                        onClickAction={this.props.item.id === 'phoneNumber' ? callPhone(this.props.translation) : null}
                     />
                 );
             case 'DropdownInput':
