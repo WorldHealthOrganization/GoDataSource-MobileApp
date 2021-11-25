@@ -1515,6 +1515,9 @@ class ContactsSingleScreen extends Component {
         this.setState({
             loading: true
         }, async () => {
+            if (this.state.contact.deleted){
+                this.saveContactAction();
+            }
             let functionsArray = [this.checkFields, this.checkRequiredFields, this.checkAgeYearsRequirements, this.checkAgeMonthsRequirements, this.checkPlaceOfResidence, this.checkRequiredFieldsQuestionnaire, this.checkForInvalidEmails];
             let message = null;
             if (this.state.maskError){

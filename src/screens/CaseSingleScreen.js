@@ -710,6 +710,9 @@ class CaseSingleScreen extends Component {
 
     //Save case
     handleOnPressSave = () => {
+        if(this.state.case.deleted){
+            this.saveCaseAction();
+        }
         if(this.state.maskError){
             Alert.alert(
                 getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),

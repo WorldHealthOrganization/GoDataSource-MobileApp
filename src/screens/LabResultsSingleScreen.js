@@ -355,6 +355,9 @@ class LabResultsSingleScreen extends Component {
     };
 
     checkRequiredFields = () => {
+        if(this.state.item.deleted){
+            return [];
+        }
         let checkRequiredFields = [];
         if (!this.state.item?.dateSampleTaken) {
             checkRequiredFields.push(getTranslation(translations.labResultsSingleScreen.sampleTaken, this.props.translation));
@@ -704,6 +707,9 @@ class LabResultsSingleScreen extends Component {
     };
 
     checkAnswerDatesQuestionnaire = () => {
+        if (this.state.item.deleted){
+            return true;
+        }
         let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);

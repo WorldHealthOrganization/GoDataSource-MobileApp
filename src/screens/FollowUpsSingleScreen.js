@@ -368,6 +368,9 @@ class FollowUpsSingleScreen extends Component {
     };
 
     checkRequiredFields = () => {
+        if (this.state.item.deleted){
+            return [];
+        }
         let checkRequiredFields = [];
         if (this.state.item.statusId === config.followUpStatuses.notPerformed || this.state.item.statusId === translations.generalLabels.noneLabel) {
             checkRequiredFields.push(getTranslation(_.get(config, 'followUpsSingleScreen.fields[1].label', 'Status'), this.props.translation));
