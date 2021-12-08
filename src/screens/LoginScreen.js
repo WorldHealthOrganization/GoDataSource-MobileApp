@@ -13,7 +13,7 @@ import {bindActionCreators} from 'redux';
 import {cleanDataAfterLogout, loginUser} from './../actions/user';
 import {removeErrors} from './../actions/errors';
 import {changeAppRoot, setSyncState} from './../actions/app';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scroll-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import Ripple from 'react-native-material-ripple';
 import lodashGet from 'lodash/get';

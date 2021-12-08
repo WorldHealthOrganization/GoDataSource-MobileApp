@@ -13,7 +13,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {loginUser} from './../actions/user';
 import {removeErrors} from './../actions/errors';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scroll-view';
 import url from './../utils/url';
 import {changeAppRoot, setSyncState, storeHubConfigurationNew} from './../actions/app';
 import Ripple from 'react-native-material-ripple';
