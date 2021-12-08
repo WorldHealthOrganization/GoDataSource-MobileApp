@@ -14,7 +14,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {loginUser} from './../actions/user';
 import { setSyncState } from './../actions/app';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scroll-view';
 import Ripple from 'react-native-material-ripple';
 import lodashGet from 'lodash/get';
 import translations from './../utils/translations';

@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {connect} from "react-redux";
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scroll-view';
 import ElevatedView from 'react-native-elevated-view';
 import filter from 'lodash/filter';
 import get from 'lodash/get';

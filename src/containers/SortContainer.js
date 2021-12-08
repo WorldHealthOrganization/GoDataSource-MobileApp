@@ -3,7 +3,7 @@ import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scroll-view';
 import get from 'lodash/get';
 import {calculateDimension, getTranslation} from '../utils/functions';
 import config from '../utils/config';
