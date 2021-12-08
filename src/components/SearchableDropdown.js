@@ -22,6 +22,7 @@ const selectOutbreakId = createSelector(
 );
 
 SearchableDropDown = React.memo(({
+                                     person,
                                      containerStyle,
                                      isEditMode,
                                      placeholder,
@@ -32,7 +33,7 @@ SearchableDropDown = React.memo(({
                                      itemTextStyle,
                                      onSelectExposure,
                                      type,
-                                     value
+                                     value,
                                  }) => {
     const {outbreakId} = useSelector(selectOutbreakId);
     const delayedSearch = useRef(debounce((tex) => searchedItems(tex), 500)).current;
@@ -75,8 +76,8 @@ SearchableDropDown = React.memo(({
         } else {
             getPersonsByName(outbreakId, tex, type)
                 .then((cases) => {
-                    // console.log('Cases: ', cases);
-                    setListItems(cases)
+                    const filteredCases = cases.filter(e=>e._id !== person._id);
+                    setListItems(filteredCases);
                 })
                 .catch((errorSearchCases) => {
                     console.log('ErrorSearchCases: ', errorSearchCases);
@@ -84,7 +85,7 @@ SearchableDropDown = React.memo(({
         }
     };
 
-    console.log("Searchable dropdown items", listItems?.length, itemsContainerStyle);
+    console.log("Searchable dropdown items", person);
 
     return (
         <View keyboardShouldpersist='always' style={{

@@ -90,7 +90,7 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
     }
     if (checkArrayAndLength(lodashGet(innerFilter, 'classification', null))) {
         innerAnd.push({[`${innerQueryAlias}.classification`] : {
-            ['$in']: innerFilter.classification
+            ['$in']: innerFilter.classification.map(i=>i?.value)
         }});
     }
     if (checkArrayAndLength(lodashGet(innerFilter, 'selectedLocations', null))) {

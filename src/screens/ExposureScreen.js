@@ -129,7 +129,7 @@ class ExposureScreen extends Component {
                             </View>
                             <ExposureContainer
                                 exposure={this.state.exposure}
-                                contact={null}
+                                person={this.props.type === 'Case' ? this.props.case : this.props.contact}
                                 fromExposureScreen={true}
                                 type={this.props.type}
                                 isEditMode={this.props.isEditMode}
