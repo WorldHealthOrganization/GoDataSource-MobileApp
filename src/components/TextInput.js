@@ -175,8 +175,9 @@ class TextInput extends Component {
         return text;
     }
     handleOnChangeText = (value) => {
+        value = value.trim();
         let maskError = false;
-        if(this.props.mask){
+        if(this.props.mask && value){
             maskError = !this.props.mask.test(value);
         }
         this.setState({

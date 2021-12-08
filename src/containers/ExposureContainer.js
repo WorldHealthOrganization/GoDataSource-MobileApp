@@ -146,6 +146,7 @@ class ExposureContainer extends PureComponent {
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
                 index={cardIndex}
+                person={this.props.person}
                 type={this.props.type}
                 onChangeDropDown={this.props.onChangeDropDown}
                 onChangeDate={this.props.onChangeDate}

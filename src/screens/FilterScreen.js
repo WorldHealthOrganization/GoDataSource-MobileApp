@@ -369,9 +369,7 @@ class FilterScreen extends Component {
             filterClone.selectedLocations = filterStateClone.selectedLocations;
         }
         if (filterStateClone.classification) {
-            if (filterStateClone.classification.length > 0) {
-                filterClone.classification = filterStateClone.classification.map((e) => get(e, 'value', null));
-            }
+            filterClone.classification = filterStateClone.classification;
         }
         if (filterStateClone.categories) {
             filterClone.categories = filterStateClone.categories;
