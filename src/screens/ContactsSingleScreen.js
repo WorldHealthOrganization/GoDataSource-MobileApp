@@ -568,7 +568,10 @@ class ContactsSingleScreen extends Component {
                 placeOfResidenceError = this.checkPlaceOfResidence();
                 break;
             case 2:
-                missingFields = this.checkFields();
+                missingFields = this.checkFields(constants.RELATIONSHIP_TYPE.contact);
+                break;
+            case 4:
+                missingFields = this.checkFields(constants.RELATIONSHIP_TYPE.exposure);
                 break;
             case 3:
                 missingFields = this.check;
@@ -1814,10 +1817,13 @@ class ContactsSingleScreen extends Component {
                 }
             });
     }
-    checkFields = () => {
+    checkFields = (type) => {
         // let pass = true;
         let requiredFields = [];
-        let relationships = _.get(this.state, 'contact.relationships', []);
+        let relationships = _.get(this.state.contact, 'relationships.contactRelations', []);
+        if(type === constants.RELATIONSHIP_TYPE.exposure){
+            relationships = _.get(this.state.contact, 'relationships.exposureRelations', []);
+        }
         if (checkArrayAndLength(relationships)) {
             relationships = relationships.map((e) => _.get(e, 'relationshipData', e));
             for (let i = 0; i < config.addRelationshipScreen.length; i++) {
