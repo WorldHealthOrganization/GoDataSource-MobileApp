@@ -17,7 +17,7 @@ import GeneralListItem from '../components/GeneralListItem';
 import Ripple from 'react-native-material-ripple';
 import moment from 'moment/min/moment.min';
 import translations from './../utils/translations';
-import ExposureContainer from '../containers/ExposureContainer';
+import RelationshipContainer from '../containers/RelationshipContainer';
 import get from 'lodash/get';
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
@@ -32,7 +32,7 @@ import {Navigation} from "react-native-navigation";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
-class ContactsSingleExposures extends Component {
+class ContactsSingleRelationship extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -53,7 +53,7 @@ class ContactsSingleExposures extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.routeKey === 'exposures') {
+        if (nextProps.routeKey === 'exposures' || nextProps.routeKey === 'contacts') {
             return true;
         }
         return false;
@@ -104,12 +104,19 @@ class ContactsSingleExposures extends Component {
                         <PermissionComponent
                             render={() => (
                                 <ScrollView contentContainerStyle={{flexGrow: 1}}>
+                                    {
+                                        this.listEmptyComponent()
+                                    }
                                     <AnimatedFlatList
-                                        data={get(this.props, 'contact.relationships', [])}
+                                        data={this.props.relationshipType === constants.RELATIONSHIP_TYPE.contact ?
+                                            get(this.props.contact, 'relationships.contactRelations', [])
+                                            :
+                                            get(this.props.contact, 'relationships.exposureRelations', [])
+                                        }
                                         renderItem={this.renderRelationship}
                                         keyExtractor={this.keyExtractor}
                                         ItemSeparatorComponent={this.renderSeparatorComponent}
-                                        ListEmptyComponent={this.listEmptyComponent}
+                                        // ListEmptyComponent={this.listEmptyComponent}
                                         style={[style.listViewStyle]}
                                         componentContainerStyle={style.componentContainerStyle}
                                     />
@@ -125,10 +132,11 @@ class ContactsSingleExposures extends Component {
                             ]}
                         />
                     ) : (
-                        <ExposureContainer
+                        <RelationshipContainer
+                            person={this.props.contact}
                             exposure={this.props.contact.relationships[0]}
                             addContactFromCasesScreen={this.props.addContactFromCasesScreen}
-                            fromExposureScreen={false}
+                            fromRelationshipScreen={false}
                             isEditMode={this.props.isEditMode}
                             contact={this.props.contact}
                             onChangeDropDown={this.props.onChangeDropDown}
@@ -214,7 +222,11 @@ class ContactsSingleExposures extends Component {
                         onPress={this.onPressAddExposure}
                     >
                         <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                            {getTranslation(translations.contactSingleScreen.exposureText, this.props.translation)}
+                            {this.props.relationshipType === constants.RELATIONSHIP_TYPE.exposure ?
+                                getTranslation(translations.contactSingleScreen.exposureText, this.props.translation)
+                                :
+                                getTranslation(translations.casesScreen.addContactButtonLabel)
+                            }
                         </Text>
                     </Ripple>
                 ) : null
@@ -236,11 +248,13 @@ class ContactsSingleExposures extends Component {
 
     onPressAddExposure = () => {
         Navigation.showModal(createStackFromComponent({
-            name: "ExposureScreen",
+            name: "RelationshipScreen",
             passProps: {
-                contact: null,
+                contact: this.props.contact,
                 type: 'Contact',
                 saveExposure: this.props.saveExposure,
+                refreshRelations: this.props.refreshRelations,
+                relationshipType: this.props.relationshipType
             }
         }))
     };
@@ -276,4 +290,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(ContactsSingleExposures);
+export default connect(mapStateToProps)(ContactsSingleRelationship);

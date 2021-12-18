@@ -18,7 +18,7 @@ import ContactsSingleScreen from './ContactsSingleScreen';
 import ContactsOfContactsScreen from './ContactsOfContactsScreen';
 import ContactsOfContactsSingleScreen from './ContactsOfContactsSingleScreen';
 import InAppNotificationScreen from './InAppNotificationScreen';
-import ExposureScreen from './ExposureScreen';
+import RelationshipScreen from './RelationshipScreen';
 import HelpScreen from './HelpScreen';
 import HelpSingleScreen from './HelpSingleScreen';
 import QRScanScreen from './QRScanScreen';
@@ -46,7 +46,7 @@ const screens = [
     {screen: constants.appScreens.labResultsScreen, component: LabResultsScreen},
     {screen: constants.appScreens.labResultsSingleScreen, component: LabResultsSingleScreen},
     {screen: constants.appScreens.inAppNotificationScreen, component: InAppNotificationScreen},
-    {screen: constants.appScreens.exposureScreen, component: ExposureScreen},
+    {screen: constants.appScreens.exposureScreen, component: RelationshipScreen},
     {screen: constants.appScreens.helpScreen, component: HelpScreen},
     {screen: constants.appScreens.helpSingleScreen, component: HelpSingleScreen},
     {screen: constants.appScreens.qrScanScreen, component: QRScanScreen},

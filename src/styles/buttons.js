@@ -40,6 +40,7 @@ const buttonLogin = {
 const buttonTextActionsBar = {
     fontFamily: 'Roboto-Medium',
     fontSize: 16,
+    textAlign:'center',
     color: colors.buttonGreen
 };
 

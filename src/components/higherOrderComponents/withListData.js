@@ -30,6 +30,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         statusId: null
                     },
                     data: [],
+                    exposureData: [],
                     dataCount: 0,
                     lastElement: null,
                     limit: 15,
@@ -86,6 +87,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     this.props,
                     {
                         data: this.state.data,
+                        exposureData: this.state.data,
                         dataCount: this.state.dataCount,
                         mainFilter: this.state.mainFilter,
                         followUpFilter: this.state.followUpFilter
@@ -223,7 +225,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             loadMore: isRefresh === null
                         }, () => {
                             methodForGettingData(filters, isRefresh === true ? isRefresh : false, this.props)
-                                .then((result) => {
+                                .then((result, exposureResult) => {
                                     if (isRefresh === true && !isRefreshAfterSync) {
                                         this.props.setLoaderState(false);
                                     }
@@ -241,6 +243,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                     this.setState((prevState) => {
                                         return {
                                             data: !isRefresh && (prevState.lastElement !== null ||  (prevState.data.length + result.data.length) === prevState.dataCount) ? union(prevState.data,result.data) : result.data,
+                                            // exposureData: !isRefresh && (prevState.lastElement !== null ||  (prevState.exposureData.length + exposureResult.dataExposures.length) === prevState.dataCount) ? union(prevState.exposureData,exposureResult.dataExposures) : exposureResult.dataExposures,
                                             lastElement: lastElement,
                                             isAddFromNavigation: false,
                                             dataCount: typeof get(result, 'dataCount') === 'number' ? get(result, 'dataCount') : prevState.dataCount,

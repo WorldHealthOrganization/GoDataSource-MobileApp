@@ -5,6 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Alert, StyleSheet, Text, View} from 'react-native';
+import constants from "./../utils/constants";
 import Button from './../components/Button';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
@@ -26,13 +27,14 @@ import {
 } from './../utils/functions';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
-import ExposureContainer from '../containers/ExposureContainer';
+import RelationshipContainer from '../containers/RelationshipContainer';
 import get from 'lodash/get';
 import {insertOrUpdateExposure} from "../actions/exposure";
 import withPincode from './../components/higherOrderComponents/withPincode';
 import {Navigation} from "react-native-navigation";
+import _ from "lodash";
 
-class ExposureScreen extends Component {
+class RelationshipScreen extends Component {
 
     constructor(props) {
         super(props);
@@ -86,7 +88,7 @@ class ExposureScreen extends Component {
                                     }}
                                 >
                                     <Text style={[style.title, {marginLeft: 30}]}>
-                                        {this.props.exposure ? getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation) : getTranslation(translations.exposureScreen.addExposureLabel, this.props.translation)}
+                                        {this.renderTitle()}
                                     </Text>
                                     <ElevatedView
                                         elevation={3}
@@ -127,10 +129,10 @@ class ExposureScreen extends Component {
                                         }}/>
 
                             </View>
-                            <ExposureContainer
+                            <RelationshipContainer
                                 exposure={this.state.exposure}
                                 person={this.props.type === 'Case' ? this.props.case : this.props.contact}
-                                fromExposureScreen={true}
+                                fromRelationshipScreen={true}
                                 type={this.props.type}
                                 isEditMode={this.props.isEditMode}
                                 onChangeText={this.handleOnChangeData}
@@ -138,6 +140,7 @@ class ExposureScreen extends Component {
                                 onChangeDate={this.handleOnChangeData}
                                 onChangeSwitch={this.handleOnChangeData}
                                 onSelectExposure={this.handleOnSelectExposure}
+                                relationshipType={this.props.relationshipType}
                                 selectedExposure={this.state.selectedExposure}
                                 addContactFromCasesScreen={this.props.addContactFromCasesScreen}
                             />
@@ -167,6 +170,13 @@ class ExposureScreen extends Component {
         }
     };
 
+    renderTitle = () =>{
+        if (this.props.relationshipType  === constants.RELATIONSHIP_TYPE.exposure){
+            return this.props.exposure ? getTranslation(translations.exposureScreen.editExposureLabel, this.props.translation) : getTranslation(translations.exposureScreen.addExposureLabel, this.props.translation)
+        } else {
+            return this.props.exposure ? getTranslation(translations.exposureScreen.editContactLabel, this.props.translation) : getTranslation(translations.exposureScreen.addContactLabel, this.props.translation)
+        }
+    }
     handleOnChangeDropDown = (value, id, type) => {
         // Check if id is exposure in order to set the persons array
         // console.log("Before changing state: ", value, id, type);
@@ -240,42 +250,47 @@ class ExposureScreen extends Component {
     handleOnSelectExposure = (selectedExposure) => {
         console.log('OnSelectExposure: ', selectedExposure);
         let personsArray = [];
+        const relationshipSource = this.props.relationshipType === constants.RELATIONSHIP_TYPE.exposure ? true : null;
+        const personSource = this.props.relationshipType === constants.RELATIONSHIP_TYPE.exposure ? null : true;
+
+        const relationshipTarget = this.props.relationshipType === constants.RELATIONSHIP_TYPE.exposure ? null : true;
+        const personTarget = this.props.relationshipType === constants.RELATIONSHIP_TYPE.exposure ? true : null;
         if (this.props.type === 'Contact') {
             personsArray = [{
                 id: get(selectedExposure, '_id', null),
                 type: get(selectedExposure, 'type', null),
-                source: true,
-                target: null
+                source: relationshipSource,
+                target: relationshipTarget
             },{
                 id: get(this.props, 'contact._id', null),
                 type: get(this.props, 'contact.type', null),
-                source: null,
-                target: true
+                source: personSource,
+                target: personTarget
             }];
         } else if (this.props.type === 'ContactOfContact') {
             personsArray = [{
                 id: get(selectedExposure, '_id', null),
                 type: get(selectedExposure, 'type', null),
-                source: true,
-                target: null
+                source: relationshipSource,
+                target: relationshipTarget
             },{
                 id: get(this.props, 'contact._id', null),
                 type: get(this.props, 'contact.type', null),
-                source: null,
-                target: true
+                source: personSource,
+                target: personTarget
             }];
         }else {
             // Here add logic for cases. Events are not yet handled. This needs refactoring
             personsArray = [{
                 id: get(selectedExposure, '_id', null),
                 type: get(selectedExposure, 'type', null),
-                source: null,
-                target: true
+                source: relationshipSource,
+                target: relationshipTarget
             },{
                 id: get(this.props, 'case._id', null),
                 type: get(this.props, 'case.type', null),
-                source: true,
-                target: null
+                source: personSource,
+                target: personTarget
             }];
         }
 
@@ -291,7 +306,6 @@ class ExposureScreen extends Component {
     handleSaveExposure = () => {
         let missingFields = this.checkFields();
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-            console.log("Here should save the exposure and dismiss the modal");
             this.setState({
                 // savePressed: true,
                 isModified: false,
@@ -332,7 +346,7 @@ class ExposureScreen extends Component {
                                 this.props.saveExposure(this.state.exposure);
                             })
                         } else {
-                            let exposure = updateRequiredFields(outbreakId = this.props.outbreak._id, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'create', fileType = 'relationship.json')
+                            // let exposure = updateRequiredFields(outbreakId = this.props.outbreak._id, userId = this.props.user._id.split('_')[this.props.user._id.split('_').length - 1], record = Object.assign({}, this.state.exposure), action = 'create', fileType = 'relationship.json')
                             let promise = null;
                             if (this.props.type === 'Contact') {
                                 promise = addExposureForContact(exposure, this.props.contact, this.props.periodOfFollowUp, get(this.props, 'user._id', null));
@@ -342,11 +356,11 @@ class ExposureScreen extends Component {
                             Promise.all([promise])
                                 .then((result) => {
                                     console.log('Successful at adding exposures');
-                                    this.props.refresh();
+                                    this.props.refreshRelations();
                                     Navigation.dismissModal(this.props.componentId);
                                 })
                                 .catch((errorAddExposure) => {
-                                    console.log(errorAddExposure)
+                                    console.log("ErrorInsertUpdateExposure contact: ",errorAddExposure)
                                 })
                         }
                     }
@@ -376,16 +390,16 @@ class ExposureScreen extends Component {
     checkFields = () => {
         // let pass = true;
         let requiredFields = [];
-        for (let i=0; i<config.addExposureScreen.length; i++) {
-            if (config.addExposureScreen[i].id === 'exposure') {
+        for (let i=0; i<config.addRelationshipScreen.length; i++) {
+            if (config.addRelationshipScreen[i].id === 'exposure') {
                 if (this.state.exposure.persons.length === 0) {
                     requiredFields.push('Person')
                     // pass = false;
                 }
             } else {
-                if (config.addExposureScreen[i].isRequired) {
-                    if (!this.state.exposure[config.addExposureScreen[i].id]) {
-                        requiredFields.push(getTranslation(config.addExposureScreen[i].label, this.props.translation));
+                if (config.addRelationshipScreen[i].isRequired) {
+                    if (!this.state.exposure[config.addRelationshipScreen[i].id]) {
+                        requiredFields.push(getTranslation(config.addRelationshipScreen[i].label, this.props.translation));
                         // pass = false;
                     }
                 }
@@ -487,4 +501,4 @@ function matchDispatchProps(dispatch) {
 export default compose(
     withPincode(),
     connect(mapStateToProps, matchDispatchProps)
-)(ExposureScreen);
+)(RelationshipScreen);

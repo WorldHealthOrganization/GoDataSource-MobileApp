@@ -33,6 +33,7 @@ import withPincode from "../components/higherOrderComponents/withPincode";
 import {getContactsForOutbreakId} from "../actions/contacts";
 import {compose} from "redux";
 import {Navigation} from "react-native-navigation";
+import constants from "../utils/constants";
 
 class CasesScreen extends Component {
 
@@ -205,6 +206,7 @@ class CasesScreen extends Component {
                                 onPressView={this.props.onPressView}
                                 onPressAddExposure={this.props.onPressAddExposure}
                                 onPressCenterButton={this.props.onPressCenterButton}
+                                goToScreen={this.goToScreen}
                                 onPressMap={this.handleOnPressMap}
                                 onPressName={this.props.onPressFullName}
                                 onPressExposure={this.props.onPressExposure}
@@ -268,6 +270,20 @@ class CasesScreen extends Component {
             },
         });
     };
+
+    goToScreen = (caseData, index) => {
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: constants.appScreens.caseSingleScreen,
+                passProps: {
+                    isNew: false,
+                    refresh: this.refresh,
+                    case: caseData,
+                    index
+                }
+            }
+        })
+    }
 
     handleOnPressMap = (dataFromMapHandler) => {
         this.setState(prevState => ({

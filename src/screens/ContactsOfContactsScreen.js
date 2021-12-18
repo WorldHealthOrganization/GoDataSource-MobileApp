@@ -34,6 +34,7 @@ import {getContactsForOutbreakId} from "../actions/contacts";
 import {compose} from "redux";
 import {Navigation} from "react-native-navigation";
 import {setDisableOutbreakChange} from "../actions/outbreak";
+import constants from "../utils/constants";
 
 class ContactsOfContactsScreen extends Component {
 
@@ -174,6 +175,7 @@ class ContactsOfContactsScreen extends Component {
                                 dataCount={this.props.dataCount || 0}
                                 colors={this.state.riskColors}
                                 loadMore={this.props.loadMore}
+                                goToScreen={this.goToScreen}
                                 dataType={'ContactOfContact'}
                                 filterText={filterText}
                                 style={[style.listViewStyle]}
@@ -272,6 +274,21 @@ class ContactsOfContactsScreen extends Component {
             },
         });
     };
+
+
+    goToScreen = (contactData, index) => {
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: constants.appScreens.contactsOfContactsSingleScreen,
+                passProps: {
+                    isNew: false,
+                    refresh: this.refresh,
+                    contact: contactData,
+                    index
+                }
+            }
+        })
+    }
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'contacts';

@@ -271,6 +271,11 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
 
     let mainQuery = {
         type: 'select',
+        // with: {
+        //     innerQueryTable:{
+        //         query: innerQuery
+        //     }},
+        // table: 'innerQueryTable',
         query: innerQuery,
         alias: innerQueryAlias,
         join: [
@@ -317,8 +322,8 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         // mainCondition[`${unfilteredExposuresAlias}.type`] = translations.personTypes.contacts;
     }
     if (type === translations.personTypes.cases) {
-        lodashSet(mainQuery, `join[1].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
-        lodashSet(mainQuery, `join[2].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
+        // lodashSet(mainQuery, `join[1].on['${relationshipAlias}Contact.${sourceType}']`, translations.personTypes.contacts);
+        // lodashSet(mainQuery, `join[2].on['${relationshipAlias}Contact.${sourceType}']`, translations.personTypes.contacts);
         // mainCondition[`${unfilteredExposuresAlias}.type`] = translations.personTypes.contacts;
     }
 
@@ -361,6 +366,73 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         ];
         mainQuery.sort = sort;
         mainQuery.group = checkArrayAndLength(lodashGet(innerFilter, 'sort', null)) ? `${innerQueryAlias}._id` : [`${innerQueryAlias}.lastName`, `${innerQueryAlias}.firstName`, `${innerQueryAlias}._id`];
+        mainQuery = {
+            type:'select',
+            fields:[
+                {
+                    table: 'mainQuery',
+                    name: '_id',
+                    alias: '_id'
+                },
+                {
+                    table: 'mainQuery',
+                    name: 'mainData',
+                    alias: 'mainData'
+                },
+                {
+                    table: 'mainQuery',
+                    name: 'exposureData',
+                    alias: 'exposureData'
+                },
+                // {
+                //     expression: {
+                //         pattern:'{a}.*',
+                //         values: {
+                //             a: {field: 'mainQuery'}
+                //         }
+                //     }},
+                {
+                    query:{
+                        type: 'select',
+                        table: 'relationship',
+                        fields:[{
+                            func: {
+                                name: 'count',
+                                args: [{
+                                    field: 'relationship._id'
+                                }],
+                            }
+                        }],
+                        condition: [
+                            {[`mainQuery._id`]: {$eq:{field:'relationship.targetId'}}},
+                            {'relationship.deleted': 0},
+                        ]
+                    },
+                    alias: 'countExposures'
+                },
+                {
+                    query:{
+                        type: 'select',
+                        table: 'relationship',
+                        fields:[{
+                            func: {
+                                name: 'count',
+                                args: [{
+                                    field: 'relationship._id'
+                                }],
+                            }
+                        }],
+                        condition: [
+                            {[`mainQuery._id`]: {$eq:{field:'relationship.sourceId'}}},
+                            {'relationship.deleted': 0},
+                        ]
+                    },
+                    alias: 'countContacts'
+                }
+            ],
+            query: mainQuery,
+            alias: 'mainQuery'
+        }
     }
 
     return mainQuery;

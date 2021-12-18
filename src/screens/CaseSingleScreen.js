@@ -19,10 +19,15 @@ import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalConta
 import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
 import CaseSingleInfectionContainer from './../containers/CaseSingleInfectionContainer';
 import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigationContainer';
-import CaseSingleExposureContainer from '../containers/CaseSingleExposureContainer';
+import CaseSingleRelationshipContainer from '../containers/CaseSingleRelationshipContainer';
 import {Icon} from 'react-native-material-ui';
 import {checkForNameDuplicatesRequest} from './../queries/cases';
-import {addCase, getCaseAndExposuresById, getRelationsForCase, updateCase} from './../actions/cases';
+import {
+    addCase,
+    getCaseAndRelationshipsById,
+    getRelationsContactForCase, getRelationsExposureForCase,
+    updateCase
+} from './../actions/cases';
 import {saveSelectedScreen} from "../actions/app";
 import {
     calculateDimension,
@@ -174,10 +179,11 @@ class CaseSingleScreen extends Component {
         this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
-            getCaseAndExposuresById(this.props.case._id)
+            getCaseAndRelationshipsById(this.props.case._id)
                 .then((caseAndRelations) => {
                     let caseData = _.get(caseAndRelations, 'caseData', null);
-                    let relations = _.get(caseAndRelations, 'relationshipData', []);
+                    let relationsContact = _.get(caseAndRelations, 'relationshipContactData', []);
+                    let relationsExposure = _.get(caseAndRelations, 'relationshipExposureData', []);
 
                     if (caseData !== null) {
                         let mappedAnswers = mapAnswers(this.props.caseInvestigationQuestions, caseData.questionnaireAnswers);
@@ -192,7 +198,7 @@ class CaseSingleScreen extends Component {
                             previousAnswers: mappedAnswers.mappedAnswers,
                             mappedQuestions: mappedAnswers.mappedQuestions,
                             case: caseData,
-                            relations: relations,
+                            relations: {relationsContact, relationsExposure},
                             loading: false
                         })
                     } else {
@@ -656,10 +662,34 @@ class CaseSingleScreen extends Component {
                 break;
             case 'exposures':
                 return (
-                    <CaseSingleExposureContainer
+                    <CaseSingleRelationshipContainer
                         routeKey={this.state.routes[this.state.index].key}
+                        relationshipType={constants.RELATIONSHIP_TYPE.exposure}
                         case={this.state.case}
-                        relations={this.state.relations}
+                        relations={this.state.relations?.relationsExposure}
+                        index={this.state.index}
+                        numberOfTabs={this.state.routes.length}
+                        onPressEdit={this.onPressEdit}
+                        onPressSaveEdit={this.onPressSaveEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
+                        onPressEditExposure={this.handleOnPressEditExposure}
+                        onPressDeleteExposure={this.handleOnPressDeleteExposure}
+                        componentId={this.props.componentId}
+                        saveExposure={this.handleSaveExposure}
+                        isNew={this.props.isNew}
+                        handleOnPressSave={this.handleOnPressSave}
+                        isEditMode={this.state.isEditMode}
+                        selectedExposure={this.props.singleCase}
+                        refreshRelations={this.refreshRelations}
+                    />
+                );
+            case 'contacts':
+                return (
+                    <CaseSingleRelationshipContainer
+                        routeKey={this.state.routes[this.state.index].key}
+                        relationshipType={constants.RELATIONSHIP_TYPE.contact}
+                        case={this.state.case}
+                        relations={this.state.relations?.relationsContact}
                         index={this.state.index}
                         numberOfTabs={this.state.routes.length}
                         onPressEdit={this.onPressEdit}
@@ -1192,7 +1222,7 @@ class CaseSingleScreen extends Component {
     handleOnPressEditExposure = (relation, index) => {
         _.set(relation || {}, 'contactData.fullName', computeFullName(_.get(relation, 'contactData', null)));
         Navigation.showModal(createStackFromComponent({
-            name: 'ExposureScreen',
+            name: 'RelationshipScreen',
             passProps: {
                 exposure: _.get(relation, 'relationshipData', null),
                 selectedExposure: _.get(relation, 'contactData', null),
@@ -1209,17 +1239,17 @@ class CaseSingleScreen extends Component {
     refreshRelations = (exposure) => {
         this.setState({
             loading: true
-        }, () => {
-            getRelationsForCase(_.get(this.state, 'case._id', null))
-                .then((updatedRelations) => {
-                    this.setState({
-                        loading: false,
-                        relations: updatedRelations
-                    })
+        }, async () => {
+            try {
+                let updatedContacts = await getRelationsContactForCase(_.get(this.state, 'case._id', null));
+                let updatedExposures = await getRelationsExposureForCase(_.get(this.state, 'case._id', null));
+                this.setState({
+                    loading: false,
+                    relations: {relationsContact:updatedContacts, relationsExposure:updatedExposures}
                 })
-                .catch((errorUpdateExposure) => {
-                    console.log('ErrorUpdateExposure', errorUpdateExposure);
-                })
+            } catch (errorUpdateExposure) {
+                console.log('ErrorUpdateExposure', errorUpdateExposure);
+            }
         })
     };
 
@@ -2197,7 +2227,9 @@ class CaseSingleScreen extends Component {
     };
 
     onNavigatorEvent = (componentId, componentName) => {
-        this.props.refresh();
+        if (_.isFunction(this.props.refresh)) {
+            this.props.refresh();
+        }
         // navigation(event, this.props.navigator);
     };
     goToHelpScreen = () => {

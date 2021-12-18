@@ -107,12 +107,14 @@ const tabsValuesRoutes = {
         {key: 'personal', title: translations.caseSingleScreen.personalTitle},
         {key: 'address', title: translations.caseSingleScreen.addressTitle},
         {key: 'infection', title: translations.caseSingleScreen.infectionTitle},
-        {key: 'exposures', title: 'Contacts'},
+        {key: 'contacts', title: 'Contacts'},
+        {key: 'exposures', title: 'Exposures'},
         {key: 'caseInvestigation', title: translations.caseSingleScreen.investigationTitle}
     ],
     contactsSingle: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
+        {key: 'contacts', title: 'Contacts'},
         {key: 'exposures', title: translations.contactSingleScreen.exposuresTitle},
         {key: 'investigation', title: translations.caseSingleScreen.investigationTitle},
         {key: 'calendar', title: translations.contactSingleScreen.calendarTitle}
@@ -1812,7 +1814,7 @@ const addFollowUpScreen = [
     },
 ];
 
-const addExposureScreen = [
+const addRelationshipScreen = [
     {
         cardNumber: 1,
         id: 'exposure',
@@ -2672,7 +2674,7 @@ export default {
     defaultFilterForCases,
     baseUrls,
     addFollowUpScreen,
-    addExposureScreen,
+    addRelationshipScreen,
     contactsSingleScreen,
     personTypes,
     mongoCollections,

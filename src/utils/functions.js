@@ -997,7 +997,6 @@ export function mapAnswers(questions, answers) {
             for (let j=0; j<sortedQuestions.length; j++) {
                 if (!mappedAnswers[questionId] && checkArrayAndLength(get(sortedQuestions, `[${j}].additionalQuestions`), null) && sortedQuestions[j].additionalQuestions.findIndex((e) => {return e.variable === questionId}) > -1) {
                     for (let i=0; i<questionnaireAnswers[questionId].length; i++) {
-                        console.log('This point fails: ', mappedAnswers[sortedQuestions[j].variable], get(mappedAnswers, `[${get(sortedQuestions, `[${j}].variable`, null)}]`, null));
                         if (checkArrayAndLength(get(mappedAnswers, `[${get(sortedQuestions, `[${j}].variable`, null)}]`, null))) {
                             let indexForStuff = mappedAnswers[sortedQuestions[j].variable].findIndex((e) => {return e.date === questionnaireAnswers[questionId][i].date});
                             if (indexForStuff > -1) {

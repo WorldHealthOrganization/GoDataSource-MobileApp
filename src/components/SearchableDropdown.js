@@ -33,6 +33,7 @@ SearchableDropDown = React.memo(({
                                      itemTextStyle,
                                      onSelectExposure,
                                      type,
+                                     relationshipType,
                                      value,
                                  }) => {
     const {outbreakId} = useSelector(selectOutbreakId);
@@ -74,9 +75,12 @@ SearchableDropDown = React.memo(({
         if (tex === '') {
             setListItems([]);
         } else {
-            getPersonsByName(outbreakId, tex, type)
+            getPersonsByName(outbreakId, tex, type, relationshipType)
                 .then((cases) => {
-                    const filteredCases = cases.filter(e=>e._id !== person._id);
+                    let filteredCases = cases;
+                    if (person){
+                        filteredCases = cases.filter(e=>e._id !== person._id);
+                    }
                     setListItems(filteredCases);
                 })
                 .catch((errorSearchCases) => {
@@ -84,8 +88,6 @@ SearchableDropDown = React.memo(({
                 })
         }
     };
-
-    console.log("Searchable dropdown items", person);
 
     return (
         <View keyboardShouldpersist='always' style={{

@@ -79,6 +79,11 @@ class PersonListItem extends Component {
                 textsStyleArray={this.props.textsStyleArray}
                 onPressArray={this.props.onPressTextsArray}
                 arrayPermissions={this.props.arrayPermissions}
+                hasSecondaryActionsBar={this.props.secondaryTextsArray?.length}
+                secondaryTextsArray={this.props.secondaryTextsArray}
+                secondaryTextsStyleArray={this.props.secondaryTextsStyleArray}
+                secondaryOnPressArray={this.props.secondaryOnPressTextsArray}
+                secondaryArrayPermissions={this.props.secondaryArrayPermissions}
             />
         )
     }
