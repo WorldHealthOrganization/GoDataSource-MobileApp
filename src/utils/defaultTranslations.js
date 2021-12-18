@@ -3,8 +3,7 @@ export default {
     'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL': "Lab Results",
     //labResultsScreen
     'LNG_PAGE_LIST_LAB_RESULTS_TITLE': "Lab Results",
-    //TODO: Needs new translation
-    'LNG_COMMON_LABEL_EMPTY_TABLE': "There are no records to be displayed",
+    'LNG_LAB_RESULTS_NO_RESULTS_FOUND_LABEL': "There are no lab results to be displayed",
     'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME': "Lab name",
     'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT': "Date of the result",
     'LNG_LAB_RESULT_FIELD_LABEL_STATUS': "Status",
@@ -28,8 +27,7 @@ export default {
     'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR': "Tested for",
     'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT': "Quantitative result",
     'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT': "Modify lab result",
-    //TODO: needs change - to lab resultS
-    'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_VIEW_LAB_RESULT': "View lab result",
+    'LNG_MENU_ITEM_VIEW_LAB_RESULTS': "View lab results",
     'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': "Are you sure you want to delete this lab result?",
     'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_LAB_RESULT': "Delete lab result",
     'LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON': "Create lab result",
@@ -305,6 +303,7 @@ export default {
 
     'LNG_DIAL_NUMBER_DESCRIPTION': 'Are you sure you want to dial this number?',
 
+    'LNG_LAB_RESULTS_FILTER_TITLE': 'Lab results filters',
 
     //alertMessages
     // alert general
