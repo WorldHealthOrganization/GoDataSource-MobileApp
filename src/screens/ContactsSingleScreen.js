@@ -16,10 +16,10 @@ import {bindActionCreators, compose} from "redux";
 import {TabBar, TabView} from 'react-native-tab-view';
 import ContactsSingleAddress from './../containers/ContactsSingleAddress';
 import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
-import ContactsSingleExposures from './../containers/ContactsSingleExposures';
+import ContactsSingleRelationship from './../containers/ContactsSingleRelationship';
 import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
 import ContactsSingleQuestionnaire from './../containers/ContactsSingleQuestionnaire';
-import ExposureScreen from './../screens/ExposureScreen';
+import RelationshipScreen from './../screens/RelationshipScreen';
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
@@ -61,6 +61,7 @@ import {validateRequiredFields, checkValidEmails, formValidator} from './../util
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import {setDisableOutbreakChange} from "../actions/outbreak";
+import {getContactRelationForContact} from "../actions/contacts";
 
 const initialLayout = {
     height: 0,
@@ -89,7 +90,7 @@ class ContactsSingleScreen extends Component {
         this.state = {
             interactionComplete: false,
             routes: routes,
-            index: 0,
+            index: this.props.index || 0,
             item: this.props.item,
             filter: this.props.filter && this.props.filter['FollowUpsScreen'] ? this.props.filter['FollowUpsScreen'] : {
                 searchText: ''
@@ -207,21 +208,22 @@ class ContactsSingleScreen extends Component {
 
                 let followUpPromise = getFollowUpsForContactId(this.state.contact._id, this.props.outbreak._id, this.props.teams)
                     .then((responseFollowUps) => responseFollowUps.map((e) => e.followUps));
-                let exposurePromise = getExposuresForContact(this.state.contact._id, this.props.outbreak._id);
+                let exposurePromise = getExposuresForContact(this.state.contact._id);
+                let contactPromise = getContactRelationForContact(this.state.contact._id);
                 let getContactPromise = null;
                 if (this.props.getContact) {
                     getContactPromise = getItemByIdRequest(this.state.contact._id);
                 }
 
-                Promise.all([followUpPromise, exposurePromise, getContactPromise])
-                    .then(([followUps, relationshipsAndExposures, contact]) => {
+                Promise.all([followUpPromise, exposurePromise, contactPromise, getContactPromise])
+                    .then(([followUps, exposureRelations, contactRelations, contact]) => {
                         this.setState(prevState => ({
                             loading: !prevState.loading,
                             previousAnswers: mappedAnswers.mappedAnswers,
                             mappedQuestions: mappedAnswers.mappedQuestions,
                             contact: Object.assign({}, this.props.getContact ? contact : prevState.contact, {
                                 followUps,
-                                relationships: relationshipsAndExposures
+                                relationships: {exposureRelations, contactRelations}
                             })
                         }))
                     })
@@ -748,9 +750,41 @@ class ContactsSingleScreen extends Component {
                 );
             case 'exposures':
                 return (
-                    <ContactsSingleExposures
+                    <ContactsSingleRelationship
+                        routeKey={this.state.routes[this.state.index].key}
+                        relationshipType={constants.RELATIONSHIP_TYPE.exposure}
+                        contact={this.state.contact}
+                        activeIndex={this.state.index}
+                        onPressEditExposure={this.handleOnPressEditExposure}
+                        onPressDeleteExposure={this.handleOnPressDeleteExposure}
+                        addContactFromCasesScreen={this.props.addContactFromCasesScreen}
+                        componentId={this.props.componentId}
+                        saveExposure={this.handleSaveExposure}
+                        refreshRelations={this.refreshRelations}
+                        onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
+                        isNew={this.props.isNew}
+                        handleOnPressSave={this.handleOnPressSave}
+                        isEditMode={this.state.isEditMode}
+                        onChangeText={this.handleOnChangeText}
+                        onChangeDropDown={this.handleOnChangeDropDown}
+                        onChangeDate={this.handleOnChangeDate}
+                        onChangeSwitch={this.handleOnChangeSwitch}
+                        handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
+                        selectedExposure={this.props.singleCase}
+                        numberOfTabs={this.state.routes.length}
+                        // onPressPreviousButton={this.handlePreviousPress}
+                        onPressNextButton={this.handleMoveToNextScreenButton}
+                        onPressSaveEdit={this.handleOnPressSave}
+                        onPressEdit={this.onPressEdit}
+                        onPressCancelEdit={this.onPressCancelEdit}
+                    />
+                );
+            case 'contacts':
+                return (
+                    <ContactsSingleRelationship
                         routeKey={this.state.routes[this.state.index].key}
                         contact={this.state.contact}
+                        relationshipType={constants.RELATIONSHIP_TYPE.contact}
                         activeIndex={this.state.index}
                         onPressEditExposure={this.handleOnPressEditExposure}
                         onPressDeleteExposure={this.handleOnPressDeleteExposure}
@@ -863,11 +897,13 @@ class ContactsSingleScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            getExposuresForContact(this.state?.contact?._id, this.props?.outbreak?._id)
-                .then((relations) => {
+            const exposurePromise = getExposuresForContact(this.state?.contact?._id);
+            const contactsPromise = getContactRelationForContact(this.state?.contact?._id);
+            Promise.all([exposurePromise, contactsPromise])
+                .then(([exposureRelations, contactRelations]) => {
                     this.setState(prevState => ({
                         loading: false,
-                        contact: Object.assign({}, prevState.contact, {relationships: relations})
+                        contact: Object.assign({}, prevState.contact, {relationships: {exposureRelations, contactRelations}})
                     }))
                 })
                 .catch((errorGetRelations) => {
@@ -1461,7 +1497,7 @@ class ContactsSingleScreen extends Component {
         // console.log('handleOnPressEditExposure: ', relation, index);
         _.set(relation, 'caseData.fullName', computeFullName(_.get(relation, 'caseData', null)));
         Navigation.showModal(createStackFromComponent({
-            name: 'ExposureScreen',
+            name: 'RelationshipScreen',
             passProps: {
                 exposure: _.get(relation, 'relationshipData', null),
                 selectedExposure: _.get(relation, 'caseData', null),
@@ -1784,16 +1820,16 @@ class ContactsSingleScreen extends Component {
         let relationships = _.get(this.state, 'contact.relationships', []);
         if (checkArrayAndLength(relationships)) {
             relationships = relationships.map((e) => _.get(e, 'relationshipData', e));
-            for (let i = 0; i < config.addExposureScreen.length; i++) {
-                if (config.addExposureScreen[i].id === 'exposure') {
+            for (let i = 0; i < config.addRelationshipScreen.length; i++) {
+                if (config.addRelationshipScreen[i].id === 'exposure') {
                     if (relationships[0].persons.length === 0) {
                         requiredFields.push('Person')
                         // pass = false;
                     }
                 } else {
-                    if (config.addExposureScreen[i].isRequired) {
-                        if (!relationships[0][config.addExposureScreen[i].id]) {
-                            requiredFields.push(getTranslation(config.addExposureScreen[i].label, this.props.translation));
+                    if (config.addRelationshipScreen[i].isRequired) {
+                        if (!relationships[0][config.addRelationshipScreen[i].id]) {
+                            requiredFields.push(getTranslation(config.addRelationshipScreen[i].label, this.props.translation));
                             // pass = false;
                         }
                     }

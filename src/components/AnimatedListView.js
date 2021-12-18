@@ -141,9 +141,17 @@ class AnimatedListView extends Component {
         let textsStyleArray = [];
         let onPressTextsArray = [];
         let arrayPermissions = [];
+
+        let secondaryTextsArray = [];
+        let secondaryTextsStyleArray = [];
+        let secondaryOnPressTextsArray = [];
+        let secondaryArrayPermissions = [];
+
         let id = null;
         let mainData = null;
         let exposureData = null;
+        let exposureCount = 0;
+        let contactCount = 0;
         let titleColor = null;
         switch(this.props.dataType){
             case 'FollowUp':
@@ -155,8 +163,8 @@ class AnimatedListView extends Component {
                     getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ];
                 textsStyleArray = [
-                    [styles.buttonTextActionsBar, {color: this.props.colors[followUpData.statusId], marginLeft: margins}],
-                    [styles.buttonTextActionsBar, {marginRight: margins}]];
+                    [styles.buttonTextActionsBar, {color: this.props.colors[followUpData.statusId], }],
+                    [styles.buttonTextActionsBar, {}]];
                 onPressTextsArray = [
                     () => {
                         this.props.onPressView(followUpData, mainData);
@@ -179,33 +187,45 @@ class AnimatedListView extends Component {
                 break;
             case 'Contact':
                 mainData = get(item, 'mainData', null);
-                exposureData = get(item, 'exposureData', null);
+                exposureCount = get(item, 'countExposures', 0);
+                contactCount = get(item, 'countContacts', 0);
                 textsArray = [
                     getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation),
-                    getTranslation(translations.casesScreen.addContactButtonLabel, this.props.translation),
-                    getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
+                    `${getTranslation(translations.casesScreen.contactExposures, this.props.translation)} (${contactCount})`,
+                    `${getTranslation(translations.casesScreen.exposures, this.props.translation)} (${exposureCount})`
                 ];
+                secondaryTextsArray = [
+                    getTranslation(translations.casesScreen.addContactOfContact, this.props.translation),
+                ]
                 textsStyleArray = [
-                    [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}],
                     [styles.buttonTextActionsBar, {fontSize: 14}],
-                    [styles.buttonTextActionsBar, {fontSize: 14, marginRight: margins}]];
+                    [styles.buttonTextActionsBar, {fontSize: 14}],
+                    [styles.buttonTextActionsBar, {fontSize: 14}]];
+                secondaryTextsStyleArray = [
+                    [styles.buttonTextActionsBar, {fontSize: 14, margin: 'auto', justifyContent: 'center'}],
+                ]
                 onPressTextsArray = [
                     () => {
-                        this.props.onPressView(mainData)
+                        this.props.onPressView(mainData);
                     },
                     () => {
-                        this.props.onPressCenterButton(mainData)
+                        this.props.goToScreen(mainData,2);
                     },
                     () => {
-                        this.props.onPressAddExposure(mainData);
+                        this.props.goToScreen(mainData,3);
                     }];
+                secondaryOnPressTextsArray = [
+                    () => {
+                        this.props.onPressCenterButton(mainData);
+                    }
+                ]
                 arrayPermissions = [
                     [constants.PERMISSIONS_CONTACT.contactAll, constants.PERMISSIONS_CONTACT.contactView],
                     [
-                        [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll],
-                        [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate],
-                        [constants.PERMISSIONS_CONTACT.contactCreateContactOfContact, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll],
-                        [constants.PERMISSIONS_CONTACT.contactCreateContactOfContact, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate]
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactAll],
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures],
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactAll],
+                        [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures]
                     ],
                     [
                         [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactAll],
@@ -214,33 +234,36 @@ class AnimatedListView extends Component {
                         [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures]
                     ],
                 ];
+                secondaryArrayPermissions = [
+                    [
+                        [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll],
+                        [constants.PERMISSIONS_CONTACT.contactAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate],
+                        [constants.PERMISSIONS_CONTACT.contactCreateContactOfContact, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll],
+                        [constants.PERMISSIONS_CONTACT.contactCreateContactOfContact, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate]
+                    ]
+                ]
                 titleColor = this.props.colors[mainData.riskLevel];
                 break;
             case 'ContactOfContact':
                 mainData = get(item, 'mainData', null);
-                exposureData = get(item, 'exposureData', null);
+                exposureCount = get(item, 'countExposures', 0);
                 textsArray = [
                     getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation),
-                    getTranslation(translations.contactsScreen.editButton, this.props.translation),
-                    getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
+                    `${getTranslation(translations.casesScreen.exposures, this.props.translation)} (${exposureCount})`
                 ];
                 textsStyleArray = [
-                    [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}],
-                    [styles.buttonTextActionsBar, {fontSize: 14}],
-                    [styles.buttonTextActionsBar, {fontSize: 14, marginRight: margins}]];
+                    [styles.buttonTextActionsBar, {fontSize: 14, }],
+                    [styles.buttonTextActionsBar, {fontSize: 14, }],
+                ]
                 onPressTextsArray = [
                     () => {
                         this.props.onPressView(mainData)
                     },
                     () => {
-                        this.props.onPressCenterButton(mainData)
-                    },
-                    () => {
-                        this.props.onPressAddExposure(mainData);
+                        this.props.goToScreen(mainData, 2);
                     }];
                 arrayPermissions = [
                     [PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsView],
-                    [PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify],
                     [
                         [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll],
                         [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreateRelationshipContacts],
@@ -252,26 +275,40 @@ class AnimatedListView extends Component {
                 break;
             case 'Case':
                 mainData = get(item, 'mainData', null);
-                exposureData = get(item, 'exposureData', []);
+                exposureCount = get(item, 'countExposures', 0);
+                contactCount = get(item, 'countContacts', 0);
                 textsArray = [
                     getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation),
-                    `${getTranslation(translations.casesScreen.contactExposures, this.props.translation)}(${get(exposureData, 'length', 0)})`,
-                    getTranslation(translations.casesScreen.addContactButtonLabel, this.props.translation)
+                    `${getTranslation(translations.casesScreen.contactExposures, this.props.translation)} (${contactCount})`,
+                    `${getTranslation(translations.casesScreen.exposures, this.props.translation)} (${exposureCount})`,
                 ];
+                secondaryTextsArray = [
+                    getTranslation(translations.casesScreen.addContactButtonLabel, this.props.translation)
+                ]
                 textsStyleArray = [
-                    [styles.buttonTextActionsBar, {marginLeft: margins}],
+                    [styles.buttonTextActionsBar, {}],
                     [styles.buttonTextActionsBar, {fontSize: 14}],
-                    [styles.buttonTextActionsBar, {marginRight: margins}]];
+                    [styles.buttonTextActionsBar, {fontSize: 14, }],
+                ];
+                secondaryTextsStyleArray = [
+                    [styles.buttonTextActionsBar, {}]
+                ]
                 onPressTextsArray = [
                     () => {
                         this.props.onPressView(mainData);
                     },
                     () => {
-                        this.props.onPressCenterButton(mainData);
+                        this.props.goToScreen(mainData, 3);
                     },
                     () => {
+                        this.props.goToScreen(mainData, 4);
+                    },
+                ];
+                secondaryOnPressTextsArray = [
+                    () => {
                         this.props.onPressAddExposure(mainData);
-                    }];
+                    }
+                ]
                 arrayPermissions = [
                     [
                         constants.PERMISSIONS_CASE.caseAll,
@@ -284,10 +321,18 @@ class AnimatedListView extends Component {
                         constants.PERMISSIONS_CASE.caseListRelationshipContacts
                     ],
                     [
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipAll,
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipList,
+                        constants.PERMISSIONS_CASE.caseAll,
+                        constants.PERMISSIONS_CASE.caseListRelationshipContacts
+                    ]
+                ];
+                secondaryArrayPermissions = [
+                    [
                         constants.PERMISSIONS_CONTACT.contactAll,
                         constants.PERMISSIONS_CONTACT.contactCreate
                     ],
-                ];
+                ]
                 titleColor = this.props.colors[mainData.classification];
                 break;
             case 'User':
@@ -297,9 +342,9 @@ class AnimatedListView extends Component {
                     getTranslation(translations.usersScreen.phoneButtonLabel, this.props.translation)
                 ];
                 textsStyleArray = [
-                    [styles.buttonTextActionsBar, {marginLeft: margins}],
+                    [styles.buttonTextActionsBar, {}],
                     [styles.buttonTextActionsBar, {fontSize: 14}],
-                    [styles.buttonTextActionsBar, {marginRight: margins}]];
+                    [styles.buttonTextActionsBar, {}]];
                 onPressTextsArray = [
                     () => {
                         this.props.onPressView(mainData);
@@ -319,7 +364,7 @@ class AnimatedListView extends Component {
                     getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation)
                 ];
                 textsStyleArray = [
-                    [styles.buttonTextActionsBar, {fontSize: 14, marginLeft: margins}]
+                    [styles.buttonTextActionsBar, {fontSize: 14, }]
                 ];
                 onPressTextsArray = [
                     () => {
@@ -336,6 +381,11 @@ class AnimatedListView extends Component {
                 textsArray = [];
                 textsStyleArray = [];
                 onPressTextsArray = [];
+
+
+                secondaryTextsArray = [];
+                secondaryTextsStyleArray = [];
+                secondaryOnPressTextsArray = [];
                 break;
         }
         return(
@@ -351,6 +401,10 @@ class AnimatedListView extends Component {
                 textsStyleArray={textsStyleArray}
                 onPressTextsArray={onPressTextsArray}
                 arrayPermissions={arrayPermissions}
+                secondaryTextsArray={secondaryTextsArray}
+                secondaryTextsStyleArray={secondaryTextsStyleArray}
+                secondaryOnPressTextsArray={secondaryOnPressTextsArray}
+                secondaryArrayPermissions={secondaryArrayPermissions}
                 titleColor={titleColor}
             />
         )

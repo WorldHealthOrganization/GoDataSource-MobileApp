@@ -93,8 +93,10 @@ const style = StyleSheet.create({
         justifyContent: 'space-between'
     },
     rippleStyle: {
+        display: 'flex',
+        flex: 1,
         height: '100%',
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     textStyle: {
         fontFamily: 'Roboto-Medium',

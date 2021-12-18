@@ -390,7 +390,7 @@ export function executeQuery(queryObject) {
                 wasCount = true;
             }
 
-            // console.log('Sql statement: ', sql);
+            start = new Date().getTime();
             return wrapExecuteSQLInPromise(transaction, sql.query, Object.values(sql.values))
         })
         .then((result) => {
@@ -410,11 +410,15 @@ function generalMapping1(unmappedData, queryFields) {
     if (checkArrayAndLength(queryFields)) {
         let fields = queryFields.map((e) => e.alias);
         return unmappedData.map((e) => {
+            // console.log("Problem", fields);
             for (let i=0; i<fields.length; i++) {
-                if (fields[i].includes('xposure')) {
+                if (fields[i].includes('count')){
+                    e[fields[i]] = e[fields[i]];
+                }
+                else if (fields[i].includes('xposure')) {
                     if (e[fields[i]] !== null) {
                         let exposures = e[fields[i]].split('***');
-                        e[fields[i]] = exposures.map((f) => JSON.parse(f));
+                        e[fields[i]] = exposures.map((f) => {return JSON.parse(f)});
                     }
                 } else {
                     try {

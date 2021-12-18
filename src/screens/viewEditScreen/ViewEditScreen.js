@@ -34,6 +34,7 @@ import {checkArrayAndLength} from "../../utils/typeCheckingFunctions";
 import FollowUpsSingleContainer from './../../containers/FollowUpsSingleContainer';
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../../utils/animations";
+import ContactsSingleRelationship from "../../containers/ContactsSingleRelationship";
 
 class ViewEditScreen extends Component {
     constructor(props) {
@@ -437,9 +438,9 @@ class ViewEditScreen extends Component {
                             />
                         );
                     case 'exposures':
-                    let ContactsSingleExposures = require('./../../containers/ContactsSingleExposures').default;
+                    let ContactsSingleRelationship = require('./../../containers/ContactsSingleRelationship').default;
                         return (
-                            <ContactsSingleExposures
+                            <ContactsSingleRelationship
                                 isNew={this.props.isNew}
                                 isEditMode={this.props.isEditMode}
                                 contact={this.props.element}
@@ -605,9 +606,9 @@ class ViewEditScreen extends Component {
                             />
                         );
                     case 'exposures':
-                    let CaseSingleExposureContainer = require("../../containers/CaseSingleExposureContainer").default;
+                    let CaseSingleRelationshipContainer = require("../../containers/CaseSingleRelationshipContainer").default;
                         return (
-                            <CaseSingleExposureContainer
+                            <CaseSingleRelationshipContainer
                                 isNew={this.props.isNew}
                                 isEditMode={this.props.isEditMode}
                                 case={this.props.element}

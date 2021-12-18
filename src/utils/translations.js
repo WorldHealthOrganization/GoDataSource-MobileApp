@@ -221,6 +221,9 @@ const exposureScreen = {
     editExposureLabel: 'LNG_RELATIONSHIP_SCREEN_EDIT_EXPOSURE_TITLE',
     addExposureLabel: 'LNG_RELATIONSHIP_SCREEN_ADD_EXPOSURE_TITLE',
 
+    editContactLabel: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT',
+    addContactLabel: 'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON',
+
     chooseCaseOrEvent: 'LNG_RELATIONSHIP_LABEL_CHOOSE_CASE_OR_EVENT',
     contactDate: 'LNG_RELATIONSHIP_LABEL_DATE_OF_LAST_CONTACT',
     contactDateEstimated: 'LNG_RELATIONSHIP_LABEL_IS_CONTACT_DATE_ESTIMATED',
@@ -255,8 +258,10 @@ const casesScreen = {
     casesTitle: 'LNG_CASE_LIST_SCREEN_TITLE',
     viewButtonLabel: 'LNG_CASE_LIST_SCREEN_VIEW_BUTTON',
     addContactButtonLabel: 'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON',
+    addContactOfContact: 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT',
     noCases: 'LNG_CASE_LIST_SCREEN_NO_CASES',
-    contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS'
+    contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS',
+    exposures: 'LNG_CONTACT_SINGLE_SCREEN_EXPOSURE_TAB'
 };
 
 const labResultsScreen = {

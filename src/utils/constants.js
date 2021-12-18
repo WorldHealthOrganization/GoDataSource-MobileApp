@@ -17,7 +17,7 @@ const appScreens = {
     contactsOfContactsScreen: 'ContactsOfContactsScreen',
     contactsOfContactsSingleScreen: 'ContactsOfContactsSingleScreen',
     labResultsSingleScreen: 'LabResultsSingleScreen',
-    exposureScreen: 'ExposureScreen',
+    exposureScreen: 'RelationshipScreen',
     helpScreen: 'HelpScreen',
     helpSingleScreen: 'HelpSingleScreen',
     qrScanScreen: 'QRScanScreen',
@@ -139,6 +139,11 @@ const PERMISSIONS_RELATIONSHIP = {
     relationshipDelete: 'relationship_delete'
 };
 
+const RELATIONSHIP_TYPE = {
+    exposure: 'relationship_exposure',
+    contact: 'relationship_contact'
+}
+
 const PERMISSIONS_HELP = {
     helpAll: 'help_all',
     helpViewCategory: 'help_view_category',
@@ -197,5 +202,6 @@ export default {
     PERMISSIONS_COMMON,
     PERMISSIONS_TEAMS,
     PERMISSIONS_LAB_RESULT,
-    PERMISSIONS_LAB_RESULT_CONSTANT
+    PERMISSIONS_LAB_RESULT_CONSTANT,
+    RELATIONSHIP_TYPE
 }

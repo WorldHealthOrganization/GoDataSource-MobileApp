@@ -307,6 +307,7 @@ class CardComponent extends Component {
                 return (
                     <SearchableDropdown
                         type={this.props.type}
+                        relationshipType={this.props.relationshipType}
                         person={this.props.person}
                         onSelectExposure={this.props.onSelectExposure}
                         isEditMode={this.props.item.isEditMode}

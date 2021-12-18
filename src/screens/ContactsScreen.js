@@ -33,6 +33,7 @@ import withPincode from "../components/higherOrderComponents/withPincode";
 import {getFollowUpsForOutbreakId} from "../actions/followUps";
 import {compose} from "redux";
 import {Navigation} from "react-native-navigation";
+import constants from "../utils/constants";
 
 class ContactsScreen extends Component {
 
@@ -184,6 +185,7 @@ class ContactsScreen extends Component {
                                 dataType={'Contact'}
                                 filterText={filterText}
                                 style={[style.listViewStyle]}
+                                goToScreen={this.goToScreen}
                                 componentContainerStyle={style.componentContainerStyle}
                                 refreshing={this.state.refreshing}
                                 onRefresh={this.handleOnRefresh}
@@ -255,6 +257,20 @@ class ContactsScreen extends Component {
             this.props.onRefresh();
         });
     };
+
+    goToScreen = (contactData, index) => {
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: constants.appScreens.contactSingleScreen,
+                passProps: {
+                    isNew: false,
+                    refresh: this.refresh,
+                    contact: contactData,
+                    index
+                }
+            }
+        })
+    }
 
     handleOnPressMap = (dataFromMapHandler) => {
         this.setState(prevState => ({

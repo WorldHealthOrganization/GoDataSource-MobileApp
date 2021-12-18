@@ -5,6 +5,7 @@
 import {executeQuery, insertOrUpdate} from "../queries/sqlTools/helperMethods";
 import translations from "../utils/translations";
 import sqlConstants from "../queries/sqlTools/constants";
+import constants from "../utils/constants";
 import get from 'lodash/get';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {getPersonWithRelationsForOutbreakId} from './../queries/sqlTools/sqlQueryInterface';
@@ -71,7 +72,7 @@ export function getCasesForOutbreakIdOld({outbreakId, casesFilter, searchText, l
                     alias: 'countRecords'
                 }
             ]
-        };
+        }
         countPromise = executeQuery(casesQueryCount);
     }
     casesPromise = executeQuery(casesQuery);
@@ -140,7 +141,7 @@ export function getCasesByName(outbreakId, search) {
         .catch((errorGetData) => Promise.reject(errorGetData))
 }
 
-export function getPersonsByName(outbreakId, search, type) {
+export function getPersonsByName(outbreakId, search, type, relationshipType) {
     let condition = {
         '$and':[
             {
@@ -164,12 +165,21 @@ export function getPersonsByName(outbreakId, search, type) {
 
         ]
     };
-    // if type is contacts, search both cases and events
-    if (type === 'Contact' || type === 'Case' || type === 'Event') {
-        condition['type'] = {'$in': [translations.personTypes.events,translations.personTypes.cases ]};
-    }
-    if (type === 'ContactOfContact') {
-        condition['type'] = translations.personTypes.contacts;
+
+    if (relationshipType === constants.RELATIONSHIP_TYPE.contact){
+        if(type === 'Case' || type === 'Event'){
+            condition['type'] = {'$in': [translations.personTypes.events,translations.personTypes.cases, translations.personTypes.contacts ]};
+        } else if (type === 'Contact'){
+            condition['type'] = {'$in':[translations.personTypes.contactsOfContacts]};
+        }
+    } else if (relationshipType === constants.RELATIONSHIP_TYPE.exposure){
+        if(type === 'Case' || type === 'Event') {
+            condition['type'] = {'$in': [translations.personTypes.events, translations.personTypes.cases]};
+        } else if (type === 'Contact'){
+            condition['type'] = {'$in': [translations.personTypes.events,translations.personTypes.cases ]};
+        } else if (type === 'ContactOfContact'){
+            condition['type'] = translations.personTypes.contacts;
+        }
     }
     let casesQuery = {
         type: 'select',
@@ -211,7 +221,7 @@ export function getPersonsByName(outbreakId, search, type) {
         .catch((errorGetData) => Promise.reject(errorGetData))
 }
 
-export function getCaseAndExposuresById (caseId, outbreakId) {
+export function getCaseAndRelationshipsById (caseId, outbreakId) {
     let queryCase = {
         type: 'select',
         table: 'person',
@@ -227,7 +237,36 @@ export function getCaseAndExposuresById (caseId, outbreakId) {
         }
     };
 
-    let queryRelations = {
+    let queryExposureRelations = {
+        type: 'select',
+        table: 'relationship',
+        fields: [
+            {
+                table: 'relationship',
+                name: 'json',
+                alias: 'relationshipData'
+            },
+            {
+                table: 'person',
+                name: 'json',
+                alias: 'contactData'
+            }
+        ],
+        join: [
+            {
+                type: 'inner',
+                table: 'person',
+                on: {'person._id': 'relationship.sourceId'}
+            }
+        ],
+        condition: {
+            'relationship.targetId': caseId,
+            'relationship.deleted': 0
+            // 'person.type': translations.personTypes.contacts
+            // 'relationship.outbreakId': outbreakId,
+        }
+    };
+    let queryContactRelations = {
         type: 'select',
         table: 'relationship',
         fields: [
@@ -251,24 +290,24 @@ export function getCaseAndExposuresById (caseId, outbreakId) {
         ],
         condition: {
             'relationship.sourceId': caseId,
-            'person.type': translations.personTypes.contacts
-            // 'relationship.outbreakId': outbreakId,
+            'relationship.deleted': 0
         }
     };
     if (outbreakId) {
-        queryRelations.condition[`person.outbreakId`] = outbreakId;
+        queryContactRelations.condition[`person.outbreakId`] = outbreakId;
     }
 
     let promiseCaseData = executeQuery(queryCase)
         .then((caseData) => Promise.resolve(get(caseData, `[0].caseData`, null)));
-    let promiseRelationsData = executeQuery(queryRelations);
+    let promiseContactRelationsData = executeQuery(queryContactRelations);
+    let promiseExposureRelationsData = executeQuery(queryExposureRelations);
 
-    return Promise.all([promiseCaseData, promiseRelationsData])
-        .then(([caseData, relationshipData]) => Promise.resolve({caseData: caseData, relationshipData: relationshipData}))
+    return Promise.all([promiseCaseData, promiseContactRelationsData, promiseExposureRelationsData])
+        .then(([caseData, relationshipContactData, relationshipExposureData ]) => Promise.resolve({caseData, relationshipContactData, relationshipExposureData }))
         .catch((errorGetData) => Promise.reject(errorGetData))
 }
 
-export function getRelationsForCase (caseId) {
+export function getRelationsContactForCase (caseId) {
     let queryRelations = {
         type: 'select',
         table: 'relationship',
@@ -293,7 +332,38 @@ export function getRelationsForCase (caseId) {
         ],
         condition: {
             'relationship.sourceId': caseId,
-            'person.type': translations.personTypes.contacts
+            'relationship.deleted': 0
+         }
+    };
+    return executeQuery(queryRelations);
+}
+export function getRelationsExposureForCase (caseId) {
+    let queryRelations = {
+        type: 'select',
+        table: 'relationship',
+        fields: [
+            {
+                table: 'relationship',
+                name: 'json',
+                alias: 'relationshipData'
+            },
+            {
+                table: 'person',
+                name: 'json',
+                alias: 'contactData'
+            }
+        ],
+        join: [
+            {
+                type: 'inner',
+                table: 'person',
+                on: {'person._id': 'relationship.sourceId'}
+            }
+        ],
+        condition: {
+            'relationship.targetId': caseId,
+            'relationship.deleted': 0
+            // 'person.type': translations.personTypes.contacts
             // 'relationship.outbreakId': outbreakId,
         }
     };

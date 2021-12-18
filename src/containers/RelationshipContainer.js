@@ -13,7 +13,7 @@ import CardComponent from './../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
 
-class ExposureContainer extends PureComponent {
+class RelationshipContainer extends PureComponent {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -44,8 +44,8 @@ class ExposureContainer extends PureComponent {
             >
                 <View style={style.container}>
                     {
-                        this.props.fromExposureScreen === true ? (
-                            this.renderItemCardComponent(config.addExposureScreen)
+                        this.props.fromRelationshipScreen === true ? (
+                            this.renderItemCardComponent(config.addRelationshipScreen)
                         ) : (
                                 this.handleRenderItem(null, 0)
                             )
@@ -106,7 +106,7 @@ class ExposureContainer extends PureComponent {
             } else {
                 value = get(this.props, 'selectedExposure', null);
             }
-            item.isEditMode = this.props.fromExposureScreen && this.props.addContactFromCasesScreen;
+            item.isEditMode = this.props.fromRelationshipScreen && this.props.addContactFromCasesScreen;
         }
 
         if (item.type === 'DropdownInput' && item.id === 'clusterId' && this.props.exposure.clusterId) {
@@ -153,6 +153,7 @@ class ExposureContainer extends PureComponent {
                 onChangeText={this.props.onChangeText}
                 onChangeSwitch={this.props.onChangeSwitch}
                 onSelectExposure={this.props.onSelectExposure}
+                relationshipType={this.props.relationshipType}
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
                 permissionsList={item.permissionsList}
@@ -244,4 +245,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(ExposureContainer);
+export default connect(mapStateToProps)(RelationshipContainer);

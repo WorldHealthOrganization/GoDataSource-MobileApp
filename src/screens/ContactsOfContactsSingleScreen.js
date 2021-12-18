@@ -15,9 +15,9 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import ContactsSingleAddress from './../containers/ContactsSingleAddress';
-import ContactsSingleExposures from './../containers/ContactsSingleExposures';
+import ContactsSingleRelationship from './../containers/ContactsSingleRelationship';
 import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
-import ExposureScreen from './../screens/ExposureScreen';
+import RelationshipScreen from './../screens/RelationshipScreen';
 import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
 import {addFollowUp, updateFollowUpAndContact} from './../actions/followUps';
@@ -77,7 +77,7 @@ class ContactsOfContactsSingleScreen extends Component {
         this.state = {
             interactionComplete: false,
             routes: routes,
-            index: 0,
+            index: _.get(this.props, 'index', 0),
             item: this.props.item,
             contact: this.props.isNew ? {
                 riskLevel: null,
@@ -607,8 +607,10 @@ class ContactsOfContactsSingleScreen extends Component {
                 );
             case 'exposures':
                 return (
-                    <ContactsSingleExposures
+                    <ContactsSingleRelationship
                         type={translations.personTypes.contactsOfContacts}
+                        relationshipType={constants.RELATIONSHIP_TYPE.exposure}
+                        refreshRelations={this.refreshRelations}
                         contact={this.state.contact}
                         routeKey={this.state.routes[this.state.index].key}
                         activeIndex={this.state.index}
@@ -1260,7 +1262,7 @@ class ContactsOfContactsSingleScreen extends Component {
         // console.log('handleOnPressEditExposure: ', relation, index);
         _.set(relation, 'caseData.fullName', computeFullName(_.get(relation, 'caseData', null)));
         Navigation.showModal(createStackFromComponent({
-            name: 'ExposureScreen',
+            name: 'RelationshipScreen',
             passProps: {
                 exposure: _.get(relation, 'relationshipData', null),
                 selectedExposure: _.get(relation, 'caseData', null),
@@ -1591,16 +1593,16 @@ class ContactsOfContactsSingleScreen extends Component {
         let relationships = _.get(this.state, 'contact.relationships', []);
         if (checkArrayAndLength(relationships)) {
             relationships = relationships.map((e) => _.get(e, 'relationshipData', e));
-            for (let i = 0; i < config.addExposureScreen.length; i++) {
-                if (config.addExposureScreen[i].id === 'exposure') {
+            for (let i = 0; i < config.addRelationshipScreen.length; i++) {
+                if (config.addRelationshipScreen[i].id === 'exposure') {
                     if (relationships[0].persons.length === 0) {
                         requiredFields.push('Person')
                         // pass = false;
                     }
                 } else {
-                    if (config.addExposureScreen[i].isRequired) {
-                        if (!relationships[0][config.addExposureScreen[i].id]) {
-                            requiredFields.push(getTranslation(config.addExposureScreen[i].label, this.props.translation));
+                    if (config.addRelationshipScreen[i].isRequired) {
+                        if (!relationships[0][config.addRelationshipScreen[i].id]) {
+                            requiredFields.push(getTranslation(config.addRelationshipScreen[i].label, this.props.translation));
                             // pass = false;
                         }
                     }
