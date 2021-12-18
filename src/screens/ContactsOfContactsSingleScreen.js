@@ -187,7 +187,7 @@ class ContactsOfContactsSingleScreen extends Component {
                         this.setState(prevState => ({
                             loading: !prevState.loading,
                             contact: Object.assign({}, prevState.contact, {
-                                relationships: relationshipsAndExposures
+                                relationships: {exposureRelations: relationshipsAndExposures}
                             })
                         }))
                     })
@@ -1284,7 +1284,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 .then((updatedRelations) => {
                     this.setState(prevState => ({
                         loading: false,
-                        contact: Object.assign({}, prevState.contact, {relationships: updatedRelations})
+                        contact: Object.assign({}, prevState.contact, {relationships: {exposureRelations: updatedRelations}})
                     }))
                 })
                 .catch((errorUpdateExposure) => {
@@ -1590,18 +1590,18 @@ class ContactsOfContactsSingleScreen extends Component {
     checkFields = () => {
         // let pass = true;
         let requiredFields = [];
-        let relationships = _.get(this.state, 'contact.relationships', []);
-        if (checkArrayAndLength(relationships)) {
-            relationships = relationships.map((e) => _.get(e, 'relationshipData', e));
+        let exposureRelationships = _.get(this.state.contact, 'relationships.exposureRelations', []);
+        if (checkArrayAndLength(exposureRelationships)) {
+            exposureRelationships = exposureRelationships.map((e) => _.get(e, 'relationshipData', e));
             for (let i = 0; i < config.addRelationshipScreen.length; i++) {
                 if (config.addRelationshipScreen[i].id === 'exposure') {
-                    if (relationships[0].persons.length === 0) {
+                    if (exposureRelationships[0].persons.length === 0) {
                         requiredFields.push('Person')
                         // pass = false;
                     }
                 } else {
                     if (config.addRelationshipScreen[i].isRequired) {
-                        if (!relationships[0][config.addRelationshipScreen[i].id]) {
+                        if (!exposureRelationships[0][config.addRelationshipScreen[i].id]) {
                             requiredFields.push(getTranslation(config.addRelationshipScreen[i].label, this.props.translation));
                             // pass = false;
                         }
