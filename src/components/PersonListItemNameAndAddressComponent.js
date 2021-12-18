@@ -10,6 +10,7 @@ import translations from './../utils/translations'
 import {calculateDimension, callPhone, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
+import colors from "../styles/colors";
 
 class PersonListItemNameAndAddressComponent extends PureComponent {
     constructor(props) {
@@ -82,15 +83,27 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                         {
                             firstComponentRenderData.telephoneNumbers ?
                                 (
-                                    <Ripple onPress={() => {callPhone(translation)(firstComponentRenderData.telephoneNumbers)}}>
+                                    <View style={{
+                                        flex: 1,
+                                        marginHorizontal: 7,
+                                        flexDirection:'row'
+                                    }}>
                                         <Text style={[style.secondaryText, {
-                                            flex: 1,
-                                            marginHorizontal: 7,
                                             display: firstComponentRenderData.telephoneNumbers ? 'flex' : 'none'
                                         }]}>
-                                            {'\u2022 ' + getTranslation(translations.usersScreen.primaryPhone, translation) + ": " + firstComponentRenderData.telephoneNumbers}
+                                            {'\u2022 ' + getTranslation(translations.usersScreen.primaryPhone, translation) + ": "}
                                         </Text>
-                                    </Ripple>
+                                        <Ripple onPress={() => {
+                                            callPhone(translation)(firstComponentRenderData.telephoneNumbers)
+                                        }}>
+                                            <Text style={[style.secondaryText, {
+                                                color: colors.buttonGreen,
+                                                display: firstComponentRenderData.telephoneNumbers ? 'flex' : 'none'
+                                            }]}>
+                                                {firstComponentRenderData.telephoneNumbers}
+                                            </Text>
+                                        </Ripple>
+                                    </View>
                                 ) : (null)
                         }
                         {
