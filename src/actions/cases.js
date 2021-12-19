@@ -178,7 +178,7 @@ export function getPersonsByName(outbreakId, search, type, relationshipType) {
         } else if (type === 'Contact'){
             condition['type'] = {'$in': [translations.personTypes.events,translations.personTypes.cases ]};
         } else if (type === 'ContactOfContact'){
-            condition['type'] = translations.personTypes.contacts;
+            condition['type'] = {'$in': [translations.personTypes.contacts]};
         }
     }
     let casesQuery = {
