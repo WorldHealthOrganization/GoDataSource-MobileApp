@@ -26,6 +26,7 @@ import ActionsBar from './ActionsBar';
 import translations from './../utils/translations';
 import SearchableDropdown from './SearchableDropdown';
 import PermissionComponent from './PermissionComponent';
+import colors from "../styles/colors";
 
 class CardComponent extends Component {
 
@@ -104,6 +105,7 @@ class CardComponent extends Component {
                         isRequired={this.props.item.isRequired}
                         multiline={this.props.item.multiline}
                         style={{width: width, marginHorizontal: marginHorizontal}}
+                        textStyle={this.props.item.id === 'phoneNumber' ? {color: colors.buttonGreen} : undefined}
                         objectType={this.props.item.objectType}
                         keyboardType={this.props.item.keyboardType}
                         translation={this.props.translation}

@@ -123,7 +123,7 @@ class TextInput extends Component {
                                 fontSize: 15,
                                 textAlign: 'left',
                                 color: 'rgb(0,0,0)',
-                                marginBottom: 2,
+                                marginBottom: 2
                             }}>
                                 {getTranslation(this.props.label, this.props.translation)}
                             </Text>
@@ -135,6 +135,7 @@ class TextInput extends Component {
                             fontSize: 15,
                             textAlign: 'left',
                             color: 'rgb(60,60,60)',
+                            ...this.props.textStyle
                         }}>
                             {localValue}
                         </Text>
