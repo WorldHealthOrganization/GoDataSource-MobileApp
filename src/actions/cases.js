@@ -167,17 +167,17 @@ export function getPersonsByName(outbreakId, search, type, relationshipType) {
     };
 
     if (relationshipType === constants.RELATIONSHIP_TYPE.contact){
-        if(type === 'Case' || type === 'Event'){
+        if((type === 'Case' || type === translations.personTypes.cases) || (type === 'Event' || type === translations.personTypes.events)){
             condition['type'] = {'$in': [translations.personTypes.events,translations.personTypes.cases, translations.personTypes.contacts ]};
-        } else if (type === 'Contact'){
+        } else if ((type === 'Contact' || type === translations.personTypes.contacts)){
             condition['type'] = {'$in':[translations.personTypes.contactsOfContacts]};
         }
     } else if (relationshipType === constants.RELATIONSHIP_TYPE.exposure){
-        if(type === 'Case' || type === 'Event') {
+        if((type === 'Case' || type === translations.personTypes.cases) || (type === 'Event' || type === translations.personTypes.events)) {
             condition['type'] = {'$in': [translations.personTypes.events, translations.personTypes.cases]};
-        } else if (type === 'Contact'){
+        } else if (type === 'Contact' || type === translations.personTypes.contacts){
             condition['type'] = {'$in': [translations.personTypes.events,translations.personTypes.cases ]};
-        } else if (type === 'ContactOfContact'){
+        } else if (type === 'ContactOfContact' || type === translations.personTypes.contactsOfContacts){
             condition['type'] = {'$in': [translations.personTypes.contacts]};
         }
     }
