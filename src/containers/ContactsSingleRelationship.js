@@ -251,7 +251,7 @@ class ContactsSingleRelationship extends Component {
             name: "RelationshipScreen",
             passProps: {
                 contact: this.props.contact,
-                type: this.props.type || 'Contact',
+                type: this.props.type === translations.personTypes.contactsOfContacts ? 'ContactOfContact' : 'Contact',
                 saveExposure: this.props.saveExposure,
                 refreshRelations: this.props.refreshRelations,
                 relationshipType: this.props.relationshipType
