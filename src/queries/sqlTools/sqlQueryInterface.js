@@ -258,6 +258,11 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
                     table: relationshipAlias,
                     name: 'targetType',
                     alias: 'targetType'
+                },
+                {
+                    table: relationshipAlias,
+                    name: 'deleted',
+                    alias: 'deleted'
                 }
             ],
             // group: `${relationshipAlias}.${target}`
@@ -284,14 +289,18 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
                 type: 'left',
                 table: 'person',
                 alias: filteredExposuresAlias,
-                on: {[`${relationshipAlias}.${source}`]: `${filteredExposuresAlias}._id`}
+                on: {
+                    [`${relationshipAlias}.${source}`]: `${filteredExposuresAlias}._id`,
+                    [`${relationshipAlias}.deleted`]: 0,
+                }
             },
             {
                 type: 'left',
                 table: 'person',
                 alias: unfilteredExposuresAlias,
                 on: {
-                    [`${relationshipAlias}.${source}`]: `${unfilteredExposuresAlias}._id`
+                    [`${relationshipAlias}.${source}`]: `${unfilteredExposuresAlias}._id`,
+                    [`${relationshipAlias}.deleted`]: 0
                 }
             },
         ],
@@ -316,8 +325,8 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
     }
 
     if (type === translations.personTypes.contactsOfContacts) {
-        lodashSet(mainQuery, `join[1].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
-        lodashSet(mainQuery, `join[2].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
+        // lodashSet(mainQuery, `join[1].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
+        // lodashSet(mainQuery, `join[2].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
         // mainCondition[`${filteredExposuresAlias}.type`] = translations.personTypes.contacts;
         // mainCondition[`${unfilteredExposuresAlias}.type`] = translations.personTypes.contacts;
     }
