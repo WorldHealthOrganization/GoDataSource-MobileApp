@@ -15,7 +15,7 @@ import styles from './../styles';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import PermissionComponent from './PermissionComponent';
 
-ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation}) => (
+ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, outbreakPermissions, onPermissionDisable, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation}) => (
     <View style={[style.containerStyle, containerStyle]}>
         <View style={[style.separatorStyle, {backgroundColor: borderColor, display: hasBorder ? 'flex' : 'none'}]}/>
         {
@@ -46,10 +46,33 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
                                             </Text>
                                         </Ripple>
                                     )}
+                                    outbreakPermissions={checkArrayAndLength(outbreakPermissions) ? outbreakPermissions[index] : []}
                                     permissionsList={arrayPermissions[index]}
-                                    alternativeRender={() => (
-                                        <View style={[style.rippleStyle, {width: 60}]}/>
-                                    )}
+                                    alternativeRender={() =>{
+                                        if(onPermissionDisable && onPermissionDisable[index]){
+                                            return (
+                                                <Ripple
+                                                    key={index}
+                                                    style={style.rippleStyle}
+                                                    disabled={true}
+                                                    onPress={onPressArray && onPressArray[index] ? () => {
+                                                        onPressArray[index](addressIndex)
+                                                    } : () => {
+                                                        console.log("Default ")
+                                                    }}
+                                                >
+                                                    <Text style={[
+                                                        textsStyleArray && Array.isArray(textsStyleArray) &&
+                                                        textsStyleArray[index] ? textsStyleArray[index] : style.textStyle]}
+                                                          numberOfLines={1}
+                                                    >
+                                                        {getTranslation(text, translation)}
+                                                    </Text>
+                                                </Ripple>
+                                            )
+                                        }
+                                        return (<View style={[style.rippleStyle, {width: 60}]}/>)
+                                    }}
                                 />
                             )
                         } else {

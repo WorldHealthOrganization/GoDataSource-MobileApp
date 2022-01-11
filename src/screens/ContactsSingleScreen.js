@@ -27,7 +27,7 @@ import {addFollowUp, getFollowUpsForContactId, updateFollowUpAndContact} from '.
 import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import _, {findIndex, sortBy} from 'lodash';
+import _, {findIndex, sortBy, remove} from 'lodash';
 import {
     calculateDimension,
     computeFullName,
@@ -86,6 +86,10 @@ class ContactsSingleScreen extends Component {
                             )) ?
             config.tabsValuesRoutes.contactsSingle :
             config.tabsValuesRoutes.contactsSingleWithoutExposures;
+
+        if(this.props.outbreak && !this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC]) {
+            remove(routes, (route => route.key === 'contacts'))
+        }
 
         this.state = {
             interactionComplete: false,

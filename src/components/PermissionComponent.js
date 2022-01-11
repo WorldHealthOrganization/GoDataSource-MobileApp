@@ -16,8 +16,15 @@ class PermissionComponent extends Component {
     }
 
     compareFunction = lodashMemoize((permissionsList) => {
-        if (!checkArrayAndLength(permissionsList)) {
+        if (!checkArrayAndLength(permissionsList) && !checkArrayAndLength(this.props.outbreakPermissions)) {
             return true;
+        }
+        if(checkArrayAndLength(this.props.outbreakPermissions)){
+            for(const permissionKey of this.props.outbreakPermissions){
+                if (!this.props.outbreak[permissionKey]){
+                    return false;
+                }
+            }
         }
         if (permissionsList.every((e) => checkArrayAndLength(e))) {
             for (let elem of permissionsList) {
@@ -47,6 +54,7 @@ class PermissionComponent extends Component {
 PermissionComponent.propTypes = {
     render: PropTypes.func.isRequired,
     permissionsList: PropTypes.arrayOf(PropTypes.oneOf(PropTypes.string, PropTypes.array)).isRequired,
+    outbreakPermissions: PropTypes.arrayOf(PropTypes.oneOf(PropTypes.string)),
     alternativeRender: PropTypes.func,
 };
 
@@ -60,11 +68,12 @@ PermissionComponent.defaultProps = {
 
 function mapStateToProps(state) {
     return {
-        permissions: lodashGet(state, 'role', [])
+        permissions: lodashGet(state, 'role', []),
+        outbreak: lodashGet(state, 'outbreak', null)
     };
 }
 
-export default connect(
+export default  connect(
     mapStateToProps,
 )(PermissionComponent);
 

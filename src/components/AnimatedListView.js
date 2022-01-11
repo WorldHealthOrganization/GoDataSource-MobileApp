@@ -141,6 +141,8 @@ class AnimatedListView extends Component {
         let textsStyleArray = [];
         let onPressTextsArray = [];
         let arrayPermissions = [];
+        let onPermissionDisable = false;
+        let outbreakPermissions = [];
 
         let secondaryTextsArray = [];
         let secondaryTextsStyleArray = [];
@@ -160,11 +162,12 @@ class AnimatedListView extends Component {
                 exposureData = get(item, 'exposureData', null);
                 textsArray = [
                     getTranslation(get(followUpData, 'statusId', translations.followUpStatuses.notPerformed), this.props.translation),
-                    getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
+                    // getTranslation(translations.followUpsScreen.addExposureFollowUpLabel, this.props.translation)
                 ];
                 textsStyleArray = [
                     [styles.buttonTextActionsBar, {color: this.props.colors[followUpData.statusId], }],
-                    [styles.buttonTextActionsBar, {}]];
+                    // [styles.buttonTextActionsBar, {}]
+                ];
                 onPressTextsArray = [
                     () => {
                         this.props.onPressView(followUpData, mainData);
@@ -173,15 +176,20 @@ class AnimatedListView extends Component {
                     () => {
                         this.props.onPressAddExposure(mainData);
                         // this.handleOnPressExposure(item, this.props.contacts.find((e) => {return extractIdFromPouchId(e._id, 'person') === item.personId}))
-                    }];
+                    }
+                ];
                 arrayPermissions = [
                     [constants.PERMISSIONS_FOLLOW_UP.followUpAll, constants.PERMISSIONS_FOLLOW_UP.followUpView],
-                    [
-                        [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactAll],
-                        [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures],
-                        [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactAll],
-                        [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures]
-                    ]
+                    // [
+                    //     [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactAll],
+                    //     [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures],
+                    //     [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactAll],
+                    //     [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures]
+                    // ]
+                ];
+                onPermissionDisable = [
+                    true,
+                    // false
                 ];
                 id = get(followUpData, 'id', null);
                 break;
@@ -212,7 +220,7 @@ class AnimatedListView extends Component {
                         this.props.goToScreen(mainData,2);
                     },
                     () => {
-                        this.props.goToScreen(mainData,3);
+                        this.props.goToScreen(mainData,this.props.outbreak?.isContactsOfContactsActive ? 3 : 2);
                     }];
                 secondaryOnPressTextsArray = [
                     () => {
@@ -241,7 +249,12 @@ class AnimatedListView extends Component {
                         [constants.PERMISSIONS_CONTACT.contactCreateContactOfContact, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll],
                         [constants.PERMISSIONS_CONTACT.contactCreateContactOfContact, PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate]
                     ]
-                ]
+                ];
+                outbreakPermissions = [
+                    [],
+                    [constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC],
+                    []
+                ];
                 titleColor = this.props.colors[mainData.riskLevel];
                 break;
             case 'ContactOfContact':
@@ -401,6 +414,8 @@ class AnimatedListView extends Component {
                 textsStyleArray={textsStyleArray}
                 onPressTextsArray={onPressTextsArray}
                 arrayPermissions={arrayPermissions}
+                onPermissionDisable={onPermissionDisable}
+                outbreakPermissions={outbreakPermissions}
                 secondaryTextsArray={secondaryTextsArray}
                 secondaryTextsStyleArray={secondaryTextsStyleArray}
                 secondaryOnPressTextsArray={secondaryOnPressTextsArray}
@@ -562,7 +577,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        translation: state.app.translation
+        translation: state.app.translation,
+        outbreak: state.outbreak
     };
 }
 

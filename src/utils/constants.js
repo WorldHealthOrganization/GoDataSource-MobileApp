@@ -35,6 +35,10 @@ const DATABASE_LOCATIONS = `${RNFetchBlobFS.dirs.DocumentDir}/who_databases`;
 const FILES_LOCATIONS = `${RNFetchBlobFS.dirs.DocumentDir}/who_files`;
 const CHUNK_SIZE_TOOLTIP = 'Number of records per file in the sync process. A lower number will mean lower RAM consumption but a longer sync process. For slow devices use a lower number of records';
 
+const PERMISSIONS_OUTBREAK = {
+    allowRegistrationOfCoC: 'isContactsOfContactsActive'
+}
+
 const PERMISSIONS_CONTACT = {
     contactAll: 'contact_all',
     contactView: 'contact_view',
@@ -194,6 +198,7 @@ export default {
     FILES_LOCATIONS,
     CHUNK_SIZE_TOOLTIP,
     PERMISSIONS_CONTACT,
+    PERMISSIONS_OUTBREAK,
     PERMISSIONS_CASE,
     PERMISSIONS_FOLLOW_UP,
     PERMISSIONS_RELATIONSHIP,
