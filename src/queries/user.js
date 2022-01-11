@@ -28,8 +28,7 @@ export function loginUserRequest (credentials, callback) {
                         if (error) {
                             console.log("Error at comparing passwords: ", error);
                             callback(error)
-                        }
-                        if (isMatch) {
+                        } else if (isMatch) {
                             console.log("Result for find time for: Passwords match: ", new Date().getTime() - start);
                             // Return user
                             // If passwords match, check also if the user has an active outbreak id
