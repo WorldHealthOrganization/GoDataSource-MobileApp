@@ -15,7 +15,7 @@ import styles from './../styles';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import PermissionComponent from './PermissionComponent';
 
-ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, onPermissionDisable, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation}) => (
+ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, outbreakPermissions, onPermissionDisable, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation}) => (
     <View style={[style.containerStyle, containerStyle]}>
         <View style={[style.separatorStyle, {backgroundColor: borderColor, display: hasBorder ? 'flex' : 'none'}]}/>
         {
@@ -46,6 +46,7 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
                                             </Text>
                                         </Ripple>
                                     )}
+                                    outbreakPermissions={checkArrayAndLength(outbreakPermissions) ? outbreakPermissions[index] : []}
                                     permissionsList={arrayPermissions[index]}
                                     alternativeRender={() =>{
                                         if(onPermissionDisable && onPermissionDisable[index]){
