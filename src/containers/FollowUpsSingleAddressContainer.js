@@ -117,6 +117,13 @@ class FollowUpsSingleAddressContainer extends PureComponent {
 
     computeValueForFollowUpSingleScreen = (item) => {
         if (item.objectType === 'Address') {
+            const coordinates = this.props.item.address?.geoLocation?.coordinates;
+            if (item.id === 'lat'){
+                return coordinates[0];
+            }
+            if(item.id === 'lng'){
+                return coordinates[1];
+            }
             return this.props.item && this.props.item.address && this.props.item.address[item.id] !== undefined ?
                 getTranslation(this.props.item.address[item.id], this.props.translation) : '';
         }
