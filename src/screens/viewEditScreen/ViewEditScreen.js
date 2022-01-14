@@ -742,7 +742,7 @@ class ViewEditScreen extends Component {
             date: date,
             fileType: 'followUp.json',
             outbreakId: this.props.outbreakId,
-            index: daysSince(_.get(this.props, 'element.followUp.startDate', null), now) + 1,
+            index: daysSince(_.get(this.props, 'element.followUp.startDate', null), date),
             teamId: generateTeamId(this.props.element.addresses.slice(), this.props.teams, this.props.locations.slice()),
             personId: extractIdFromPouchId(this.props.element._id, 'person.json')
         };
