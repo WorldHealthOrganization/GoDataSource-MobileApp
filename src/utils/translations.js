@@ -252,6 +252,7 @@ const followUpsSingleScreen = {
     date: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
     status: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
     targeted: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
+    team: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM'
 };
 
 const casesScreen = {
