@@ -245,6 +245,7 @@ export default {
     'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Date',
     'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID': 'Status',
     'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED': 'Targeted',
+    'LNG_FOLLOW_UP_FIELD_LABEL_TEAM': 'Team',
 
 
     //casesScreen

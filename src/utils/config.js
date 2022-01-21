@@ -307,6 +307,18 @@ const followUpsSingleScreen = {
                 },
                 {
                     cardNumber: 1,
+                    id: 'targeted',
+                    label: translations.followUpsSingleScreen.targeted,
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: true,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'FollowUp'
+                },
+                {
+                    cardNumber: 1,
                     id: 'statusId',
                     label: translations.followUpsSingleScreen.status,
                     type: 'DropdownInput',
@@ -329,18 +341,21 @@ const followUpsSingleScreen = {
                     activeBackgroundColor: styles.missedRedColorWithOpacity,
                     objectType: 'FollowUp'
                 },
-                // {
-                //     cardNumber: 1,
-                //     id: 'targeted',
-                //     label: translations.followUpsSingleScreen.targeted,
-                //     type: 'SwitchInput',
-                //     value: false,
-                //     isRequired: false,
-                //     isEditMode: true,
-                //     activeButtonColor: 'green',
-                //     activeBackgroundColor: 'green',
-                //     objectType: 'FollowUp'
-                // },
+            ]
+        },
+        {
+            fields:[
+                {
+                    cardNumber: 3,
+                    id: 'teamId',
+                    label: translations.followUpsSingleScreen.team,
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    objectType: 'FollowUp',
+                    skipNone: true
+                },
             ]
         }
     ],
