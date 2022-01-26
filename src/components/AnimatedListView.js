@@ -27,10 +27,12 @@ const VIEWABILITY_CONFIG = {
     waitForInteraction: true
 };
 
-const scrollAnim = new Animated.Value(0);
-const offsetAnim = new Animated.Value(0);
+
 
 class AnimatedListView extends Component {
+
+    scrollAnim = new Animated.Value(0);
+    offsetAnim = new Animated.Value(0);
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -39,23 +41,27 @@ class AnimatedListView extends Component {
         this.state = {
             searchText: ''
         };
+
+        this.scrollAnim = new Animated.Value(0);
+        this.offsetAnim = new Animated.Value(0);
+
     }
 
     clampedScroll = Animated.diffClamp(
         Animated.add(
-            scrollAnim.interpolate({
+            this.scrollAnim.interpolate({
                 inputRange: [0, 1],
                 outputRange: [0, 1],
                 extrapolateLeft: 'clamp',
             }),
-            offsetAnim,
+            this.offsetAnim,
         ),
         0,
         30,
     );
 
     handleScroll = Animated.event(
-        [{ nativeEvent: { contentOffset: { y: scrollAnim } } }],
+        [{ nativeEvent: { contentOffset: { y: this.scrollAnim } } }],
         { useNativeDriver: true }
     );
 
@@ -75,6 +81,7 @@ class AnimatedListView extends Component {
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
+        console.log("Rendered animated list view");
         return (
             <AnimatedFlatList
                 ref={this.animatedFlatList}
