@@ -1824,10 +1824,11 @@ class ContactsSingleScreen extends Component {
     checkFields = (type) => {
         // let pass = true;
         let requiredFields = [];
-        let relationships = _.get(this.state.contact, 'relationships.contactRelations', []);
-        if(type === constants.RELATIONSHIP_TYPE.exposure){
-            relationships = _.get(this.state.contact, 'relationships.exposureRelations', []);
-        }
+        // let relationships = _.get(this.state.contact, 'relationships.contactRelations', []);
+        // if(type === constants.RELATIONSHIP_TYPE.exposure){
+        //     relationships = _.get(this.state.contact, 'relationships.exposureRelations', []);
+        // }
+        let relationships = _.get(this.state.contact, 'relationships', []);
         if (checkArrayAndLength(relationships)) {
             relationships = relationships.map((e) => _.get(e, 'relationshipData', e));
             for (let i = 0; i < config.addRelationshipScreen.length; i++) {

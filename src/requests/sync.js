@@ -160,7 +160,11 @@ export function postDatabaseSnapshotRequest(internetCredentials, path) {
                     //     console.log("Got database");
                     return Promise.resolve('Finished sending data to the server');
                 } else {
-                    return Promise.resolve(res);
+                    let data = res.data;
+                    if(typeof data === 'string'){
+                        data = JSON.parse(data);
+                    }
+                    return Promise.resolve(data?.error?.message || res);
                 }
             })
         )

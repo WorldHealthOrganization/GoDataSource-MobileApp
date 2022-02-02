@@ -101,7 +101,7 @@ function mapStateToProps(state) {
 
 let syncStateGlobal = cloneDeep(config.manualSyncStages);
 
-handleChangingSyncState = (syncState) => {
+let handleChangingSyncState = (syncState) => {
     let returnedValue = {
         showModal: !!(syncState && syncState.id && (syncState.status || syncState.name)),
         syncState: syncStateGlobal,
