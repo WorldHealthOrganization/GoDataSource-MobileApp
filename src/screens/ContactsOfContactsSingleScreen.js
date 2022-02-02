@@ -1590,7 +1590,7 @@ class ContactsOfContactsSingleScreen extends Component {
     checkFields = () => {
         // let pass = true;
         let requiredFields = [];
-        let exposureRelationships = _.get(this.state.contact, 'relationships.exposureRelations', []);
+        let exposureRelationships = _.get(this.state.contact, 'relationships', []);
         if (checkArrayAndLength(exposureRelationships)) {
             exposureRelationships = exposureRelationships.map((e) => _.get(e, 'relationshipData', e));
             for (let i = 0; i < config.addRelationshipScreen.length; i++) {
