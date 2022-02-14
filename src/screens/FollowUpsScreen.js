@@ -93,15 +93,13 @@ class FollowUpsScreen extends Component {
 
         let filterNumbers = 0;
         if (mainFilter) {
-            if (get(mainFilter, 'gender', null) !== null) {
-                ++filterNumbers
-            }
-            if (get(mainFilter, 'age', null) !== null) {
-                ++filterNumbers
-            }
-            if (checkArrayAndLength(get(mainFilter, 'selectedLocations', null))) {
-                ++filterNumbers
-            }
+            Object.keys(mainFilter).forEach(key => {
+                if(checkArrayAndLength(mainFilter[key])){
+                    filterNumbers++;
+                } else if(mainFilter[key] !== null && !Array.isArray(mainFilter[key])){
+                    filterNumbers++;
+                }
+            })
         }
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `(${filterNumbers})`
 

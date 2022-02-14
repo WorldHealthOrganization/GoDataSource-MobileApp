@@ -42,6 +42,7 @@ class RelationshipScreen extends Component {
             exposure: this.props.exposure || {
                 outbreakId: this.props.outbreak._id,
                 contactDate: new Date(),
+                dateOfFirstContact: new Date(),
                 contactDateEstimated: false,
                 certaintyLevelId: '',
                 exposureTypeId: '',

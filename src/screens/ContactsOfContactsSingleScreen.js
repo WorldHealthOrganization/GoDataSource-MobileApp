@@ -87,6 +87,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 middleName: '',
                 lastName: '',
                 gender: '',
+                pregnancyStatus: '',
                 occupation: '',
                 dob: null,
                 age: {
@@ -99,6 +100,7 @@ class ContactsOfContactsSingleScreen extends Component {
                     {
                         outbreakId: this.props.outbreak._id ? this.props.outbreak._id : '',
                         contactDate: createDate(null),
+                        dateOfFirstContact: createDate(null),
                         contactDateEstimated: false,
                         certaintyLevelId: '',
                         exposureTypeId: '',

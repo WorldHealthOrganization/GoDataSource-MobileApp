@@ -176,8 +176,8 @@ class RelationshipContainer extends PureComponent {
         let maximumDate = undefined;
 
         if (item.type === 'DatePicker') {
-            if (item.id === 'contactDate') {
-                maximumDate = new Date()
+            if (item.id === 'contactDate' || item.id === 'dateOfFirstContact') {
+                maximumDate = new Date();
             }
         }
 
