@@ -10,6 +10,8 @@ export default {
     'LNG_LAB_RESULT_FIELD_LABEL_RESULT': "Result",
     'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN': "Sample taken",
 
+    'LNG_RELATIONSHIP_FIELD_LABEL_RELATION': 'Context of exposure',
+
     //labResultSingleScreen
     'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID': "Sample lab ID",
     'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED': "Sample delivered to lab",
@@ -167,8 +169,8 @@ export default {
     'LNG_CASE_FIELD_LABEL_DECEASED': 'Deceased',
     'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL': 'Was Burial Safety Performed?',
     'LNG_CASE_FIELD_LABEL_DATE_OF_DECEASE': 'Date of decease',
-    'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION': 'Place of burial',
-    'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION': 'Burial Place Name',
+    'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL': 'Place of burial',
+    'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME': 'Burial Place Name',
 
     'LNG_DATE_FIELD_LABEL_FROM': 'From',
     'LNG_DATE_FIELD_LABEL_TO': 'To',
@@ -218,6 +220,7 @@ export default {
 
     'LNG_RELATIONSHIP_LABEL_CHOOSE_CASE_OR_EVENT': 'Person',
     'LNG_RELATIONSHIP_LABEL_DATE_OF_LAST_CONTACT': 'Date of last contact',
+    'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT': 'Date of first contact',
     'LNG_RELATIONSHIP_LABEL_IS_CONTACT_DATE_ESTIMATED': 'Is contact date estimated?',
     'LNG_RELATIONSHIP_LABEL_CERTAINTY_LEVEL': 'Certainty level',
     'LNG_RELATIONSHIP_LABEL_EXPOSURE_TYPE': 'Exposure type',
@@ -238,13 +241,16 @@ export default {
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE': 'Delete follow-up',
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE': 'Deceased',
 
-    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT': 'View contact',
+    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT': 'Edit contact',
+
+    'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CONTACT': 'View contact',
 
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_FOLLOW_UP': 'Are you sure you want to delete this follow-up?',
 
     'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Date',
     'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID': 'Status',
     'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED': 'Targeted',
+    'LNG_FOLLOW_UP_FIELD_LABEL_TEAM': 'Team',
 
 
     //casesScreen

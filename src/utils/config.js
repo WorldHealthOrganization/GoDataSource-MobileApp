@@ -101,7 +101,7 @@ const tabsValuesRoutes = {
         {key: 'personal', title: translations.caseSingleScreen.personalTitle},
         {key: 'address', title: translations.caseSingleScreen.addressTitle},
         {key: 'infection', title: translations.caseSingleScreen.infectionTitle},
-        {key: 'caseInvestigation', title: translations.caseSingleScreen.investigationTitle}
+        {key: 'caseInvestigation', title: translations.followUpsSingleScreen.questionnaireTitle}
     ],
     casesSingleViewEdit: [
         {key: 'personal', title: translations.caseSingleScreen.personalTitle},
@@ -109,20 +109,20 @@ const tabsValuesRoutes = {
         {key: 'infection', title: translations.caseSingleScreen.infectionTitle},
         {key: 'contacts', title: 'Contacts'},
         {key: 'exposures', title: 'Exposures'},
-        {key: 'caseInvestigation', title: translations.caseSingleScreen.investigationTitle}
+        {key: 'caseInvestigation', title: translations.followUpsSingleScreen.questionnaireTitle}
     ],
     contactsSingle: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
         {key: 'contacts', title: 'Contacts'},
         {key: 'exposures', title: translations.contactSingleScreen.exposuresTitle},
-        {key: 'investigation', title: translations.caseSingleScreen.investigationTitle},
+        {key: 'investigation', title: translations.followUpsSingleScreen.questionnaireTitle},
         {key: 'calendar', title: translations.contactSingleScreen.calendarTitle}
     ],
     contactsSingleWithoutExposures: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
-        {key: 'investigation', title: translations.caseSingleScreen.investigationTitle},
+        {key: 'investigation', title: translations.followUpsSingleScreen.questionnaireTitle},
         {key: 'calendar', title: translations.contactSingleScreen.calendarTitle}
     ],
     contactsOfContactsSingle: [
@@ -138,7 +138,7 @@ const tabsValuesRoutes = {
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
         {key: 'exposures', title: translations.contactSingleScreen.exposuresTitle},
-        {key: 'investigation', title: translations.caseSingleScreen.investigationTitle},
+        {key: 'investigation', title: translations.followUpsSingleScreen.questionnaireTitle},
     ]
 };
 
@@ -307,6 +307,18 @@ const followUpsSingleScreen = {
                 },
                 {
                     cardNumber: 1,
+                    id: 'targeted',
+                    label: translations.followUpsSingleScreen.targeted,
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: true,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'FollowUp'
+                },
+                {
+                    cardNumber: 1,
                     id: 'statusId',
                     label: translations.followUpsSingleScreen.status,
                     type: 'DropdownInput',
@@ -329,18 +341,21 @@ const followUpsSingleScreen = {
                     activeBackgroundColor: styles.missedRedColorWithOpacity,
                     objectType: 'FollowUp'
                 },
-                // {
-                //     cardNumber: 1,
-                //     id: 'targeted',
-                //     label: translations.followUpsSingleScreen.targeted,
-                //     type: 'SwitchInput',
-                //     value: false,
-                //     isRequired: false,
-                //     isEditMode: true,
-                //     activeButtonColor: 'green',
-                //     activeBackgroundColor: 'green',
-                //     objectType: 'FollowUp'
-                // },
+            ]
+        },
+        {
+            fields:[
+                {
+                    cardNumber: 3,
+                    id: 'teamId',
+                    label: translations.followUpsSingleScreen.team,
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    objectType: 'FollowUp',
+                    skipNone: true
+                },
             ]
         }
     ],
@@ -799,6 +814,16 @@ const caseSingleScreen = {
                     objectType: 'Case'
                 },
                 {
+                    id: 'riskReason',
+                    label: translations.caseSingleScreen.riskReason,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    multiline: true,
+                    objectType: 'Case'
+                },
+                {
                     cardNumber: 2,
                     id: 'dateOfReporting',
                     label: translations.caseSingleScreen.dateOfReporting,
@@ -809,19 +834,7 @@ const caseSingleScreen = {
                     format: 'YYYY-MM-dd',
                     objectType: 'Case'
                 },
-                {
-                    cardNumber: 2,
-                    id: 'pregnancyStatus',
-                    label: translations.caseSingleScreen.pregnancyStatus,
-                    labelValue: 'test',
-                    type: 'DropdownInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'Case'
-                },
+
                 {
                     cardNumber: 2,
                     id: 'isDateOfReportingApproximate',
@@ -836,24 +849,15 @@ const caseSingleScreen = {
                 },
                 {
                     cardNumber: 2,
-                    id: 'transferRefused',
-                    label: translations.caseSingleScreen.transferRefused,
-                    type: 'SwitchInput',
-                    value: false,
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
-                    objectType: 'Case'
-                },
-                {
-                    id: 'riskReason',
-                    label: translations.caseSingleScreen.riskReason,
-                    type: 'TextInput',
+                    id: 'pregnancyStatus',
+                    label: translations.caseSingleScreen.pregnancyStatus,
+                    labelValue: 'test',
+                    type: 'DropdownInput',
                     value: '',
                     isRequired: false,
                     isEditMode: false,
-                    multiline: true,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
                     objectType: 'Case'
                 },
             ]
@@ -1019,6 +1023,18 @@ const caseSingleScreen = {
                     format: 'YYYY-MM-dd',
                     objectType: 'Case'
                 },
+                {
+                    cardNumber: 2,
+                    id: 'transferRefused',
+                    label: translations.caseSingleScreen.transferRefused,
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'Case'
+                },
                 // {
                 //     cardNumber: 1,
                 //     id: 'deceased',
@@ -1075,7 +1091,7 @@ const caseSingleScreen = {
                     isRequired: false,
                     isEditMode: false,
                     objectType: 'Case'
-                }
+                },
                 // {
                 //     cardNumber: 1,
                 //     id: 'dateDeceased',
@@ -1828,6 +1844,17 @@ const addRelationshipScreen = [
     },
     {
         cardNumber: 1,
+        id: 'dateOfFirstContact',
+        label: translations.exposureScreen.dateOfFirstContact,
+        value: createDate(null),
+        type: "DatePicker",
+        isRequired: false,
+        isEditMode: true,
+        format: 'MM/dd/YYYY',
+        objectType: 'Contact'
+    },
+    {
+        cardNumber: 1,
         id: 'contactDate',
         label: translations.exposureScreen.contactDate,
         value: createDate(null),
@@ -2009,6 +2036,19 @@ const contactsOfContactsPersonal = [
             },
             {
                 cardNumber: 1,
+                id: 'pregnancyStatus',
+                label: translations.caseSingleScreen.pregnancyStatus,
+                labelValue: 'test',
+                type: 'DropdownInput',
+                value: '',
+                isRequired: false,
+                isEditMode: false,
+                activeButtonColor: 'red',
+                activeBackgroundColor: 'red',
+                objectType: 'Contact'
+            },
+            {
+                cardNumber: 1,
                 id: 'occupation',
                 label: translations.contactSingleScreen.occupation,
                 labelValue: 'test',
@@ -2178,6 +2218,19 @@ const contactsSingleScreen = {
                 },
                 {
                     cardNumber: 1,
+                    id: 'pregnancyStatus',
+                    label: translations.caseSingleScreen.pregnancyStatus,
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Contact'
+                },
+                {
+                    cardNumber: 1,
                     id: 'occupation',
                     label: translations.contactSingleScreen.occupation,
                     labelValue: 'test',
@@ -2329,6 +2382,17 @@ const contactsSingleScreen = {
                 value: '',
                 isRequired: true,
                 isEditMode: true,
+                objectType: 'Exposure'
+            },
+            {
+                cardNumber: 1,
+                id: 'dateOfFirstContact',
+                label: translations.exposureScreen.dateOfFirstContact,
+                value: createDate(null),
+                type: "DatePicker",
+                isRequired: false,
+                isEditMode: true,
+                format: 'MM/dd/YYYY',
                 objectType: 'Exposure'
             },
             {

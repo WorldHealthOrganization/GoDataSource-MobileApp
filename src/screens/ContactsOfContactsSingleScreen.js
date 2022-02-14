@@ -87,6 +87,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 middleName: '',
                 lastName: '',
                 gender: '',
+                pregnancyStatus: '',
                 occupation: '',
                 dob: null,
                 age: {
@@ -99,6 +100,7 @@ class ContactsOfContactsSingleScreen extends Component {
                     {
                         outbreakId: this.props.outbreak._id ? this.props.outbreak._id : '',
                         contactDate: createDate(null),
+                        dateOfFirstContact: createDate(null),
                         contactDateEstimated: false,
                         certaintyLevelId: '',
                         exposureTypeId: '',
@@ -1590,7 +1592,7 @@ class ContactsOfContactsSingleScreen extends Component {
     checkFields = () => {
         // let pass = true;
         let requiredFields = [];
-        let exposureRelationships = _.get(this.state.contact, 'relationships.exposureRelations', []);
+        let exposureRelationships = _.get(this.state.contact, 'relationships', []);
         if (checkArrayAndLength(exposureRelationships)) {
             exposureRelationships = exposureRelationships.map((e) => _.get(e, 'relationshipData', e));
             for (let i = 0; i < config.addRelationshipScreen.length; i++) {

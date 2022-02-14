@@ -96,13 +96,14 @@ class LabResultsScreen extends Component {
         let {mainFilter} = this.props;
 
         let filterNumbers = 0;
-        if (mainFilter) {
-            if (get(mainFilter, 'type', null) !== null && this.props.outbreak?.isContactLabResultsActive) {
-                ++filterNumbers
-            }
-            // if(get(mainFilter, 'personId', null) !== null){
-            //     ++filterNumbers
-            // }
+        if (mainFilter && this.props.outbreak?.isContactLabResultsActive) {
+            Object.keys(mainFilter).forEach(key => {
+                if(checkArrayAndLength(mainFilter[key])){
+                    filterNumbers++;
+                } else if(mainFilter[key] !== null && !Array.isArray(mainFilter[key])){
+                    filterNumbers++;
+                }
+            })
         }
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `(${filterNumbers})`;
 
