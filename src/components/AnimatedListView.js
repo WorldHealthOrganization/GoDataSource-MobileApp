@@ -408,12 +408,22 @@ class AnimatedListView extends Component {
                 secondaryOnPressTextsArray = [];
                 break;
         }
+        let placeOfResidence = mainData?.addresses?.find((e) => {
+            return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+        });
+        let placeOfResidenceLatitude = get(placeOfResidence, 'geoLocation.coordinates[1]', '');
+        let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[0]', '');
+
         return(
             <PersonListItem
                 key={id}
                 type={this.props.dataType}
                 itemToRender={item}
-                onPressMapIconProp={() => this.handleOnPressMap(mainData)}
+                onPressMapIconProp={(placeOfResidenceLongitude === '' && placeOfResidenceLatitude === '') ?
+                    null
+                    :
+                    () => this.handleOnPressMap(mainData)
+                }
                 onPressNameProp={() => this.props.onPressName(mainData, this.props.screen)}
                 onPressExposureProp={this.props.onPressExposure}
                 screenSize={this.props.screenSize}
@@ -512,31 +522,35 @@ class AnimatedListView extends Component {
             let placeOfResidence = person.addresses.find((e) => {
                 return e.typeId === config.userResidenceAddress.userPlaceOfResidence
             });
-            let placeOfResidenceLatitude = get(placeOfResidence, 'geoLocation.coordinates[1]', 0);
-            let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[0]', 0);
-            geolocation.getCurrentPosition(
-                (position) => {
-                    this.props.onPressMap({
-                        latitude: placeOfResidenceLatitude,
-                        longitude: placeOfResidenceLongitude,
-                        sourceLatitude: position.coords.latitude,
-                        sourceLongitude: position.coords.longitude,
-                        isVisible: true,
-                        error: null,
-                    });
-                },
-                (error) => {
-                    Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                            onPress: () => { console.log("OK pressed") }
-                        }
-                    ])
-                },
-                {
-                    timeout: 5000
-                }
-            );
+            let placeOfResidenceLatitude = get(placeOfResidence, 'geoLocation.coordinates[1]', '');
+            let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[0]', '');
+
+            if (placeOfResidenceLongitude !== '' && placeOfResidenceLatitude !== ''){
+                geolocation.getCurrentPosition(
+                    (position) => {
+                        this.props.onPressMap({
+                            latitude: placeOfResidenceLatitude,
+                            longitude: placeOfResidenceLongitude,
+                            sourceLatitude: position.coords.latitude,
+                            sourceLongitude: position.coords.longitude,
+                            isVisible: true,
+                            error: null,
+                        });
+                    },
+                    (error) => {
+                        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
+                            {
+                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                onPress: () => { console.log("OK pressed") }
+                            }
+                        ])
+                    },
+                    {
+                        timeout: 5000
+                    }
+                );
+            }
+
         }
     };
 }

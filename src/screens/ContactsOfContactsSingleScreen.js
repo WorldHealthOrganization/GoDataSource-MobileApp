@@ -124,7 +124,7 @@ class ContactsOfContactsSingleScreen extends Component {
                         locationId: '',
                         phoneNumber: '',
                         geoLocation: {
-                            coordinates: [0, 0],
+                            coordinates: ['', ''],
                             type: 'Point'
                         },
                         date: createDate(null)
@@ -1747,7 +1747,7 @@ class ContactsOfContactsSingleScreen extends Component {
             postalCode: '',
             locationId: '',
             geoLocation: {
-                coordinates: [0, 0],
+                coordinates: ['', ''],
                 type: 'Point'
             },
             date: createDate(null)

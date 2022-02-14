@@ -55,7 +55,7 @@ class PersonListItem extends Component {
                         type={this.props.type}
                         titleColor={this.props.titleColor}
                         firstComponentRenderData={firstComponentData}
-                        onPressMapIcon={this.onPressMapIcon}
+                        onPressMapIcon={this.props.onPressMapIconProp ? this.onPressMapIcon : null}
                         onPressName={this.props.onPressNameProp}
                     />
                 }
@@ -203,7 +203,7 @@ class PersonListItem extends Component {
 
     onPressMapIcon = () => {
         InteractionManager.runAfterInteractions(() => {
-            if (this.props.onPressMapIconProp !== undefined) {
+            if (this.props.onPressMapIconProp) {
                 this.props.onPressMapIconProp()
             }
         })
