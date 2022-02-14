@@ -442,7 +442,6 @@ class ContactsSingleScreen extends Component {
         // Here contact={label: <name>, value: <contactId>} and date is a regular date
         // extract contact's main address
         // let address = this.state.contact.addresses.find((e) => {return e.type === config.})
-        let now = createDate(null);
         date = createDate(date).toISOString();
         let followUp = {
             _id: generateId(),
@@ -451,7 +450,7 @@ class ContactsSingleScreen extends Component {
             date: date,
             fileType: 'followUp.json',
             outbreakId: this.props.outbreak._id,
-            index: daysSince(_.get(this.state, 'contact.followUp.startDate', null), date),
+            index: daysSince(_.get(this.state, 'contact.followUp.startDate', null), date) + 1,
             teamId: _.get(this.state, 'contact.followUpTeamId', null) !== null ? this.state.contact.followUpTeamId : generateTeamId(_.get(this.state, 'contact.addresses', []).slice(), this.props.teams, this.props.locations.slice()),
             personId: extractIdFromPouchId(this.state.contact._id, 'person.json'),
             address: _.get(this.state, 'contact.addresses', null) !== null ? this.state.contact.addresses.find((e) => e.typeId === translations.userResidenceAddress.userPlaceOfResidence) : null
