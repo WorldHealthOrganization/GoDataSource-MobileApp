@@ -19,7 +19,7 @@
       android:allowBackup="false"
       android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
-        tools:targetApi="29"
+        tools:targetApi="30"
         android:largeHeap="true"
         >
       <activity
