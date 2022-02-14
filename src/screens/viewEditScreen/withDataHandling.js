@@ -270,7 +270,7 @@ export function enhanceTabsWithDataHandling() {
                                 if (value) {
                                     getLocationAccurate()
                                         .then((position) => {
-                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.lng : 0, value ? position.lat : 0];
+                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.lng : '', value ? position.lat : ''];
                                             this.generalUpdate({addresses: addressesClone});
                                         })
                                         .catch((errorGetLocation) => {
@@ -380,7 +380,7 @@ export function enhanceTabsWithDataHandling() {
                     postalCode: '',
                     locationId: '',
                     geoLocation: {
-                        coordinates: [0, 0],
+                        coordinates: ['', ''],
                         type: 'Point'
                     },
                     date: createDate(null)

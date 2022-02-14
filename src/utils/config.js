@@ -2629,7 +2629,7 @@ const caseBlueprint = {
             postalCode: '',
             locationId: '',
             geoLocation: {
-                coordinates: [0, 0],
+                coordinates: ['', ''],
                 type: 'Point'
             },
             date: createDate(null)

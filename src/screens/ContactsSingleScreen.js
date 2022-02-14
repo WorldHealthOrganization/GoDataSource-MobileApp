@@ -143,7 +143,7 @@ class ContactsSingleScreen extends Component {
                         locationId: '',
                         phoneNumber: '',
                         geoLocation: {
-                            coordinates: [0, 0],
+                            coordinates: ['', ''],
                             type: 'Point'
                         },
                         date: createDate(null)
@@ -1960,7 +1960,7 @@ class ContactsSingleScreen extends Component {
             postalCode: '',
             locationId: '',
             geoLocation: {
-                coordinates: [0, 0],
+                coordinates: ['', ''],
                 type: 'Point'
             },
             date: createDate(null)

@@ -44,10 +44,10 @@ class ContactsOfContactsScreen extends Component {
             loading: false,
             sortData: false,
             isVisible: false,
-            latitude: 0,
-            longitude: 0,
-            sourceLatitude: 0,
-            sourceLongitude: 0,
+            latitude: '',
+            longitude: '',
+            sourceLatitude: '',
+            sourceLongitude: '',
             error: null,
             refreshing: false,
             riskColors: {}
@@ -256,10 +256,10 @@ class ContactsOfContactsScreen extends Component {
 
     handleOnPressMap = (dataFromMapHandler) => {
         this.setState(prevState => ({
-            latitude: get(dataFromMapHandler, 'latitude', 0),
-            longitude: get(dataFromMapHandler, 'longitude', 0),
-            sourceLatitude: get(dataFromMapHandler, 'sourceLatitude', 0),
-            sourceLongitude: get(dataFromMapHandler, 'sourceLongitude', 0),
+            latitude: get(dataFromMapHandler, 'latitude', ''),
+            longitude: get(dataFromMapHandler, 'longitude', ''),
+            sourceLatitude: get(dataFromMapHandler, 'sourceLatitude', ''),
+            sourceLongitude: get(dataFromMapHandler, 'sourceLongitude', ''),
             isVisible: get(dataFromMapHandler, 'isVisible', false),
             error: get(dataFromMapHandler, 'error', null)
         }))
