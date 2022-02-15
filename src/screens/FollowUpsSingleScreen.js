@@ -291,7 +291,7 @@ class FollowUpsSingleScreen extends Component {
                         previousAnswers={this.state.previousAnswers}
                         contact={this.state.contact}
                         isNew={this.props.isNew}
-                        isEditMode={this.state.isEditMode}
+                        isEditMode={this.state.isEditMode && moment().diff(this.state.item.date) >= 0}
                         activeIndex={this.state.index}
                         onChangeTextAnswer={this.onChangeTextAnswer}
                         onChangeDateAnswer={this.onChangeDateAnswer}
@@ -372,7 +372,7 @@ class FollowUpsSingleScreen extends Component {
             return [];
         }
         let checkRequiredFields = [];
-        if (this.state.item.statusId === config.followUpStatuses.notPerformed || this.state.item.statusId === translations.generalLabels.noneLabel) {
+        if (this.state.item.statusId === translations.generalLabels.noneLabel) {
             checkRequiredFields.push(getTranslation(_.get(config, 'followUpsSingleScreen.fields[1].label', 'Status'), this.props.translation));
         }
         return checkRequiredFields
@@ -443,16 +443,19 @@ class FollowUpsSingleScreen extends Component {
         }
     };
     onChangeDate = (value, id, objectType) => {
-        console.log("onChangeDate: ", value, id);
 
         if (objectType === 'FollowUp') {
+            let status = this.state.item.statusId;
+            if (id === 'date' && moment().diff(value) < 0){
+                status = translations.followUpStatuses.notPerformed;
+            }
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({}, prevState.item, { [id]: value }),
+                    item: Object.assign({}, prevState.item, { [id]: value, statusId: status }),
                     isModified: true
                 })
                 , () => {
-                    console.log("onChangeDate", id, " ", value, " ", this.state.item);
+                    console.log("onChangeDate statusId", id, " ", value, " ", this.state.item);
                 }
             )
         } else {
@@ -520,7 +523,7 @@ class FollowUpsSingleScreen extends Component {
 
     };
     onChangeDropDown = (value, id, objectType) => {
-        // console.log("onChangeDropDown: ", value, id, this.state.item);
+        console.log("onChangeDropDown: ", value, id, this.state.item);
         if (objectType === 'FollowUp' || id === 'address') {
             if (id === 'address') {
                 if (!this.state.item[id]) {
@@ -594,7 +597,7 @@ class FollowUpsSingleScreen extends Component {
         })
     };
     onChangeDateAnswer = (value, id, parentId, index) => {
-        // console.log ('onChangeDateAnswer', value, id)
+        console.log ('onChangeDateAnswer', value, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
