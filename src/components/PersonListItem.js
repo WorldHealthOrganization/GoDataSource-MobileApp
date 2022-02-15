@@ -81,6 +81,7 @@ class PersonListItem extends Component {
                 arrayPermissions={this.props.arrayPermissions}
                 onPermissionDisable={this.props.onPermissionDisable}
                 outbreakPermissions={this.props.outbreakPermissions}
+                secondaryOutbreakPermissions={this.props.secondaryOutbreakPermissions}
                 hasSecondaryActionsBar={this.props.secondaryTextsArray?.length}
                 secondaryTextsArray={this.props.secondaryTextsArray}
                 secondaryTextsStyleArray={this.props.secondaryTextsStyleArray}

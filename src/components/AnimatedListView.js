@@ -150,6 +150,7 @@ class AnimatedListView extends Component {
         let arrayPermissions = [];
         let onPermissionDisable = false;
         let outbreakPermissions = [];
+        let secondaryOutbreakPermissions = [];
 
         let secondaryTextsArray = [];
         let secondaryTextsStyleArray = [];
@@ -243,10 +244,10 @@ class AnimatedListView extends Component {
                         [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures]
                     ],
                     [
-                        [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactAll],
-                        [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures],
-                        [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactAll],
-                        [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures]
+                        // [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactAll],
+                        // [constants.PERMISSIONS_RELATIONSHIP.relationshipAll, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures],
+                        // [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactAll],
+                        // [constants.PERMISSIONS_RELATIONSHIP.relationshipCreate, constants.PERMISSIONS_CONTACT.contactCreateRelationshipExposures]
                     ],
                 ];
                 secondaryArrayPermissions = [
@@ -262,6 +263,10 @@ class AnimatedListView extends Component {
                     [constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC],
                     []
                 ];
+                secondaryOutbreakPermissions = [
+                    [constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC]
+                ];
+                onPermissionDisable = [false, true, false];
                 titleColor = this.props.colors[mainData.riskLevel];
                 break;
             case 'ContactOfContact':
@@ -433,6 +438,7 @@ class AnimatedListView extends Component {
                 arrayPermissions={arrayPermissions}
                 onPermissionDisable={onPermissionDisable}
                 outbreakPermissions={outbreakPermissions}
+                secondaryOutbreakPermissions={secondaryOutbreakPermissions}
                 secondaryTextsArray={secondaryTextsArray}
                 secondaryTextsStyleArray={secondaryTextsStyleArray}
                 secondaryOnPressTextsArray={secondaryOnPressTextsArray}
