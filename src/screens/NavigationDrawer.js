@@ -132,7 +132,7 @@ class NavigationDrawer extends Component {
                                 addButton = true;
                             }
 
-                            if(item === 'contactsOfContacts' && !this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC]) {
+                            if(item === 'contactsOfContacts' && !(this.props.outbreak && this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC])) {
                                 return (<></>);
                             }
 
