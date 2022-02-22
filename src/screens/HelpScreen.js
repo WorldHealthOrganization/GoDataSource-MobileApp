@@ -31,10 +31,12 @@ import {Navigation} from "react-native-navigation";
 
 let AnimatedListView = Animated.createAnimatedComponent(FlatList);
 
-const scrollAnim = new Animated.Value(0);
-const offsetAnim = new Animated.Value(0);
 
 class HelpScreen extends Component {
+
+
+    scrollAnim = new Animated.Value(0);
+    offsetAnim = new Animated.Value(0);
 
     constructor(props) {
         super(props);
@@ -60,6 +62,9 @@ class HelpScreen extends Component {
         this.listEmptyComponent = this.listEmptyComponent.bind(this);
         this.filterHelp = this.filterHelp.bind(this);
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
+
+        this.scrollAnim = new Animated.Value(0);
+        this.offsetAnim = new Animated.Value(0);
     }
 
     // Please add here the react lifecycle methods that you need
@@ -122,19 +127,19 @@ class HelpScreen extends Component {
 
     clampedScroll= Animated.diffClamp(
         Animated.add(
-            scrollAnim.interpolate({
+            this.scrollAnim.interpolate({
                 inputRange: [0, 1],
                 outputRange: [0, 1],
                 extrapolateLeft: 'clamp',
             }),
-            offsetAnim,
+            this.offsetAnim,
         ),
         0,
         30,
     );
 
     handleScroll = Animated.event(
-        [{nativeEvent: {contentOffset: {y: scrollAnim}}}],
+        [{nativeEvent: {contentOffset: {y: this.scrollAnim}}}],
         {useNativeDriver: true}
     );
 
