@@ -22,7 +22,7 @@ import {addFollowUp, createFollowUp, updateFollowUpAndContact} from './../action
 import _, {cloneDeep, sortBy} from 'lodash';
 import {
     calculateDimension,
-    createDate, createStackFromComponent,
+    createDate, createStackFromComponent, daysSince,
     getTranslation,
     mapAnswers,
     reMapAnswers,
@@ -749,6 +749,8 @@ class FollowUpsSingleScreen extends Component {
                         if (followUpClone.address && followUpClone.address.location) {
                             delete followUpClone.address.location;
                         }
+
+                        followUpClone.index = daysSince(_.get(this.props, 'contact.followUp.startDate', null), followUpClone.date) + 1;
 
                         if (this.props.isNew) {
                             followUpClone = updateRequiredFields(this.props.outbreak._id, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp');
