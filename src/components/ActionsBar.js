@@ -63,7 +63,9 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
                                                 >
                                                     <Text style={[
                                                         textsStyleArray && Array.isArray(textsStyleArray) &&
-                                                        textsStyleArray[index] ? textsStyleArray[index] : style.textStyle]}
+                                                        textsStyleArray[index] ? textsStyleArray[index] : style.textStyle,
+                                                        onPermissionDisable[index] ? {color:'gray'} : {}
+                                                    ]}
                                                           numberOfLines={1}
                                                     >
                                                         {getTranslation(text, translation)}
@@ -79,7 +81,7 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
                             return (
                                 <Ripple
                                     key={index}
-                                    style={style.rippleStyle}
+                                    style={[style.rippleStyle]}
                                     onPress={onPressArray && onPressArray[index] ? () => {
                                         onPressArray[index](addressIndex)
                                     } : () => {
@@ -88,7 +90,8 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
                                 >
                                     <Text style={[
                                         textsStyleArray && Array.isArray(textsStyleArray) &&
-                                        textsStyleArray[index] ? textsStyleArray[index] : style.textStyle]}
+                                        textsStyleArray[index] ? textsStyleArray[index] : style.textStyle
+                                    ]}
                                           numberOfLines={1}
                                     >
                                         {getTranslation(text, translation)}
