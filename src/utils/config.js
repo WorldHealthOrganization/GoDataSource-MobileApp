@@ -2692,10 +2692,10 @@ const caseBlueprint = {
             addressLine2: '',
             postalCode: '',
             locationId: '',
-            geoLocation: {
-                coordinates: ['', ''],
-                type: 'Point'
-            },
+            // geoLocation: {
+            //     coordinates: ['', ''],
+            //     type: 'Point'
+            // },
             date: createDate(null)
         }
     ],

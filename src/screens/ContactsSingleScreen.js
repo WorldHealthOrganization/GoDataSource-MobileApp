@@ -75,19 +75,19 @@ class ContactsSingleScreen extends Component {
 
         // Process what the tab contents will be based on
         let routes = this.props.isNew ?
-                            config.tabsValuesRoutes.contactsAdd :
-                            checkArrayAndLength(lodashIntersect(
-                                this.props.role,
-                                [
-                                    constants.PERMISSIONS_CONTACT.contactAll,
-                                    constants.PERMISSIONS_CONTACT.contactListRelationshipExposures,
-                                    constants.PERMISSIONS_CONTACT.contactListRelationshipContacts
-                                ]
-                            )) ?
-            config.tabsValuesRoutes.contactsSingle :
-            config.tabsValuesRoutes.contactsSingleWithoutExposures;
+            config.tabsValuesRoutes.contactsAdd :
+            checkArrayAndLength(lodashIntersect(
+                this.props.role,
+                [
+                    constants.PERMISSIONS_CONTACT.contactAll,
+                    constants.PERMISSIONS_CONTACT.contactListRelationshipExposures,
+                    constants.PERMISSIONS_CONTACT.contactListRelationshipContacts
+                ]
+            )) ?
+                config.tabsValuesRoutes.contactsSingle :
+                config.tabsValuesRoutes.contactsSingleWithoutExposures;
 
-        if(this.props.outbreak && !this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC]) {
+        if (this.props.outbreak && !this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC]) {
             remove(routes, (route => route.key === 'contacts'))
         }
 
@@ -144,10 +144,10 @@ class ContactsSingleScreen extends Component {
                         postalCode: '',
                         locationId: '',
                         phoneNumber: '',
-                        geoLocation: {
-                            coordinates: ['', ''],
-                            type: 'Point'
-                        },
+                        // geoLocation: {
+                        //     coordinates: ['', ''],
+                        //     type: 'Point'
+                        // },
                         date: createDate(null)
                     }
                 ]
@@ -190,14 +190,14 @@ class ContactsSingleScreen extends Component {
 
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
-            let ageClone = { years: 0, months: 0 };
+            let ageClone = {years: 0, months: 0};
             let updateAge = false;
             if (!this.props.contact || this.props.contact.age === null || this.props.contact.age === undefined || (this.props.contact.age.years === undefined && this.props.contact.age.months === undefined)) {
                 updateAge = true
             }
             if (updateAge) {
                 this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, { age: ageClone }, { dob: this.props.contact.dob !== undefined ? this.props.contact.dob : null }),
+                    contact: Object.assign({}, prevState.contact, {age: ageClone}, {dob: this.props.contact.dob !== undefined ? this.props.contact.dob : null}),
                 }), () => {
                     console.log('old contact with age as string update')
                 })
@@ -255,7 +255,7 @@ class ContactsSingleScreen extends Component {
                 let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
                 relationshipsClone[0].persons = personsArray;
                 this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, { relationships: relationshipsClone })
+                    contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone})
                 }), () => {
                     console.log('After changing state componentDidMount: ', this.state.contact);
                 })
@@ -295,10 +295,10 @@ class ContactsSingleScreen extends Component {
     render() {
         return (
             <ViewHOC style={style.container}
-                showLoader={this.state.loading}
-                loaderText={
-                    this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)
-                }>
+                     showLoader={this.state.loading}
+                     loaderText={
+                         this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)
+                     }>
                 <NavBarCustom
                     title={null}
                     customTitle={
@@ -309,7 +309,10 @@ class ContactsSingleScreen extends Component {
                                 componentId={this.props.componentId}
                                 onPress={this.handlePressBreadcrumb}
                             />
-                            <View style={{ flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize) }}>
+                            <View style={{
+                                flexDirection: 'row',
+                                marginRight: calculateDimension(16, false, this.props.screenSize)
+                            }}>
                                 <ElevatedView
                                     elevation={3}
                                     style={{
@@ -324,7 +327,7 @@ class ContactsSingleScreen extends Component {
                                         justifyContent: 'center',
                                         alignItems: 'center'
                                     }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15} />
+                                        <Icon name="help" color={'white'} size={15}/>
                                     </Ripple>
                                 </ElevatedView>
                                 {
@@ -338,8 +341,9 @@ class ContactsSingleScreen extends Component {
                                             <Menu
                                                 ref="menuRef"
                                                 button={
-                                                    <Ripple onPress={this.showMenu} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                                                        <Icon name="more-vert" />
+                                                    <Ripple onPress={this.showMenu}
+                                                            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                                                        <Icon name="more-vert"/>
                                                     </Ripple>
                                                 }
                                             >
@@ -354,17 +358,17 @@ class ContactsSingleScreen extends Component {
                                                         constants.PERMISSIONS_CONTACT.contactAll
                                                     ]}
                                                 />
-                                                        <PermissionComponent
-                                                            render={() => (
-                                                                <MenuItem onPress={this.handleOnAddFollowUp}>
-                                                                    {getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation)}
-                                                                </MenuItem>
-                                                            )}
-                                                            permissionsList={[constants.PERMISSIONS_FOLLOW_UP.followUpAll, constants.PERMISSIONS_FOLLOW_UP.followUpCreate]}
-                                                            alternativeRender={() => (
-                                                                <View style={[style.rippleStyle, {width: 60}]}/>
-                                                            )}
-                                                        />
+                                                <PermissionComponent
+                                                    render={() => (
+                                                        <MenuItem onPress={this.handleOnAddFollowUp}>
+                                                            {getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation)}
+                                                        </MenuItem>
+                                                    )}
+                                                    permissionsList={[constants.PERMISSIONS_FOLLOW_UP.followUpAll, constants.PERMISSIONS_FOLLOW_UP.followUpCreate]}
+                                                    alternativeRender={() => (
+                                                        <View style={[style.rippleStyle, {width: 60}]}/>
+                                                    )}
+                                                />
                                                 {
                                                     this.props.outbreak?.isContactLabResultsActive && this.props.contact ?
                                                         <>
@@ -381,7 +385,8 @@ class ContactsSingleScreen extends Component {
                                                             />
                                                             <PermissionComponent
                                                                 render={() => (
-                                                                    <MenuItem onPress={this.handleOnPressShowLabResults}>
+                                                                    <MenuItem
+                                                                        onPress={this.handleOnPressShowLabResults}>
                                                                         {getTranslation(translations.labResultsSingleScreen.viewLabResult, this.props.translation)}
                                                                     </MenuItem>
                                                                 )}
@@ -412,7 +417,7 @@ class ContactsSingleScreen extends Component {
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
                 <TabView
-                    navigationState={{index: this.state.index, routes:this.state.routes }}
+                    navigationState={{index: this.state.index, routes: this.state.routes}}
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.renderScene}
                     renderTabBar={this.handleRenderTabBar}
@@ -464,36 +469,36 @@ class ContactsSingleScreen extends Component {
             this.hideMenu();
             // addFollowUp(followUp)
             //     .then((resultAddFollowUp) => {
-                    // console.log('FollowUpAdded');
-                    // this.props.navigator.showInAppNotification({
-                    //     screen: 'InAppNotificationScreen',
-                    //     autoDismissTimerSec: 1,
-                    //     passProps: {
-                    //         text: 'Follow-up added'
-                    //     }
-                    // })
-                    Navigation.push(this.props.componentId, {
-                        component:{
-                            name: 'FollowUpsSingleScreen',
-                            options:{
-                                animations:{
-                                    push: fadeInAnimation,
-                                    pop: fadeOutAnimation
-                                }
-                            },
-                            passProps: {
-                                isNew: true,
-                                isEditMode: true,
-                                item: followUp,
-                                contact: this.state.contact,
-                                previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
-                            }
+            // console.log('FollowUpAdded');
+            // this.props.navigator.showInAppNotification({
+            //     screen: 'InAppNotificationScreen',
+            //     autoDismissTimerSec: 1,
+            //     passProps: {
+            //         text: 'Follow-up added'
+            //     }
+            // })
+            Navigation.push(this.props.componentId, {
+                component: {
+                    name: 'FollowUpsSingleScreen',
+                    options: {
+                        animations: {
+                            push: fadeInAnimation,
+                            pop: fadeOutAnimation
                         }
-                    })
-                // })
-                // .catch((errorAddFollowUp) => {
-                //     console.log('ErrorAddFollowUp: ', errorAddFollowUp);
-                // })
+                    },
+                    passProps: {
+                        isNew: true,
+                        isEditMode: true,
+                        item: followUp,
+                        contact: this.state.contact,
+                        previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
+                    }
+                }
+            })
+            // })
+            // .catch((errorAddFollowUp) => {
+            //     console.log('ErrorAddFollowUp: ', errorAddFollowUp);
+            // })
         });
     };
     handleOnPressDelete = () => {
@@ -536,14 +541,14 @@ class ContactsSingleScreen extends Component {
         });
     };
 
-    handleOnIndexChange = _.throttle( (index) => {
+    handleOnIndexChange = _.throttle((index) => {
         // if (this.state.canChangeScreen) {
         this.setState({
             canChangeScreen: false,
             index
         });
         // }
-    },300);
+    }, 300);
     handleMoveToScreen = (nextIndex) => {
         this.setState({
             canChangeScreen: true,
@@ -557,7 +562,7 @@ class ContactsSingleScreen extends Component {
         let missingFields = [];
         let invalidEmails = [];
         let placeOfResidenceError = true;
-        switch(this.state.index) {
+        switch (this.state.index) {
             case 0:
                 missingFields = this.checkRequiredFieldsPersonalInfo();
                 if (!this.checkAgeYearsRequirements()) {
@@ -588,20 +593,24 @@ class ContactsSingleScreen extends Component {
             Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
                 {
                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => { this.hideMenu() }
+                    onPress: () => {
+                        this.hideMenu()
+                    }
                 }
             ])
-        } else if (checkArrayAndLength(invalidEmails)){
-                Alert.alert(
-                    getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
-                    `${getTranslation(translations.alertMessages.invalidEmails, this.props.translation)}: ${invalidEmails}`,
-                    [
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                            onPress: () => { this.hideMenu() }
+        } else if (checkArrayAndLength(invalidEmails)) {
+            Alert.alert(
+                getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
+                `${getTranslation(translations.alertMessages.invalidEmails, this.props.translation)}: ${invalidEmails}`,
+                [
+                    {
+                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                        onPress: () => {
+                            this.hideMenu()
                         }
-                    ]
-                );
+                    }
+                ]
+            );
         } else if (!placeOfResidenceError) {
             Alert.alert(
                 getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation),
@@ -620,7 +629,7 @@ class ContactsSingleScreen extends Component {
 
             this.setState({
                 canChangeScreen: true,
-            }, ()=>{
+            }, () => {
                 this.handleOnIndexChange(nextIndex)
             });
         }
@@ -648,13 +657,13 @@ class ContactsSingleScreen extends Component {
                     height: 41,
                     backgroundColor: 'white'
                 }}
-                onTabPress={({ route, preventDefault })=>{
+                onTabPress={({route, preventDefault}) => {
                     preventDefault();
-                    if(this.props.isNew) {
+                    if (this.props.isNew) {
                         return;
                     }
                     const index = findIndex(this.state.routes, predicate => predicate.key === route.key);
-                    if(index !== -1){
+                    if (index !== -1) {
                         this.handleMoveToScreen(index);
                     }
                 }}
@@ -667,7 +676,7 @@ class ContactsSingleScreen extends Component {
         )
     };
 
-    handleRenderLabel = (props) => ({ route, index }) => {
+    handleRenderLabel = (props) => ({route, index}) => {
         // const inputRange = props.navigationState.routes.map((x, i) => i);
         //
         // const outputRange = inputRange.map(
@@ -691,7 +700,7 @@ class ContactsSingleScreen extends Component {
         );
     };
 
-    renderScene = ({ route }) => {
+    renderScene = ({route}) => {
         switch (route.key) {
             case 'personal':
                 return (
@@ -911,7 +920,12 @@ class ContactsSingleScreen extends Component {
                 .then(([exposureRelations, contactRelations]) => {
                     this.setState(prevState => ({
                         loading: false,
-                        contact: Object.assign({}, prevState.contact, {relationships: {exposureRelations, contactRelations}})
+                        contact: Object.assign({}, prevState.contact, {
+                            relationships: {
+                                exposureRelations,
+                                contactRelations
+                            }
+                        })
                     }))
                 })
                 .catch((errorGetRelations) => {
@@ -937,7 +951,7 @@ class ContactsSingleScreen extends Component {
         });
 
         this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, { documents }),
+            contact: Object.assign({}, prevState.contact, {documents}),
             isModified: true
         }), () => {
             // console.log("### after updating the data: ", this.state.contact);
@@ -947,14 +961,16 @@ class ContactsSingleScreen extends Component {
         // console.log("DeletePressed: ", index);
         Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteDocument, this.state.translation), [
             {
-                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => { console.log('Cancel pressed') }
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
+                    console.log('Cancel pressed')
+                }
             },
             {
                 text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
                     let contactDocumentsClone = _.cloneDeep(this.state.contact.documents);
                     contactDocumentsClone.splice(index, 1);
                     this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, { documents: contactDocumentsClone }),
+                        contact: Object.assign({}, prevState.contact, {documents: contactDocumentsClone}),
                         isModified: true
                     }), () => {
                         // console.log("After deleting the document: ", this.state.contact);
@@ -979,7 +995,7 @@ class ContactsSingleScreen extends Component {
         });
 
         this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, { vaccinesReceived: vaccinesReceived }),
+            contact: Object.assign({}, prevState.contact, {vaccinesReceived: vaccinesReceived}),
             isModified: true
         }), () => {
             // console.log("### after updating the data: ", this.state.contact);
@@ -990,7 +1006,7 @@ class ContactsSingleScreen extends Component {
         let vaccinesReceived = _.cloneDeep(this.state.contact.vaccinesReceived);
         vaccinesReceived.splice(index, 1);
         this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, { vaccinesReceived: vaccinesReceived }),
+            contact: Object.assign({}, prevState.contact, {vaccinesReceived: vaccinesReceived}),
             isModified: true
         }), () => {
             // console.log("After deleting the Vaccines: ", this.state.contact);
@@ -1003,7 +1019,7 @@ class ContactsSingleScreen extends Component {
 
         if (stateValue !== undefined && stateValue !== null) {
             if (id === 'age') {
-                let ageClone = { years: 0, months: 0 };
+                let ageClone = {years: 0, months: 0};
 
                 // Do replacing for value
                 // Replace first and last chars if it is ,
@@ -1018,9 +1034,9 @@ class ContactsSingleScreen extends Component {
                     ageClone.months = Number(value);
                 }
                 this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, { age: ageClone ,  dob: null }),
-                    isModified: true
-                })
+                        contact: Object.assign({}, prevState.contact, {age: ageClone, dob: null}),
+                        isModified: true
+                    })
                     , () => {
                         console.log("handleOnChangeTextInputWithDropDown done", id, " ", value, " ", this.state.contact);
                     }
@@ -1031,24 +1047,27 @@ class ContactsSingleScreen extends Component {
     handleOnChangeText = (value, id, objectTypeOrIndex, objectType, maskError) => {
         console.log("onChangeText: ", value, id, objectTypeOrIndex);
         if (objectTypeOrIndex === 'Contact') {
-                this.setState(
-                    (prevState) => ({
-                        contact: Object.assign({}, prevState.contact, {[id]: value}),
-                        maskError,
-                        isModified: true
-                    }))
-            } else if (objectTypeOrIndex === 'Exposure' && this.props.isNew === true) {
-                let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
-                relationshipsClone[0][id] = value && value.value ? value.value : value;
-                this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
+            this.setState(
+                (prevState) => ({
+                    contact: Object.assign({}, prevState.contact, {[id]: value}),
                     maskError,
                     isModified: true
                 }))
-            } else if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
-                if (objectType && objectType === 'Address') {
-                    let addressesClone = _.cloneDeep(this.state.contact.addresses);
-                    if (id === 'lng') {
+        } else if (objectTypeOrIndex === 'Exposure' && this.props.isNew === true) {
+            let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
+            relationshipsClone[0][id] = value && value.value ? value.value : value;
+            this.setState(prevState => ({
+                contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
+                maskError,
+                isModified: true
+            }))
+        } else if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
+            if (objectType && objectType === 'Address') {
+                let addressesClone = _.cloneDeep(this.state.contact.addresses);
+                if (id === 'lng') {
+                    if (value === '' || value.value === '') {
+                        delete addressesClone[objectTypeOrIndex].geoLocation;
+                    } else {
                         if (!addressesClone[objectTypeOrIndex].geoLocation) {
                             addressesClone[objectTypeOrIndex].geoLocation = {};
                             addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
@@ -1063,7 +1082,11 @@ class ContactsSingleScreen extends Component {
                             addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
                         }
                         addressesClone[objectTypeOrIndex].geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
-                    } else if (id === 'lat') {
+                    }
+                } else if (id === 'lat') {
+                    if (value === '' || value.value === '') {
+                        delete addressesClone[objectTypeOrIndex].geoLocation;
+                    } else {
                         if (!addressesClone[objectTypeOrIndex].geoLocation) {
                             addressesClone[objectTypeOrIndex].geoLocation = {};
                             addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
@@ -1078,25 +1101,26 @@ class ContactsSingleScreen extends Component {
                             addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
                         }
                         addressesClone[objectTypeOrIndex].geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
-                    } else {
-                        addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
                     }
-                    this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
-                        maskError,
-                        isModified: true
-                    }))
-                } else if (objectType && objectType === 'Documents') {
-                    let documentsClone = _.cloneDeep(this.state.contact.documents);
-                    documentsClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
-                    console.log('documentsClone', documentsClone);
-                    this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, {documents: documentsClone}),
-                        maskError,
-                        isModified: true
-                    }))
+                } else {
+                    addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
                 }
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
+                    maskError,
+                    isModified: true
+                }))
+            } else if (objectType && objectType === 'Documents') {
+                let documentsClone = _.cloneDeep(this.state.contact.documents);
+                documentsClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                console.log('documentsClone', documentsClone);
+                this.setState(prevState => ({
+                    contact: Object.assign({}, prevState.contact, {documents: documentsClone}),
+                    maskError,
+                    isModified: true
+                }))
             }
+        }
     };
     handleOnChangeTextSwitchSelector = (index, stateValue) => {
         if (stateValue === 'selectedItemIndexForAgeUnitOfMeasureDropDown') {
@@ -1110,7 +1134,7 @@ class ContactsSingleScreen extends Component {
             }
             this.setState(prevState => ({
                 [stateValue]: index,
-                contact: Object.assign({}, prevState.contact, { dob: null }, { age: ageClone }),
+                contact: Object.assign({}, prevState.contact, {dob: null}, {age: ageClone}),
                 isModified: true
             }), () => {
                 console.log('handleOnChangeTextSwitchSelector', stateValue, this.state[stateValue])
@@ -1219,13 +1243,12 @@ class ContactsSingleScreen extends Component {
             var days = enddateMoment.diff(startdateMoment, 'days')
 
 
-            console.log('calcDateDiff', { months: months, years: years })
+            console.log('calcDateDiff', {months: months, years: years})
             return nrOFYears = {
                 months: months,
                 years: years,
             };
-        }
-        else {
+        } else {
             return undefined;
         }
     };
@@ -1239,7 +1262,7 @@ class ContactsSingleScreen extends Component {
                         addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
                         this.setState(
                             (prevState) => ({
-                                contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
+                                contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
                                 isModified: true
                             })
                             // , () => {
@@ -1269,7 +1292,7 @@ class ContactsSingleScreen extends Component {
                                     addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
                                     this.setState(
                                         (prevState) => ({
-                                            contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
+                                            contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
                                             isModified: true
                                         })
                                         // , () => {
@@ -1281,7 +1304,9 @@ class ContactsSingleScreen extends Component {
                                     Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(error.message, this.props.translation), [
                                         {
                                             text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                            onPress: () => { console.log("OK pressed") }
+                                            onPress: () => {
+                                                console.log("OK pressed")
+                                            }
                                         }
                                     ])
                                 },
@@ -1307,7 +1332,7 @@ class ContactsSingleScreen extends Component {
                             addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
                             this.setState(
                                 (prevState) => ({
-                                    contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
+                                    contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
                                     isModified: true
                                 }), () => {
                                     console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
@@ -1321,7 +1346,7 @@ class ContactsSingleScreen extends Component {
             if (objectType === 'FollowUp') {
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, prevState.item, { [id]: value }),
+                        item: Object.assign({}, prevState.item, {[id]: value}),
                         isModified: true
                     }), () => {
                         console.log("onChangeSwitch", id, " ", value, " ", this.state.item);
@@ -1331,7 +1356,7 @@ class ContactsSingleScreen extends Component {
                 if (objectType === 'Contact') {
                     this.setState(
                         (prevState) => ({
-                            contact: Object.assign({}, prevState.contact, { [id]: value }),
+                            contact: Object.assign({}, prevState.contact, {[id]: value}),
                             isModified: true
                         }), () => {
                             console.log("onChangeSwitch", id, " ", value, " ", this.state.contact);
@@ -1341,7 +1366,7 @@ class ContactsSingleScreen extends Component {
                     let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
                     relationshipsClone[0][id] = value && value.value ? value.value : value;
                     this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, { relationships: relationshipsClone }),
+                        contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
                         isModified: true
                     }))
                 }
@@ -1364,7 +1389,7 @@ class ContactsSingleScreen extends Component {
 
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, prevState.item, { [id]: address[0] }),
+                        item: Object.assign({}, prevState.item, {[id]: address[0]}),
                         isModified: true
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
@@ -1373,7 +1398,7 @@ class ContactsSingleScreen extends Component {
             } else {
                 this.setState(
                     (prevState) => ({
-                        item: Object.assign({}, prevState.item, { [id]: value }),
+                        item: Object.assign({}, prevState.item, {[id]: value}),
                         isModified: true
                     }), () => {
                         console.log("onChangeDropDown", id, " ", value, " ", this.state.item);
@@ -1383,9 +1408,9 @@ class ContactsSingleScreen extends Component {
         } else if (objectType === 'Contact') {
             let newContact = this.state.contact;
 
-            if( id === 'followUp.status') {
-                let newFollowUp = Object.assign({},this.state.contact.followUp, {status: value && value.value !== undefined ? value.value : value});
-                newContact = Object.assign({},this.state.contact, {followUp: newFollowUp});
+            if (id === 'followUp.status') {
+                let newFollowUp = Object.assign({}, this.state.contact.followUp, {status: value && value.value !== undefined ? value.value : value});
+                newContact = Object.assign({}, this.state.contact, {followUp: newFollowUp});
             } else {
                 newContact = Object.assign({}, this.state.contact, {[id]: value && value.value !== undefined ? value.value : value});
             }
@@ -1399,9 +1424,9 @@ class ContactsSingleScreen extends Component {
             );
         } else if (type && type === 'Exposure' && this.props.isNew === true) {
             let relationshipsClone = _.cloneDeep(this.state.contact.relationships);
-            relationshipsClone[0][id] = value && value.value !== undefined  ? value.value : value;
+            relationshipsClone[0][id] = value && value.value !== undefined ? value.value : value;
             this.setState(prevState => ({
-                contact: Object.assign({}, prevState.contact, { relationships: relationshipsClone }),
+                contact: Object.assign({}, prevState.contact, {relationships: relationshipsClone}),
                 isModified: true
             }), () => {
                 console.log('After changing state handleOnChangeDropDown: ', this.state.contact);
@@ -1424,12 +1449,14 @@ class ContactsSingleScreen extends Component {
 
                 addressesClone[objectType][id] = value && value.value !== undefined ? value.value : value;
                 let hasPlaceOfResidence = false;
-                let contactPlaceOfResidence = addressesClone.filter((e) => { return e.typeId === config.userResidenceAddress.userPlaceOfResidence });
+                let contactPlaceOfResidence = addressesClone.filter((e) => {
+                    return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+                });
                 if (contactPlaceOfResidence && contactPlaceOfResidence.length > 0) {
                     hasPlaceOfResidence = true
                 }
                 this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, { addresses: addressesClone }),
+                    contact: Object.assign({}, prevState.contact, {addresses: addressesClone}),
                     isModified: true,
                     anotherPlaceOfResidenceWasChosen,
                     hasPlaceOfResidence
@@ -1441,7 +1468,7 @@ class ContactsSingleScreen extends Component {
                 vaccinesClone[objectType][id] = value && value.value !== undefined ? value.value : value;
                 console.log('vaccinesClone', vaccinesClone);
                 this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, { vaccinesReceived: vaccinesClone }),
+                    contact: Object.assign({}, prevState.contact, {vaccinesReceived: vaccinesClone}),
                     isModified: true
                 }), () => {
                     // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
@@ -1451,7 +1478,7 @@ class ContactsSingleScreen extends Component {
                 documentsClone[objectType][id] = value && value.value !== undefined ? value.value : value;
                 console.log('vaccinesClone', documentsClone);
                 this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, { documents: documentsClone }),
+                    contact: Object.assign({}, prevState.contact, {documents: documentsClone}),
                     isModified: true
                 }), () => {
                     // console.log("onChangeDropDown", id, " ", value, " ", this.state.case);
@@ -1466,23 +1493,25 @@ class ContactsSingleScreen extends Component {
             let addresses = _.cloneDeep(this.state.contact.addresses);
             addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
             if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
-                if (selectedItems['0'].geoLocation.coordinates[0] !== 0 || selectedItems['0'].geoLocation.coordinates[1] !== 0) {
+                if (selectedItems['0'].geoLocation.coordinates[0] !== '' || selectedItems['0'].geoLocation.coordinates[1] !== '') {
                     setTimeout(() => {
                         Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
                             {
-                                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation), onPress: () => {
+                                text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
+                                onPress: () => {
                                     console.log('Cancel pressed');
                                     this.setState(prevState => ({
-                                        contact: Object.assign({}, prevState.contact, { addresses }),
+                                        contact: Object.assign({}, prevState.contact, {addresses}),
                                         isModified: true
                                     }))
                                 }
                             },
                             {
-                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation), onPress: () => {
+                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                onPress: () => {
                                     addresses[index].geoLocation = selectedItems['0'].geoLocation;
                                     this.setState(prevState => ({
-                                        contact: Object.assign({}, prevState.contact, { addresses }),
+                                        contact: Object.assign({}, prevState.contact, {addresses}),
                                         isModified: true
                                     }))
                                 }
@@ -1493,7 +1522,7 @@ class ContactsSingleScreen extends Component {
             } else {
                 console.log('Addresses biatch: ', addresses);
                 this.setState(prevState => ({
-                    contact: Object.assign({}, prevState.contact, { addresses }),
+                    contact: Object.assign({}, prevState.contact, {addresses}),
                     isModified: true
                 }))
             }
@@ -1524,25 +1553,33 @@ class ContactsSingleScreen extends Component {
             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.contactDeleteLastExposureError, this.props.translation), [
                 {
                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => { console.log("Ok pressed") }
+                    onPress: () => {
+                        console.log("Ok pressed")
+                    }
                 }
             ])
         } else {
             Alert.alert(getTranslation(translations.alertMessages.warningLabel, this.props.translation), getTranslation(translations.alertMessages.contactDeleteExposureConfirmation, this.props.translation), [
                 {
                     text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
-                    onPress: () => { console.log("Cancel delete") }
+                    onPress: () => {
+                        console.log("Cancel delete")
+                    }
                 },
                 {
                     text: getTranslation(translations.alertMessages.yesButtonLabel, this.props.translation),
                     onPress: () => {
                         let relations = _.cloneDeep(this.state.contact.relationships);
                         console.log('Relations after cloneDeep: ', relations, relation);
-                        if (relations && Array.isArray(relations) && relations.map((e) => { return e._id }).indexOf(relation._id) > -1) {
-                            relations.splice(relations.map((e) => { return e._id }).indexOf(relation._id), 1);
+                        if (relations && Array.isArray(relations) && relations.map((e) => {
+                            return e._id
+                        }).indexOf(relation._id) > -1) {
+                            relations.splice(relations.map((e) => {
+                                return e._id
+                            }).indexOf(relation._id), 1);
                             console.log('Relations after splice: ', relations);
                             this.setState(prevState => ({
-                                contact: Object.assign({}, prevState.contact, { relationships: relations })
+                                contact: Object.assign({}, prevState.contact, {relationships: relations})
                             }), () => {
                                 relation = updateRequiredFields(this.props.outbreak._id, this.props.user._id, Object.assign({}, relation), 'delete');
                                 this.props.deleteExposureForContact(this.props.outbreak._id, this.props.contact._id, relation, this.props.user.token, this.props.teams);
@@ -1559,15 +1596,15 @@ class ContactsSingleScreen extends Component {
         this.setState({
             loading: true
         }, async () => {
-            if (this.state.contact.deleted){
+            if (this.state.contact.deleted) {
                 this.saveContactAction();
             }
             let functionsArray = [this.checkFields, this.checkRequiredFields, this.checkAgeYearsRequirements, this.checkAgeMonthsRequirements, this.checkPlaceOfResidence, this.checkRequiredFieldsQuestionnaire, this.checkForInvalidEmails];
             let message = null;
-            if (this.state.maskError){
+            if (this.state.maskError) {
                 message = getTranslation(translations.alertMessages.invalidMaskAlert, this.props.translation).replace('{{mask}}', `${this.props.outbreak?.contactIdMask}`);
             }
-            for (let i=0; i<functionsArray.length; i++) {
+            for (let i = 0; i < functionsArray.length; i++) {
                 let response = await functionsArray[i]();
                 if (checkArrayAndLength(response)) {
                     if (i === functionsArray.length - 1) {
@@ -1578,7 +1615,7 @@ class ContactsSingleScreen extends Component {
                     break;
                 } else {
                     if (!response) {
-                        switch(i) {
+                        switch (i) {
                             case 2:
                                 message = translations.alertMessages.yearsValueError;
                                 break;
@@ -1661,47 +1698,47 @@ class ContactsSingleScreen extends Component {
         // this.setState({
         //     savePressed: true
         // }, () => {
-            this.hideMenu();
-            let ageConfig = this.ageAndDobPrepareForSave();
+        this.hideMenu();
+        let ageConfig = this.ageAndDobPrepareForSave();
 
-            let contactClone = _.cloneDeep(this.state.contact);
-            contactClone = Object.assign({}, contactClone, { age: ageConfig.ageClone }, { dob: ageConfig.dobClone });
-            let operation = 'create';
-            let promise = null;
-            if (!this.props.isNew) {
-                if (this.state.deletePressed) {
-                    operation = 'delete';
-                } else {
-                    operation = 'update';
-                }
-            }
-
-            contactClone.questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
-            contactClone.questionnaireAnswers = this.filterUnasweredQuestions(contactClone.questionnaireAnswers);
-            contactClone = updateRequiredFields(this.props.outbreak._id, this.props.user._id, contactClone, operation, 'person.json', 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT');
-
-            if (operation === 'create') {
-                promise = addContact(contactClone, _.get(this.props, 'periodOfFollowUp', 1), _.get(this.props, 'user._id'))
+        let contactClone = _.cloneDeep(this.state.contact);
+        contactClone = Object.assign({}, contactClone, {age: ageConfig.ageClone}, {dob: ageConfig.dobClone});
+        let operation = 'create';
+        let promise = null;
+        if (!this.props.isNew) {
+            if (this.state.deletePressed) {
+                operation = 'delete';
             } else {
-                promise = updateContact(contactClone);
+                operation = 'update';
             }
+        }
 
-            promise
-                .then((result) => {
-                    if (_.isFunction(this.props.refresh)) {
-                        this.props.refresh();
-                    }
-                    Navigation.pop(this.props.componentId)
-                })
-                .catch((errorAddContact) => {
-                    console.log(`Error ${operation} contact`, errorAddContact);
-                })
+        contactClone.questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
+        contactClone.questionnaireAnswers = this.filterUnasweredQuestions(contactClone.questionnaireAnswers);
+        contactClone = updateRequiredFields(this.props.outbreak._id, this.props.user._id, contactClone, operation, 'person.json', 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT');
+
+        if (operation === 'create') {
+            promise = addContact(contactClone, _.get(this.props, 'periodOfFollowUp', 1), _.get(this.props, 'user._id'))
+        } else {
+            promise = updateContact(contactClone);
+        }
+
+        promise
+            .then((result) => {
+                if (_.isFunction(this.props.refresh)) {
+                    this.props.refresh();
+                }
+                Navigation.pop(this.props.componentId)
+            })
+            .catch((errorAddContact) => {
+                console.log(`Error ${operation} contact`, errorAddContact);
+            })
         // });
     };
 
     ageAndDobPrepareForSave = () => {
         let dobClone = null;
-        let ageClone = { years: 0, months: 0 }
+        let ageClone = {years: 0, months: 0}
 
         if (this.state.contact.dob !== null && this.state.contact.dob !== undefined) {
             //get info from date
@@ -1741,7 +1778,7 @@ class ContactsSingleScreen extends Component {
             }
         }
 
-        if (checkArrayAndLength(_.get(this.state , 'contact.documents', []))) {
+        if (checkArrayAndLength(_.get(this.state, 'contact.documents', []))) {
             for (let i = 0; i < _.get(this.state, 'contact.documents.length', 0); i++) {
                 for (let j = 0; j < _.get(config, 'caseSingleScreen.document.fields.length', 0); j++) {
                     if (_.get(config, `caseSingleScreen.document.fields[${j}].isRequired`, false) && !_.get(this.state, `contact.documents[${i}][${config.caseSingleScreen.document.fields[j].id}]`, null)) {
@@ -1752,7 +1789,7 @@ class ContactsSingleScreen extends Component {
             }
         }
 
-        if (checkArrayAndLength(_.get(this.state , 'contact.vaccinesReceived', []))) {
+        if (checkArrayAndLength(_.get(this.state, 'contact.vaccinesReceived', []))) {
             for (let i = 0; i < _.get(this.state, 'contact.vaccinesReceived.length', 0); i++) {
                 for (let j = 0; j < _.get(config, 'caseSingleScreen.vaccinesReceived.fields.length', 0); j++) {
                     if (_.get(config, `caseSingleScreen.vaccinesReceived.fields[${j}].isRequired`, false) && !_.get(this.state, `contact.vaccinesReceived[${i}][${config.caseSingleScreen.vaccinesReceived.fields[j].id}]`, null)) {
@@ -1796,8 +1833,8 @@ class ContactsSingleScreen extends Component {
         })
     };
     handleOnPressAddLabResult = () => {
-        Navigation.push(this.props.componentId,{
-            component:{
+        Navigation.push(this.props.componentId, {
+            component: {
                 name: 'LabResultsSingleScreen',
                 passProps: {
                     isNew: true,
@@ -1808,19 +1845,18 @@ class ContactsSingleScreen extends Component {
             }
         })
     };
-    handleOnPressShowLabResults = () =>{
-            Navigation.push(this.props.componentId,{
-                component:{
-                    name: constants.appScreens.labResultsScreen,
-                    passProps: {
-                        filtersToAdd: {
-                            personId: this.props.contact._id
-                        }
-                    },
-                    options: {
+    handleOnPressShowLabResults = () => {
+        Navigation.push(this.props.componentId, {
+            component: {
+                name: constants.appScreens.labResultsScreen,
+                passProps: {
+                    filtersToAdd: {
+                        personId: this.props.contact._id
                     }
-                }
-            });
+                },
+                options: {}
+            }
+        });
     }
     checkFields = (type) => {
         // let pass = true;
@@ -1881,20 +1917,20 @@ class ContactsSingleScreen extends Component {
     };
 
     showMenu = () => {
-        if( this.refs.menuRef) {
+        if (this.refs.menuRef) {
             this.refs.menuRef.show();
         }
     };
 
     hideMenu = () => {
         // this.refs['menuRef'].hide();
-        if( this.refs.menuRef) {
+        if (this.refs.menuRef) {
             this.refs.menuRef.hide();
         }
     };
 
     handleOnPressDeleteContact = () => {
-        this.setState ({
+        this.setState({
             deletePressed: true
         }, () => {
             this.handleOnPressSave();
@@ -1905,7 +1941,9 @@ class ContactsSingleScreen extends Component {
 
         Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteAddress, this.props.translation), [
             {
-                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => { console.log('Cancel pressed') }
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
+                    console.log('Cancel pressed')
+                }
             },
             {
                 text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
@@ -1913,12 +1951,14 @@ class ContactsSingleScreen extends Component {
                     contactAddressesClone.splice(index, 1);
 
                     let hasPlaceOfResidence = false
-                    let contactPlaceOfResidence = contactAddressesClone.find((e) => { return e.typeId === config.userResidenceAddress.userPlaceOfResidence })
+                    let contactPlaceOfResidence = contactAddressesClone.find((e) => {
+                        return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+                    })
                     if (contactPlaceOfResidence !== undefined) {
                         hasPlaceOfResidence = true
                     }
                     this.setState(prevState => ({
-                        contact: Object.assign({}, prevState.contact, { addresses: contactAddressesClone }),
+                        contact: Object.assign({}, prevState.contact, {addresses: contactAddressesClone}),
                         hasPlaceOfResidence
                     }), () => {
                         console.log("After deleting the address: ", this.state.contact);
@@ -1932,7 +1972,9 @@ class ContactsSingleScreen extends Component {
         Alert.alert(
             getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.copyAddress, this.props.translation), [
                 {
-                    text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => { console.log('Cancel pressed') }
+                    text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
+                        console.log('Cancel pressed')
+                    }
                 },
                 {
                     text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
@@ -1961,14 +2003,14 @@ class ContactsSingleScreen extends Component {
             addressLine2: '',
             postalCode: '',
             locationId: '',
-            geoLocation: {
-                coordinates: ['', ''],
-                type: 'Point'
-            },
+            // geoLocation: {
+            //     coordinates: ['', ''],
+            //     type: 'Point'
+            // },
             date: createDate(null)
         });
         this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, { addresses })
+            contact: Object.assign({}, prevState.contact, {addresses})
         }), () => {
             console.log("### after updating the data: ", this.state.contact);
         })
@@ -2044,8 +2086,8 @@ class ContactsSingleScreen extends Component {
                 questionnaireAnswers[parentId] = [];
             }
             if (lodashGet(questionnaireAnswers, `[${parentId}][0]`, null) !== null) {
-                if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
-                    questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
+                if (!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")) {
+                    questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0], {subAnswers: {}});
                 }
                 if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
@@ -2066,7 +2108,7 @@ class ContactsSingleScreen extends Component {
             previousAnswers: questionnaireAnswers,
             isModified: true
         }, () => {
-            console.log ('onChangeMultipleSelection after setState', this.state.previousAnswers);
+            console.log('onChangeMultipleSelection after setState', this.state.previousAnswers);
         })
     };
     onChangeAnswerDate = (value, questionId, index) => {
@@ -2074,19 +2116,19 @@ class ContactsSingleScreen extends Component {
         if (checkArrayAndLength(questionnaireAnswers?.[questionId])) {
             if (questionnaireAnswers[questionId][0]) {
                 questionnaireAnswers[questionId][0].date = value;
-                if(!questionnaireAnswers[questionId][0].hasOwnProperty("subAnswers")){
-                    questionnaireAnswers[questionId][0] = Object.assign({}, questionnaireAnswers[questionId][0],{ subAnswers: {}});
+                if (!questionnaireAnswers[questionId][0].hasOwnProperty("subAnswers")) {
+                    questionnaireAnswers[questionId][0] = Object.assign({}, questionnaireAnswers[questionId][0], {subAnswers: {}});
                 }
                 if (checkArrayAndLength(questionnaireAnswers?.[questionId]?.[0]?.subAnswers)) {
                     for (let subQuestionId in questionnaireAnswers[questionId][0].subAnswers) {
                         questionnaireAnswers[questionId][0].subAnswers[subQuestionId].map((e) => {
-                            return { value: e.value, date: value };
+                            return {value: e.value, date: value};
                         })
                     }
                 }
             }
         } else {
-            questionnaireAnswers[questionId]= [{date: value, value: null}];
+            questionnaireAnswers[questionId] = [{date: value, value: null}];
         }
         this.setState({
             previousAnswers: questionnaireAnswers,
@@ -2098,16 +2140,21 @@ class ContactsSingleScreen extends Component {
     onClickAddNewMultiFrequencyAnswer = (item) => {
         //add new empty item to question and update previousAnswers
         let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
-        if(previousAnswersClone.hasOwnProperty(item.variable) && item.variable){
+        if (previousAnswersClone.hasOwnProperty(item.variable) && item.variable) {
             previousAnswersClone[item.variable].push({date: null, value: null});
         } else {
-            previousAnswersClone = Object.assign({}, previousAnswersClone, { [item.variable]: [{date: null, value: null}] });
+            previousAnswersClone = Object.assign({}, previousAnswersClone, {
+                [item.variable]: [{
+                    date: null,
+                    value: null
+                }]
+            });
         }
         this.savePreviousAnswers(previousAnswersClone[item.variable], item.variable);
     };
     savePreviousAnswers = (previousAnswers, previousAnswersId) => {
         this.setState(prevState => ({
-            previousAnswers: Object.assign({}, prevState.previousAnswers, { [previousAnswersId]: previousAnswers }),
+            previousAnswers: Object.assign({}, prevState.previousAnswers, {[previousAnswersId]: previousAnswers}),
             isModified: true
         }), () => {
             Navigation.dismissAllModals();
@@ -2115,8 +2162,8 @@ class ContactsSingleScreen extends Component {
     };
     handleCopyAnswerDate = (value) => {
         let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
-        for(let questionId in previousAnswersClone) {
-            if(previousAnswersClone.hasOwnProperty(questionId)) {
+        for (let questionId in previousAnswersClone) {
+            if (previousAnswersClone.hasOwnProperty(questionId)) {
                 previousAnswersClone[questionId] = previousAnswersClone[questionId].map((e) => {
                     return {date: e.date === null ? createDate(value).toISOString() : e.date, value: e.value};
                 });
@@ -2133,17 +2180,17 @@ class ContactsSingleScreen extends Component {
         sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
         let canSave = true;
         //questions exist
-        if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0){
-            for(let i=0; i < sortedQuestions.length; i++){
+        if (Array.isArray(sortedQuestions) && sortedQuestions.length > 0) {
+            for (let i = 0; i < sortedQuestions.length; i++) {
                 //verify only multianswer questions and if they were answered
-                if(sortedQuestions[i].multiAnswer && previousAnswersClone.hasOwnProperty(sortedQuestions[i].variable)){
+                if (sortedQuestions[i].multiAnswer && previousAnswersClone.hasOwnProperty(sortedQuestions[i].variable)) {
                     //current answers
                     let answerValues = previousAnswersClone[sortedQuestions[i].variable];
                     //validate all the answers of the question
-                    if( Array.isArray(answerValues) && answerValues.length > 0){
-                        for( let q=0; q < answerValues.length; q++){
+                    if (Array.isArray(answerValues) && answerValues.length > 0) {
+                        for (let q = 0; q < answerValues.length; q++) {
                             // if it has value then it must have date
-                            if(answerValues[q].value !== null && answerValues[q].date === null){
+                            if (answerValues[q].value !== null && answerValues[q].date === null) {
                                 canSave = false;
                             }
                         }
@@ -2157,7 +2204,7 @@ class ContactsSingleScreen extends Component {
         // let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
         let sortedQuestions = sortBy(cloneDeep(this.props.caseInvestigationQuestions), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
-        if( Array.isArray(sortedQuestions) && sortedQuestions.length > 0) {
+        if (Array.isArray(sortedQuestions) && sortedQuestions.length > 0) {
             for (let i = 0; i < sortedQuestions.length; i++) {
                 //verify only multianswer questions and if they were answered
                 if (sortedQuestions[i].multiAnswer && previousAnswersClone.hasOwnProperty(sortedQuestions[i].variable)) {
@@ -2165,15 +2212,15 @@ class ContactsSingleScreen extends Component {
                     let answerValues = previousAnswersClone[sortedQuestions[i].variable];
                     let answerValuesClone = [];
                     //validate all the answers of the question
-                    if( Array.isArray(answerValues) && answerValues.length > 0){
-                        answerValuesClone = answerValues.filter((answer)=>{
+                    if (Array.isArray(answerValues) && answerValues.length > 0) {
+                        answerValuesClone = answerValues.filter((answer) => {
                             return answer.value !== null;
                         });
                     }
-                    if(answerValuesClone.length > 0){
+                    if (answerValuesClone.length > 0) {
                         //update answer list
                         previousAnswersClone[sortedQuestions[i].variable] = answerValuesClone;
-                    }else{
+                    } else {
                         //remove key
                         delete previousAnswersClone[sortedQuestions[i].variable];
                     }
@@ -2230,8 +2277,7 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 };
 
-export default
-    compose(
-        withPinconde(),
-        connect(mapStateToProps, matchDispatchProps)
-    )(ContactsSingleScreen);
+export default compose(
+    withPinconde(),
+    connect(mapStateToProps, matchDispatchProps)
+)(ContactsSingleScreen);

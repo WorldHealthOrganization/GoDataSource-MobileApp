@@ -379,10 +379,10 @@ export function enhanceTabsWithDataHandling() {
                     addressLine2: '',
                     postalCode: '',
                     locationId: '',
-                    geoLocation: {
-                        coordinates: ['', ''],
-                        type: 'Point'
-                    },
+                    // geoLocation: {
+                    //     coordinates: ['', ''],
+                    //     type: 'Point'
+                    // },
                     date: createDate(null)
                 });
 
@@ -420,7 +420,7 @@ export function enhanceTabsWithDataHandling() {
                     let addresses = lodashGet(this.state, 'editableElement.addresses', []);
                     lodashSet(addresses, `[${index}].locationId`, extractIdFromPouchId(selectedItems['0']._id, 'location'));
                     if (checkArray(lodashGet(selectedItems, `[0].geoLocation.coordinates`, null))) {
-                        if (lodashGet(selectedItems, `[0].geoLocation.coordinates[0]`) !== 0 || lodashGet(selectedItems, `[0].geoLocation.coordinates[1]`) !== 0) {
+                        if (lodashGet(selectedItems, `[0].geoLocation.coordinates[0]`) !== '' || lodashGet(selectedItems, `[0].geoLocation.coordinates[1]`) !== '') {
                             setTimeout(() => {
                                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
                                     {
