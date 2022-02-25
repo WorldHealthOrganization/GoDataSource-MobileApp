@@ -446,13 +446,25 @@ class FollowUpsSingleScreen extends Component {
 
         if (objectType === 'FollowUp') {
             let status = this.state.item.statusId;
+            let currentAnswers = this.state.currentAnswers;
+            let previousAnswers = this.state.previousAnswers;
+            let mappedQuestions = this.state.mappedQuestions;
+            let fillLocation = this.state.item.fillLocation;
             if (id === 'date' && moment().diff(value) < 0){
                 status = translations.followUpStatuses.notPerformed;
+                fillLocation = false;
+            } else if (id === 'date' && moment().diff(value) >= 0) {
+                currentAnswers = {};
+                previousAnswers = {};
+                mappedQuestions = [];
             }
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({}, prevState.item, { [id]: value, statusId: status }),
-                    isModified: true
+                    item: Object.assign({}, prevState.item, { [id]: value, statusId: status, fillLocation }),
+                    isModified: true,
+                    currentAnswers,
+                    previousAnswers,
+                    mappedQuestions,
                 })
                 , () => {
                     console.log("onChangeDate statusId", id, " ", value, " ", this.state.item);

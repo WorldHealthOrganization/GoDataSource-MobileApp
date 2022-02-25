@@ -172,7 +172,9 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
 
     computeDataForFollowUpSingleScreenDropdownInput = (item) => {
         if (item.id === 'statusId') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE") &&  o.value !== config.followUpStatuses.notPerformed})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")
+                // && o.value !== config.followUpStatuses.notPerformed
+            })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
