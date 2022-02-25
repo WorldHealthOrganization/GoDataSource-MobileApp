@@ -204,7 +204,7 @@ class CardComponent extends Component {
                             marginBottom: 2,
                             marginTop: 7,
                         }}
-                        isEditMode={this.props.item.isEditMode}
+                        isEditMode={this.props.isEditMode}
                         isRequired={this.props.item.isRequired}
                         onChange={this.props.onChangeSwitch}
                         activeButtonColor={this.props.item.activeButtonColor}
