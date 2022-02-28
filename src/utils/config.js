@@ -858,7 +858,8 @@ const caseSingleScreen = {
                     isEditMode: false,
                     activeButtonColor: 'red',
                     activeBackgroundColor: 'red',
-                    objectType: 'Case'
+                    objectType: 'Case',
+                    skipNone: true
                 },
             ]
         },
@@ -2045,7 +2046,8 @@ const contactsOfContactsPersonal = [
                 isEditMode: false,
                 activeButtonColor: 'red',
                 activeBackgroundColor: 'red',
-                objectType: 'Contact'
+                objectType: 'Contact',
+                skipNone: true
             },
             {
                 cardNumber: 1,
@@ -2227,7 +2229,8 @@ const contactsSingleScreen = {
                     isEditMode: false,
                     activeButtonColor: 'red',
                     activeBackgroundColor: 'red',
-                    objectType: 'Contact'
+                    objectType: 'Contact',
+                    skipNone: true
                 },
                 {
                     cardNumber: 1,

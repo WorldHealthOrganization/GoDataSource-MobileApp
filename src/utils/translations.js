@@ -161,20 +161,20 @@ const caseSingleScreen = {
     dateRangeEndDate: 'LNG_DATE_FIELD_LABEL_TO',
     dateRangeLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     dateRangeComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
-    dateRangeCenterName: 'LNG_DATE_FIELD_LABEL_CENTER_NAME',
+    dateRangeCenterName: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
     dateRangeHospitalName: 'LNG_DATE_FIELD_LABEL_HOSPITAL_NAME',
 
 
     hospitalisationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     hospitalisationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
-    hospitalisationCenterName: 'LNG_DATE_FIELD_LABEL_HOSPITAL_NAME',
+    hospitalisationCenterName: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
     hospitalisationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     hospitalisationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
 
 
     isolationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     isolationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
-    isolationCenterName: 'LNG_DATE_FIELD_LABEL_CENTER_NAME',
+    isolationCenterName: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
     isolationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     isolationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
 

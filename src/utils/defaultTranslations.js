@@ -171,6 +171,7 @@ export default {
     'LNG_CASE_FIELD_LABEL_DATE_OF_DECEASE': 'Date of decease',
     'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL': 'Place of burial',
     'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME': 'Burial Place Name',
+    'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME': 'Center name',
 
     'LNG_DATE_FIELD_LABEL_FROM': 'From',
     'LNG_DATE_FIELD_LABEL_TO': 'To',
