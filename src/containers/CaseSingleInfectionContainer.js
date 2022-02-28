@@ -150,9 +150,9 @@ class CaseSingleInfectionContainer extends Component {
             fields[3].label = translations.caseSingleScreen.dateRangeCenterName;
         }
         if (this.props && this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges[index]
-            // && (this.props.case.dateRanges[index].typeId !== config.dateRangeTypes.hospitalization && this.props.case.dateRanges[index].typeId !== config.dateRangeTypes.isolation)
+            && (this.props.case.dateRanges[index].typeId !== config.dateRangeTypes.hospitalization && this.props.case.dateRanges[index].typeId !== config.dateRangeTypes.isolation)
         ) {
-            fields.splice(3, 1);
+            // fields.splice(3, 1);
         }
         return this.renderItemCardComponent(fields, index)
     };
