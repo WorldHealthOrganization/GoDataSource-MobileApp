@@ -53,7 +53,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
         let fields = item.fields.map((field) => {
-            if (this.props.isNew === false && field.id === 'date') {
+            if  (field.id === 'date') {
                 return Object.assign({}, field, { isEditMode: false })
             } else {
                 return Object.assign({}, field, { isEditMode: this.props.isEditMode })
