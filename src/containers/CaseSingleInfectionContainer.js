@@ -144,11 +144,11 @@ class CaseSingleInfectionContainer extends Component {
         let fields = config.caseSingleScreen.dateRanges.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
-        if (this.props && this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges[index] && this.props.case.dateRanges[index].typeId === config.dateRangeTypes.hospitalization) {
-            fields[3].label = translations.caseSingleScreen.dateRangeHospitalName;
-        } else {
+        // if (this.props && this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges[index] && this.props.case.dateRanges[index].typeId === config.dateRangeTypes.hospitalization) {
+        //     fields[3].label = translations.caseSingleScreen.dateRangeHospitalName;
+        // } else {
             fields[3].label = translations.caseSingleScreen.dateRangeCenterName;
-        }
+        // }
         if (this.props && this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges[index]
             && (this.props.case.dateRanges[index].typeId !== config.dateRangeTypes.hospitalization && this.props.case.dateRanges[index].typeId !== config.dateRangeTypes.isolation)
         ) {
@@ -383,6 +383,9 @@ class CaseSingleInfectionContainer extends Component {
                 break;
             case 'riskLevel':
                 categoryId = "LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL";
+                break;
+            case 'pregnancyStatus':
+                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS';
                 break;
             case 'gender':
                 categoryId = 'LNG_REFERENCE_DATA_CATEGORY_GENDER';
