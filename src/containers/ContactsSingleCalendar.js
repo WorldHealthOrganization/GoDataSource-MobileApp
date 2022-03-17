@@ -73,24 +73,6 @@ class ContactsSingleCalendar extends Component {
 
         return (
             <ElevatedView elevation={3} style={[style.container]}>
-                <View style = {{alignItems: 'center'}}>
-                    <PermissionComponent
-                        render={() => (
-                            <TopContainerButtons
-                                isNew={this.props.isNew}
-                                isEditMode={this.props.isEditMode}
-                                index={this.props.activeIndex}
-                                numberOfTabs={this.props.numberOfTabs}
-                                onPressEdit={this.props.onPressEdit}
-                                onPressSaveEdit={this.props.onPressSaveEdit}
-                                onPressCancelEdit={this.props.onPressCancelEdit}
-                                onPressNextButton={this.props.onPressNextButton}
-                                onPressPreviousButton={this.props.onPressPreviousButton}
-                            />
-                        )}
-                        permissionsList={permissionsList}
-                    />
-                </View>
                 <FollowUpAgenda
                     contact={this.props.contact}
                     followUps={followUps}

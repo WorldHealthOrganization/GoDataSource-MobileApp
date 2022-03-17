@@ -78,6 +78,7 @@ class FollowUpAgendaItem extends PureComponent {
                                                 previousAnswers={get(mappedAnswers, 'mappedAnswers', {})}
                                                 contact={this.props.contact}
                                                 isEditMode={false}
+                                                noEditButton={true}
                                             />
                                         </Collapsible>) : null
                                 }
