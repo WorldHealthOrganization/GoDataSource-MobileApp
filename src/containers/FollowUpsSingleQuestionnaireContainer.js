@@ -81,26 +81,31 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.mainContainer}>
-                    <PermissionComponent
-                        render={() => (
-                            <TopContainerButtons
-                                isNew={this.props.isNew}
-                                isEditMode={this.props.isEditMode}
-                                index={this.props.activeIndex}
-                                numberOfTabs={this.props.numberOfTabs}
-                                onPressEdit={this.props.onPressEdit}
-                                onPressSaveEdit={this.props.onPressSaveEdit}
-                                onPressCancelEdit={this.props.onPressCancelEdit}
-                                onPressNextButton={this.props.handleNextButton}
-                                onPressPreviousButton={this.props.onPressPreviousButton}
+                    {
+                        this.props.noEditButton ?
+                            null
+                            :
+                            <PermissionComponent
+                                render={() => (
+                                    <TopContainerButtons
+                                        isNew={this.props.isNew}
+                                        isEditMode={this.props.isEditMode}
+                                        index={this.props.activeIndex}
+                                        numberOfTabs={this.props.numberOfTabs}
+                                        onPressEdit={this.props.onPressEdit}
+                                        onPressSaveEdit={this.props.onPressSaveEdit}
+                                        onPressCancelEdit={this.props.onPressCancelEdit}
+                                        onPressNextButton={this.props.handleNextButton}
+                                        onPressPreviousButton={this.props.onPressPreviousButton}
+                                    />
+                                )}
+                                permissionsList={[
+                                    constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                                    constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
+                                    constants.PERMISSIONS_FOLLOW_UP.followUpsModify
+                                ]}
                             />
-                        )}
-                        permissionsList={[
-                            constants.PERMISSIONS_FOLLOW_UP.followUpAll,
-                            constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
-                            constants.PERMISSIONS_FOLLOW_UP.followUpsModify
-                        ]}
-                    />
+                    }
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
