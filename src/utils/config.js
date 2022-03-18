@@ -738,6 +738,20 @@ const caseSingleScreen = {
                     activeBackgroundColor: 'red',
                     objectType: 'Case'
                 },
+
+                {
+                    cardNumber: 2,
+                    id: 'pregnancyStatus',
+                    label: translations.caseSingleScreen.pregnancyStatus,
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Case',
+                    skipNone: true
+                },
                 {
                     cardNumber: 1,
                     id: 'occupation',
@@ -796,6 +810,29 @@ const caseSingleScreen = {
                     isEditMode: false,
                     objectType: 'Case'
                 },
+                {
+                    cardNumber: 2,
+                    id: 'dateOfReporting',
+                    label: translations.caseSingleScreen.dateOfReporting,
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: true,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'isDateOfReportingApproximate',
+                    label: translations.caseSingleScreen.isDateOfReportingApproximate,
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'Case'
+                },
             ]
         },
         {
@@ -822,44 +859,7 @@ const caseSingleScreen = {
                     isEditMode: false,
                     multiline: true,
                     objectType: 'Case'
-                },
-                {
-                    cardNumber: 2,
-                    id: 'dateOfReporting',
-                    label: translations.caseSingleScreen.dateOfReporting,
-                    value: '',
-                    type: "DatePicker",
-                    isRequired: true,
-                    isEditMode: false,
-                    format: 'YYYY-MM-dd',
-                    objectType: 'Case'
-                },
-
-                {
-                    cardNumber: 2,
-                    id: 'isDateOfReportingApproximate',
-                    label: translations.caseSingleScreen.isDateOfReportingApproximate,
-                    type: 'SwitchInput',
-                    value: false,
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 2,
-                    id: 'pregnancyStatus',
-                    label: translations.caseSingleScreen.pregnancyStatus,
-                    type: 'DropdownInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'Case',
-                    skipNone: true
-                },
+                }
             ]
         },
     ],

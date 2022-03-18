@@ -573,7 +573,6 @@ class CaseSingleScreen extends Component {
 
     //Render scene
     handleRenderScene = ({route}) => {
-        console.log("Render scene", this.state.routes[this.state.index].key);
         switch (route.key) {
             case 'personal':
                 return (

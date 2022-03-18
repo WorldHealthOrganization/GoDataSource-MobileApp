@@ -153,6 +153,11 @@ class CaseSinglePersonalContainer extends Component {
         let minimumDate = undefined;
         let maximumDate = undefined;
 
+
+        if(item.id === 'pregnancyStatus' && (this.props.case?.gender !== translations.localTranslationTokens.female )) {
+            return;
+        }
+
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForCasesSingleScreenDropdownInput(item);
         } else if (item.type === 'ActionsBar') {
