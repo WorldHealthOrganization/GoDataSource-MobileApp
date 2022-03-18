@@ -211,6 +211,10 @@ class ContactsSinglePersonal extends Component {
         let minimumDate = undefined;
         let maximumDate = undefined;
 
+        if(item.id === 'pregnancyStatus' && (this.props.contact?.gender !== translations.localTranslationTokens.female )) {
+            return;
+        }
+
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForContactsSingleScreenDropdownInput(item);
         } else if (item.type === 'ActionsBar') {
@@ -220,6 +224,7 @@ class ContactsSinglePersonal extends Component {
                 item.onPressArray = [this.props.onPressDeleteVaccines]
             }
         }
+
 
         if (item.type === 'DatePicker' && item.objectType !== 'Address' && item.objectType !== 'Documents' && item.objectType !== 'Vaccines') {
             value = this.props.contact[item.id]
