@@ -124,6 +124,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
             <CardComponent
                 key={cardIndex}
                 item={item}
+                data={item.data}
                 isEditMode={isEditable}
                 isEditModeForDropDownInput={isEditable}
                 value={value}
