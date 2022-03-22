@@ -223,7 +223,8 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
                 {[`${aliasForContacts}.locationId`]: {'$in': search.locations}},
                 {[`${aliasForFilteredExposures}.firstName`]: {'$like': `%${search.text}%`}},
                 {[`${aliasForFilteredExposures}.lastName`]: {'$like': `%${search.text}%`}},
-                {[`${aliasForFilteredExposures}.visualId`]: {'$like': `%${search.text}%`}}
+                {[`${aliasForFilteredExposures}.visualId`]: {'$like': `%${search.text}%`}},
+                {[`indexDay`]: {'$like': `%${search.text}%`}},
             ]
         }
     }
