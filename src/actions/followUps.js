@@ -327,7 +327,10 @@ export function getFollowUpsForContactId(contactId, outbreakId, userTeams) {
         ],
         condition: {
             'personId': contactId,
-            'teamId': {'$in': userTeams.map((e) => e.teamId)},
+            '$or': [
+                {'teamId': {'$in': userTeams.map((e) => e.teamId)}},
+                {'teamId': {'$is': null}},
+            ],
             'outbreakId': outbreakId,
             'deleted': 0
         }
