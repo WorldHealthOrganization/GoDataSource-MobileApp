@@ -35,7 +35,7 @@ class FollowUpAgenda extends PureComponent {
                 items={newFollowUps}
                 renderItem={this.renderItem}
                 renderEmptyDate={() => { return (<View />); }}
-                rowHasChanged={(r1, r2) => { return r1.text?._id !== r2.text?._id }}
+                rowHasChanged={(r1, r2) => { return r1.text !== r2.text }}
                 renderDay={this.renderDay}
                 theme={{
                     agendaKnobColor: 'rgba(0, 0, 0, 0.1)',
