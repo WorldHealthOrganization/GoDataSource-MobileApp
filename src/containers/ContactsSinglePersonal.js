@@ -211,7 +211,7 @@ class ContactsSinglePersonal extends Component {
         let minimumDate = undefined;
         let maximumDate = undefined;
 
-        if(item.id === 'pregnancyStatus' && (this.props.contact?.gender !== translations.localTranslationTokens.female )) {
+        if(item.id === 'pregnancyStatus' && (this.props.contact?.gender === translations.localTranslationTokens.male )) {
             return;
         }
 

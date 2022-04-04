@@ -154,7 +154,7 @@ class CaseSinglePersonalContainer extends Component {
         let maximumDate = undefined;
 
 
-        if(item.id === 'pregnancyStatus' && (this.props.case?.gender !== translations.localTranslationTokens.female )) {
+        if(item.id === 'pregnancyStatus' && (this.props.case?.gender === translations.localTranslationTokens.male )) {
             return;
         }
 
