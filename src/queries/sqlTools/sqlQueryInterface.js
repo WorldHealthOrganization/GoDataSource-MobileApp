@@ -162,6 +162,12 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
             $expression: `json_extract(${innerQueryAlias}.json, '$.pregnancyStatus') in (${innerFilter.pregnancyStatuses.map(vax=>`"${vax.value}"`).join(', ')})`
         })
     }
+    if (lodashGet(innerFilter, 'selectedIndexDay', null)) {
+        filterCondition.$and.push({
+            'indexDay': innerFilter.selectedIndexDay
+        })
+    }
+
 
     let mainCondition = {
         $and: [deletedCheck, searchCondition, filterCondition]
@@ -306,6 +312,31 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         ],
         condition: mainCondition
     };
+    if (lodashGet(innerFilter, 'selectedIndexDay', null)) {
+        const relationshipsJoinForFollowUp = {
+                type: 'left',
+                table: 'followUp',
+                alias: "FollowUp",
+                fields: [
+                    {
+                        table: "FollowUp",
+                        name: 'indexDay'
+                    },
+                    {
+                        table: "FollowUp",
+                        name: 'deleted'
+                    }
+                ],
+                on: {
+                    'FollowUp.personId': `${innerQueryAlias}._id`,
+                    'FollowUp.deleted' : 0,
+                    'FollowUp.indexDay': innerFilter.selectedIndexDay
+                }
+        };
+        mainQuery.join.push(
+            relationshipsJoinForFollowUp
+        )
+    }
 
     // TODO handle email
     if (shouldSearchEmail || checkArrayAndLength(lodashGet(innerFilter, 'vaccines', null)) || checkArrayAndLength(lodashGet(innerFilter, 'vaccineStatuses', null))) {
@@ -374,7 +405,11 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
             }
         ];
         mainQuery.sort = sort;
-        mainQuery.group = checkArrayAndLength(lodashGet(innerFilter, 'sort', null)) ? `${innerQueryAlias}._id` : [`${innerQueryAlias}.lastName`, `${innerQueryAlias}.firstName`, `${innerQueryAlias}._id`];
+        mainQuery.group = checkArrayAndLength(lodashGet(innerFilter, 'sort', null)) ? [`${innerQueryAlias}._id`] : [`${innerQueryAlias}.lastName`, `${innerQueryAlias}.firstName`, `${innerQueryAlias}._id`];
+
+        if (lodashGet(innerFilter, 'selectedIndexDay', null)) {
+            mainQuery.group.push(mainQuery.group = `${innerQueryAlias}._id`);
+        }
         mainQuery = {
             type:'select',
             fields:[
@@ -437,7 +472,7 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
                         ]
                     },
                     alias: 'countContacts'
-                }
+                },
             ],
             query: mainQuery,
             alias: 'mainQuery'

@@ -173,6 +173,8 @@ export default {
     'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME': 'Burial Place Name',
     'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME': 'Center name',
 
+    'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP': 'Day of follow-up',
+
     'LNG_DATE_FIELD_LABEL_FROM': 'From',
     'LNG_DATE_FIELD_LABEL_TO': 'To',
     'LNG_DATE_FIELD_LABEL_HOSPITAL_NAME': 'Hospital Name',
