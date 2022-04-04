@@ -46,6 +46,8 @@ const followUpFilter = {
     ageRange: 'LNG_FILTER_SCREEN_AGE_RANGE_LABEL',
     area: 'LNG_FILTER_SCREEN_AREA_LABEL',
     chooseLocationLabel: 'LNG_FILTER_SCREEN_CHOOSE_LOCATIONS_MESSAGE',
+
+    dayOfFollowUp: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
 };
 
 const personFilter = {
@@ -253,7 +255,7 @@ const followUpsSingleScreen = {
     date: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
     status: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
     targeted: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-    team: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM'
+    team: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
 };
 
 const casesScreen = {

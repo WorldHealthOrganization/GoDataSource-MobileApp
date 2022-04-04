@@ -116,7 +116,7 @@ class FiltersContainer extends PureComponent {
 
     handleRenderItemByType = (item, cardIndex) => {
         const { translation, filter } = this.props;
-        const { onChangeSectionedDropDown, onChangeInterval, onChangeMultipleSelection, onSelectItem } = this.props;
+        const { onChangeSectionedDropDown, onChangeInterval, onChangeMultipleSelection, onSelectItem, onChangeText } = this.props;
 
         let value = '';
         let data = [];
@@ -153,6 +153,11 @@ class FiltersContainer extends PureComponent {
             data = this.computeDataForDropdown(item);
             value = filter.filter[item.id];
         }
+        if(item.type === 'TextInput') {
+            value = filter.filter[item.id];
+            item.value = filter.filter[item.id];
+        }
+
 
         return (
             <CardComponent
@@ -162,7 +167,7 @@ class FiltersContainer extends PureComponent {
                 isEditModeForDropDownInput={true}
                 value={value}
                 data={data}
-
+                onChangeText={onChangeText}
                 onChangeSectionedDropDown={onChangeSectionedDropDown}
                 onChangeInterval={onChangeInterval}
                 onChangeMultipleSelection={onChangeMultipleSelection}

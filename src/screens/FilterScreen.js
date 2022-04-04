@@ -29,6 +29,7 @@ class FilterScreen extends Component {
                     },
                     age: [0, 150],
                     selectedLocations: [],
+                    selectedIndexDay: '',
                     classification: [],
                     categories: [],
                     vaccines: [],
@@ -95,6 +96,10 @@ class FilterScreen extends Component {
             if (activeFilters.age && Array.isArray(activeFilters.age) && activeFilters.age.length === 2) {
                 filterClone.age[0] = activeFilters.age[0];
                 filterClone.age[1] = activeFilters.age[1];
+            }
+
+            if (activeFilters.selectedIndexDay && activeFilters.selectedIndexDay !== '') {
+                filterClone.selectedIndexDay = activeFilters.selectedIndexDay;
             }
 
             if (activeFilters.selectedLocations && Array.isArray(activeFilters.selectedLocations) && activeFilters.selectedLocations.length > 0) {
@@ -229,6 +234,7 @@ class FilterScreen extends Component {
                             onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
                             onChangeInterval={this.handleOnChangeInterval}
                             onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                            onChangeText={this.handleOnChangeText}
 
                         />
                     );
@@ -368,6 +374,9 @@ class FilterScreen extends Component {
         if (filterStateClone.selectedLocations) {
             filterClone.selectedLocations = filterStateClone.selectedLocations;
         }
+        if (filterStateClone.selectedIndexDay) {
+            filterClone.selectedIndexDay = filterStateClone.selectedIndexDay;
+        }
         if (filterStateClone.classification) {
             filterClone.classification = filterStateClone.classification;
         }
@@ -465,6 +474,12 @@ class FilterScreen extends Component {
             console.log("Filters: ", this.state.filter.filter);
         })
     };
+
+    handleOnChangeText = (text) => {
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, { filter: Object.assign({}, prevState.filter.filter, { selectedIndexDay: text }) })
+        }))
+    }
 
     handleOnChangeInterval = (values, id) => {
         this.setState(prevState => ({

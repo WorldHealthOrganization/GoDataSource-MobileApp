@@ -195,6 +195,9 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
     if (followUpFilter.statusId) {
         condition[`${aliasFollowUps}.statusId`] = followUpFilter.statusId
     }
+    if (contactsFilter?.selectedIndexDay){
+        condition['indexDay'] = contactsFilter.selectedIndexDay;
+    }
     if (checkArrayAndLength(userTeams)) {
         condition['$or'] = [
             {
@@ -223,8 +226,7 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
                 {[`${aliasForContacts}.locationId`]: {'$in': search.locations}},
                 {[`${aliasForFilteredExposures}.firstName`]: {'$like': `%${search.text}%`}},
                 {[`${aliasForFilteredExposures}.lastName`]: {'$like': `%${search.text}%`}},
-                {[`${aliasForFilteredExposures}.visualId`]: {'$like': `%${search.text}%`}},
-                {[`indexDay`]: {'$like': `%${search.text}%`}},
+                {[`${aliasForFilteredExposures}.visualId`]: {'$like': `%${search.text}%`}}
             ]
         }
     }

@@ -77,7 +77,7 @@ class TextInput extends Component {
         }
         return (
             <View style={[{flexDirection: 'row'},this.props.style]}>
-                <View style={{flex: 1}}> 
+                <View style={{flex: 1}}>
                     <TextField
                         label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                         value={value ? value.toString() : ''}

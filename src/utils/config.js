@@ -1308,6 +1308,28 @@ const personFilterScreen = {
                 }
             ]
         },
+        {
+            fields: [
+                {
+                    cardNumber: 7,
+                    label: translations.followUpFilter.dayOfFollowUp,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 7,
+                    id: 'selectedIndexDay',
+                    label: translations.followUpFilter.dayOfFollowUp,
+                    type: 'TextInput',
+                    keyboardType: 'numeric',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        }
     ],
     sort: {
         fields: [
@@ -1412,11 +1434,33 @@ const followUpsFilterScreen = {
                     single: false
                 }
             ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 4,
+                    label: translations.followUpFilter.dayOfFollowUp,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 4,
+                    id: 'selectedIndexDay',
+                    label: translations.followUpFilter.dayOfFollowUp,
+                    type: 'TextInput',
+                    keyboardType: 'numeric',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
         }
     ],
     sort: {
         fields: [
-            {      
+            {
                 cardNumber: 1,
                 label: translations.sortTab.SortBy,
                 type: 'Section',
