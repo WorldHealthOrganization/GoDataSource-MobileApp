@@ -68,7 +68,7 @@ class IntervalPicker extends PureComponent {
                                     markerColor={this.props.markerColor}
                                 />)
                         }}
-                        allowOverlap={false}
+                        allowOverlap={this.props.allowOverlap || false}
                     />
                     {
                         tooltip.hasTooltip === true ? (

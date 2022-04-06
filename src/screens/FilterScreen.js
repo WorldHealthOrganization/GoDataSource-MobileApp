@@ -29,7 +29,7 @@ class FilterScreen extends Component {
                     },
                     age: [0, 150],
                     selectedLocations: [],
-                    selectedIndexDay: '',
+                    selectedIndexDay: props.outbreak?.periodOfFollowup ? [0, props.outbreak?.periodOfFollowup * 2] : null,
                     classification: [],
                     categories: [],
                     vaccines: [],
@@ -99,7 +99,8 @@ class FilterScreen extends Component {
             }
 
             if (activeFilters.selectedIndexDay && activeFilters.selectedIndexDay !== '') {
-                filterClone.selectedIndexDay = activeFilters.selectedIndexDay;
+                filterClone.selectedIndexDay[0] = activeFilters.selectedIndexDay[0];
+                filterClone.selectedIndexDay[1] = activeFilters.selectedIndexDay[1];
             }
 
             if (activeFilters.selectedLocations && Array.isArray(activeFilters.selectedLocations) && activeFilters.selectedLocations.length > 0) {
@@ -475,9 +476,9 @@ class FilterScreen extends Component {
         })
     };
 
-    handleOnChangeText = (text) => {
+    handleOnChangeText = (text, id) => {
         this.setState(prevState => ({
-            filter: Object.assign({}, prevState.filter, { filter: Object.assign({}, prevState.filter.filter, { selectedIndexDay: text }) })
+            filter: Object.assign({}, prevState.filter, { filter: Object.assign({}, prevState.filter.filter, { [id]: text }) })
         }))
     }
 

@@ -134,6 +134,9 @@ class FiltersContainer extends PureComponent {
         if (item.type === 'IntervalPicker' && item.id === 'age') {
             item.value = filter.filter[item.id];
         }
+        if(item.type === 'IntervalPicker' && item.id === 'selectedIndexDay') {
+            item.max = this.props.outbreak?.periodOfFollowup * 2;
+        }
         if (item.type === 'DropDownSectioned' && item.id === 'selectedLocations') {
             if (filter.filter[item.id].length === 1) {
                 for (let i = 0; i < this.props.locations.length; i++) {
@@ -255,7 +258,8 @@ function mapStateToProps(state) {
         translation: get(state, 'app.translation', []),
         locations: get(state, `locations.locations`, []),
         helpCategory: get(state, 'helpCategory', []),
-        referenceData: get(state, 'referenceData', [])
+        referenceData: get(state, 'referenceData', []),
+        outbreak: get(state, 'outbreak', null)
     };
 }
 

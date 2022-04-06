@@ -3,6 +3,7 @@ import {executeQuery} from './helperMethods';
 import lodashGet from 'lodash/get';
 import lodashSet from 'lodash/set';
 import {checkArrayAndLength} from "../../utils/typeCheckingFunctions";
+import get from "lodash/get";
 var jsonSql = require('json-sql')();
 jsonSql.configure({separatedValues: false});
 
@@ -164,7 +165,10 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
     }
     if (lodashGet(innerFilter, 'selectedIndexDay', null)) {
         filterCondition.$and.push({
-            'indexDay': innerFilter.selectedIndexDay
+            'indexDay': {
+                ['$gte']: get(innerFilter, 'selectedIndexDay[0]', 0),
+                ['$lte']: get(innerFilter, 'selectedIndexDay[1]', 150)
+            }
         })
     }
 
@@ -330,7 +334,10 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
                 on: {
                     'FollowUp.personId': `${innerQueryAlias}._id`,
                     'FollowUp.deleted' : 0,
-                    'FollowUp.indexDay': innerFilter.selectedIndexDay
+                    'FollowUp.indexDay': {
+                        ['$gte']: get(innerFilter, 'selectedIndexDay[0]', 0),
+                        ['$lte']: get(innerFilter, 'selectedIndexDay[1]', 150)
+                    }
                 }
         };
         mainQuery.join.push(

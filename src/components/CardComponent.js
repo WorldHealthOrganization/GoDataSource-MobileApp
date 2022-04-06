@@ -255,6 +255,7 @@ class CardComponent extends Component {
                         style={{width, marginHorizontal}}
                         onChange={this.props.onChangeInterval}
                         objectType={this.props.item.objectType}
+                        allowOverlap={this.props.item.allowOverlap}
                     />
                 );
             case 'ActionsBar':
