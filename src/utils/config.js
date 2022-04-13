@@ -41,6 +41,10 @@ const sideMenuItems = {
     [sideMenuKeys[4]]: {
         name: 'science',
         label: translations.navigationDrawer.labResultsLabel
+    },
+    [sideMenuKeys[5]]: {
+        name: 'insert-invitation',
+        label: translations.navigationDrawer.eventsLabel
     }
 };
 
@@ -79,6 +83,10 @@ const tabsValuesRoutes = {
         {key: 'filters', title: translations.casesFilter.filterTitle},
         {key: 'sort', title: translations.casesFilter.sortTitle}
     ],
+    eventsFilter: [
+        {key: 'filters', title: translations.eventsFilter.filterTitle},
+        {key: 'sort', title: translations.eventsFilter.sortTitle}
+    ],
     followUpsSingle: [
         {key: 'genInfo', title: translations.followUpsSingleScreen.detailsiTitle},
         {key: 'quest', title: translations.followUpsSingleScreen.questionnaireTitle}
@@ -110,6 +118,16 @@ const tabsValuesRoutes = {
         {key: 'contacts', title: 'Contacts'},
         {key: 'exposures', title: 'Exposures'},
         {key: 'caseInvestigation', title: translations.followUpsSingleScreen.questionnaireTitle}
+    ],
+    eventsSingle: [
+        {key: 'details', title: translations.eventSingleScreen.detailsTitle},
+        {key: 'address', title: translations.eventSingleScreen.addressTitle},
+    ],
+    eventsSingleViewEdit: [
+        {key: 'details', title: translations.eventSingleScreen.detailsTitle},
+        {key: 'address', title: translations.eventSingleScreen.addressTitle},
+        {key: 'contacts', title: 'Contacts'},
+        {key: 'exposures', title: 'Exposures'},
     ],
     contactsSingle: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
@@ -1187,6 +1205,166 @@ const caseSingleScreen = {
     },
 };
 
+const eventsFilterScreen = {
+    filter: [
+
+    ],
+    sort: {
+        fields: [
+            {
+                cardNumber: 1,
+                label: translations.sortTab.SortBy,
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.navigationDrawerSeparatorGrey
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortCriteria,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortOrder,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Sort'
+            }
+        ]
+    }
+}
+const eventSingleScreen = {
+    details: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'name',
+                    label: translations.eventSingleScreen.nameLabel,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: false,
+                    objectType: 'Event'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'date',
+                    label: translations.eventSingleScreen.date,
+                    labelValue: 'test',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: true,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'Event'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateOfReporting',
+                    label: translations.eventSingleScreen.dateOfReporting,
+                    labelValue: 'test',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: true,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'Event'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'isDateOfReportingApproximate',
+                    label: translations.eventSingleScreen.isDateOfReportingApproximate,
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.missedRedColor,
+                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    objectType: 'Event'
+                },
+                // {
+                //     cardNumber: 1,
+                //     id: 'responsibleUserId',
+                //     label: translations.eventSingleScreen.responsibleUser,
+                //     labelValue: 'test',
+                //     type: 'DropdownInput',
+                //     value: '',
+                //     isRequired: false,
+                //     isEditMode: false,
+                //     activeButtonColor: 'red',
+                //     activeBackgroundColor: 'red',
+                //     objectType: 'Event'
+                // },
+                {
+                    cardNumber: 1,
+                    id: 'description',
+                    label: translations.eventSingleScreen.description,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Event'
+                },
+            ]
+        }
+    ],
+    address: addressFields,
+    document: {
+        fields: [
+            {
+                cardNumber: 3,
+                id: 'type',
+                label: translations.caseSingleScreen.documentType,
+                type: 'DropdownInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Documents'
+            },
+            {
+                cardNumber: 3,
+                id: 'number',
+                label: translations.caseSingleScreen.documentNumber,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Documents'
+            },
+            {
+                cardNumber: 3,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: [translations.caseSingleScreen.deleteButton],
+                textsStyleArray: [{color: styles.missedRedColor}],
+                onPressArray: [],
+                objectType: 'Documents'
+            }
+        ]
+    },
+}
+
 const personFilterScreen = {
     filter: [
         {
@@ -1696,7 +1874,7 @@ const casesFilterScreen = {
         {
             fields: [
                 {
-                    cardNumber: 67,
+                    cardNumber: 7,
                     label: translations.personFilter.pregnancyStatus,
                     type: 'Section',
                     hasBorderBottom: true,
@@ -2782,6 +2960,8 @@ export default {
     helpFilterScreen,
     casesFilterScreen,
     caseSingleScreen,
+    eventsFilterScreen,
+    eventSingleScreen,
     defaultFilterForContacts,
     defaultFilterForCases,
     baseUrls,

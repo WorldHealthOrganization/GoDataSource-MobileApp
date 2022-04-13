@@ -156,8 +156,23 @@ export default {
     'LNG_CASE_FIELD_LABEL_CASE_ID': 'Case ID',
     'LNG_MOBILE_CASE_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
 
+    'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE': 'Details',
+    'LNG_PAGE_MODIFY_EVENT_TAB_ADDRESS_TITLE': 'Address',
+
+    'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT': 'Delete event',
+    //TODO: Add translations to API
+    'LNG_EVENT_SINGLE_SCREEN_ADD_NEW_EVENT_TITLE_LABEL': 'Add event',
+    'LNG_CASE_LIST_SCREEN_NO_EVENTS': 'There are no events to display',
+
     'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE': 'Document Type',
     'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER': 'Document number',
+    'LNG_PAGE_LIST_EVENTS_TITLE': 'Events',
+    'LNG_LOCATION_FIELD_LABEL_NAME': 'Name',
+    'LNG_EVENT_FIELD_LABEL_DATE' : 'Date',
+    'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
+    'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Date of reporting approximate',
+    'LNG_EVENT_FIELD_LABEL_DESCRIPTION': 'Description',
+    'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID': 'Assigned User',
 
     'LNG_CASE_FIELD_LABEL_CLASSIFICATION': 'Classification',
     'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET': 'Date of onset',

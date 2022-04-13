@@ -153,6 +153,14 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             offset: get(this.state, 'data.length', 0)
                         };
                         break;
+                    case 'EventsScreen':
+                        filter = {
+                            outbreakId: get(this.props, 'outbreak._id', null),
+                            eventsFilter: get(this.state, 'mainFilter', null),
+                            searchText: get(this.state, 'searchText', null),
+                            lastElement: get(this.state, 'lastElement', null),
+                            offset: get(this.state, 'data.length', 0)
+                        };
                     case 'UsersScreen':
                         filter = {
                             outbreakId: get(this.props, 'outbreak._id', null),
@@ -360,6 +368,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     case 'CasesScreen':
                         forwardProps.case = dataToForward;
                         break;
+                    case 'EventsScreen':
+                        forwardProps.event = dataToForward;
                     case 'LabResultsScreen':
                         forwardProps.item = dataToForward;
                         forwardProps.contact = contactData;
@@ -388,7 +398,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             onPressAddExposure = (dataToForward) => {
                 let forwardScreen = this.computeForwardScreen('onPressAddExposure');
-                if (screenType === 'CasesScreen') {
+                if (screenType === 'CasesScreen' || screenType === 'EventsScreen') {
                     Navigation.push(this.props.componentId,{
                         component: {
                             name: forwardScreen,
@@ -423,7 +433,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             onPressCenterButton = (caseData) => {
                 let forwardScreen = this.computeForwardScreen('onPressCenterButton');
-                if (screenType === 'CasesScreen') {
+                if (screenType === 'CasesScreen' || screenType === 'EventsScreen') {
                     Navigation.push(this.props.componentId,{
                         component:{
                             name: forwardScreen,
@@ -594,6 +604,27 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 break;
                             case 'onPressCenterButton':
                                 forwardScreen = constants.appScreens.caseSingleScreen;
+                                break;
+                            default:
+                                forwardScreen = null;
+                        }
+                        break;
+                    case constants.appScreens.eventsScreen:
+                        switch (method) {
+                            case 'onPressView':
+                                forwardScreen = constants.appScreens.eventSingleScreen;
+                                break;
+                            case 'onPressAddExposure':
+                                forwardScreen = constants.appScreens.contactSingleScreen;
+                                break;
+                            case 'onPressFullName':
+                                forwardScreen = constants.appScreens.eventSingleScreen;
+                                break;
+                            case 'onPressExposure':
+                                forwardScreen = constants.appScreens.contactSingleScreen;
+                                break;
+                            case 'onPressCenterButton':
+                                forwardScreen = constants.appScreens.eventSingleScreen;
                                 break;
                             default:
                                 forwardScreen = null;

@@ -42,6 +42,27 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
                                 numberOfLines={1}
                             >{'\u2022 ' + ' ID: ' + firstComponentRenderData.visualId}</Text>
                         </View>
+                        {
+                            this.props.type === 'Event' ?
+                                <>
+                                    <Text style={[style.secondaryText, {
+                                        flex: 1,
+                                        marginHorizontal: 7,
+                                        display: firstComponentRenderData.date ? 'flex' : 'none'
+                                    }]}>
+                                        {'\u2022 ' + getTranslation(translations.eventSingleScreen.date, translation) + ": " + firstComponentRenderData.date}
+                                    </Text>
+                                    <Text style={[style.secondaryText, {
+                                        flex: 1,
+                                        marginHorizontal: 7,
+                                        display: firstComponentRenderData.description ? 'flex' : 'none'
+                                    }]}>
+                                        {'\u2022 ' + getTranslation(translations.eventSingleScreen.description, translation) + ": " + firstComponentRenderData.description}
+                                    </Text>
+                                </>
+                                :
+                                null
+                        }
                         <Text style={[style.secondaryText, {
                             flex: 1,
                             marginHorizontal: 7,

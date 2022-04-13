@@ -59,7 +59,7 @@ class PersonListItem extends Component {
                         onPressName={this.props.onPressNameProp}
                     />
                 }
-                secondComponent={this.props.type !== 'Case' && this.props.type !== 'User' && this.props.type !== 'LabResult' ? (
+                secondComponent={this.props.type !== 'Case' && this.props.type !== 'Event' && this.props.type !== 'User' && this.props.type !== 'LabResult' ? (
                     <PermissionComponent
                         render={() => (
                             <PersonListItemExposuresComponent
@@ -111,7 +111,11 @@ class PersonListItem extends Component {
             dateOfResult: '',
             labName: '',
             result: '',
-            labResultStatus: ''
+            labResultStatus: '',
+            //Event
+            name: '',
+            date: '',
+            description: ''
         };
         // the new implementation
         let person = get(itemToRender, 'mainData', null);
@@ -174,13 +178,20 @@ class PersonListItem extends Component {
         if (type === 'LabResult' && person && person.classification){
             returnValues.classification = person.classification ? getTranslation(person.classification, this.props.translation) : null;
         }
-        if(type === 'LabResult'){
+        if (type === 'LabResult'){
             const labResultData =  get(itemToRender, 'labResultData', null);
             returnValues.result = labResultData.result ? getTranslation(labResultData.result, this.props.translation) : null;
             returnValues.dateSampleTaken = labResultData.dateSampleTaken ? moment(labResultData.dateSampleTaken).format('YYYY-MM-DD') : undefined;
             returnValues.dateOfResult = labResultData.dateOfResult ? moment(labResultData.dateOfResult).format('YYYY-MM-DD') : undefined;
             returnValues.labName = labResultData.labName;
             returnValues.labResultStatus = labResultData.status ? getTranslation(labResultData.status, this.props.translation) : null;
+        }
+        if (type === 'Event') {
+            const eventData =  get(itemToRender, 'mainData', null);
+            returnValues.name = eventData.name;
+            returnValues.fullName = eventData.name;
+            returnValues.description = eventData.description;
+            returnValues.date = eventData.date ? moment(eventData.date).format('YYYY-MM-DD') : undefined
         }
         return returnValues;
     };

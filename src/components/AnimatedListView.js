@@ -360,6 +360,68 @@ class AnimatedListView extends Component {
                 ]
                 titleColor = this.props.colors[mainData.classification];
                 break;
+            case 'Event':
+                mainData = get(item, 'mainData', null);
+                exposureCount = get(item, 'countExposures', 0);
+                contactCount = get(item, 'countContacts', 0);
+                textsArray = [
+                    getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation),
+                    `${getTranslation(translations.casesScreen.contactExposures, this.props.translation)} (${contactCount})`,
+                    `${getTranslation(translations.casesScreen.exposures, this.props.translation)} (${exposureCount})`,
+                ];
+                secondaryTextsArray = [
+                    getTranslation(translations.casesScreen.addContactButtonLabel, this.props.translation)
+                ]
+                textsStyleArray = [
+                    [styles.buttonTextActionsBar, {}],
+                    [styles.buttonTextActionsBar, {fontSize: 14}],
+                    [styles.buttonTextActionsBar, {fontSize: 14, }],
+                ];
+                secondaryTextsStyleArray = [
+                    [styles.buttonTextActionsBar, {}]
+                ]
+                onPressTextsArray = [
+                    () => {
+                        this.props.onPressView(mainData);
+                    },
+                    () => {
+                        this.props.goToScreen(mainData, 2);
+                    },
+                    () => {
+                        this.props.goToScreen(mainData, 3);
+                    },
+                ];
+                secondaryOnPressTextsArray = [
+                    () => {
+                        this.props.onPressAddExposure(mainData);
+                    }
+                ]
+                arrayPermissions = [
+                    [
+                        constants.PERMISSIONS_EVENT.eventAll,
+                        constants.PERMISSIONS_EVENT.eventView
+                    ],
+                    [
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipAll,
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipList,
+                        constants.PERMISSIONS_EVENT.eventAll,
+                        constants.PERMISSIONS_EVENT.eventListRelationshipContacts
+                    ],
+                    [
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipAll,
+                        constants.PERMISSIONS_RELATIONSHIP.relationshipList,
+                        constants.PERMISSIONS_EVENT.eventAll,
+                        constants.PERMISSIONS_EVENT.eventListRelationshipContacts
+                    ]
+                ];
+                secondaryArrayPermissions = [
+                    [
+                        constants.PERMISSIONS_CONTACT.contactAll,
+                        constants.PERMISSIONS_CONTACT.contactCreate
+                    ],
+                ]
+                titleColor = this.props.colors[mainData.classification];
+                break;
             case 'User':
                 mainData = get(item, 'mainData', null);
                 exposureData = get(item, 'exposureData', []);

@@ -62,6 +62,12 @@ class NavigationDrawerListItem extends PureComponent {
                     constants.PERMISSIONS_LAB_RESULT.labResultList
                 ];
                 break;
+            case sideMenuKeys[5]:
+                permissionElement = [
+                    constants.PERMISSIONS_EVENT.eventAll,
+                    constants.PERMISSIONS_EVENT.eventList
+                ];
+                break;
             case 'users':
                 permissionElement = [
                     constants.PERMISSIONS_USER.userAll,
