@@ -199,7 +199,6 @@ export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
                             }
                         },
                             (errorTransaction) => {
-                            console.log("Error transaction", errorTransaction, mappedData, i, mappedData.length);
                             return Promise.reject(errorTransaction)
                             },
                             () => {

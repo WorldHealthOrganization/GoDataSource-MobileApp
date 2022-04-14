@@ -13,6 +13,8 @@ import FilterScreen from './FilterScreen';
 import FollowUpsSingleScreen from './FollowUpsSingleScreen';
 import CasesScreen from './CasesScreen';
 import CaseSingleScreen from './CaseSingleScreen';
+import EventsScreen from "./EventsScreen";
+import EventSingleScreen from "./EventSingleScreen";
 import ContactsScreen from './ContactsScreen';
 import ContactsSingleScreen from './ContactsSingleScreen';
 import ContactsOfContactsScreen from './ContactsOfContactsScreen';
@@ -39,6 +41,8 @@ const screens = [
     {screen: constants.appScreens.followUpSingleScreen, component: FollowUpsSingleScreen},
     {screen: constants.appScreens.casesScreen, component: CasesScreen},
     {screen: constants.appScreens.caseSingleScreen, component: CaseSingleScreen},
+    {screen: constants.appScreens.eventsScreen, component: EventsScreen},
+    {screen: constants.appScreens.eventSingleScreen, component: EventSingleScreen},
     {screen: constants.appScreens.contactsScreen, component: ContactsScreen},
     {screen: constants.appScreens.contactSingleScreen, component: ContactsSingleScreen},
     {screen: constants.appScreens.contactsOfContactsScreen, component: ContactsOfContactsScreen},

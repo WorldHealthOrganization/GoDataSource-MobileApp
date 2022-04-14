@@ -5,6 +5,7 @@ const navigationDrawer = {
     contactsOfContactsLabel: 'LNG_NAVIGATION_DRAWER_CONTACTS_OF_CONTACTS',
 
     casesLabel: 'LNG_NAVIGATION_DRAWER_CASES',
+    eventsLabel: 'LNG_PAGE_LIST_EVENTS_TITLE',
     labResultsLabel: 'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
     syncHubManually: 'LNG_NAVIGATION_DRAWER_SYNC_HUB_MANUAL',
     changeHubConfig: 'LNG_NAVIGATION_DRAWER_CHANGE_HUB_CONFIG',
@@ -13,7 +14,9 @@ const navigationDrawer = {
     logoutLabel: 'LNG_NAVIGATION_DRAWER_LOGOUT',
     helpLabel: 'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
     addLanguagePacks: 'LNG_NAVIGATION_DRAWER_ADD_LANGUAGE_PACKS',
-    community: 'LNG_MOBILE_NAVIGATION_DRAWER_COMMUNITY_LINK'
+    community: 'LNG_MOBILE_NAVIGATION_DRAWER_COMMUNITY_LINK',
+
+
 };
 
 const addFollowUpScreen = {
@@ -648,12 +651,113 @@ const languageModalComponentLabels = {
     alertNoLanguage: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_ALERT_NO_LANGUAGE'
 };
 
+
+const eventsFilter = {
+    eventsFilterTitle: 'LNG_CASE_FILTER_SCREEN_TITLE',
+    filterTitle: 'LNG_FILTER_SCREEN_FILTER_TAB',
+    sortTitle: 'LNG_FILTER_SCREEN_SORT_TAB',
+
+    gender: 'LNG_FILTER_SCREEN_GENDER_LABEL',
+    ageRange: 'LNG_FILTER_SCREEN_AGE_RANGE_LABEL',
+    area: 'LNG_FILTER_SCREEN_AREA_LABEL',
+    chooseLocationLabel: 'LNG_FILTER_SCREEN_CHOOSE_LOCATIONS_MESSAGE',
+    classification: 'LNG_FILTER_SCREEN_CLASSIFICATION_LABEL',
+    chooseClassificationLabel: 'LNG_FILTER_SCREEN_CHOOSE_CLASSIFICATIONS_MESSAGE',
+}
+const eventSingleScreen = {
+    eventsTitle: 'LNG_PAGE_LIST_EVENTS_TITLE',
+    title: 'LNG_PAGE_LIST_EVENTS_TITLE',
+    nameLabel: 'LNG_LOCATION_FIELD_LABEL_NAME',
+    date: 'LNG_EVENT_FIELD_LABEL_DATE',
+    dateOfReporting: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+    dateOfReportingApproximate: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+    description: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+    responsibleUser: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+    detailsTitle: 'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
+    addressTitle: 'LNG_PAGE_MODIFY_EVENT_TAB_ADDRESS_TITLE',
+
+    personalTitle: 'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
+
+    addEventTitle: 'LNG_EVENT_SINGLE_SCREEN_ADD_NEW_EVENT_TITLE_LABEL',
+    deleteEventLabel: 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT',
+
+    oneAddressText: 'LNG_ADDRESS_ADD_NEW_ADDRESS_MESSAGE',
+    moreAddressesText: 'LNG_ADDRESS_ADD_ANOTHER_ADDRESS_MESSAGE',
+
+    oneDateRangeText: 'LNG_DATE_RANGE_ADD_NEW_DATE_MESSAGE',
+    moreDateRangeText: 'LNG_DATE_RANGE_ADD_ANOTHER_DATE_MESSAGE',
+
+    oneIsolationDateText: 'LNG_ISOLATION_ADD_NEW_ISOLATION_MESSAGE',
+    moreIsolationDatesText: 'LNG_ISOLATION_ADD_ANOTHER_ISOLATION_MESSAGE',
+    oneDocumentText: 'LNG_DOCUMENT_ADD_NEW_DOCUMENT_MESSAGE',
+    moreDocumentsText: 'LNG_DOCUMENT_ADD_ANOTHER_DOCUMENT_MESSAGE',
+
+    firstNameLabel: 'LNG_LOCATION_FIELD_LABEL_NAME',
+
+    isDateOfReportingApproximate: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE',
+
+
+    documentType: 'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE',
+    documentNumber: 'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER',
+    deleteButton: 'LNG_COMMON_BUTTON_DELETE',
+
+    classification: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+    dateOfOnset: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+    isDateOfOnsetApproximate: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+    dateBecomeCase: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+    dateOfInfection: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+    outcomeId: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+    dateOfOutcome: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+    deceased: 'LNG_CASE_FIELD_LABEL_DECEASED',
+    safeBurial: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
+    dateDeceased: 'LNG_CASE_FIELD_LABEL_DATE_OF_DECEASE',
+    dateOfBurial: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
+    burialLocationId: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
+    burialPlaceName: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
+
+
+    dateRangeType: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE',
+    dateRangeStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
+    dateRangeEndDate: 'LNG_DATE_FIELD_LABEL_TO',
+    dateRangeLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
+    dateRangeComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
+    dateRangeCenterName: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
+    dateRangeHospitalName: 'LNG_DATE_FIELD_LABEL_HOSPITAL_NAME',
+
+
+    hospitalisationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
+    hospitalisationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
+    hospitalisationCenterName: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
+    hospitalisationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
+    hospitalisationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
+
+
+    isolationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
+    isolationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
+    isolationCenterName: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
+    isolationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
+    isolationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
+
+    deleteEvent: 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT'
+}
+const eventsScreen = {
+    eventsTitle: 'LNG_PAGE_LIST_EVENTS_TITLE',
+    viewButtonLabel: 'LNG_CASE_LIST_SCREEN_VIEW_BUTTON',
+    addContactButtonLabel: 'LNG_EVENT_SINGLE_SCREEN_ADD_NEW_EVENT_TITLE_LABEL',
+    noCases: 'LNG_CASE_LIST_SCREEN_NO_EVENTS',
+    contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS',
+    exposures: 'LNG_CONTACT_SINGLE_SCREEN_EXPOSURE_TAB'
+}
+
 export default {
     navigationDrawer,
     addFollowUpScreen,
     casesFilter,
     caseSingleScreen,
     casesScreen,
+    eventsFilter,
+    eventSingleScreen,
+    eventsScreen,
     usersScreen,
     contactsScreen,
     generalLabels,

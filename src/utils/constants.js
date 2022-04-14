@@ -11,6 +11,8 @@ const appScreens = {
     followUpSingleScreen: 'FollowUpsSingleScreen',
     casesScreen: 'CasesScreen',
     caseSingleScreen: 'CaseSingleScreen',
+    eventsScreen: 'EventsScreen',
+    eventSingleScreen: 'EventSingleScreen',
     contactsScreen: 'ContactsScreen',
     labResultsScreen: 'LabResultsScreen',
     contactSingleScreen: 'ContactsSingleScreen',
@@ -117,6 +119,16 @@ const PERMISSIONS_LAB_RESULT_CONSTANT = {
 
 let PERMISSIONS_LAB_RESULT = PERMISSIONS_LAB_RESULT_CONSTANT;
 
+const PERMISSIONS_EVENT = {
+    eventAll: 'event_all',
+    eventView: 'event_view',
+    eventList: 'event_list',
+    eventCreate: 'event_create',
+    eventModify: 'event_modify',
+    eventDelete: 'event_delete',
+    eventListRelationshipContacts: 'event_list_relationship_contacts'
+}
+
 const PERMISSIONS_FOLLOW_UP = {
     followUpAll: 'follow_up_all',
     followUpView: 'follow_up_view',
@@ -208,5 +220,6 @@ export default {
     PERMISSIONS_TEAMS,
     PERMISSIONS_LAB_RESULT,
     PERMISSIONS_LAB_RESULT_CONSTANT,
-    RELATIONSHIP_TYPE
+    RELATIONSHIP_TYPE,
+    PERMISSIONS_EVENT
 }

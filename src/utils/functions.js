@@ -3,6 +3,7 @@
  */
 import errorTypes from './errorTypes';
 import config, {sideMenuKeys} from './config';
+import appConfig from './../../app.config';
 import geolocation from '@react-native-community/geolocation';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import {unzip, zip} from 'react-native-zip-archive';
@@ -162,9 +163,16 @@ export function mapSideMenuKeysToScreenName(sideMenuKey){
             addScreen = true;
             break;
         case sideMenuKeys[5]:
-            screenToSwitchTo = constants.appScreens.usersScreen;
+            screenToSwitchTo = constants.appScreens.eventsScreen;
+            break;
+        case `${sideMenuKeys[5]}-add`:
+            screenToSwitchTo = constants.appScreens.eventSingleScreen;
+            addScreen = true;
             break;
         case sideMenuKeys[6]:
+            screenToSwitchTo = constants.appScreens.usersScreen;
+            break;
+        case sideMenuKeys[7]:
             screenToSwitchTo = constants.appScreens.helpScreen;
             break;
         default:
@@ -241,9 +249,16 @@ export function navigation(event, navigator) {
                         addScreen = constants.appScreens.labResultsSingleScreen;
                         break;
                     case sideMenuKeys[5]:
-                        screenToSwitchTo = constants.appScreens.usersScreen;
+                        screenToSwitchTo = constants.appScreens.eventsScreen;
+                        break;
+                    case `${sideMenuKeys[5]}-add`:
+                        screenToSwitchTo = constants.appScreens.eventSingleScreen;
+                        addScreen = constants.appScreens.eventSingleScreen;
                         break;
                     case sideMenuKeys[6]:
+                        screenToSwitchTo = constants.appScreens.usersScreen;
+                        break;
+                    case sideMenuKeys[7]:
                         screenToSwitchTo = constants.appScreens.helpScreen;
                     break;
                     default:
@@ -307,14 +322,18 @@ export function unzipFile(source, dest, password, clientCredentials) {
                         unzip(source, dest, 'UTF-8')
                             .then((path) => {
                                 // Delete the zip file after unzipping
-                                deleteFile(source, true)
-                                    .then(() => {
-                                        resolve(path);
-                                    })
-                                    .catch((errorDelete) => {
-                                        console.log('Error delete: ', errorDelete);
-                                        resolve(path);
-                                    })
+                                if(appConfig.env !== 'development'){
+                                    deleteFile(source, true)
+                                        .then(() => {
+                                            resolve(path);
+                                        })
+                                        .catch((errorDelete) => {
+                                            console.log('Error delete: ', errorDelete);
+                                            resolve(path);
+                                        })
+                                } else {
+                                    resolve(path);
+                                }
                             })
                             .catch((error) => {
                                 console.log(error);

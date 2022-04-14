@@ -20,7 +20,6 @@ class FiltersContainer extends PureComponent {
     };
 
     render() {
-        console.log("Excuse me?", this.props.filter?.filter);
         const { configFilterScreen } = this.props
         const { handleMoveToNextScreenButton, onPressResetFilters, onPressApplyFilters } = this.props
         const { screenSize, translation } = this.props
