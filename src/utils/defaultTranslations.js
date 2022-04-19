@@ -38,6 +38,10 @@ export default {
     //labResultsFilter
     'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_TYPE': "Person type",
 
+    //eventsFilter
+    //TODO: Add to the API
+    'LNG_EVENT_FILTER_SCREEN_TITLE': 'Events filters',
+
 
     //navigationDrawer
     'LNG_NAVIGATION_DRAWER_ACTIVE_OUTBREAK': 'Active outbreak',
@@ -168,6 +172,7 @@ export default {
     'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER': 'Document number',
     'LNG_PAGE_LIST_EVENTS_TITLE': 'Events',
     'LNG_LOCATION_FIELD_LABEL_NAME': 'Name',
+    'LNG_EVENT_FIELD_LABEL_NAME': 'Name',
     'LNG_EVENT_FIELD_LABEL_DATE' : 'Date',
     'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
     'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Date of reporting approximate',
@@ -350,6 +355,10 @@ export default {
     // cases
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_CASE': 'Are you sure you want to delete this case?',
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DISCARD_ALL_CHANGES': 'Are you sure you want to discard all changes?',
+
+    //events
+    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_EVENT': 'Are you sure you want to delete this event?',
+    'LNG_DIALOG_CONFIRM_DELETE_EVENT': 'Are you sure you want to delete this event?',
 
     // contacts
     'LNG_DIALOG_ALERT_MESSAGE_CANNOT_DELETE_CONTACT_LAST_EXPOSURE': 'Cannot delete the contact last exposure',

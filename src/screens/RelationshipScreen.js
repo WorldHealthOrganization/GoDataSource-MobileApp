@@ -72,6 +72,17 @@ class RelationshipScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        let person;
+        switch (this.props.type) {
+            case 'Case':
+               person = this.props.case;
+               break;
+            case 'Event':
+                person = this.props.event;
+                break;
+            default:
+                person = this.props.contact;
+        }
         return (
             <ViewHOC style={style.viewHocContainer}
                 showLoader={this && this.state && this.state.loading}
@@ -132,7 +143,7 @@ class RelationshipScreen extends Component {
                             </View>
                             <RelationshipContainer
                                 exposure={this.state.exposure}
-                                person={this.props.type === 'Case' ? this.props.case : this.props.contact}
+                                person={person}
                                 fromRelationshipScreen={true}
                                 type={this.props.type}
                                 isEditMode={this.props.isEditMode}
@@ -210,7 +221,7 @@ class RelationshipScreen extends Component {
                     source: null,
                     target: true
                 }];
-            }else {
+            } else {
                 // Here add logic for cases/events
                 personsArray = [{
                     id: value.value,
@@ -280,8 +291,20 @@ class RelationshipScreen extends Component {
                 source: personSource,
                 target: personTarget
             }];
-        }else {
+        } else if (this.props.type === 'Event'){
             // Here add logic for cases. Events are not yet handled. This needs refactoring
+            personsArray = [{
+                id: get(selectedExposure, '_id', null),
+                type: get(selectedExposure, 'type', null),
+                source: relationshipSource,
+                target: relationshipTarget
+            },{
+                id: get(this.props, 'event._id', null),
+                type: get(this.props, 'event.type', null),
+                source: personSource,
+                target: personTarget
+            }];
+        } else {
             personsArray = [{
                 id: get(selectedExposure, '_id', null),
                 type: get(selectedExposure, 'type', null),

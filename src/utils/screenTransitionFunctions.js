@@ -40,6 +40,15 @@ export function pushNewEditScreen(QRCodeInfo, componentId, user, outbreak, trans
                         itemId = parsedData.resourceContext.caseId;
                         outbreakId = parsedData.resourceContext.outbreakId
                     }
+                } else if (parsedData.targetResource === 'event' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT') {{
+                        itemType = 'event';
+                        if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&
+                            parsedData.resourceContext.outbreakId && parsedData.resourceContext.outbreakId !== undefined &&
+                            parsedData.resourceContext.eventId && parsedData.resourceContext.eventId !== undefined) {
+                            itemId = parsedData.resourceContext.eventId;
+                            outbreakId = parsedData.resourceContext.outbreakId
+                        }
+                    }
                 } else if (parsedData.targetResource === 'contact' || parsedData.targetResource === 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT') {
                     itemType = 'contact';
                     if (parsedData.resourceContext && parsedData.resourceContext !== undefined &&

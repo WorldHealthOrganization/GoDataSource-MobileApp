@@ -126,7 +126,8 @@ const PERMISSIONS_EVENT = {
     eventCreate: 'event_create',
     eventModify: 'event_modify',
     eventDelete: 'event_delete',
-    eventListRelationshipContacts: 'event_list_relationship_contacts'
+    eventListRelationshipContacts: 'event_list_relationship_contacts',
+    eventListRelationshipExposures: 'event_list_relationship_exposures'
 }
 
 const PERMISSIONS_FOLLOW_UP = {
