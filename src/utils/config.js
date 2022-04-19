@@ -2843,6 +2843,13 @@ const sortCriteriaDropDownItems = [
     { value: translations.sortTab.sortUpdatedAt  },
 ];
 
+const eventSortCriteriaDropDownItems = [
+    { value: translations.sortTab.sortName },
+    { value: translations.sortTab.sortVisualId  },
+    { value: translations.sortTab.sortCreatedAt  },
+    { value: translations.sortTab.sortUpdatedAt  },
+]
+
 const helpItemsSortCriteriaDropDownItems = [
     { value: translations.sortTab.sortCategory},
     { value: translations.sortTab.sortTitle}
@@ -2851,9 +2858,11 @@ const helpItemsSortCriteriaDropDownItems = [
 const userPermissions = {
     readContact: 'read_contact',
     readCase: 'read_case',
+    readEvent: 'read_event',
     readFollowUp: 'read_followup',
     writeContact: 'write_contact',
     writeCase: 'write_case',
+    writeEvent: 'write_event',
     writeFollowUp: 'write_followup',
 };
 
@@ -2980,6 +2989,7 @@ export default {
     localTranslationTokens,
     sortOrderDropDownItems,
     sortCriteriaDropDownItems,
+    eventSortCriteriaDropDownItems,
     userPermissions,
     helpSingleScreen,
     helpItemsSortCriteriaDropDownItems,

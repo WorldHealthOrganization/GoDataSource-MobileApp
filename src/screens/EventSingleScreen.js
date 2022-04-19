@@ -53,7 +53,7 @@ import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import Menu, {MenuItem} from "react-native-material-menu";
 import PermissionComponent from "../components/PermissionComponent";
 import {setDisableOutbreakChange} from "../actions/outbreak";
-import CaseSingleRelationshipContainer from "../containers/CaseSingleRelationshipContainer";
+import EventSingleRelationshipContainer from "../containers/EventSingleRelationshipContainer";
 
 const initialLayout = {
     height: 0,
@@ -581,10 +581,10 @@ class EventSingleScreen extends Component {
                 break;
             case 'exposures':
                 return (
-                    <CaseSingleRelationshipContainer
+                    <EventSingleRelationshipContainer
                         routeKey={this.state.routes[this.state.index].key}
                         relationshipType={constants.RELATIONSHIP_TYPE.exposure}
-                        case={this.state.case}
+                        event={this.state.event}
                         relations={this.state.relations?.relationsExposure}
                         index={this.state.index}
                         numberOfTabs={this.state.routes.length}
@@ -604,10 +604,10 @@ class EventSingleScreen extends Component {
                 );
             case 'contacts':
                 return (
-                    <CaseSingleRelationshipContainer
+                    <EventSingleRelationshipContainer
                         routeKey={this.state.routes[this.state.index].key}
                         relationshipType={constants.RELATIONSHIP_TYPE.contact}
-                        case={this.state.case}
+                        event={this.state.event}
                         relations={this.state.relations?.relationsContact}
                         index={this.state.index}
                         numberOfTabs={this.state.routes.length}
@@ -832,8 +832,8 @@ class EventSingleScreen extends Component {
                 }
             ])
         } else {
-            if (this.props.selectedScreen !== sideMenuKeys[3]) {
-                this.props.saveSelectedScreen(sideMenuKeys[3]);
+            if (this.props.selectedScreen !== sideMenuKeys[5]) {
+                this.props.saveSelectedScreen(sideMenuKeys[5]);
             }
             Navigation.setStackRoot(this.props.componentId, {
                 component: {

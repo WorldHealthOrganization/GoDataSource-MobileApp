@@ -401,6 +401,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 if (screenType === 'CasesScreen' || screenType === 'EventsScreen') {
                     Navigation.push(this.props.componentId,{
                         component: {
+                            //contactSingleScreen
                             name: forwardScreen,
                             passProps: {
                                 isNew: true,

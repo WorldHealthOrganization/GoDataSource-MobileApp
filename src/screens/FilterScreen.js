@@ -58,7 +58,7 @@ class FilterScreen extends Component {
         const { activeFilters, translation, screen } = this.props;
 
         const { tabsValuesRoutes, localTranslationTokens } = config;
-        const { sortOrderDropDownItems, sortCriteriaDropDownItems, helpItemsSortCriteriaDropDownItems } = config;
+        const { sortOrderDropDownItems, sortCriteriaDropDownItems, eventSortCriteriaDropDownItems, helpItemsSortCriteriaDropDownItems } = config;
         const { followUpsFilterScreen,personFilterScreen, casesFilterScreen, helpFilterScreen, labResultsFilterScreen, eventsFilterScreen, labResultsFilterScreenNoContactPermission } = config;
 
         let filterClone = cloneDeep(filter.filter);
@@ -153,7 +153,7 @@ class FilterScreen extends Component {
                 screenTitle = getTranslation(translations.eventsFilter.eventsFilterTitle, translation);
                 routes = tabsValuesRoutes.eventsFilter;
                 configFilterScreen = eventsFilterScreen;
-                mySortCriteriaDropDownItems = sortCriteriaDropDownItems;
+                mySortCriteriaDropDownItems = eventSortCriteriaDropDownItems;
                 break;
             case 'HelpFilterScreen':
                 screenTitle = getTranslation(translations.helpFilter.helpFilterTitle, translation);

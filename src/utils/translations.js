@@ -91,6 +91,7 @@ const sortTab = {
     sortCriteria: 'LNG_SORT_SCREEN_CRITERIA_LABEL',
     sortOrder: 'LNG_SORT_SCREEN_ORDER_LABEL',
 
+    sortName: 'LNG_EVENT_FIELD_LABEL_NAME',
     sortFirstName: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
     sortLastName: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
     sortCreatedAt: 'LNG_SORT_CRITERIA_CREATED_AT',
@@ -396,6 +397,10 @@ const alertMessages = {
     caseDeleteConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_CASE',
     caseDiscardAllChangesConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DISCARD_ALL_CHANGES',
 
+    //events
+    eventDeleteConfirmation: 'LNG_DIALOG_CONFIRM_DELETE_EVENT',
+    eventDiscardAllChangesConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DISCARD_ALL_CHANGES',
+
     // contacts
     contactDeleteLastExposureError: 'LNG_DIALOG_ALERT_MESSAGE_CANNOT_DELETE_CONTACT_LAST_EXPOSURE',
     contactDeleteExposureConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_EXPOSURE',
@@ -653,7 +658,7 @@ const languageModalComponentLabels = {
 
 
 const eventsFilter = {
-    eventsFilterTitle: 'LNG_CASE_FILTER_SCREEN_TITLE',
+    eventsFilterTitle: 'LNG_EVENT_FILTER_SCREEN_TITLE',
     filterTitle: 'LNG_FILTER_SCREEN_FILTER_TAB',
     sortTitle: 'LNG_FILTER_SCREEN_SORT_TAB',
 
@@ -743,7 +748,7 @@ const eventSingleScreen = {
 const eventsScreen = {
     eventsTitle: 'LNG_PAGE_LIST_EVENTS_TITLE',
     viewButtonLabel: 'LNG_CASE_LIST_SCREEN_VIEW_BUTTON',
-    addContactButtonLabel: 'LNG_EVENT_SINGLE_SCREEN_ADD_NEW_EVENT_TITLE_LABEL',
+    addContactButtonLabel: 'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON',
     noCases: 'LNG_CASE_LIST_SCREEN_NO_EVENTS',
     contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS',
     exposures: 'LNG_CONTACT_SINGLE_SCREEN_EXPOSURE_TAB'

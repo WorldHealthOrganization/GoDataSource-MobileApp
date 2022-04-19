@@ -115,7 +115,7 @@ export function updateFileInDatabase(file, type) {
                     file._id = createIdForType(file, type);
                     type = `${type.split('.')[0]}.${type.split('.')[2]}`;
                     // Person needs special treatment
-                    if (type.includes('person') && (file.type === config.personTypes.cases || file.type === config.personTypes.contacts)) {
+                    if (type.includes('person') && (file.type === config.personTypes.cases || file.type === config.personTypes.events || file.type === config.personTypes.contacts)) {
                         // This method checks for changing id
                         upsertDataWithChangingId(file, type, database)
                             .then((res) => {
