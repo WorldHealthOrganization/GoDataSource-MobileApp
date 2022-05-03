@@ -92,8 +92,7 @@ class EventSingleScreen extends Component {
                 dateOfReporting: null,
                 isDateOfReportingApproximate: false,
                 name: '',
-                addresses: [
-                    {
+                address: {
                         typeId: config.userResidenceAddress.userPlaceOfResidence,
                         country: '',
                         city: '',
@@ -107,8 +106,7 @@ class EventSingleScreen extends Component {
                         //     type: 'Point'
                         // },
                         date: createDate(null)
-                    }
-                ],
+                    },
 
             } : Object.assign({}, this.props.event),
             isEditMode: this.props.isNew ? true : this.props.forceNew ? true : false,
@@ -571,7 +569,7 @@ class EventSingleScreen extends Component {
                         onPressAddAddress={this.handleOnPressAddAddress}
                         onPressNextButton={this.handleMoveToNextScreenButton}
                         handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
-                        checkRequiredFieldsAddresses={this.checkRequiredFieldsAddresses}
+                        checkRequiredFieldsAddress={this.checkRequiredFieldsAddress}
                         isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
                         anotherPlaceOfResidenceWasChosen={this.state.anotherPlaceOfResidenceWasChosen}
                         anotherPlaceOfResidenceChanged={this.anotherPlaceOfResidenceChanged}
@@ -649,17 +647,15 @@ class EventSingleScreen extends Component {
             return;
         }
         let missingFields = this.checkRequiredFields().map((e) => getTranslation(e, this.props.translation));
-        let invalidEmails = validateRequiredFields(_.get(this.state, 'event.addresses', []), config?.addressFields?.fields, (dataToBeValidated, fields, defaultFunction) => {
+        let invalidEmails = validateRequiredFields(_.get(this.state, 'event.address', {}), config?.addressFields?.fields, (dataToBeValidated, fields, defaultFunction) => {
             if (fields.id === 'emailAddress') {
                 return checkValidEmails(dataToBeValidated, fields?.id);
             }
 
             return null;
         });
-        let placeOfResidenceError = checkArrayAndLength(this.state?.event?.addresses) &&
-            !this.state?.event?.addresses.find((e) =>
-                e.typeId === translations.userResidenceAddress.userPlaceOfResidence
-            );
+        let placeOfResidenceError = this.state?.event?.address &&
+            !this.state?.event?.address.typeId === translations.userResidenceAddress.userPlaceOfResidence;
         // console.log('InvalidEmails: ', invalidEmails);
         if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
                     if (!placeOfResidenceError) {
@@ -949,70 +945,12 @@ class EventSingleScreen extends Component {
     };
 
 
-    // Address functions
-    handleOnPressAddAddress = () => {
-        let addresses = [];
-        if (this.state && this.state.event && this.state.event.addresses) {
-            addresses = _.cloneDeep(this.state.event.addresses);
-        }
-        addresses.push({
-            typeId: '',
-            country: '',
-            city: '',
-            addressLine1: '',
-            addressLine2: '',
-            postalCode: '',
-            locationId: '',
-            // geoLocation: {
-            //     coordinates: ['', ''],
-            //     type: 'Point'
-            // },
-            date: createDate(null)
-        });
 
-        this.setState(prevState => ({
-            event: Object.assign({}, prevState.event, {addresses}),
-            isModified: true
-        }), () => {
-            // console.log("### after updating the data: ", this.state.event);
-        })
-    };
-    handleOnPressDeleteAddress = (index) => {
-        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteAddress, this.state.translation), [
-            {
-                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
-                    console.log('Cancel pressed')
-                }
-            },
-            {
-                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
-                    let eventAddressesClone = _.cloneDeep(this.state.event.addresses);
-                    eventAddressesClone.splice(index, 1);
-
-                    let hasPlaceOfResidence = false;
-                    let eventlaceOfResidence = eventAddressesClone.find((e) => {
-                        return e.typeId === config.userResidenceAddress.userPlaceOfResidence
-                    });
-                    if (eventlaceOfResidence !== undefined) {
-                        hasPlaceOfResidence = true
-                    }
-
-                    this.setState(prevState => ({
-                        event: Object.assign({}, prevState.event, {addresses: eventAddressesClone}),
-                        isModified: true,
-                        hasPlaceOfResidence
-                    }), () => {
-                        // console.log("After deleting the address: ", this.state.event);
-                    })
-                }
-            }
-        ]);
-    };
     handleOnChangeSectionedDropDownAddress = (selectedItems, index) => {
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index
         if (selectedItems && Array.isArray(selectedItems) && selectedItems.length > 0) {
-            let addresses = _.cloneDeep(this.state.event.addresses);
-            addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
+            let address = _.cloneDeep(this.state.event.address);
+            address.locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
             if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
                 if (selectedItems['0'].geoLocation.coordinates[0] !== '' || selectedItems['0'].geoLocation.coordinates[1] !== '') {
                     setTimeout(() => {
@@ -1021,7 +959,7 @@ class EventSingleScreen extends Component {
                                 text: getTranslation(translations.alertMessages.cancelButtonLabel, this.props.translation),
                                 onPress: () => {
                                     this.setState(prevState => ({
-                                        event: Object.assign({}, prevState.event, {addresses}),
+                                        event: Object.assign({}, prevState.event, {address}),
                                         isModified: true
                                     }))
                                 }
@@ -1029,9 +967,9 @@ class EventSingleScreen extends Component {
                             {
                                 text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                                 onPress: () => {
-                                    addresses[index].geoLocation = selectedItems['0'].geoLocation;
+                                    address.geoLocation = selectedItems['0'].geoLocation;
                                     this.setState(prevState => ({
-                                        event: Object.assign({}, prevState.event, {addresses}),
+                                        event: Object.assign({}, prevState.event, {address}),
                                         isModified: true
                                     }))
                                 }
@@ -1041,7 +979,7 @@ class EventSingleScreen extends Component {
                 }
             } else {
                 this.setState(prevState => ({
-                    event: Object.assign({}, prevState.event, {addresses}),
+                    event: Object.assign({}, prevState.event, {address}),
                     isModified: true
                 }))
             }
@@ -1199,17 +1137,15 @@ class EventSingleScreen extends Component {
         return requiredFields;
         // return true;
     };
-    checkRequiredFieldsAddresses = () => {
+    checkRequiredFieldsAddress = () => {
         let requiredFields = [];
-        if (this.state.event && this.state.event.addresses && Array.isArray(this.state.event.addresses) && this.state.event.addresses.length > 0) {
-            for (let i = 0; i < this.state.event.addresses.length; i++) {
+        if (this.state.event && this.state.event.address) {
                 for (let j = 0; j < config.eventSingleScreen.address.fields.length; j++) {
-                    if (config.eventSingleScreen.address.fields[j].isRequired && !this.state.event.addresses[i][config.eventSingleScreen.address.fields[j].id]) {
+                    if (config.eventSingleScreen.address.fields[j].isRequired && !this.state.event.address[config.eventSingleScreen.address.fields[j].id]) {
                         requiredFields.push(getTranslation(config.eventSingleScreen.address.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }
-            }
         } else {
             return requiredFields;
             // return false;
@@ -1222,8 +1158,8 @@ class EventSingleScreen extends Component {
         if (this.state.event?.deleted) {
             return [];
         }
-        return requiredFields.concat(this.checkRequiredFieldsPersonalInfo(), this.checkRequiredFieldsAddresses());
-        // return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsInfection() && this.checkRequiredFieldsEventInvestigationQuestionnaire()
+        return requiredFields.concat(this.checkRequiredFieldsPersonalInfo(), this.checkRequiredFieldsAddress());
+        // return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddress() && this.checkRequiredFieldsInfection() && this.checkRequiredFieldsEventInvestigationQuestionnaire()
     };
 
     // onChangeStuff functions
@@ -1238,54 +1174,54 @@ class EventSingleScreen extends Component {
         } else {
             if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
                 if (objectType && objectType === 'Address') {
-                    let addressesClone = _.cloneDeep(this.state.event.addresses);
+                    let addressClone = _.cloneDeep(this.state.event.address);
                     // Check if the lat/lng have changed
                     if (id === 'lng') {
                         console.log("Wnna know lng", value);
                         if (value === '' || value.value === '') {
-                            delete addressesClone[objectTypeOrIndex].geoLocation;
+                            delete addressClone.geoLocation;
                         } else {
-                            if (!addressesClone[objectTypeOrIndex].geoLocation) {
-                                addressesClone[objectTypeOrIndex].geoLocation = {};
-                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                                if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                            if (!addressClone.geoLocation) {
+                                addressClone.geoLocation = {};
+                                addressClone.geoLocation.type = 'Point';
+                                if (!addressClone.geoLocation.coordinates) {
+                                    addressClone.geoLocation.coordinates = [];
                                 }
                             }
-                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                            if (!addressClone.geoLocation.coordinates) {
+                                addressClone.geoLocation.coordinates = [];
                             }
-                            if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
-                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                            if (!addressClone.geoLocation.type) {
+                                addressClone.geoLocation.type = 'Point';
                             }
-                            addressesClone[objectTypeOrIndex].geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
+                            addressClone.geoLocation.coordinates[0] = value && value.value ? value.value : parseFloat(value);
                         }
                     } else {
                         if (id === 'lat') {
                             if (value === '' || value.value === '') {
-                                delete addressesClone[objectTypeOrIndex].geoLocation;
+                                delete addressClone.geoLocation;
                             } else {
-                                if (!addressesClone[objectTypeOrIndex].geoLocation) {
-                                    addressesClone[objectTypeOrIndex].geoLocation = {};
-                                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                                    if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                                        addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                if (!addressClone.geoLocation) {
+                                    addressClone.geoLocation = {};
+                                    addressClone.geoLocation.type = 'Point';
+                                    if (!addressClone.geoLocation.coordinates) {
+                                        addressClone.geoLocation.coordinates = [];
                                     }
                                 }
-                                if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                                    addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                if (!addressClone.geoLocation.coordinates) {
+                                    addressClone.geoLocation.coordinates = [];
                                 }
-                                if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
-                                    addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                if (!addressClone.geoLocation.type) {
+                                    addressClone.geoLocation.type = 'Point';
                                 }
-                                addressesClone[objectTypeOrIndex].geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
+                                addressClone.geoLocation.coordinates[1] = value && value.value ? value.value : parseFloat(value);
                             }
                         } else {
-                            addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                            addressClone[id] = value && value.value ? value.value : value;
                         }
                     }
                     this.setState(prevState => ({
-                        event: Object.assign({}, prevState.event, {addresses: addressesClone}),
+                        event: Object.assign({}, prevState.event, {address: addressClone}),
                         maskError,
                         isModified: true
                     }))
@@ -1359,13 +1295,13 @@ class EventSingleScreen extends Component {
                             // console.log("onChangeDate dateRanges", id, " ", value, " ", this.state.event);
                         })
                     } else if (objectType && objectType === 'Address') {
-                        let addressesClone = _.cloneDeep(this.state.event.addresses);
-                        addressesClone[objectTypeOrIndex][id] = value && value.value ? value.value : value;
+                        let addressClone = _.cloneDeep(this.state.event.address);
+                        addressClone[id] = value && value.value ? value.value : value;
                         this.setState(prevState => ({
-                            event: Object.assign({}, prevState.event, {addresses: addressesClone}),
+                            event: Object.assign({}, prevState.event, {address: addressClone}),
                             isModified: true
                         }), () => {
-                            // console.log("onChangeDate addressesClone", id, " ", value, " ", this.state.event);
+                            // console.log("onChangeDate addressClone", id, " ", value, " ", this.state.event);
                         })
                     } else if (objectType === 'Vaccines') {
                         let vaccinesClone = _.cloneDeep(this.state.event.vaccinesReceived);
@@ -1386,11 +1322,11 @@ class EventSingleScreen extends Component {
             Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
                 {
                     text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
-                        let addressesClone = _.cloneDeep(this.state.event.addresses);
-                        addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                        let addressClone = _.cloneDeep(this.state.event.address);
+                        addressClone.geoLocationAccurate = value;
                         this.setState(
                             (prevState) => ({
-                                event: Object.assign({}, prevState.event, {addresses: addressesClone}),
+                                event: Object.assign({}, prevState.event, {address: addressClone}),
                                 isModified: true
                             }), () => {
                                 // console.log("onChangeSwitch", id, " ", value, " ", this.state.event);
@@ -1401,31 +1337,31 @@ class EventSingleScreen extends Component {
                 {
                     text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
                         if (value) {
-                            let addressesClone = _.cloneDeep(this.state.event.addresses);
-                            addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                            let addressClone = _.cloneDeep(this.state.event.address);
+                            addressClone.geoLocationAccurate = value;
                             this.setState(
                                 (prevState) => ({
-                                    event: Object.assign({}, prevState.event, {addresses: addressesClone}),
+                                    event: Object.assign({}, prevState.event, {address: addressClone}),
                                     isModified: true
                                 }), () => {
                                     geolocation.getCurrentPosition((position) => {
-                                            let addressesClone = _.cloneDeep(this.state.event.addresses);
-                                            if (!addressesClone[objectTypeOrIndex].geoLocation) {
-                                                addressesClone[objectTypeOrIndex].geoLocation = {};
-                                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                            let addressClone = _.cloneDeep(this.state.event.address);
+                                            if (!addressClone.geoLocation) {
+                                                addressClone.geoLocation = {};
+                                                addressClone.geoLocation.type = 'Point';
+                                                addressClone.geoLocation.coordinates = [];
                                             }
-                                            if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
-                                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                            if (!addressClone.geoLocation.type) {
+                                                addressClone.geoLocation.type = 'Point';
                                             }
-                                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                            if (!addressClone.geoLocation.coordinates) {
+                                                addressClone.geoLocation.coordinates = [];
                                             }
-                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.coords.longitude : 0, value ? position.coords.latitude : 0];
-                                            addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                                            addressClone.geoLocation.coordinates = [value ? position.coords.longitude : 0, value ? position.coords.latitude : 0];
+                                            addressClone.geoLocationAccurate = value;
                                             this.setState(
                                                 (prevState) => ({
-                                                    event: Object.assign({}, prevState.event, {addresses: addressesClone}),
+                                                    event: Object.assign({}, prevState.event, {address: addressClone}),
                                                     isModified: true
                                                 })
                                             )
@@ -1435,23 +1371,23 @@ class EventSingleScreen extends Component {
                                                 {
                                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                                                     onPress: () => {
-                                                        let addressesClone = _.cloneDeep(this.state.event.addresses);
-                                                        if (!addressesClone[objectTypeOrIndex].geoLocation) {
-                                                            addressesClone[objectTypeOrIndex].geoLocation = {};
-                                                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                                        let addressClone = _.cloneDeep(this.state.event.address);
+                                                        if (!addressClone.geoLocation) {
+                                                            addressClone.geoLocation = {};
+                                                            addressClone.geoLocation.type = 'Point';
+                                                            addressClone.geoLocation.coordinates = [];
                                                         }
-                                                        if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
-                                                            addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                                                        if (!addressClone.geoLocation.type) {
+                                                            addressClone.geoLocation.type = 'Point';
                                                         }
-                                                        if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                                                        if (!addressClone.geoLocation.coordinates) {
+                                                            addressClone.geoLocation.coordinates = [];
                                                         }
-                                                        addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
-                                                        addressesClone[objectTypeOrIndex].geoLocationAccurate = false;
+                                                        addressClone.geoLocation.coordinates = [null, null];
+                                                        addressClone.geoLocationAccurate = false;
                                                         this.setState(
                                                             (prevState) => ({
-                                                                event: Object.assign({}, prevState.event, {addresses: addressesClone}),
+                                                                event: Object.assign({}, prevState.event, {address: addressClone}),
                                                                 isModified: true
                                                             })
                                                         )
@@ -1466,23 +1402,23 @@ class EventSingleScreen extends Component {
                                 }
                             )
                         } else {
-                            let addressesClone = _.cloneDeep(this.state.event.addresses);
-                            if (!addressesClone[objectTypeOrIndex].geoLocation) {
-                                addressesClone[objectTypeOrIndex].geoLocation = {};
-                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
-                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                            let addressClone = _.cloneDeep(this.state.event.address);
+                            if (!addressClone.geoLocation) {
+                                addressClone.geoLocation = {};
+                                addressClone.geoLocation.type = 'Point';
+                                addressClone.geoLocation.coordinates = [];
                             }
-                            if (!addressesClone[objectTypeOrIndex].geoLocation.type) {
-                                addressesClone[objectTypeOrIndex].geoLocation.type = 'Point';
+                            if (!addressClone.geoLocation.type) {
+                                addressClone.geoLocation.type = 'Point';
                             }
-                            if (!addressesClone[objectTypeOrIndex].geoLocation.coordinates) {
-                                addressesClone[objectTypeOrIndex].geoLocation.coordinates = [];
+                            if (!addressClone.geoLocation.coordinates) {
+                                addressClone.geoLocation.coordinates = [];
                             }
-                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [null, null];
-                            addressesClone[objectTypeOrIndex].geoLocationAccurate = value;
+                            addressClone.geoLocation.coordinates = [null, null];
+                            addressClone.geoLocationAccurate = value;
                             this.setState(
                                 (prevState) => ({
-                                    event: Object.assign({}, prevState.event, {addresses: addressesClone}),
+                                    event: Object.assign({}, prevState.event, {address: addressClone}),
                                     isModified: true
                                 })
                             )
@@ -1514,31 +1450,27 @@ class EventSingleScreen extends Component {
         } else {
             if (typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
                 if (objectType === 'Address') {
-                    let addressesClone = _.cloneDeep(this.state.event.addresses);
+                    let addressClone = _.cloneDeep(this.state.event.address);
 
                     let anotherPlaceOfResidenceWasChosen = false;
                     if (value && value.value !== undefined) {
                         if (value.value === config.userResidenceAddress.userPlaceOfResidence) {
-                            addressesClone.forEach(element => {
-                                if (element[id] === value.value) {
-                                    element[id] = config.userResidenceAddress.userOtherResidence;
+                                if (addressClone[id] === value.value) {
+                                    addressClone[id] = config.userResidenceAddress.userOtherResidence;
                                     anotherPlaceOfResidenceWasChosen = true
                                 }
-                            });
                         }
                     }
 
-                    addressesClone[objectTypeOrIndex][id] = value && value.value !== undefined ? value.value : value;
+                    addressClone[id] = value && value.value !== undefined ? value.value : value;
                     let hasPlaceOfResidence = false;
-                    let eventPlaceOfResidence = addressesClone.filter((e) => {
-                        return e.typeId === config.userResidenceAddress.userPlaceOfResidence
-                    });
+                    let eventPlaceOfResidence = addressClone.typeId === config.userResidenceAddress.userPlaceOfResidence ? addressClone : null;
                     if (eventPlaceOfResidence && eventPlaceOfResidence.length > 0) {
                         hasPlaceOfResidence = true
                     }
 
                     this.setState(prevState => ({
-                        event: Object.assign({}, prevState.event, {addresses: addressesClone}),
+                        event: Object.assign({}, prevState.event, {address: addressClone}),
                         isModified: true,
                         anotherPlaceOfResidenceWasChosen,
                         hasPlaceOfResidence
@@ -1853,9 +1785,9 @@ class EventSingleScreen extends Component {
     };
 
     onNavigatorEvent = (componentId, componentName) => {
-        if (_.isFunction(this.props.refresh)) {
-            this.props.refresh();
-        }
+        // if (_.isFunction(this.props.refresh)) {
+        //     this.props.refresh();
+        // }
         // navigation(event, this.props.navigator);
     };
     goToHelpScreen = () => {

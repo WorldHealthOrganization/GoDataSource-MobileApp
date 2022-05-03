@@ -2255,9 +2255,9 @@ class CaseSingleScreen extends Component {
     };
 
     onNavigatorEvent = (componentId, componentName) => {
-        if (_.isFunction(this.props.refresh)) {
-            this.props.refresh();
-        }
+        // if (_.isFunction(this.props.refresh)) {
+        //     this.props.refresh();
+        // }
         // navigation(event, this.props.navigator);
     };
     goToHelpScreen = () => {

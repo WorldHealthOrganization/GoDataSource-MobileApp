@@ -135,6 +135,7 @@ class FiltersContainer extends PureComponent {
         }
         if(item.type === 'IntervalPicker' && item.id === 'selectedIndexDay') {
             item.max = this.props.outbreak?.periodOfFollowup * 2;
+            item.value = filter.filter[item.id];
         }
         if (item.type === 'DropDownSectioned' && item.id === 'selectedLocations') {
             if (filter.filter[item.id].length === 1) {
