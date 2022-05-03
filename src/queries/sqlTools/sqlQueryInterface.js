@@ -393,7 +393,7 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         ]
     } else {
         mainQuery.limit = 10;
-        if (checkArrayAndLength(lodashGet(innerFilter, 'sort', null)) && lastElement && offset) {
+        if (lastElement && offset) {
             mainQuery.offset = offset;
         }
         mainQuery.fields = [

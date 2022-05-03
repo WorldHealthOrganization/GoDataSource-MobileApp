@@ -87,30 +87,9 @@ class EventSingleAddressContainer extends React.Component {
                     >
                         <View style={style.container}>
                             {
-                                this.props.event && this.props.event.addresses && this.props.event.addresses.map((item, index) => {
-                                    return this.handleRenderItem(item, index)
-                                })
+                                this.props.event && this.props.event.address && this.handleRenderItem(this.props.event.address, 0)
                             }
                         </View>
-                        {
-                            this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start',
-                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                    marginVertical: 20 }}>
-                                    <Ripple
-                                        style={{
-                                            height: 25,
-                                            justifyContent: 'center'
-                                        }}
-                                        onPress={this.props.onPressAddAddress}
-                                    >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
-                                            {this.props.event.addresses && this.props.event.addresses.length === 0 ? getTranslation(translations.eventSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.eventSingleScreen.moreAddressesText, this.props.translation)}
-                                        </Text>
-                                    </Ripple>
-                                </View>
-                            ) : null
-                        }
                     </ScrollView>
                 </View>
             </View >
@@ -166,9 +145,9 @@ class EventSingleAddressContainer extends React.Component {
         }
 
         if (item.type === 'DropDownSectioned') {
-            if (this.props.event && this.props.event.addresses && Array.isArray(this.props.event.addresses) && this.props.event.addresses[cardIndex] && this.props.event.addresses[cardIndex][item.id] && this.props.event.addresses[cardIndex][item.id] !== "") {
+            if (this.props.event && this.props.event.address  && this.props.event.address[item.id] && this.props.event.address[item.id] !== "") {
                 for (let i = 0; i < this.props.locations.length; i++) {
-                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.event.addresses[cardIndex][item.id]);
+                    let myLocationName = this.getLocationNameById(this.props.locations[i], this.props.event.address[item.id]);
                     if (myLocationName !== null) {
                         value = myLocationName;
                         break
@@ -184,8 +163,8 @@ class EventSingleAddressContainer extends React.Component {
         }
 
         if (item.type === 'SwitchInput' && item.id === 'geoLocationAccurate') {
-            if (this.props.event && this.props.event.addresses && Array.isArray(this.props.event.addresses) && this.props.event.addresses[cardIndex] && (this.props.event.addresses[cardIndex][item.id] === true || this.props.event.addresses[cardIndex][item.id] === false)) {
-                value = this.props.event.addresses[cardIndex][item.id];
+            if (this.props.event && this.props.event.address &&  (this.props.event.address[item.id] === true || this.props.event.address[item.id] === false)) {
+                value = this.props.event.address[item.id];
             }
         }
 
@@ -260,12 +239,12 @@ class EventSingleAddressContainer extends React.Component {
         if (index !== null || index >= 0) {
             if (item.objectType === 'Address') {
                 if (item.id === 'lng') {
-                    return getTranslation(_.get(this.props, `event.addresses[${index}].geoLocation.coordinates[0]`, ''), this.props.translation);
+                    return getTranslation(_.get(this.props, `event.address.geoLocation.coordinates[0]`, ''), this.props.translation);
                 } else {
                     if (item.id === 'lat') {
-                        return getTranslation(_.get(this.props, `event.addresses[${index}].geoLocation.coordinates[1]`, ''), this.props.translation);
+                        return getTranslation(_.get(this.props, `event.address.geoLocation.coordinates[1]`, ''), this.props.translation);
                     } else {
-                        return getTranslation(_.get(this.props, `event.addresses[${index}][${item.id}]`, ''), this.props.translation);
+                        return getTranslation(_.get(this.props, `event.address[${item.id}]`, ''), this.props.translation);
                     }
                 }
             }
@@ -275,7 +254,7 @@ class EventSingleAddressContainer extends React.Component {
 
     handleNextButton = () => {
         let invalidEmails = validateRequiredFields(
-            _.get(this.props, 'event.addresses', []),
+            _.get(this.props, 'event.address', {}),
             config?.addressFields?.fields,
             (dataToBeValidated, fields, defaultFunction) => {
                 if (fields.id === 'emailAddress') {
@@ -286,7 +265,7 @@ class EventSingleAddressContainer extends React.Component {
         );
         let missingFields = this.props.checkRequiredFieldsAddresses();
         let checkPlaceOfResidence = validateRequiredFields(
-            this.props?.event?.addresses,
+            this.props?.event?.address,
             config.addressFields?.fields,
             (dataToBeValidated, fields, defaultFunction) => {
                 if (fields.id === 'typeId') {

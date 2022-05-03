@@ -150,9 +150,21 @@ class PersonListItem extends Component {
                 }
             }
         }
+        if(person?.address){
+            let personPlaceOfResidence = person.address.typeId === config.userResidenceAddress.userPlaceOfResidence ? person.address : null;
+            if (personPlaceOfResidence) {
+                returnValues.addressString = getAddress(personPlaceOfResidence, true, this.props.locations);
+                if(personPlaceOfResidence.phoneNumber){
+                    // !IMPORTANT - this gets replaced if there's a person telephone number to show!
+                    returnValues.telephoneNumbers = personPlaceOfResidence.phoneNumber;
+                }
+            }
+        }
         // Emails
         if (checkArrayAndLength(person?.addresses) && type !== 'LabResult') {
             returnValues.emails = person?.addresses.filter((e) => e.emailAddress).map((e) => e?.emailAddress).join(', ')
+        } else if (person?.address) {
+            returnValues.emails = person.address.emailAddress
         }
         // Visual Id
         if (person && person.visualId) {
