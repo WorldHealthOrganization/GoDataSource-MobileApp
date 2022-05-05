@@ -528,6 +528,8 @@ class AnimatedListView extends Component {
             case 'LabResult':
                 message = translations.labResultsScreen.noLabResults;
                 break;
+            case 'Event':
+                message = translations.eventsScreen.noEvents;
             default:
                 message = translations.labResultsScreen.noLabResults;
         }
@@ -554,6 +556,8 @@ class AnimatedListView extends Component {
                 return get(item, 'mainData._id', null);
             case 'LabResult':
                 return get(item, 'labResultData._id', null);
+            case 'Event':
+                return get(item, 'mainData._id', null);
             default:
                 return get(item, 'mainData._id', null);
         }

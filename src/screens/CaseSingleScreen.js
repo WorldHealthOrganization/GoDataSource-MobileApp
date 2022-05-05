@@ -950,7 +950,9 @@ class CaseSingleScreen extends Component {
                     }), () => {
                         updateCase(this.state.case)
                             .then((result) => {
-                                // this.props.refresh();
+                                if (_.isFunction(this.props.refresh)) {
+                                    this.props.refresh();
+                                }
                                 Navigation.pop(this.props.componentId)
                             })
                             .catch((errorUpdateCase) => {
@@ -970,7 +972,7 @@ class CaseSingleScreen extends Component {
                         }), () => {
                             addCase(this.state.case)
                                 .then((result) => {
-                                    // this.props.refresh();
+                                    this.props.refresh();
                                     if (this.props.isAddFromNavigation) {
                                         Navigation.setStackRoot(this.props.componentId, {
                                             component: {
@@ -1003,7 +1005,7 @@ class CaseSingleScreen extends Component {
                         }), () => {
                             updateCase(this.state.case)
                                 .then((result) => {
-                                    // this.props.refresh();
+                                    this.props.refresh();
                                     if (this.props.isAddFromNavigation) {
                                         Navigation.setStackRoot(this.props.componentId, {
                                             component: {

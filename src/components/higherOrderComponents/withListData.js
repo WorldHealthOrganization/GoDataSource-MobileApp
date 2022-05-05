@@ -111,7 +111,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 );
             }
 
-            prepareFilters = () => {
+            prepareFilters = (isRefresh) => {
                 let filter = {};
                 switch (screenType) {
                     case 'FollowUpsScreen':
@@ -182,7 +182,9 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     default:
                         break;
                 }
-                console.log("Important cases filter", filter);
+                if(isRefresh){
+                    filter.offset = 0
+                }
                 return filter;
             };
 
@@ -228,7 +230,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         && !this.getDataInprogress
                     ) {
                         this.getDataInprogress = true;
-                        let filters = this.prepareFilters();
+                        let filters = this.prepareFilters(isRefresh);
                         this.setState({
                             loadMore: isRefresh === null
                         }, () => {
@@ -482,7 +484,26 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 let requiredPermissions = this.computePermissions('onPressFullName');
                 let forwardScreen = this.computeForwardScreen('onPressFullName');
                 let forwardedProps = {};
-                let dataToSend = screenType === 'CasesScreen' ? 'case' : 'contact';
+                let dataToSend = null;
+                switch (screenType) {
+                    case constants.appScreens.casesScreen:
+                        dataToSend = 'case'
+                        break;
+                    case constants.appScreens.eventsScreen:
+                        dataToSend = 'event'
+                        break;
+                    case constants.appScreens.contactsOfContactsScreen:
+                        dataToSend = 'contact'
+                        break;
+                    case constants.appScreens.contactsScreen:
+                        dataToSend = 'contact';
+                        break;
+                    case constants.appScreens.labResultsScreen:
+                        dataToSend = 'labResult';
+                        break;
+                    default:
+                        dataToSend = null;
+                }
                 forwardedProps[dataToSend] = person;
                 forwardedProps['previousScreen'] = prevScreen;
                 forwardedProps['refresh'] = this.refresh;
@@ -730,9 +751,28 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         break;
                     case constants.appScreens.labResultsScreen:
                         switch (method) {
+                            case 'onPressFullName':
+                                permissions = [
+                                    constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                    constants.PERMISSIONS_LAB_RESULT.labResultView,
+                                ];
+                                break;
                             default:
                                 permissions = [];
                         }
+                        break;
+                    case constants.appScreens.eventsScreen:
+                        switch (method) {
+                            case 'onPressFullName':
+                                permissions = [
+                                    constants.PERMISSIONS_EVENT.eventAll,
+                                    constants.PERMISSIONS_EVENT.eventView,
+                                ];
+                                break;
+                            default:
+                                permissions = [];
+                        }
+                        break;
                     default:
                         break;
                 }
