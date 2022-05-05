@@ -749,7 +749,7 @@ const eventsScreen = {
     eventsTitle: 'LNG_PAGE_LIST_EVENTS_TITLE',
     viewButtonLabel: 'LNG_CASE_LIST_SCREEN_VIEW_BUTTON',
     addContactButtonLabel: 'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON',
-    noCases: 'LNG_CASE_LIST_SCREEN_NO_EVENTS',
+    noEvents: 'LNG_CASE_LIST_SCREEN_NO_EVENTS',
     contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS',
     exposures: 'LNG_CONTACT_SINGLE_SCREEN_EXPOSURE_TAB'
 }

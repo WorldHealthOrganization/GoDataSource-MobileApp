@@ -2,6 +2,7 @@ import { getAllLabResultsForOutbreakQuery } from "../queries/labResults";
 import {insertOrUpdate} from "../queries/sqlTools/helperMethods";
 
 export function getAllLabResultsForOutbreak({outbreakId, labResultsFilter, searchText, lastElement, offset}, computeCount) {
+
     return getAllLabResultsForOutbreakQuery(
         outbreakId,
         labResultsFilter,
