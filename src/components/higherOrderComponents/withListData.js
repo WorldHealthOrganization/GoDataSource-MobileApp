@@ -662,11 +662,11 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 forwardScreen = constants.appScreens.exposureScreen;
                                 break;
                             case 'onPressFullName':
-                                forwardScreen = constants.appScreens.contactSingleScreen;
+                                forwardScreen = constants.appScreens.labResultsSingleScreen;
                                 // forwardScreen = constants.appScreens.viewEditScreen;
                                 break;
                             case 'onPressExposure':
-                                forwardScreen = constants.appScreens.caseSingleScreen;
+                                forwardScreen = constants.appScreens.contactSingleScreen;
                                 // forwardScreen = constants.appScreens.viewEditScreen;
                                 break;
                             default:

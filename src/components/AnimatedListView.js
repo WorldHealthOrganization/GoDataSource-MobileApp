@@ -475,9 +475,12 @@ class AnimatedListView extends Component {
                 secondaryOnPressTextsArray = [];
                 break;
         }
-        let placeOfResidence = mainData?.addresses?.find((e) => {
-            return e.typeId === config.userResidenceAddress.userPlaceOfResidence
-        });
+        let placeOfResidence = mainData?.addresses ?
+            mainData?.addresses?.find((e) => {
+                return e.typeId === config.userResidenceAddress.userPlaceOfResidence;
+            })
+            :
+            (mainData?.address.typeId === config.userResidenceAddress.userPlaceOfResidence ? mainData?.address : null);
         let placeOfResidenceLatitude = get(placeOfResidence, 'geoLocation.coordinates[1]', '');
         let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[0]', '');
 
@@ -590,10 +593,15 @@ class AnimatedListView extends Component {
     };
 
     handleOnPressMap = (person) => {
-        if (checkArrayAndLength(get(person, 'addresses', null))) {
-            let placeOfResidence = person.addresses.find((e) => {
-                return e.typeId === config.userResidenceAddress.userPlaceOfResidence
-            });
+        if (checkArrayAndLength(get(person, 'addresses', null)) || person?.address) {
+
+            let placeOfResidence = person.addresses ?
+                person.addresses.find((e) => {
+                    return e.typeId === config.userResidenceAddress.userPlaceOfResidence;
+                })
+                :
+                (person.address.typeId === config.userResidenceAddress.userPlaceOfResidence ? person.address : null);
+
             let placeOfResidenceLatitude = get(placeOfResidence, 'geoLocation.coordinates[1]', '');
             let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[0]', '');
 
