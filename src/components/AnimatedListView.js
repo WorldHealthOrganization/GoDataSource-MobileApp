@@ -159,6 +159,7 @@ class AnimatedListView extends Component {
 
         let id = null;
         let mainData = null;
+        let secondaryData = null;
         let exposureData = null;
         let exposureCount = 0;
         let contactCount = 0;
@@ -166,6 +167,7 @@ class AnimatedListView extends Component {
         switch(this.props.dataType){
             case 'FollowUp':
                 let followUpData = get(item, 'followUpData', null);
+                secondaryData = followUpData;
                 mainData = get(item, 'mainData', null);
                 exposureData = get(item, 'exposureData', null);
                 textsArray = [
@@ -446,6 +448,7 @@ class AnimatedListView extends Component {
                 break;
             case 'LabResult':
                 const labResultData = get(item, 'labResultData', null);
+                secondaryData = labResultData;
                 mainData = get(item, 'mainData', null);
                 textsArray = [
                     getTranslation(translations.casesScreen.viewButtonLabel, this.props.translation)
@@ -494,7 +497,7 @@ class AnimatedListView extends Component {
                     :
                     () => this.handleOnPressMap(mainData)
                 }
-                onPressNameProp={() => this.props.onPressName(mainData, this.props.screen)}
+                onPressNameProp={() => this.props.onPressName(mainData, this.props.screen, secondaryData)}
                 onPressExposureProp={this.props.onPressExposure}
                 screenSize={this.props.screenSize}
                 textsArray={textsArray}

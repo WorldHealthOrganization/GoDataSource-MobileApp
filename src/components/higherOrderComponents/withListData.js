@@ -353,7 +353,6 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     isNew: false,
                     refresh: this.refresh
                 };
-                console.log("What's up?", screenType);
                 switch (screenType) {
                     case 'FollowUpsScreen':
                         forwardProps.item = dataToForward;
@@ -480,7 +479,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 }
             };
 
-            onPressFullName = (person, prevScreen) => {
+            onPressFullName = (person, prevScreen, secondaryData) => {
                 let requiredPermissions = this.computePermissions('onPressFullName');
                 let forwardScreen = this.computeForwardScreen('onPressFullName');
                 let forwardedProps = {};
@@ -499,11 +498,23 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         dataToSend = 'contact';
                         break;
                     case constants.appScreens.labResultsScreen:
-                        dataToSend = 'labResult';
+                        dataToSend = 'contact';
+                        forwardedProps.item = secondaryData;
+                        forwardedProps.contact = person;
+                        forwardedProps.isEditMode = false;
+                        forwardedProps.previousScreen = 'LabResults'
+                        break;
+                    case constants.appScreens.followUpScreen:
+                        dataToSend = 'contact';
+                        forwardedProps.item = secondaryData;
+                        forwardedProps.contact = person;
+                        forwardedProps.isEditMode = false;
+                        forwardedProps.previousScreen = 'FollowUps';
                         break;
                     default:
                         dataToSend = null;
                 }
+
                 forwardedProps[dataToSend] = person;
                 forwardedProps['previousScreen'] = prevScreen;
                 forwardedProps['refresh'] = this.refresh;
@@ -557,7 +568,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 forwardScreen = constants.appScreens.exposureScreen;
                                 break;
                             case 'onPressFullName':
-                                forwardScreen = constants.appScreens.contactSingleScreen;
+                                forwardScreen = constants.appScreens.followUpSingleScreen;
                                 // forwardScreen = constants.appScreens.viewEditScreen;
                                 break;
                             case 'onPressExposure':
