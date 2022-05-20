@@ -13,14 +13,17 @@ import CustomMarker from './CustomMarker';
 import {getTooltip} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
 import lodashGet from 'lodash/get';
+import {Switch} from 'react-native-ui-lib';
 
 class IntervalPicker extends PureComponent {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
         super(props);
+
         this.state = {
-            interval: [this.props.min, this.props.max]
+            interval: this.props.value ? this.props.value.length === 1 ? [this.props.value[0]] : [this.props.value[0], this.props.value[1]] : [this.props.min, this.props.max],
+            active: false
         }
     }
     // Please add here the react lifecycle methods that you need
@@ -47,9 +50,29 @@ class IntervalPicker extends PureComponent {
                         alignItems: 'center',
                         justifyContent: 'space-between'
                     }}>
+                    <Switch
+                        value={this.state.active}
+                        onValueChange={(value)=>{
+                            if (value){
+                                this.multiSliderValuesChange(this.state.interval);
+                            } else {
+                                this.multiSliderValuesChange(null);
+                            }
+                            this.setState({
+                                active: value
+                            });
+                        }}
+                        height={18}
+                        width={40}
+                        thumbSize={16}
+                        offColor={lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)}
+                        onColor={lodashGet(this.props, 'selectedStyle', styles.buttonGreen)}
+                    />
                     <MultiSlider
-                        values={this.props.value ? this.props.value.length === 1 ? this.props.value : [this.props.value[0], this.props.value[1]] : [this.state.interval[0], this.state.interval[1]]}
+                        values={this.state.interval}
                         onValuesChange={this.multiSliderValuesChange}
+                        enabledOne={this.state.active}
+                        enabledTwo={this.state.active}
                         min={this.props.min}
                         max={this.props.max}
                         step={this.props.step ? this.props.step : 1}
@@ -59,13 +82,22 @@ class IntervalPicker extends PureComponent {
                             backgroundColor: lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)
                         }}
                         selectedStyle={{
-                            backgroundColor: lodashGet(this.props, 'selectedStyle', styles.buttonGreen)
+                            backgroundColor: this.state.active ?
+                                lodashGet(this.props, 'selectedStyle', styles.buttonGreen)
+                                :
+                                lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)
                         }}
                         customMarker={(props) => {
                              return (
                                 <CustomMarker
                                     currentValue={props.currentValue}
-                                    markerColor={this.props.markerColor}
+                                    markerStyle={{
+                                        backgroundColor: this.state.active ?
+                                            lodashGet(this.props, 'selectedStyle', styles.buttonGreen)
+                                            :
+                                            lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)
+                                    }}
+                                    markerColor={this.state.active ? this.props.markerColor : lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)}
                                 />)
                         }}
                         allowOverlap={this.props.allowOverlap || false}
@@ -90,7 +122,14 @@ class IntervalPicker extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     multiSliderValuesChange = (values) => {
-        this.props.onChange(values, this.props.id);
+        if(this.state.active){
+            if(values){
+                this.setState({
+                    interval: values
+                })
+            }
+            this.props.onChange(values, this.props.id);
+        }
     };
 }
 

@@ -658,7 +658,7 @@ class ManualConfigScreen extends PureComponent {
 
     onChangeInterval = (value, id) => {
         this.setState(prevState => ({
-            [id]: value[0]
+            [id]: value ? value[0] : null
         }))
     };
 

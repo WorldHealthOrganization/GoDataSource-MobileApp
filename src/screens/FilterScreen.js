@@ -27,9 +27,9 @@ class FilterScreen extends Component {
                         [translations.localTranslationTokens.male]: false,
                         [translations.localTranslationTokens.female]: false
                     },
-                    age: [0, 150],
+                    age: null,
                     selectedLocations: [],
-                    selectedIndexDay: props.outbreak?.periodOfFollowup ? [0, props.outbreak?.periodOfFollowup * 2] : null,
+                    selectedIndexDay: null,
                     classification: [],
                     categories: [],
                     vaccines: [],
