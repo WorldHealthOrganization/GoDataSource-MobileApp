@@ -523,7 +523,7 @@ class FirstConfigScreen extends Component {
     };
 
     onChangeInterval = (value, id) => {
-        this.setState({[id]: value[0], isModified: true}
+        this.setState({[id]: value ? value[0] : null, isModified: true}
         // , () => {
         //     console.log('onChangeSwitch: ', this.state);
         // }

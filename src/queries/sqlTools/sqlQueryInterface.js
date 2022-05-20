@@ -4,6 +4,7 @@ import lodashGet from 'lodash/get';
 import lodashSet from 'lodash/set';
 import {checkArrayAndLength} from "../../utils/typeCheckingFunctions";
 import get from "lodash/get";
+import {createDate} from "../../utils/functions";
 var jsonSql = require('json-sql')();
 jsonSql.configure({separatedValues: false});
 
@@ -163,14 +164,6 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
             $expression: `json_extract(${innerQueryAlias}.json, '$.pregnancyStatus') in (${innerFilter.pregnancyStatuses.map(vax=>`"${vax.value}"`).join(', ')})`
         })
     }
-    if (lodashGet(innerFilter, 'selectedIndexDay', null)) {
-        filterCondition.$and.push({
-            'indexDay': {
-                ['$gte']: get(innerFilter, 'selectedIndexDay[0]', 0),
-                ['$lte']: get(innerFilter, 'selectedIndexDay[1]', 150)
-            }
-        })
-    }
 
 
     let mainCondition = {
@@ -230,8 +223,49 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         type: 'select',
         table: 'person',
         alias: innerQueryAlias,
-        condition: innerCondition
+        condition: innerCondition,
+        join:[],
+        group: `${innerQueryAlias}._id`
     };
+
+    if (lodashGet(innerFilter, 'selectedIndexDay', null)) {
+        const relationshipsJoinForFollowUp = {
+            type: 'left',
+            table: 'followUp',
+            alias: "FollowUp",
+            fields: [
+                {
+                    table: "FollowUp",
+                    name: 'indexDay'
+                },
+                {
+                    table: "FollowUp",
+                    name: 'deleted'
+                }
+            ],
+            on: {
+                'FollowUp.personId': `${innerQueryAlias}._id`,
+                'FollowUp.deleted' : 0,
+                'FollowUp.indexDay': {
+                    ['$gte']: get(innerFilter, 'selectedIndexDay[0]', 0),
+                    ['$lte']: get(innerFilter, 'selectedIndexDay[1]', 150)
+                },
+                'FollowUp.date': {
+                    ['$gte']: {expression: `"${createDate(new Date()).toISOString()}"`},
+                    ['$lte']: {expression: `"${createDate(new Date(), true).toISOString()}"`}
+                }
+            }
+        };
+        innerQuery.join.push(
+            relationshipsJoinForFollowUp
+        )
+        innerQuery.condition.$and.push({
+            'FollowUp.indexDay': {
+                ['$gte']: get(innerFilter, 'selectedIndexDay[0]', 0),
+                ['$lte']: get(innerFilter, 'selectedIndexDay[1]', 150)
+            }
+        })
+    }
 
     // Main query
     let source = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'sourceId' : 'targetId';
@@ -320,34 +354,8 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         ],
         condition: mainCondition
     };
-    if (lodashGet(innerFilter, 'selectedIndexDay', null)) {
-        const relationshipsJoinForFollowUp = {
-                type: 'left',
-                table: 'followUp',
-                alias: "FollowUp",
-                fields: [
-                    {
-                        table: "FollowUp",
-                        name: 'indexDay'
-                    },
-                    {
-                        table: "FollowUp",
-                        name: 'deleted'
-                    }
-                ],
-                on: {
-                    'FollowUp.personId': `${innerQueryAlias}._id`,
-                    'FollowUp.deleted' : 0,
-                    'FollowUp.indexDay': {
-                        ['$gte']: get(innerFilter, 'selectedIndexDay[0]', 0),
-                        ['$lte']: get(innerFilter, 'selectedIndexDay[1]', 150)
-                    }
-                }
-        };
-        mainQuery.join.push(
-            relationshipsJoinForFollowUp
-        )
-    }
+    // console.log("Nasty date", createDate(new Date()).toISOString(), `${createDate(new Date(), true).toISOString()}`);
+
 
     // TODO handle email
     if (shouldSearchEmail || checkArrayAndLength(lodashGet(innerFilter, 'vaccines', null)) || checkArrayAndLength(lodashGet(innerFilter, 'vaccineStatuses', null))) {
@@ -486,9 +494,15 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
                 },
             ],
             query: mainQuery,
+            join:[],
+            condition:{
+                $and:[]
+            },
             alias: 'mainQuery'
         }
     }
+
+
 
     return mainQuery;
 }
