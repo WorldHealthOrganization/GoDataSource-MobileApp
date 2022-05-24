@@ -248,6 +248,8 @@ class CardComponent extends Component {
                 return (
                     <IntervalPicker
                         id={this.props.item.id}
+                        showSwitch={true}
+                        active={this.props.item.value !== null}
                         label={get(this.props, 'item.label', null)}
                         value={this.props.item.value}
                         min={this.props.item.min}

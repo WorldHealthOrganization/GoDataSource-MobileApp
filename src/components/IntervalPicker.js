@@ -23,7 +23,7 @@ class IntervalPicker extends PureComponent {
 
         this.state = {
             interval: this.props.value ? this.props.value.length === 1 ? [this.props.value[0]] : [this.props.value[0], this.props.value[1]] : [this.props.min, this.props.max],
-            active: false
+            active: this.props.showSwitch ? !!this.props.active : true
         }
     }
     // Please add here the react lifecycle methods that you need
@@ -48,26 +48,30 @@ class IntervalPicker extends PureComponent {
                         flexDirection: 'row',
                         width: '100%',
                         alignItems: 'center',
-                        justifyContent: 'space-between'
+                        justifyContent: 'space-around'
                     }}>
-                    <Switch
-                        value={this.state.active}
-                        onValueChange={(value)=>{
-                            if (value){
-                                this.multiSliderValuesChange(this.state.interval);
-                            } else {
-                                this.multiSliderValuesChange(null);
-                            }
-                            this.setState({
-                                active: value
-                            });
-                        }}
-                        height={18}
-                        width={40}
-                        thumbSize={16}
-                        offColor={lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)}
-                        onColor={lodashGet(this.props, 'selectedStyle', styles.buttonGreen)}
-                    />
+                    {
+                        this.props.showSwitch &&
+                        <Switch
+                            value={this.state.active}
+                            onValueChange={(value)=>{
+                                if (value){
+                                    this.multiSliderValuesChange(this.state.interval);
+                                } else {
+                                    this.multiSliderValuesChange(null);
+                                }
+                                this.setState({
+                                    active: value
+                                });
+                            }}
+                            height={18}
+                            width={40}
+                            thumbSize={16}
+                            offColor={lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)}
+                            onColor={lodashGet(this.props, 'selectedStyle', styles.buttonGreen)}
+                        />
+                    }
+
                     <MultiSlider
                         values={this.state.interval}
                         onValuesChange={this.multiSliderValuesChange}
@@ -77,7 +81,7 @@ class IntervalPicker extends PureComponent {
                         max={this.props.max}
                         step={this.props.step ? this.props.step : 1}
                         snapped
-                        sliderLength={this.props.sliderLength}
+                        sliderLength={this.props.showSwitch ? this.props.sliderLength - 40 : this.props.sliderLength}
                         unselectedStyle={{
                             backgroundColor: lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)
                         }}
