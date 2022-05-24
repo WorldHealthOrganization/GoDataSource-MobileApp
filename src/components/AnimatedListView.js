@@ -478,14 +478,14 @@ class AnimatedListView extends Component {
                 secondaryOnPressTextsArray = [];
                 break;
         }
-        let placeOfResidence = mainData?.addresses ?
-            mainData?.addresses?.find((e) => {
-                return e.typeId === config.userResidenceAddress.userPlaceOfResidence;
-            })
-            :
-            (mainData?.address.typeId === config.userResidenceAddress.userPlaceOfResidence ? mainData?.address : null);
-        let placeOfResidenceLatitude = get(placeOfResidence, 'geoLocation.coordinates[1]', '');
-        let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[0]', '');
+            let placeOfResidence = mainData?.addresses ?
+                mainData?.addresses?.find((e) => {
+                    return e.typeId === config.userResidenceAddress.userPlaceOfResidence;
+                })
+                :
+                (mainData?.address?.typeId === config.userResidenceAddress.userPlaceOfResidence ? mainData?.address : null);
+            let placeOfResidenceLatitude = get(placeOfResidence, 'geoLocation.coordinates[1]', '');
+            let placeOfResidenceLongitude = get(placeOfResidence, 'geoLocation.coordinates[0]', '');
 
         return(
             <PersonListItem

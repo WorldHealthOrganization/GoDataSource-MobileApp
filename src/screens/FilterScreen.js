@@ -94,13 +94,11 @@ class FilterScreen extends Component {
             }
 
             if (activeFilters.age && Array.isArray(activeFilters.age) && activeFilters.age.length === 2) {
-                filterClone.age[0] = activeFilters.age[0];
-                filterClone.age[1] = activeFilters.age[1];
+                filterClone.age = [activeFilters.age[0], activeFilters.age[1]]
             }
 
             if (activeFilters.selectedIndexDay && activeFilters.selectedIndexDay !== '') {
-                filterClone.selectedIndexDay[0] = activeFilters.selectedIndexDay[0];
-                filterClone.selectedIndexDay[1] = activeFilters.selectedIndexDay[1];
+                filterClone.selectedIndexDay = [activeFilters.selectedIndexDay[0], activeFilters.selectedIndexDay[1]]
             }
 
             if (activeFilters.selectedLocations && Array.isArray(activeFilters.selectedLocations) && activeFilters.selectedLocations.length > 0) {
