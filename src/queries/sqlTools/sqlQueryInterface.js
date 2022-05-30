@@ -354,8 +354,6 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         ],
         condition: mainCondition
     };
-    // console.log("Nasty date", createDate(new Date()).toISOString(), `${createDate(new Date(), true).toISOString()}`);
-
 
     // TODO handle email
     if (shouldSearchEmail || checkArrayAndLength(lodashGet(innerFilter, 'vaccines', null)) || checkArrayAndLength(lodashGet(innerFilter, 'vaccineStatuses', null))) {

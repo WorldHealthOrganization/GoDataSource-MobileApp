@@ -161,6 +161,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                             lastElement: get(this.state, 'lastElement', null),
                             offset: get(this.state, 'data.length', 0)
                         };
+                        break;
                     case 'UsersScreen':
                         filter = {
                             outbreakId: get(this.props, 'outbreak._id', null),
@@ -182,7 +183,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     default:
                         break;
                 }
-                if(isRefresh){
+                if (isRefresh){
                     filter.offset = 0
                 }
                 return filter;
