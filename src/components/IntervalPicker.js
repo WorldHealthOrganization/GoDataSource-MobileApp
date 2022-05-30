@@ -25,13 +25,12 @@ class IntervalPicker extends PureComponent {
             interval: this.props.value ? this.props.value.length === 1 ? [this.props.value[0]] : [this.props.value[0], this.props.value[1]] : [this.props.min, this.props.max],
             active: this.props.showSwitch ? !!this.props.active : true
         }
-        console.log("Nasty What's the value?", this.props.value, this.state.interval);
     }
     // Please add here the react lifecycle methods that you need
 
     componentWillReceiveProps(nextProps, nextContext) {
         if (nextProps.value !== this.props.value){
-            this.state.interval = this.props.value ? this.props.value.length === 1 ? [this.props.value[0]] : [this.props.value[0], this.props.value[1]] : [this.props.min, this.props.max];
+            this.state.interval = this.props.value ? this.props.value : [this.props.min, this.props.max];
             // this.setState({
             //     interval: this.props.value ? this.props.value.length === 1 ? [this.props.value[0]] : [this.props.value[0], this.props.value[1]] : [this.props.min, this.props.max],
             // })
@@ -42,7 +41,6 @@ class IntervalPicker extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log("Nasty What's the value2?", this.props.value, this.state.interval);
         let tooltip = getTooltip(this.props.label, this.props.translation, this.props.tooltipsMessage, this.props.tooltipsMessage);
         return (
             <View
@@ -87,8 +85,8 @@ class IntervalPicker extends PureComponent {
                         onValuesChange={this.multiSliderValuesChange}
                         enabledOne={this.state.active}
                         enabledTwo={this.state.active}
-                        min={this.props.min}
-                        max={this.props.max}
+                        min={1000}
+                        max={5000}
                         step={this.props.step ? this.props.step : 1}
                         snapped
                         sliderLength={this.props.showSwitch ? this.props.sliderLength - 40 : this.props.sliderLength}
@@ -114,7 +112,7 @@ class IntervalPicker extends PureComponent {
                                     markerColor={this.state.active ? this.props.markerColor : lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)}
                                 />)
                         }}
-                        allowOverlap={this.props.allowOverlap || false}
+                        allowOverlap={this.props.allowOverlap || true}
                     />
                     {
                         tooltip.hasTooltip === true ? (
