@@ -19,8 +19,8 @@ export function storeOutbreak(outbreak) {
     if(outbreak?._id.includes("outbreak.json_")){
         outbreak._id = outbreak._id.substring(14, outbreak._id.length);
     }
+    AsyncStorage.setItem('outbreakId', outbreak?._id);
     constants.PERMISSIONS_LAB_RESULT = constants.PERMISSIONS_LAB_RESULT_CONSTANT;
-    AsyncStorage.setItem('outbreakId', outbreak._id);
     return {
         type: ACTION_TYPE_STORE_OUTBREAK,
         payload: outbreak
