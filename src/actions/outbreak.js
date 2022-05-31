@@ -12,6 +12,7 @@ import {
 import constants from './../utils/constants';
 import {getOutbreakByIdRequest} from './../queries/outbreak';
 import errorTypes from './../utils/errorTypes';
+import AsyncStorage from '@react-native-community/async-storage';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeOutbreak(outbreak) {
@@ -19,7 +20,7 @@ export function storeOutbreak(outbreak) {
         outbreak._id = outbreak._id.substring(14, outbreak._id.length);
     }
     constants.PERMISSIONS_LAB_RESULT = constants.PERMISSIONS_LAB_RESULT_CONSTANT;
-
+    AsyncStorage.setItem('outbreakId', outbreak._id);
     return {
         type: ACTION_TYPE_STORE_OUTBREAK,
         payload: outbreak
@@ -65,7 +66,7 @@ export function getOutbreakById(outbreakId) {
     return new Promise((resolve, reject) => {
         getOutbreakByIdRequest(outbreakId, null, (error, response) => {
             if (error) {
-                console.log('*** getOutbreakById error: ', error);
+                console.log('*** getOutbreakById error: ', error, outbreakId);
                 reject(errorTypes.ERROR_OUTBREAK);
             }
             if (response) {
