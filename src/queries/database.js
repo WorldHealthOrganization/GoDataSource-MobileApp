@@ -200,7 +200,6 @@ export function processBulkDocs(data, type) {
                     // New types: fileType.number.json
                     let fileType = `${type.split('.')[0]}.${type.split('.')[2]}`;
                     let bulks = data.map((e) => {
-                        console.log("Nasty every bulk doc");
                         return Object.assign({}, e, {_id: createIdForType(e, type), fileType})
                     })
                     database.bulkDocs(bulks)
@@ -211,7 +210,6 @@ export function processBulkDocs(data, type) {
                         })
                         .catch((errorBulkDocs) => {
                             console.log('Bulk docs encountered an error: ', errorBulkDocs);
-                            console.log("Nasty bulk", bulks);
                             data = null;
                             reject(errorBulkDocs)
                         })

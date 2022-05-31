@@ -173,7 +173,6 @@ export function computeCommonData(storeUserBool, user, skipLoad, outbreakId) {
                 }
             }
             console.log("All user data", user);
-            console.log("Nasty outbreakId", outbreakId);
             let outbreakAndLocationInfo;
             try {
                 outbreakAndLocationInfo = await getOutbreakById(outbreakId);
