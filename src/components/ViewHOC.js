@@ -50,7 +50,7 @@ class ViewHOC extends Component {
                             overlay={true}
                             backgroundColor={'rgba(255, 255, 255, 0.8)'}
                             // message={loaderText}
-                            message={'Loading222222222222222222'}
+                            message={'Loading'}
                         />
                     ) : (null)
                 }

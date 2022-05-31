@@ -349,6 +349,7 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                                     }
                                 })
                         } else {
+                            console.log("The error: ", promiseResponses.length, files.length, sqlFiles.length);
                             dispatch(setSyncState({id: 'sync', status: 'Error', error: 'Error while processing files', addLanguagePacks: checkArrayAndLength(languagePacks)}));
                         }
                     }

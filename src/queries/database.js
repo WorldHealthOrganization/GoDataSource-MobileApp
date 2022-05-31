@@ -199,9 +199,10 @@ export function processBulkDocs(data, type) {
                 if (database) {
                     // New types: fileType.number.json
                     let fileType = `${type.split('.')[0]}.${type.split('.')[2]}`;
-                    database.bulkDocs(data.map((e) => {
+                    let bulks = data.map((e) => {
                         return Object.assign({}, e, {_id: createIdForType(e, type), fileType})
-                    }))
+                    })
+                    database.bulkDocs(bulks)
                         .then(() => {
                             console.log('Bulk docs finished: ');
                             data = null;
