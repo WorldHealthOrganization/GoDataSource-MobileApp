@@ -173,15 +173,16 @@ export function computeCommonData(storeUserBool, user, skipLoad, outbreakId) {
                 }
             }
             console.log("All user data", user);
+            console.log("Nasty outbreakId", outbreakId);
             let outbreakAndLocationInfo;
-            // try {
+            try {
                 outbreakAndLocationInfo = await getOutbreakById(outbreakId);
-            // } catch (e) {
-            //     if(outbreakId !== user.activeOutbreakId){
-            //         outbreakId = user.activeOutbreakId;
-            //         outbreakAndLocationInfo = await getOutbreakById(outbreakId);
-            //     }
-            // }
+            } catch (e) {
+                if(outbreakId !== user.activeOutbreakId){
+                    outbreakId = user.activeOutbreakId;
+                    outbreakAndLocationInfo = await getOutbreakById(outbreakId);
+                }
+            }
             if (outbreakAndLocationInfo) {
                 let promises = [];
 

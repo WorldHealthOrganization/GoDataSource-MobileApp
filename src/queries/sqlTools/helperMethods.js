@@ -21,6 +21,7 @@ export function openDatabase(databaseName) {
                 resolve(sqlDb);
             });
         } catch(errorOpenDatabase) {
+            console.log("Nasty error", errorOpenDatabase);
             reject(new Error('Could not open database'));
         }
     })
@@ -199,6 +200,7 @@ export function insertOrUpdate(databaseName, tableName, data, createTableBool) {
                             }
                         },
                             (errorTransaction) => {
+                            console.log("Nasty error", errorTransaction);
                             return Promise.reject(errorTransaction)
                             },
                             () => {

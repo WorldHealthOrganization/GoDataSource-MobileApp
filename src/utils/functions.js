@@ -403,6 +403,7 @@ export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFir
     return Promise.resolve()
         .then(() => processFileGeneral(path, fileName, unzipLocation, hubConfig, encryptedData))
         .then((data) => {
+            console.log("Nasty 1")
             if (data) {
                 let promiseArray = [];
                 if (isFirstTime && forceBulk) {
@@ -416,6 +417,7 @@ export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFir
             }
         })
         .then((responses) => {
+            console.log("Nasty 2")
             // console.log('Finished syncing: ', responses);
             let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
             numberOfFilesProcessedAux += 1;
@@ -436,6 +438,7 @@ function processEncryptedFile (path, hubConfig) {
 }
 
 function processUnencryptedFile (path, fileName, unzipLocation) {
+    console.log("Nasty process")
     return Promise.resolve()
         .then(() => unzip(`${path}`, `${unzipLocation}`))
         .then((unzipPath) => RNFetchBlobFS.readFile(getFilePath(unzipPath, fileName), 'utf8'))
@@ -473,12 +476,14 @@ function processFileGeneral(path, fileName, unzipLocation, hubConfig, encryptedD
         .then(() => RNFetchBlobFS.exists(path))
         .then((exists) => {
             if (exists) {
+                console.log("Nasty path")
                 return encryptedData ? processEncryptedFile(path, hubConfig) : processUnencryptedFile(path, fileName, unzipLocation);
             } else {
                 return Promise.reject('File does not exist');
             }
         })
         .then((promiseResponse) => {
+            console.log("Nasty path x")
             if (!encryptedData) {
                 return Promise.resolve(promiseResponse);
             }
