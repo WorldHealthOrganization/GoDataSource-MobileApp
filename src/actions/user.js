@@ -173,7 +173,15 @@ export function computeCommonData(storeUserBool, user, skipLoad, outbreakId) {
                 }
             }
             console.log("All user data", user);
-            let outbreakAndLocationInfo = await getOutbreakById(outbreakId);
+            let outbreakAndLocationInfo;
+            // try {
+                outbreakAndLocationInfo = await getOutbreakById(outbreakId);
+            // } catch (e) {
+            //     if(outbreakId !== user.activeOutbreakId){
+            //         outbreakId = user.activeOutbreakId;
+            //         outbreakAndLocationInfo = await getOutbreakById(outbreakId);
+            //     }
+            // }
             if (outbreakAndLocationInfo) {
                 let promises = [];
 
@@ -324,6 +332,7 @@ export function computeCommonData(storeUserBool, user, skipLoad, outbreakId) {
                         }
                     })
                     .catch((errorProcessInitialData) => {
+                        console.log("Error initial data", errorProcessInitialData);
                         dispatch(batchActions([
                             setLoginState('Error'),
                             addError(errorProcessInitialData)
