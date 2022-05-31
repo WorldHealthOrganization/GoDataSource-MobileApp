@@ -176,7 +176,7 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
             let sortOrder = lodashGet(innerFilter, `sort[${i}].sortOrder`, null) === translations.sortTab.sortOrderAsc ? 1 : -1;
             // Sort by name
             if (lodashGet(innerFilter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortName) {
-                sort[`${innerQueryAlias}.name`] = sortOrder;
+                sort[`${innerQueryAlias}.firstName`] = sortOrder;
             }
             // Sort by firstName
             if (lodashGet(innerFilter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortFirstName) {
