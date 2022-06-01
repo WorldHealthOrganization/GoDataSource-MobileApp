@@ -85,8 +85,8 @@ class IntervalPicker extends PureComponent {
                         onValuesChange={this.multiSliderValuesChange}
                         enabledOne={this.state.active}
                         enabledTwo={this.state.active}
-                        min={1000}
-                        max={5000}
+                        min={this.props.min}
+                        max={this.props.max}
                         step={this.props.step ? this.props.step : 1}
                         snapped
                         sliderLength={this.props.showSwitch ? this.props.sliderLength - 40 : this.props.sliderLength}

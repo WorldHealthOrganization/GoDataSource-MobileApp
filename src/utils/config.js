@@ -1621,30 +1621,6 @@ const personFilterScreen = {
                     single: false
                 }
             ]
-        },
-        {
-            fields: [
-                {
-                    cardNumber: 7,
-                    label: translations.followUpFilter.dayOfFollowUp,
-                    type: 'Section',
-                    hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
-                },
-                {
-                    cardNumber: 7,
-                    id: 'selectedIndexDay',
-                    label: translations.followUpFilter.dayOfFollowUp,
-                    type: 'IntervalPicker',
-                    allowOverlap: true,
-                    value: '',
-                    min: 0,
-                    max: 150,
-                    isRequired: false,
-                    isEditMode: true,
-                    single: false
-                }
-            ]
         }
     ],
     sort: {
@@ -1689,6 +1665,39 @@ const personFilterScreen = {
         ]
     }
 };
+
+const contactFilterScreen = {
+    filter:[
+        ...personFilterScreen.filter,
+        {
+            fields: [
+                {
+                    cardNumber: 7,
+                    label: translations.followUpFilter.dayOfFollowUp,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                },
+                {
+                    cardNumber: 7,
+                    id: 'selectedIndexDay',
+                    label: translations.followUpFilter.dayOfFollowUp,
+                    type: 'IntervalPicker',
+                    allowOverlap: true,
+                    value: '',
+                    min: 0,
+                    max: 150,
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        }
+        ],
+    sort: {
+        ...personFilterScreen.sort
+    }
+}
 
 const followUpsFilterScreen = {
     filter: [
@@ -3103,6 +3112,7 @@ export default {
     labResultsFilterScreen,
     helpFilterScreen,
     casesFilterScreen,
+    contactFilterScreen,
     caseSingleScreen,
     eventsFilterScreen,
     eventSingleScreen,

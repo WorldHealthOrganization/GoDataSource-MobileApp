@@ -59,7 +59,7 @@ class FilterScreen extends Component {
 
         const { tabsValuesRoutes, localTranslationTokens } = config;
         const { sortOrderDropDownItems, sortCriteriaDropDownItems, eventSortCriteriaDropDownItems, helpItemsSortCriteriaDropDownItems } = config;
-        const { followUpsFilterScreen,personFilterScreen, casesFilterScreen, helpFilterScreen, labResultsFilterScreen, eventsFilterScreen, labResultsFilterScreenNoContactPermission } = config;
+        const { followUpsFilterScreen,personFilterScreen, contactFilterScreen, casesFilterScreen, helpFilterScreen, labResultsFilterScreen, eventsFilterScreen, labResultsFilterScreenNoContactPermission } = config;
 
         let filterClone = cloneDeep(filter.filter);
         let sortClone = cloneDeep(filter.sort);
@@ -129,6 +129,11 @@ class FilterScreen extends Component {
 
         switch (screen) {
             case 'ContactsScreen':
+                screenTitle = getTranslation(translations.followUpFilter.contactFilterTitle, translation);
+                routes = tabsValuesRoutes.personFilter;
+                configFilterScreen = contactFilterScreen;
+                mySortCriteriaDropDownItems = sortCriteriaDropDownItems;
+                break;
             case 'ContactsOfContactsScreen':
                 screenTitle = getTranslation(translations.followUpFilter.contactFilterTitle, translation);
                 routes = tabsValuesRoutes.personFilter;
