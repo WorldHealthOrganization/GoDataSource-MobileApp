@@ -145,7 +145,6 @@ class FirstConfigScreen extends Component {
         Promise.resolve()
             .then(() => AsyncStorage.getItem('activeDatabase'))
             .then((activeDatabase) => {
-                console.log("active database")
                 activeDatabaseGlobal = activeDatabase;
                 let lastSyncDatePromise = AsyncStorage.getItem(activeDatabase);
                 let internetCredentialsPromise = getInternetCredentials(activeDatabase);
@@ -154,7 +153,6 @@ class FirstConfigScreen extends Component {
                 return Promise.all([lastSyncDatePromise, internetCredentialsPromise, databasesPromise])
             })
             .then(([lastSyncDate, internetCredentials, databases]) => {
-                console.log("What happened", internetCredentials);
                 let currentHubConfig = JSON.parse(internetCredentials.username);
                 // console.log('Active database credentials: ', JSON.parse(activeDatabaseCredentials.username));
                 let databaseId = Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service;
@@ -177,7 +175,6 @@ class FirstConfigScreen extends Component {
                     showLoading: false,
                     allDatabases: databasesGlobal
                 }, () => {
-                    console.log("It did change!", this.state, this.props.verifyChangesExist);
                     this.props.verifyChangesExist();
                 })
             })
@@ -194,7 +191,6 @@ class FirstConfigScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log("Render", this.state);
         let marginHorizontal = calculateDimension(16, false, this.props.screenSize);
         let width = calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize);
         let marginVertical = 4;
@@ -402,7 +398,7 @@ class FirstConfigScreen extends Component {
                                 />
                                 <Button
                                     title={'Delete'}
-                                    disabled={this.state.databaseToBeDeleted === this.state.databaseId && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId)) && !this.state.hubReplacement}
+                                    disabled={(this.state.databaseToBeDeleted === this.state.databaseId && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId))) && !this.state.hubReplacement}
                                     onPress={this.onConfirmDelete}
                                     color={styles.colorButtonRed}
                                     titleColor={'white'}
@@ -531,6 +527,7 @@ class FirstConfigScreen extends Component {
     };
 
     onChangeDropDown = (value, id) => {
+        console.log("What's the hub replacement?", this.state.hubReplacement, value, id)
         this.setState({
             [id]: value
         })

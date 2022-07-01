@@ -48,6 +48,7 @@ const DatePicker = React.memo(({
         if (newDate && typeof newDate === 'string' && newDate !== '') {
             newDate = new Date(value);
         }
+
         return (
             <View style={[{marginVertical: 10, flexDirection: 'row', marginBottom: 7.5}, style]}>
                 <View style = {{flex: 1}}>
@@ -103,7 +104,7 @@ const DatePicker = React.memo(({
                         isDarkModeEnabled={isDarkMode}
                         date={value ? new Date(
                             Date.parse(
-                                moment(value, 'DD/MM/YYYY').format(
+                                moment(new Date(value), 'DD/MM/YYYY').format(
                                     'ddd MMM DD YYYY HH:mm:ss ZZ',
                                 ),
                             ),
@@ -164,6 +165,14 @@ const DatePicker = React.memo(({
 
     const handleShowDatePicker = () => {
         console.log("Show date picker", isDateTimePickerVisible);
+        console.log("Show date picker 2", `"${value}"`);
+        console.log("Show date picker 3", value ? new Date(
+            Date.parse(
+                moment(new Date(value), 'DD/MM/YYYY').format(
+                    'ddd MMM DD YYYY HH:mm:ss ZZ',
+                ),
+            ),
+        ) : new Date())
         setIsDateTimePickerVisible(true);
     };
 
