@@ -114,7 +114,7 @@ class TextInput extends Component {
         let localValue = this.extractAgeForViewInput();
         let tooltip = getTooltip(this.props.label, this.props.translation);
         return (
-            <View style={[{flexDirection: 'row', marginTop: 7},this.props.style]}>
+            <View style={[{flexDirection: 'row', marginTop: 25},this.props.style]}>
                 <View style={{flex: 1}}>
                     {
                         this.props.skipLabel ? (null) : (

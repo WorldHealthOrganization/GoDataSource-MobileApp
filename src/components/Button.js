@@ -27,6 +27,7 @@ class Button extends PureComponent {
             <RaisedTextButton
                 title={getTranslation(this.props.title, this.props.translation)}
                 color={this.props.color}
+                disabled={this.props.disabled}
                 titleColor={this.props.titleColor}
                 titleStyle={[{
                     fontFamily: 'Roboto-Regular',

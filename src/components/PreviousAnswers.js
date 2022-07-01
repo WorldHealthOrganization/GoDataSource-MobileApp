@@ -86,7 +86,7 @@ class PreviousAnswers extends Component {
     // and can slow down the app
     render() {
         return (
-            <ViewHOC style={{ flex: 1, backgroundColor: styles.screenBackgroundGrey,}}
+            <ViewHOC style={{ flex: 1, backgroundColor: styles.screenBackgroundGrey}}
                      showLoader={false}
                      loaderText={"test"}
             >
