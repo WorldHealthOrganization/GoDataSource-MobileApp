@@ -2166,7 +2166,7 @@ class ContactsSingleScreen extends Component {
             if (question.variable && question.answerType !== "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP"){
                 if (previousAnswersClone[question.variable]){
                     previousAnswersClone[question.variable].map((e) => {
-                        return {date: e.date === null ? createDate(value).toISOString() : e.date, value: e.value};
+                        return {date: e.date || createDate(value).toISOString(), value: e.value || null};
                     })
                 } else {
                     previousAnswersClone[question.variable] = [{
@@ -2179,7 +2179,7 @@ class ContactsSingleScreen extends Component {
         for (let questionId in previousAnswersClone) {
             if (previousAnswersClone.hasOwnProperty(questionId)) {
                 previousAnswersClone[questionId] = previousAnswersClone[questionId].map((e) => {
-                    return {date: e.date === null ? createDate(value).toISOString() : e.date, value: e.value};
+                    return {date: e.date || createDate(value).toISOString(), value: e.value || null};
                 });
             }
         }
