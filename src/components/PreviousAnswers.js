@@ -86,19 +86,19 @@ class PreviousAnswers extends Component {
     // and can slow down the app
     render() {
         return (
-            <ViewHOC style={{ flex: 1, backgroundColor: styles.screenBackgroundGrey,}}
+            <ViewHOC style={{ flex: 1, backgroundColor: styles.screenBackgroundColor,}}
                      showLoader={false}
                      loaderText={"test"}
             >
                 <View style={{
-                    backgroundColor: styles.screenBackgroundGrey,
+                    backgroundColor: styles.screenBackgroundColor,
                     flexDirection: 'row',
                     alignSelf: 'center',
                     width: '100%',
                     marginHorizontal: calculateDimension(24, false, this.props.screenSize),
                     marginVertical: calculateDimension(5, true, this.props.screenSize),
                     justifyContent: 'space-between',
-                    borderTopColor: styles.screenBackgroundGrey,
+                    borderTopColor: styles.screenBackgroundColor,
                     borderTopWidth: 1
                 }}>
                     <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 16, marginLeft: 5, }}> { getTranslation(translations.questionCardLabels.previousAnswers, this.props.translation) } </Text>
@@ -363,7 +363,7 @@ class PreviousAnswers extends Component {
 const style = StyleSheet.create({
     mapContainer: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor
     },
     containerContent: {
         justifyContent: 'center',
@@ -374,7 +374,7 @@ const style = StyleSheet.create({
     },
     containerScrollView: {
         flex: 1,
-        backgroundColor: styles.colorWhite
+        backgroundColor: styles.backgroundColor
     },
     contentContainerStyle: {
         alignItems: 'center'
@@ -392,12 +392,12 @@ const style = StyleSheet.create({
     emptyComponentTextView: {
         fontFamily: 'Roboto-Light',
         fontSize: 15,
-        color: styles.textEmptyList
+        color: styles.secondaryColor
     },
     buttonEmptyListText: {
         fontFamily: 'Roboto-Regular',
         fontSize: 16.8,
-        color: styles.buttonTextGray
+        color: styles.secondaryColor
     },
     breadcrumbContainer: {
         flex: 1,

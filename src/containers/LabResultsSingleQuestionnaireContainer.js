@@ -250,12 +250,12 @@ class LabResultsSingleQuestionnaireContainer extends Component {
 const style = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
+        backgroundColor: styles.screenBackgroundColor,
         alignItems: 'center'
     },
     container: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor
     },
     contentContainerStyle: {
         alignItems: 'center'

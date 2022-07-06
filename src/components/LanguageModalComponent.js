@@ -78,7 +78,7 @@ const LanguageModalComponent = React.memo(({availableLanguages, showModal, onCan
                 <LocalButton
                     title={getTranslation(getTranslation(translations.languageModalComponentLabels.downloadButton, translation))}
                     onPress={onPressContinue}
-                    color={styles.buttonGreen}
+                    color={styles.primaryButton}
                     titleColor={'white'}
                     height={calculateDimension(35, true, screenSize)}
                     width={calculateDimension(200, false, screenSize)}

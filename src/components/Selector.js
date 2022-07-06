@@ -45,13 +45,13 @@ class Selector extends PureComponent {
                 style={[
                     style.itemStyle,
                     {
-                        backgroundColor: item.selected ? styles.buttonGreen : styles.colorUnselectedItem,
+                        backgroundColor: item.selected ? styles.primaryButton : styles.secondaryColor,
                         marginHorizontal: index === 0 ? 0 : 10
                     }
                     ]}
                 onPress={() => {this.handleSelectItem(item, index)}}
             >
-                <Text style={[style.itemTextStyle, {color: item.selected ? 'white' : styles.colorUnselectedItemText}]}>
+                <Text style={[style.itemTextStyle, {color: item.selected ? 'white' : styles.textColor}]}>
                     {this.props.shouldTranslate ? getTranslation(item.value, this.props.translation) : item.value}
                 </Text>
             </Ripple>

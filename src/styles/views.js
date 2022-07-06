@@ -1,22 +1,21 @@
-/**
- * Created by florinpopa on 18/07/2018.
- */
+/* Views */
 import colors from './colors';
 
 const lineStyle = {
-    width: '100%',
+    backgroundColor: colors.separatorColor,
     height: 1,
-    backgroundColor: colors.navigationDrawerSeparatorGrey
+    width: '100%'
 };
 
-export const modalStyle = {
-    backgroundColor: 'white',
+const modalStyle = {
+    backgroundColor: colors.backgroundColor,
+    borderRadius: 4,
     marginHorizontal: 16,
-    padding: 8,
-    borderRadius: 10,
-    maxHeight: '70%'
+    maxHeight: '70%',
+    padding: 16
 };
 
 export default {
-    lineStyle
+    lineStyle,
+    modalStyle
 }

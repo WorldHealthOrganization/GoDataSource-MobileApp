@@ -497,7 +497,7 @@ const style = StyleSheet.create({
     },
     containerContent: {
         flex: 1,
-        backgroundColor: styles.appBackground,
+        backgroundColor: styles.screenBackgroundColor,
         paddingBottom: 25
     },
     separatorComponentStyle: {
@@ -516,12 +516,12 @@ const style = StyleSheet.create({
     emptyComponentTextView: {
         fontFamily: 'Roboto-Light',
         fontSize: 15,
-        color: styles.textEmptyList
+        color: styles.secondaryColor
     },
     buttonEmptyListText: {
         fontFamily: 'Roboto-Regular',
         fontSize: 16.8,
-        color: styles.buttonTextGray
+        color: styles.secondaryColor
     },
     breadcrumbContainer: {
         flex: 1,

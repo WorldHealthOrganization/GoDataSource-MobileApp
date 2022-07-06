@@ -35,7 +35,7 @@ CustomMarker = React.memo(({markerStyle, style, currentValue, markerColor}) => {
                 height: 9,
                 justifyContent: 'center',
                 marginBottom: 14,
-                backgroundColor: styles.buttonGreen
+                backgroundColor: styles.primaryButton
             },markerStyle]}/>
         </View>
 )});

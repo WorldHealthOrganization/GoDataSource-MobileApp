@@ -158,7 +158,7 @@ class QuestionCard extends PureComponent {
                                     width={buttonWidth}
                                     height={buttonHeight}
                                     titleColor={'white'}
-                                    color={styles.buttonGreen}
+                                    color={styles.primaryButton}
                                     onPress={() => {
                                         this.props.onCollapse(this.props.item, true);
                                         this.props.onClickAddNewMultiFrequencyAnswer(this.props.item)
@@ -245,7 +245,7 @@ const style = StyleSheet.create({
     },
     containerQuestion: {
         flexDirection: 'row',
-        backgroundColor: styles.colorBackgroundQuestions,
+        backgroundColor: styles.questionsBackgroundColor,
         alignItems: 'center'
     },
     containerQuestionNumber: {

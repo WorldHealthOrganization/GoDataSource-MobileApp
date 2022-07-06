@@ -64,7 +64,7 @@ class DropDown extends PureComponent {
                             {this.state.selectedItems.length === 0 ? this.props.isRequired === false ? getTranslation(translations.dropDownLabels.selectedAnswersLabel, this.props.translation) : getTranslation(translations.dropDownLabels.selectedAnswersLabel, this.props.translation) + '*' : (getTranslation(translations.dropDownLabels.selectedLabel, this.props.translation) + ' ' + this.state.selectedItems.length + ' ' + getTranslation(translations.dropDownLabels.answersLabel, this.props.translation))}</Text>
                         <Icon name="arrow-drop-down"/>
                     </View>
-                    <View style={[{height: 1, backgroundColor: styles.textFieldUnderline, marginTop: 14}]} />
+                    <View style={[{height: 1, backgroundColor: styles.secondaryColor, marginTop: 14}]} />
                     <Modal
                         isVisible={this.state.showDropdown}
                         style={[this.props.dropDownStyle, {
@@ -171,7 +171,7 @@ const style = StyleSheet.create({
         flex: 1,
         fontFamily: 'Roboto-Light',
         fontSize: 15,
-        color: styles.navigationDrawerItemText
+        color: styles.textColor
     },
     innerTextContainer: {
         flexDirection: 'row',

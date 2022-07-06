@@ -29,7 +29,7 @@ class FiltersContainer extends PureComponent {
                 <Button
                     title={getTranslation(translations.generalButtons.nextButtonLabel, translation)}
                     onPress={handleMoveToNextScreenButton}
-                    color={styles.buttonGreen}
+                    color={styles.primaryButton}
                     titleColor={'white'}
                     height={calculateDimension(25, true, screenSize)}
                     width={calculateDimension(130, false, screenSize)}
@@ -50,7 +50,7 @@ class FiltersContainer extends PureComponent {
                 <View style={style.containerButtonApplyFilters}>
                     <Button
                         title={getTranslation(translations.generalLabels.applyFiltersButton, translation)}
-                        color={styles.buttonGreen}
+                        color={styles.primaryButton}
                         onPress={onPressApplyFilters}
                         width={calculateDimension(247.5, false, screenSize)}
                         height={calculateDimension(32, true, screenSize)}
@@ -62,7 +62,7 @@ class FiltersContainer extends PureComponent {
                     />
                     <Button
                         title={getTranslation(translations.generalLabels.resetFiltersButton, translation)}
-                        color={styles.buttonWhite}
+                        color={styles.backgroundColor}
                         onPress={onPressResetFilters}
                         width={calculateDimension(80.5, false, screenSize)}
                         height={calculateDimension(32, true, screenSize)}
@@ -235,7 +235,7 @@ const style = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
+        backgroundColor: styles.screenBackgroundColor,
         borderRadius: 2,
         alignItems: 'center',
     },
@@ -248,7 +248,7 @@ const style = StyleSheet.create({
     },
     containerScrollView: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
+        backgroundColor: styles.screenBackgroundColor,
     },
 });
 

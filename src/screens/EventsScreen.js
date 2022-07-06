@@ -136,7 +136,7 @@ class EventsScreen extends Component {
                                 <ElevatedView
                                     elevation={3}
                                     style={{
-                                        backgroundColor: styles.buttonGreen,
+                                        backgroundColor: styles.primaryButton,
                                         width: calculateDimension(33, false, this.props.screenSize),
                                         height: calculateDimension(25, true, this.props.screenSize),
                                         borderRadius: 4
@@ -158,7 +158,7 @@ class EventsScreen extends Component {
                                         <ElevatedView
                                             elevation={3}
                                             style={{
-                                                backgroundColor: styles.buttonGreen,
+                                                backgroundColor: styles.primaryButton,
                                                 width: calculateDimension(33, false, this.props.screenSize),
                                                 height: calculateDimension(25, true, this.props.screenSize),
                                                 borderRadius: 4
@@ -222,7 +222,7 @@ class EventsScreen extends Component {
                             {
                                 width: '100%',
                                 height: 60,
-                                backgroundColor: styles.appBackground,
+                                backgroundColor: styles.backgroundColor,
                                 justifyContent: 'center',
                                 alignItems: 'center'
                             }}
@@ -369,7 +369,7 @@ const style = StyleSheet.create({
     },
     containerContent: {
         flex: 1,
-        backgroundColor: styles.appBackground,
+        backgroundColor: styles.screenBackgroundColor,
         paddingBottom: 25
     },
     separatorComponentStyle: {

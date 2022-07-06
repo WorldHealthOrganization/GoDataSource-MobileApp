@@ -88,7 +88,7 @@ class UsersScreen extends Component {
                                 <ElevatedView
                                     elevation={3}
                                     style={{
-                                        backgroundColor: styles.buttonGreen,
+                                        backgroundColor: styles.primaryButton,
                                         width: calculateDimension(33, false, this.props.screenSize),
                                         height: calculateDimension(25, true, this.props.screenSize),
                                         borderRadius: 4, marginLeft: 10
@@ -186,7 +186,7 @@ const style = StyleSheet.create({
     },
     containerContent: {
         flex: 1,
-        backgroundColor: styles.appBackground,
+        backgroundColor: styles.screenBackgroundColor,
         paddingBottom: 25
     },
     separatorComponentStyle: {

@@ -279,7 +279,7 @@ class FilterScreen extends Component {
             <TabBar
                 {...props}
                 indicatorStyle={{
-                    backgroundColor: styles.buttonGreen,
+                    backgroundColor: styles.primaryButton,
                     height: 2
                 }}
                 style={{
@@ -298,7 +298,7 @@ class FilterScreen extends Component {
             // const inputRange = props.navigationState.routes.map((x, i) => i);
             //
             // const outputRange = inputRange.map(
-            //     inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
+            //     inputIndex => (inputIndex === index ? styles.textColor : styles.disabledColor)
             // );
             // const color = props.position.interpolate({
             //     inputRange,
@@ -309,7 +309,7 @@ class FilterScreen extends Component {
                 <Animated.Text style={{
                     fontFamily: 'Roboto-Medium',
                     fontSize: 12,
-                    color: styles.colorLabelActiveTab,
+                    color: styles.textColor,
                     flex: 1,
                     alignSelf: 'center'
                 }}>

@@ -6,7 +6,6 @@
 import React, {Component} from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import Ripple from 'react-native-material-ripple';
@@ -34,6 +33,7 @@ import {getContactsForOutbreakId} from "../actions/contacts";
 import {compose} from "redux";
 import {Navigation} from "react-native-navigation";
 import constants from "../utils/constants";
+import styles from './../styles';
 
 class CasesScreen extends Component {
 
@@ -113,7 +113,7 @@ class CasesScreen extends Component {
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View style={{flex: 1, flexDirection: 'row'}}>
+                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingRight: 16}}>
                             <View
                                 style={[style.breadcrumbContainer]}>
                                 <Breadcrumb
@@ -122,23 +122,23 @@ class CasesScreen extends Component {
                                     componentId={this.props.componentId}
                                 />
                             </View>
-                            <View style={{flex: 0.15, marginRight: 10}}>
+                            <View style={{marginRight: 8}}>
                                 <Ripple style={{
                                     flex: 1,
                                     justifyContent: 'center',
                                     alignItems: 'center'
                                 }} onPress={this.handleOnPressQRCode}>
-                                    <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20}/>
+                                    <MaterialCommunityIcons name="qrcode-scan" color={styles.textColor} size={24}/>
                                 </Ripple>
                             </View>
 
-                            <View style={{flex: 0.15, marginRight: 10}}>
+                            <View style={{marginRight: 8}}>
                                 <ElevatedView
                                     elevation={3}
                                     style={{
-                                        backgroundColor: styles.buttonGreen,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        backgroundColor: styles.secondaryColor,
+                                        width: calculateDimension(30, false, this.props.screenSize),
+                                        height: calculateDimension(30, true, this.props.screenSize),
                                         borderRadius: 4
                                     }}
                                 >
@@ -147,20 +147,20 @@ class CasesScreen extends Component {
                                         justifyContent: 'center',
                                         alignItems: 'center'
                                     }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15}/>
+                                        <Icon name="help" color={styles.backgroundColor} size={18}/>
                                     </Ripple>
                                 </ElevatedView>
                             </View>
 
                             <PermissionComponent
                                 render={() => (
-                                    <View style={{flex: 0.15}}>
+                                    <View>
                                         <ElevatedView
                                             elevation={3}
                                             style={{
-                                                backgroundColor: styles.buttonGreen,
-                                                width: calculateDimension(33, false, this.props.screenSize),
-                                                height: calculateDimension(25, true, this.props.screenSize),
+                                                backgroundColor: styles.primaryColor,
+                                                width: calculateDimension(30, false, this.props.screenSize),
+                                                height: calculateDimension(30, true, this.props.screenSize),
                                                 borderRadius: 4
                                             }}
                                         >
@@ -169,7 +169,7 @@ class CasesScreen extends Component {
                                                 justifyContent: 'center',
                                                 alignItems: 'center'
                                             }} onPress={this.handleOnPressAddCase}>
-                                                <Icon name="add" color={'white'} size={15}/>
+                                                <Icon name="add" color={styles.backgroundColor} size={18}/>
                                             </Ripple>
                                         </ElevatedView>
                                     </View>
@@ -221,13 +221,13 @@ class CasesScreen extends Component {
                         <View style={
                             {
                                 width: '100%',
-                                height: 60,
-                                backgroundColor: styles.appBackground,
+                                height: 30,
+                                backgroundColor: styles.primaryColor,
                                 justifyContent: 'center',
                                 alignItems: 'center'
                             }}
                         >
-                            <ActivityIndicator animating size={'large'} />
+                            <ActivityIndicator animating size={'small'} color={styles.backgroundColor} />
                         </View>
                     ) : (null)
                 }
@@ -364,19 +364,18 @@ const style = StyleSheet.create({
         backgroundColor: '#F5FCFF'
     },
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        flex: 1
     },
     containerContent: {
         flex: 1,
-        backgroundColor: styles.appBackground,
-        paddingBottom: 25
+        backgroundColor: styles.screenBackgroundColor
     },
     separatorComponentStyle: {
         height: 8
     },
     breadcrumbContainer: {
-        flex: 0.8,
+        alignItems: 'center',
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'flex-start'
     },

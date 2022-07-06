@@ -14,6 +14,7 @@ import {getTooltip} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
 import lodashGet from 'lodash/get';
 import {Switch} from 'react-native-ui-lib';
+import colors from '../styles/colors';
 
 class IntervalPicker extends PureComponent {
 
@@ -45,9 +46,8 @@ class IntervalPicker extends PureComponent {
         return (
             <View
                 style={[{
-                    backgroundColor: 'white',
-                    marginVertical: 3,
-                    borderRadius: 3,
+                    backgroundColor: colors.separatorColor,
+                    borderRadius: 4,
                     alignItems: 'center'
                 }, this.props.style]}
             >
@@ -56,7 +56,8 @@ class IntervalPicker extends PureComponent {
                         flexDirection: 'row',
                         width: '100%',
                         alignItems: 'center',
-                        justifyContent: 'space-around'
+                        justifyContent: 'space-between',
+                        paddingHorizontal: 16
                     }}>
                     {
                         this.props.showSwitch &&
@@ -73,10 +74,10 @@ class IntervalPicker extends PureComponent {
                                 });
                             }}
                             height={18}
-                            width={40}
-                            thumbSize={16}
-                            offColor={lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)}
-                            onColor={lodashGet(this.props, 'selectedStyle', styles.buttonGreen)}
+                            width={36}
+                            thumbSize={14}
+                            offColor={lodashGet(this.props, 'unselectedStyle', colors.secondaryColor)}
+                            onColor={lodashGet(this.props, 'selectedStyle', colors.primaryColor)}
                         />
                     }
 
@@ -91,13 +92,13 @@ class IntervalPicker extends PureComponent {
                         snapped
                         sliderLength={this.props.showSwitch ? this.props.sliderLength - 40 : this.props.sliderLength}
                         unselectedStyle={{
-                            backgroundColor: lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)
+                            backgroundColor: lodashGet(this.props, 'unselectedStyle', colors.secondaryColor)
                         }}
                         selectedStyle={{
                             backgroundColor: this.state.active ?
-                                lodashGet(this.props, 'selectedStyle', styles.buttonGreen)
+                                lodashGet(this.props, 'selectedStyle', colors.primaryColor)
                                 :
-                                lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)
+                                lodashGet(this.props, 'unselectedStyle', colors.secondaryColor)
                         }}
                         customMarker={(props) => {
                              return (
@@ -105,11 +106,14 @@ class IntervalPicker extends PureComponent {
                                     currentValue={props.currentValue}
                                     markerStyle={{
                                         backgroundColor: this.state.active ?
-                                            lodashGet(this.props, 'selectedStyle', styles.buttonGreen)
+                                            lodashGet(this.props, 'selectedStyle', colors.primaryColor)
                                             :
-                                            lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)
+                                            lodashGet(this.props, 'unselectedStyle', colors.secondaryColor),
+                                        height: 14,
+                                        width: 14,
+                                        top: -2
                                     }}
-                                    markerColor={this.state.active ? this.props.markerColor : lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)}
+                                    markerColor={this.state.active ? this.props.markerColor : lodashGet(this.props, 'unselectedStyle', colors.secondaryColor)}
                                 />)
                         }}
                         allowOverlap={this.props.allowOverlap || true}
@@ -122,7 +126,7 @@ class IntervalPicker extends PureComponent {
                                     flex: 0,
                                     marginTop: 0,
                                     marginBottom: 0,
-                                    marginLeft: 5
+                                    marginLeft: 8
                                 }}
                             />
                         ) : null
@@ -151,8 +155,8 @@ IntervalPicker.defaultProps = {
     noMargin: true,
     markerColor: 'black',
     sliderLength: 280,
-    selectedStyle: styles.buttonGreen,
-    unselectedStyle: styles.navigationDrawerSeparatorGrey
+    selectedStyle: styles.primaryButton,
+    unselectedStyle: styles.separatorColor
 };
 
 IntervalPicker.propTypes = {

@@ -41,7 +41,7 @@ class SortContainer extends Component {
                 <Button
                     title={'Back'}
                     onPress={handleMoveToPrevieousScreenButton}
-                    color={styles.buttonGreen}
+                    color={styles.primaryButton}
                     titleColor={'white'}
                     height={calculateDimension(25, true, screenSize)}
                     width={calculateDimension(130, false, screenSize)}
@@ -73,7 +73,7 @@ class SortContainer extends Component {
                                     }}
                                     onPress={onPressAddSortRule}
                                 >
-                                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
+                                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.primaryButton }}>
                                         {addSortRuleText}
                                     </Text>
                                 </Ripple>
@@ -83,7 +83,7 @@ class SortContainer extends Component {
                 <View style={style.containerButtonApplyFilters}>
                     <Button
                         title={getTranslation(translations.generalLabels.applyFiltersButton, translation)}
-                        color={styles.buttonGreen}
+                        color={styles.primaryButton}
                         onPress={onPressApplyFilters}
                         width={calculateDimension(247.5, false, screenSize)}
                         height={calculateDimension(32, true, screenSize)}
@@ -95,7 +95,7 @@ class SortContainer extends Component {
                     />
                     <Button
                         title={getTranslation(translations.generalLabels.resetFiltersButton, translation)}
-                        color={styles.buttonWhite}
+                        color={styles.backgroundColor}
                         onPress={onPressResetFilters}
                         width={calculateDimension(80.5, false, screenSize)}
                         height={calculateDimension(32, true, screenSize)}
@@ -209,7 +209,7 @@ const style = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
+        backgroundColor: styles.screenBackgroundColor,
         borderRadius: 2,
         alignItems: 'center',
     },
@@ -219,7 +219,7 @@ const style = StyleSheet.create({
     },
     containerScrollView: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor
     },
     contentContainerStyle: {
         alignItems: 'center'

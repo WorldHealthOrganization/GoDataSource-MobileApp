@@ -10,7 +10,6 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {computeOutbreakSwitch, logoutUser, updateUser} from './../actions/user';
 import {changeAppRoot, getTranslationsAsync, saveSelectedScreen, sendDatabaseToServer} from './../actions/app';
-import styles from './../styles';
 import {Icon, ListItem} from 'react-native-material-ui';
 import DropdownInput from './../components/DropdownInput';
 import {
@@ -30,6 +29,7 @@ import {Navigation} from "react-native-navigation";
 import {Dropdown} from "react-native-material-dropdown";
 import {getAllOutbreaks} from "../queries/outbreak";
 import {storeOutbreak} from "../actions/outbreak";
+import styles from './../styles';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -78,36 +78,58 @@ class NavigationDrawer extends Component {
         return (
             <View style={style.container}>
                 <View
-                    style={{
-                        flex: 0.4,
-                        marginTop: Platform.OS === 'ios' ? (this.props.screenSize.height === 812 ? 44 : 20) : 0,
-                        justifyContent: 'space-around'
-                    }}>
+                    style={[
+                        style.topNavContainer,
+                        {
+                            marginTop: Platform.OS === 'ios' ? (this.props.screenSize.height === 812 ? 44 : 20) : 0
+                        }
+                    ]}>
                         <ListItem
                             numberOfLines={2}
-                            leftElement={<Icon name="account-circle" size={38} color={styles.buttonGreen}/>}
+                            leftElement={<Icon name="account-circle" size={36} color={styles.primaryColor} />}
                             centerElement={{
                                 primaryText: (this.props.user && this.props.user.firstName ? (this.props.user.firstName + ' ') : ' ') + (this.props.user && this.props.user.lastName ? this.props.user.lastName : ' '),
                                 secondaryText: this.props.user && this.props.user.email ? this.props.user.email : ' '
                             }}
                             style={{
-                                primaryText: {fontFamily: 'Roboto-Medium', fontSize: 18},
-                                secondaryText: {fontFamily: 'Roboto-Regular', fontSize: 12},
-                                centerElementContainer: {height: '100%', justifyContent: 'center'}
+                                primaryText: {
+                                    color: styles.textColor, fontFamily: 'Roboto-Medium', fontSize: 18
+                                },
+                                secondaryText: {
+                                    color: styles.secondaryColor, fontFamily: 'Roboto-Regular', fontSize: 12
+                                },
+                                centerElementContainer: {
+                                    height: '100%', justifyContent: 'center'
+                                },
+                                container: {
+                                    borderBottomWidth: 1, borderBottomColor: styles.separatorColor
+                                }
                             }}
                         />
                     {
                         this.props && this.props.outbreak && this.props.outbreak.name ? (
-                            <View style={{marginHorizontal: 16}}>
-                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText, marginBottom: -15}} numberOfLines={1}>{getTranslation(translations.navigationDrawer.activeOutbreak, this.props.translation)}</Text>
+                            <View style={style.activeOutbreakContainer}>
                                 <Dropdown
                                     useNativeDriver={true}
+                                    label={getTranslation(translations.navigationDrawer.activeOutbreak, this.props.translation)}
                                     value={this.props.outbreak?._id}
                                     labelExtractor={element => element.name}
                                     valueExtractor={element => element._id}
                                     containerStyle={{
-                                        margin:0, padding:0
+                                        marginBottom: 0
                                     }}
+                                    inputContainerStyle={{
+                                        borderBottomColor: 'transparent',
+                                        paddingHorizontal: 16
+                                    }}
+                                    labelTextStyle={{
+                                        marginLeft: 16
+                                    }}
+                                    pickerStyle={{
+                                        marginLeft: 0,
+                                        width: '80%'
+                                    }}
+                                    selectedItemColor={styles.primaryColor}
                                     disabled={!!this.props.outbreak?.disableOutbreakChange}
                                     data={this.state.outbreaks}
                                     onChangeText={(value,index,data)=>{
@@ -116,13 +138,12 @@ class NavigationDrawer extends Component {
                                         AsyncStorage.setItem("outbreakId",value);
                                         this.props.computeOutbreakSwitch(this.props.user, value);
                                     }}
-                                    />
+                                />
                             </View>
                         ) : (null)
                     }
-                    <View style={styles.lineStyle} />
                 </View>
-
+                
                 <ScrollView scrollEnabled={true} style={{flex: 0.9}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         Object.keys(config.sideMenuItems).map((item, index) => {
@@ -154,7 +175,7 @@ class NavigationDrawer extends Component {
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.syncHubManually, this.props.translation)} name={'cached'} onPress={this.handleOnPressSync} />
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.changeHubConfig, this.props.translation)} name={'settings'} onPress={this.handleOnPressChangeHubConfig} />
                     <View style={styles.lineStyle} />
-                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <View style={style.languageContainer}>
                         <PermissionComponent
                             render={() => (
                                 <LanguageComponent
@@ -181,6 +202,7 @@ class NavigationDrawer extends Component {
                             ]}
                         />
                     </View>
+                    <View style={styles.lineStyle} />
                     <NavigationDrawerListItem
                         label={getTranslation(translations.navigationDrawer.usersLabel, this.props.translation)}
                         name={'contact-phone'}
@@ -204,16 +226,28 @@ class NavigationDrawer extends Component {
                         name="open-in-browser"
                         onPress={this.handleCommunity}
                     />
-                    <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)} name="power-settings-new" onPress={this.handleLogout} />
-                    <Text
-                        style={{
-                            color: styles.navigationDrawerItemText,
-                            fontFamily: 'Roboto-Medium',
-                            fontSize: 14,
-                            // marginTop: 10,
-                            marginHorizontal: 16
+                    <ListItem
+                        onPress={this.handleLogout}
+                        numberOfLines={1}
+                        leftElement={<Icon name="power-settings-new" color={styles.dangerColor} />}
+                        centerElement={{
+                            primaryText: getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)
                         }}
-                    >
+                        style={{
+                            leftElementContainer: {
+                                marginLeft: 16
+                            },
+                            centerElementContainer: {
+                                marginLeft: -16
+                            },
+                            primaryText: {
+                                color: styles.dangerColor,
+                                fontFamily: 'Roboto-Medium',
+                                fontSize: 16
+                            }
+                        }}
+                    />
+                    <Text style={style.version}>
                         {`Version: ${VersionNumber.appVersion} - build ${VersionNumber.buildVersion}`}
                     </Text>
                 </ScrollView>
@@ -330,15 +364,28 @@ class NavigationDrawer extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
+        backgroundColor: styles.backgroundColor,
         flex: 1,
-        width: '100%',
-        backgroundColor: 'white'
+        width: '100%'
     },
-    textInput: {
-        borderColor: 'red',
-        borderWidth: 1,
-        borderRadius: 20,
-        flex: 1
+    topNavContainer: {
+        borderBottomWidth: 1,
+        borderBottomColor: styles.separatorColor
+    },
+    activeOutbreakContainer: {
+        backgroundColor: styles.backgroundColorRgb
+    },
+    languageContainer: {
+        alignItems: 'center',
+        backgroundColor: styles.backgroundColorRgb,
+        justifyContent: 'center'
+    },
+    version: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Light',
+        fontSize: 12,
+        marginBottom: 8,
+        paddingLeft: 18
     }
 });
 

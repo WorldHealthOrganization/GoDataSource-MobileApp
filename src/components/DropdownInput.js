@@ -10,6 +10,7 @@ import {getTranslation, getTooltip, getDropDownInputDisplayParameters} from './.
 import { Dropdown } from 'react-native-material-dropdown';
 import TooltipComponent from './TooltipComponent'
 import get from 'lodash/get';
+import colors from '../styles/colors';
 
 class DropdownInput extends PureComponent {
 
@@ -46,7 +47,8 @@ class DropdownInput extends PureComponent {
                         value={this.props.value || ''}
                         fontSize={15}
                         labelFontSize={15}
-                        selectedItemColor={'rgb(255,60,56)'}
+                        textColor={colors.textColor}
+                        selectedItemColor={colors.primaryColor}
                         onChangeText={this.handleOnChangeText}
                         dropdownMargins={{min: 4, max: 8}}
                         dropdownPosition={dropDownParams.dropdownPosition}

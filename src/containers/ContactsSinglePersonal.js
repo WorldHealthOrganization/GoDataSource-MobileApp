@@ -118,7 +118,7 @@ class ContactsSinglePersonal extends Component {
                                         }}
                                         onPress={this.props.onPressAddVaccine}
                                     >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
+                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.primaryButton }}>
                                             {!_.get(this.props, 'contact.vaccinesReceived', null) || checkArray(this.props.contact.vaccinesReceived) && this.props.contact.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
                                         </Text>
                                     </Ripple>
@@ -142,7 +142,7 @@ class ContactsSinglePersonal extends Component {
                                         }}
                                         onPress={this.props.onPressAddDocument}
                                     >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
+                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.primaryButton }}>
                                             {!_.get(this.props, 'contact.documents', null) || checkArray(this.props.contact.documents) && this.props.contact.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
                                         </Text>
                                     </Ripple>
@@ -393,7 +393,7 @@ const style = StyleSheet.create({
     },
     viewContainer: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
+        backgroundColor: styles.screenBackgroundColor,
         alignItems: 'center',
     },
     cardStyle: {
@@ -402,7 +402,7 @@ const style = StyleSheet.create({
     },
     containerScrollView: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor
     },
     contentContainerStyle: {
         alignItems: 'center'

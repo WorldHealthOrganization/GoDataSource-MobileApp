@@ -19,7 +19,7 @@ class InAppNotificationScreen extends Component {
                 height: 70,
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: styles.buttonGreen
+                backgroundColor: styles.primaryButton
             }}>
                 <Text
                     style={{

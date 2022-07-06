@@ -9,7 +9,6 @@
 import React, {Component} from 'react';
 import {Alert, Image, Platform, StyleSheet, Text, View} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
-import styles from './../styles';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {loginUser} from './../actions/user';
@@ -25,6 +24,7 @@ import withPincode from "../components/higherOrderComponents/withPincode";
 import {compose} from "redux";
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
+import styles from './../styles';
 
 class FirstConfigScreen extends Component {
 
@@ -54,42 +54,38 @@ class FirstConfigScreen extends Component {
             >
                 {
                     this.props && this.props.allowBack ? (
-                        <Ripple style={{flexDirection: 'row', position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>
-                            <Icon name="arrow-back"/>
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Hub config</Text>
+                        <Ripple style={[style.topNavLinks, {left: 24}]} onPress={this.handleOnPressBack}>
+                            <Icon name="arrow-back" style={style.topNavLinksIcon} />
+                            <Text style={[style.topNavLinksText, {marginLeft: 4}]}>Hub config</Text>
                         </Ripple>
                     ) : (<View/>)
                 }
                 {
                     this.props && this.props.activeDatabase && !this.props.skipEdit ? (
-                        <Ripple style={{flexDirection: 'row', alignItems: 'center', position: "absolute", top: 20, right: 20}} onPress={this.handleOnPressForward}>
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Current Hub config</Text>
-                            <Icon name="arrow-forward"/>
+                        <Ripple style={[style.topNavLinks, {right: 24}]} onPress={this.handleOnPressForward}>
+                            <Text style={[style.topNavLinksText, {marginRight: 4}]}>Current Hub config</Text>
+                            <Icon name="arrow-forward" style={style.topNavLinksIcon} />
                         </Ripple>
                     ) : (<View/>)
                 }
-                <View style={[style.welcomeTextContainer]}>
+                <View style={style.welcomeTextContainer}>
                     <Text style={style.welcomeText}>
                         {getTranslation(translations.firstConfigScreen.welcomeMessage, null)}
                     </Text>
+                </View>
+                <View style={style.logoContainer}>
+                    <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
                 </View>
                 <View style={style.inputsContainer}>
                     <Text style={style.text}>
                         {getTranslation(translations.firstConfigScreen.infoMessage, null)}
                     </Text>
-                    <Button onPress={this.handlePressScanQR} upperCase={false} icon="photo-camera" raised text={getTranslation(translations.firstConfigScreen.qrScanButton, null)} style={styles.buttonLogin} />
-                    {/*<Button onPress={this.handlePressImport} upperCase={false} icon={<MaterialCommunityIcons size={24} name="download" />} raised text="Import config file" style={styles.buttonLogin} />*/}
-                    <Button onPress={this.handlePressManual} upperCase={false} icon="short-text" raised text={getTranslation(translations.firstConfigScreen.manualConfigButton, null)} style={styles.buttonLogin} />
+                    <Button onPress={this.handlePressScanQR} upperCase={false} icon="photo-camera" flat text={getTranslation(translations.firstConfigScreen.qrScanButton, null)} style={styles.primaryButton} />
+                    {/*<Button onPress={this.handlePressImport} upperCase={false} icon={<MaterialCommunityIcons size={24} name="download" />} flat text="Import config file" style={styles.secondaryButton} />*/}
+                    <Button onPress={this.handlePressManual} upperCase={false} icon="short-text" flat text={getTranslation(translations.firstConfigScreen.manualConfigButton, null)} style={styles.primaryButton} />
                 </View>
-                <View style={style.logoContainer}>
-                    <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
-                    <Text
-                        style={{
-                            color: 'white',
-                            fontFamily: 'Roboto-Medium',
-                            fontSize: 14
-                        }}
-                    >
+                <View>
+                    <Text style={style.version}>
                         {`Version: ${VersionNumber.appVersion} - build ${VersionNumber.buildVersion}`}
                     </Text>
                 </View>
@@ -211,48 +207,67 @@ class FirstConfigScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#55b5a6'
+        backgroundColor: styles.backgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
-        justifyContent: 'space-around',
         alignItems: 'center',
-        flexGrow: 1
+        flexGrow: 1,
+        justifyContent: 'space-between',
+        padding: 24
     },
-    textInput: {
-        width: '100%',
-        alignSelf: 'center'
+    topNavLinks: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        position: "absolute",
+        top: 24
+    },
+    topNavLinksIcon: {
+        color: styles.secondaryColor,
+        fontSize: 18
+    },
+    topNavLinksText: {
+        color: styles.primaryAltColor,
+        fontFamily: 'Roboto-Medium',
+        fontSize: 16
     },
     welcomeTextContainer: {
-        flex: 0.35,
-        width: '75%',
-        justifyContent: 'center'
+        flex: 0.25,
+        justifyContent: 'center',
+        width: '100%'
     },
     welcomeText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Bold',
-        fontSize: 35,
-        color: 'white',
-        textAlign: 'left'
-    },
-    inputsContainer: {
-        flex: 0.15,
-        width: '75%',
-        justifyContent: 'space-around',
+        fontSize: 36,
+        textAlign: 'center'
     },
     logoContainer: {
-        flex: 0.5,
-        width: '100%',
+        alignItems: 'center',
+        flex: 0.25,
         justifyContent: 'center',
-        alignItems: 'center'
+        width: '100%'
     },
     logoStyle: {
-        width: 180,
-        height: 34
+        height: 40,
+        width: 212
     },
     text: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Light',
         fontSize: 16,
-        color: 'white'
+        marginBottom: 16,
+        textAlign: 'center'
+    },
+    inputsContainer: {
+        flex: 0.5,
+        width: '100%'
+    },
+    version: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Light',
+        fontSize: 12,
+        textAlign: 'center'
     }
 });
 

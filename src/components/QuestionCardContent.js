@@ -445,7 +445,7 @@ class QuestionCardContent extends PureComponent {
 const style = StyleSheet.create({
     containerQuestion: {
         flexDirection: 'row',
-        backgroundColor: styles.colorBackgroundQuestions,
+        backgroundColor: styles.questionsBackgroundColor,
         alignItems: 'center'
     },
     containerQuestionNumber: {

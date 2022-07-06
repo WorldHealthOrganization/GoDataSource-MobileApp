@@ -104,7 +104,7 @@ class CaseSingleAddressContainer extends React.Component {
                                         }}
                                         onPress={this.props.onPressAddAddress}
                                     >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
+                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.primaryButton }}>
                                             {this.props.case.addresses && this.props.case.addresses.length === 0 ? getTranslation(translations.caseSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreAddressesText, this.props.translation)}
                                         </Text>
                                     </Ripple>
@@ -354,7 +354,7 @@ const style = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
+        backgroundColor: styles.screenBackgroundColor,
         alignItems: 'center',
     },
     cardStyle: {
@@ -363,7 +363,7 @@ const style = StyleSheet.create({
     },
     containerScrollView: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor
     },
     contentContainerStyle: {
         alignItems: 'center'

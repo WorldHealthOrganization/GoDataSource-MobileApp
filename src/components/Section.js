@@ -58,20 +58,20 @@ const style = StyleSheet.create({
     mediumTextStyle: {
         fontFamily: 'Roboto-Medium',
         fontSize: 16,
-        color: styles.colorLabelActiveTab,
+        color: styles.textColor,
         marginLeft: 15
     },
     normalTextStyle: {
         fontFamily: 'Roboto-Regular',
         fontSize: 15,
-        color: styles.colorUnselectedItemText,
+        color: styles.textColor,
         marginLeft: 15,
         flexShrink: 1
     },
     smallTextStyle: {
         fontFamily: 'Roboto-Light',
         fontSize: 15,
-        color: styles.colorUnselectedItemText,
+        color: styles.textColor,
         marginLeft: 15
     },
     separatorStyle: {
@@ -92,7 +92,7 @@ Section.propTypes = {
 Section.defaultProps = {
     label: 'Test',
     hasBorderBottom: false,
-    borderBottomColor: styles.navigationDrawerSeparatorGrey,
+    borderBottomColor: styles.separatorColor,
     containerStyle: {},
     labelSize: 'large',
     textStyle: {}

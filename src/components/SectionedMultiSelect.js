@@ -99,7 +99,7 @@ class SectionedMultiSelect extends PureComponent {
                                 style={{
                                     flex: 0.1,
                                     flexDirection: 'row',
-                                    backgroundColor: stylesGlobal.screenBackgroundGrey,
+                                    backgroundColor: stylesGlobal.screenBackgroundColor,
                                     alignItems: 'center'
                                 }}
                             >
@@ -140,7 +140,7 @@ class SectionedMultiSelect extends PureComponent {
                                         marginHorizontal: 6.5,
                                         flex: 0.75
                                     }}
-                                    color={stylesGlobal.buttonGreen}
+                                    color={stylesGlobal.primaryColor}
                                     titleColor={'white'}
                                     titleStyle={{fontFamily: 'Roboto-Medium', fontSize: 14}}
                                     onPress={this.handleOnPressShowAll}
@@ -173,7 +173,7 @@ class SectionedMultiSelect extends PureComponent {
                                         marginHorizontal: 6.5,
                                         flex: 0.75
                                     }}
-                                    color={stylesGlobal.buttonGreen}
+                                    color={stylesGlobal.primaryColor}
                                     titleColor={'white'}
                                     titleStyle={{fontFamily: 'Roboto-Medium', fontSize: 14}}
                                     onPress={this.handleOnPressOk}

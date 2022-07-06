@@ -124,7 +124,7 @@ const style = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
+        backgroundColor: styles.screenBackgroundColor,
         alignItems: 'center',
     },
     cardStyle: {
@@ -133,7 +133,7 @@ const style = StyleSheet.create({
     },
     containerScrollView: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor
     },
     contentContainerStyle: {
         alignItems: 'center'

@@ -53,7 +53,7 @@ class DropDownSectioned extends Component {
                         items={this.props.userData}
                         allItems={this.props.data}
                         showUnderline={true}
-                        underlineColor={stylesGlobal.textFieldUnderline}
+                        underlineColor={stylesGlobal.secondaryColor}
                         selectToggleIconComponent={(<Icon name="check" size={18} />)}
                         dropDownToggleIconDownComponent={(<Icon name="arrow-drop-down" size={18} />)}
                         dropDownToggleIconUpComponent={(<Icon name="arrow-drop-up" size={18} />)}

@@ -89,7 +89,7 @@ class CaseSinglePersonalContainer extends Component {
                                         }}
                                         onPress={this.props.onPressAddDocument}
                                     >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
+                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.primaryButton }}>
                                             {!_.get(this.props, 'case.documents', null) || checkArray(this.props.case.documents) && this.props.case.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
                                         </Text>
                                     </Ripple>
@@ -330,7 +330,7 @@ const style = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
+        backgroundColor: styles.screenBackgroundColor,
         alignItems: 'center',
     },
     cardStyle: {
@@ -339,7 +339,7 @@ const style = StyleSheet.create({
     },
     containerScrollView: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor
     },
     contentContainerStyle: {
         alignItems: 'center'

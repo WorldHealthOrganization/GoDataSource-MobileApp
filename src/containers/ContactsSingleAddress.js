@@ -107,7 +107,7 @@ class ContactsSingleAddress extends Component {
                                     }}
                                     onPress={this.props.onPressAddAdrress}
                                 >
-                                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
+                                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.primaryButton }}>
                                         {this.props.contact.addresses && this.props.contact.addresses.length === 0 ? getTranslation(translations.contactSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.contactSingleScreen.moreAddressesText, this.props.translation)}
                                     </Text>
                                 </Ripple>
@@ -170,7 +170,7 @@ class ContactsSingleAddress extends Component {
             item.onPressArray = [this.props.onDeletePress];
             if (this.props.isNew) {
                 item.textsArray = [item.textsArray[0], translations.addressFieldLabels.copyAddress];
-                item.textsStyleArray = [item.textsStyleArray[0], {color: styles.buttonGreen}];
+                item.textsStyleArray = [item.textsStyleArray[0], {color: styles.primaryButton}];
                 item.onPressArray = [item.onPressArray[0], this.props.onPressCopyAddress];
             }
         }
@@ -337,7 +337,7 @@ const style = StyleSheet.create({
     },
     viewContainer: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
+        backgroundColor: styles.screenBackgroundColor,
         alignItems: 'center',
     },
     cardStyle: {
@@ -346,7 +346,7 @@ const style = StyleSheet.create({
     },
     containerScrollView: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor
     },
     contentContainerStyle: {
         alignItems: 'center'

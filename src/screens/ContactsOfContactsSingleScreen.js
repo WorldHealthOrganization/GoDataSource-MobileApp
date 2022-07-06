@@ -274,7 +274,7 @@ class ContactsOfContactsSingleScreen extends Component {
                                 <ElevatedView
                                     elevation={3}
                                     style={{
-                                        backgroundColor: styles.buttonGreen,
+                                        backgroundColor: styles.primaryButton,
                                         width: calculateDimension(33, false, this.props.screenSize),
                                         height: calculateDimension(25, true, this.props.screenSize),
                                         borderRadius: 4
@@ -499,7 +499,7 @@ class ContactsOfContactsSingleScreen extends Component {
             <TabBar
                 {...props}
                 indicatorStyle={{
-                    backgroundColor: styles.buttonGreen,
+                    backgroundColor: styles.primaryButton,
                     height: 2
                 }}
                 style={{
@@ -529,7 +529,7 @@ class ContactsOfContactsSingleScreen extends Component {
         // const inputRange = props.navigationState.routes.map((x, i) => i);
         //
         // const outputRange = inputRange.map(
-        //     inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
+        //     inputIndex => (inputIndex === index ? styles.textColor : styles.disabledColor)
         // );
         // const color = props.position.interpolate({
         //     inputRange,
@@ -540,7 +540,7 @@ class ContactsOfContactsSingleScreen extends Component {
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
-                color: styles.colorLabelActiveTab,
+                color: styles.textColor,
                 flex: 1,
                 alignSelf: 'center'
             }}>

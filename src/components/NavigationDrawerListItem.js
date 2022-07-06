@@ -4,9 +4,8 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {InteractionManager, StyleSheet, View} from 'react-native';
+import {InteractionManager, StyleSheet, Text, View} from 'react-native';
 import {Icon, ListItem} from 'react-native-material-ui';
-import styles from './../styles';
 import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
@@ -14,6 +13,7 @@ import {calculateDimension} from './../utils/functions';
 import PermissionComponent from './../components/PermissionComponent';
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
 import {sideMenuKeys} from "../utils/config";
+import styles from './../styles';
 
 class NavigationDrawerListItem extends PureComponent {
 
@@ -96,22 +96,28 @@ class NavigationDrawerListItem extends PureComponent {
             <PermissionComponent
                 render={() => (
                     <View style={[style.container]}>
-                        <View style={{flex: this.props.addButton ? 0.8 : 1}}>
+                        <View style={[style.containerWrapper, {borderLeftColor: this.props.isSelected ? styles.primaryColor : 'transparent'}]}>
                             <ListItem
                                 numberOfLines={1}
-                                leftElement={<Icon name={this.props.name} color={this.props.isSelected ? styles.buttonGreen : styles.navigationDrawerItemText} />}
+                                leftElement={<Icon name={this.props.name} color={this.props.isSelected ? styles.primaryColor : styles.textColor} />}
                                 centerElement={this.props.label}
                                 hideChevron={false}
                                 onPress={this.onPress}
                                 style={{
                                     container: {
-                                        backgroundColor: this.props.isSelected ? styles.backgroundGreen : 'white',
-                                        marginTop: this.props.isSelected ? 7.5 : 0,
-                                        marginLeft: this.props.isSelected ? 7.5 : 0,
-                                        marginBottom: this.props.isSelected ? 7.5 : 0,
-                                        marginRight: this.props.isSelected ? (this.props.addButton ? 0 : 7.5) : 0
+                                        backgroundColor: this.props.isSelected ? styles.primaryColorRgb : styles.backgroundColor
                                     },
-                                    primaryText: {fontFamily: 'Roboto-Medium', fontSize: 15, color: this.props.isSelected ? styles.buttonGreen : styles.navigationDrawerItemText}
+                                    leftElementContainer: {
+                                        marginLeft: 11
+                                    },
+                                    centerElementContainer: {
+                                        marginLeft: -16
+                                    },
+                                    primaryText: {
+                                        color: this.props.isSelected ? styles.primaryColor : styles.textColor,
+                                        fontFamily: 'Roboto-Medium',
+                                        fontSize: 16
+                                    }
                                 }}
                             />
                         </View>
@@ -120,29 +126,26 @@ class NavigationDrawerListItem extends PureComponent {
                                 (
                                     <PermissionComponent
                                         render={() => (
-                                            <View style={{
-                                                flex: 0.2,
-                                                justifyContent: 'center',
-                                                backgroundColor: this.props.isSelected ? styles.backgroundGreen : 'white',
-                                                marginTop: this.props.isSelected ? 7.5 : 0,
-                                                marginBottom: this.props.isSelected ? 7.5 : 0,
-                                                marginRight: this.props.isSelected ? 7.5 : 0,
-                                            }}>
+                                            <View
+                                                style={[
+                                                    style.permissionStyle,
+                                                    {
+                                                        backgroundColor: this.props.isSelected ? styles.primaryColorRgb : styles.backgroundColor
+                                                    }
+                                                ]}
+                                            >
                                                 <ElevatedView
                                                     elevation={3}
-                                                    style={{
-                                                        backgroundColor: styles.buttonGreen,
-                                                        width: calculateDimension(33, false, this.props.screenSize),
-                                                        height: calculateDimension(25, true, this.props.screenSize),
-                                                        borderRadius: 4
-                                                    }}
+                                                    style={[
+                                                        style.permissionAddButton,
+                                                        {
+                                                            width: calculateDimension(36, false, this.props.screenSize),
+                                                            height: calculateDimension(24, true, this.props.screenSize)
+                                                        }
+                                                    ]}
                                                 >
-                                                    <Ripple style={{
-                                                        flex: 1,
-                                                        justifyContent: 'center',
-                                                        alignItems: 'center'
-                                                    }} onPress={this.props.handleOnPressAdd}>
-                                                        <Icon name="add" color={'white'} size={15}/>
+                                                    <Ripple style={style.addButton} onPress={this.props.handleOnPressAdd}>
+                                                        <Text style={style.addButtonText}>Add</Text>
                                                     </Ripple>
                                                 </ElevatedView>
                                             </View>
@@ -179,8 +182,29 @@ NavigationDrawerListItem.defaultProps = {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        width: '100%',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        width: '100%'
+    },
+    containerWrapper: {
+        borderLeftWidth: 5,
+        flex: 1
+    },
+    permissionStyle: {
+        flex: 0.2,
+        justifyContent: 'center'
+    },
+    permissionAddButton: {
+        backgroundColor: styles.primaryColor,
+        borderRadius: 4
+    },
+    addButton: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    addButtonText: {
+        color: styles.backgroundColor,
+        fontSize: 12
     }
 });
 

@@ -105,7 +105,7 @@ class ContactsSingleCalendar extends Component {
 const style = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
+        backgroundColor: styles.screenBackgroundColor,
         borderRadius: 2
     }
 });

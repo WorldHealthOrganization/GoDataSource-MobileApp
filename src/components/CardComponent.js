@@ -105,7 +105,7 @@ class CardComponent extends Component {
                         isRequired={this.props.item.isRequired}
                         multiline={this.props.item.multiline}
                         style={{width: width, marginHorizontal: marginHorizontal}}
-                        textStyle={this.props.item.id === 'phoneNumber' ? {color: colors.buttonGreen} : undefined}
+                        textStyle={this.props.item.id === 'phoneNumber' ? {color: colors.primaryColor} : undefined}
                         objectType={this.props.item.objectType}
                         keyboardType={this.props.item.keyboardType}
                         translation={this.props.translation}
@@ -345,7 +345,7 @@ class CardComponent extends Component {
  */
 const style = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        backgroundColor: colors.backgroundColor,
         borderRadius: 2
     },
     containerCardComponent: {

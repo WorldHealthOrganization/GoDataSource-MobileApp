@@ -110,7 +110,7 @@ class FollowUpsScreen extends Component {
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View style={{ flex: 1, flexDirection: 'row' }}>
+                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingRight: 16}}>
                             <View
                                 style={[style.breadcrumbContainer]}>
                                 <Breadcrumb
@@ -119,23 +119,23 @@ class FollowUpsScreen extends Component {
                                     componentId={this.props.componentId}
                                 />
                             </View>
-                            <View style={{ flex: 0.15, marginRight: 10 }}>
+                            <View style={{marginRight: 8}}>
                                 <Ripple style={{
                                     flex: 1,
                                     justifyContent: 'center',
                                     alignItems: 'center'
                                 }} onPress={this.handleOnPressQRCode}>
-                                    <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20} />
+                                    <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={24} />
                                 </Ripple>
                             </View>
 
-                            <View style={{flex: 0.135 /*, marginRight: 10*/}}>
+                            <View>
                                 <ElevatedView
                                     elevation={3}
                                     style={{
-                                        backgroundColor: styles.buttonGreen,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
+                                        backgroundColor: styles.secondaryColor,
+                                        width: calculateDimension(30, false, this.props.screenSize),
+                                        height: calculateDimension(30, true, this.props.screenSize),
                                         borderRadius: 4
                                     }}
                                 >
@@ -144,7 +144,7 @@ class FollowUpsScreen extends Component {
                                         justifyContent: 'center',
                                         alignItems: 'center'
                                     }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15}/>
+                                        <Icon name="help" color={'white'} size={18}/>
                                     </Ripple>
                                 </ElevatedView>
                             </View>
@@ -204,7 +204,7 @@ class FollowUpsScreen extends Component {
                             {
                                 width: '100%',
                                 height: 60,
-                                backgroundColor: styles.appBackground,
+                                backgroundColor: styles.backgroundColor,
                                 justifyContent: 'center',
                                 alignItems: 'center'
                             }}
@@ -244,7 +244,7 @@ class FollowUpsScreen extends Component {
         let followUpsColors = {};
         let refData = checkArrayAndLength(this.props.referenceData) ? this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"}) : {};
         for (let i=0; i<refData.length; i++) {
-            followUpsColors[refData[i].value] = refData[i].colorCode || styles.buttonGreen
+            followUpsColors[refData[i].value] = refData[i].colorCode || styles.primaryButton
         }
         this.setState({
                 followUpsColors
@@ -352,13 +352,11 @@ const style = StyleSheet.create({
         backgroundColor: '#F5FCFF'
     },
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        flex: 1
     },
     containerContent: {
         flex: 1,
-        backgroundColor: styles.appBackground,
-        paddingBottom: 25
+        backgroundColor: styles.screenBackgroundColor
     },
     separatorComponentStyle: {
         height: 8
@@ -376,17 +374,18 @@ const style = StyleSheet.create({
     emptyComponentTextView: {
         fontFamily: 'Roboto-Light',
         fontSize: 15,
-        color: styles.textEmptyList
+        color: styles.secondaryColor
     },
     buttonEmptyListText: {
         fontFamily: 'Roboto-Regular',
         fontSize: 16.8,
-        color: styles.buttonTextGray
+        color: styles.secondaryColor
     },
     breadcrumbContainer: {
+        alignItems: 'center',
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'flex-start'
     }
 });
 

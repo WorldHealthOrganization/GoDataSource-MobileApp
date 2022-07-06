@@ -127,7 +127,7 @@ const style = StyleSheet.create({
     textStyle: {
         fontFamily: 'Roboto-Medium',
         fontSize: 12,
-        color: styles.buttonGreen
+        color: styles.primaryButton
     },
     separatorStyle: {
         width: '100%',
@@ -151,7 +151,7 @@ ActionsBar.defaultProps = {
     onPressArray: [],
     arrayPermissions: [],
     hasBorder: true,
-    borderColor: styles.navigationDrawerSeparatorGrey,
+    borderColor: styles.separatorColor,
     containerStyle: {}
 };
 

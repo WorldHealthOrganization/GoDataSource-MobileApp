@@ -105,7 +105,7 @@ class RelationshipScreen extends Component {
                                     <ElevatedView
                                         elevation={3}
                                         style={{
-                                            backgroundColor: styles.buttonGreen,
+                                            backgroundColor: styles.primaryButton,
                                             width: calculateDimension(33, false, this.props.screenSize),
                                             height: calculateDimension(25, true, this.props.screenSize),
                                             borderRadius: 4
@@ -131,7 +131,7 @@ class RelationshipScreen extends Component {
                                     <Button
                                         title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                                         onPress={this.handleSaveExposure}
-                                        color={styles.buttonGreen}
+                                        color={styles.primaryButton}
                                         titleColor={'white'}
                                         height={calculateDimension(25, true, this.props.screenSize)}
                                         width={calculateDimension(130, false, this.props.screenSize)}
@@ -470,7 +470,7 @@ const style = StyleSheet.create({
     },
     containContainer: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
+        backgroundColor: styles.screenBackgroundColor,
         alignItems: 'center',
     },
     cardStyle: {
@@ -479,14 +479,14 @@ const style = StyleSheet.create({
     },
     containerScrollView: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor
     },
     contentContainerStyle: {
         alignItems: 'center'
     },
     innerContainer: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor
     },
     buttonContainer: {
         flexDirection: 'row',

@@ -247,7 +247,7 @@ const style = StyleSheet.create({
     addressStyle: {
         fontFamily: 'Roboto-Light',
         fontSize: 12,
-        color: styles.navigationDrawerItemText
+        color: styles.textColor
     },
     secondSectionContainer: {
         justifyContent: 'center'
@@ -265,7 +265,7 @@ const style = StyleSheet.create({
     rippleTextStyle: {
         fontFamily: 'Roboto-Medium',
         fontSize: 12,
-        color: styles.buttonGreen
+        color: styles.primaryButton
     },
     centerItemContainer: {
         height: '100%',
@@ -279,7 +279,7 @@ const style = StyleSheet.create({
     secondaryText: {
         fontFamily: 'Roboto-Regular',
         fontSize: 15,
-        color: styles.buttonTextGray
+        color: styles.secondaryColor
     },
     exposedToTextStyle: {
         fontFamily: 'Roboto-Medium',

@@ -15,7 +15,6 @@ import ElevatedView from 'react-native-elevated-view';
 import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import Button from './../components/Button';
 import TextInput from './../components/TextInput';
-import styles from './../styles';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import lodashGet from 'lodash/get';
@@ -36,7 +35,7 @@ import RNFS from 'react-native-fs';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import RippleFeedback from 'react-native-material-ripple';
 import {Navigation} from "react-native-navigation";
-
+import styles from './../styles';
 
 let textFieldsStructure = [
     {
@@ -88,8 +87,8 @@ let textFieldsStructure = [
         value: true,
         isRequired: false,
         isEditMode: true,
-        activeButtonColor: 'green',
-        activeBackgroundColor: 'green',
+        activeButtonColor: styles.backgroundColor,
+        activeBackgroundColor: styles.primaryColor,
     },
     {
         id: 'chunkSize',
@@ -201,7 +200,7 @@ class FirstConfigScreen extends Component {
         let minHeight = calculateDimension(72, true, this.props.screenSize);
 
         return (
-                <ViewHOC style={{flex: 1, backgroundColor: 'white'}} showLoader={this.state.showLoading} loaderText="Loading...">
+                <ViewHOC style={{flex: 1, backgroundColor: styles.backgroundColor}} showLoader={this.state.showLoading} loaderText="Loading...">
                     <NavBarCustom style = {style.navbarContainer}
                                   title={getTranslation(translations.hubConfigScreen.label, this.props.translation)}
                                   componentId={this.props.componentId}
@@ -219,7 +218,7 @@ class FirstConfigScreen extends Component {
                             width,
                             marginVertical,
                             minHeight,
-                            backgroundColor: 'white',
+                            backgroundColor: styles.backgroundColor,
                             borderRadius: 2,
                             paddingVertical: 5
                         }}>
@@ -248,8 +247,8 @@ class FirstConfigScreen extends Component {
                                 <Button
                                     title={getTranslation(translations.hubConfigScreen.scanQRButtonLabel, this.props.translation)}
                                     onPress={this.handleOnPressQr}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
+                                    color={styles.primaryButton}
+                                    titleColor={styles.backgroundColor}
                                     height={calculateDimension(25, true, this.props.screenSize)}
                                     width={calculateDimension(165, false, this.props.screenSize)}
                                     style={{
@@ -261,8 +260,8 @@ class FirstConfigScreen extends Component {
                                 <Button
                                     title={getTranslation(translations.hubConfigScreen.saveCurrentHubButtonLabel, this.props.translation)}
                                     onPress={this.handlePressSaveHub}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
+                                    color={styles.primaryButton}
+                                    titleColor={styles.backgroundColor}
                                     height={calculateDimension(25, true, this.props.screenSize)}
                                     width={calculateDimension(165, false, this.props.screenSize)}
                                     style={{
@@ -274,8 +273,8 @@ class FirstConfigScreen extends Component {
                             <Button
                                 title={getTranslation(translations.hubConfigScreen.deleteHubButton, this.props.translation)}
                                 onPress={() => {this.handlePressDeleteHub(this.state.databaseId)}}
-                                color={styles.colorButtonRed}
-                                titleColor={'white'}
+                                color={styles.dangerColor}
+                                titleColor={styles.backgroundColor}
                                 height={calculateDimension(25, true, this.props.screenSize)}
                                 width={calculateDimension(165, false, this.props.screenSize)}
                                 style={{
@@ -292,7 +291,7 @@ class FirstConfigScreen extends Component {
                                 width,
                                 marginVertical,
                                 minHeight,
-                                backgroundColor: 'white',
+                                backgroundColor: styles.backgroundColor,
                                 borderRadius: 2,
                                 paddingVertical: 5
                             }}
@@ -302,8 +301,8 @@ class FirstConfigScreen extends Component {
                                 <Button
                                     title={getTranslation(translations.hubConfigScreen.addHubButtonLabel, this.props.translation)}
                                     onPress={this.handleOnPressAddHub}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
+                                    color={styles.primaryButton}
+                                    titleColor={styles.backgroundColor}
                                     height={calculateDimension(25, true, this.props.screenSize)}
                                     width={calculateDimension(165, false, this.props.screenSize)}
                                     style={{
@@ -321,7 +320,7 @@ class FirstConfigScreen extends Component {
                                 width,
                                 marginVertical,
                                 minHeight,
-                                backgroundColor: 'white',
+                                backgroundColor: styles.backgroundColor,
                                 borderRadius: 2,
                                 paddingVertical: 5
                             }}
@@ -391,8 +390,8 @@ class FirstConfigScreen extends Component {
                                 <Button
                                     title={"Cancel"}
                                     onPress={this.hideModal}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
+                                    color={styles.primaryColor}
+                                    titleColor={styles.backgroundColor}
                                     height={calculateDimension(25, true, this.props.screenSize)}
                                     width={calculateDimension(125, false, this.props.screenSize)}
                                     style={{
@@ -404,8 +403,8 @@ class FirstConfigScreen extends Component {
                                     title={'Delete'}
                                     disabled={this.state.databaseToBeDeleted === this.state.databaseId && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId)) && !this.state.hubReplacement}
                                     onPress={this.onConfirmDelete}
-                                    color={styles.colorButtonRed}
-                                    titleColor={'white'}
+                                    color={styles.dangerColor}
+                                    titleColor={styles.backgroundColor}
                                     height={calculateDimension(25, true, this.props.screenSize)}
                                     width={calculateDimension(125, false, this.props.screenSize)}
                                     style={{
@@ -627,11 +626,11 @@ class FirstConfigScreen extends Component {
                     }}
                 >
                     <Button
-                        color={styles.buttonGreen}
+                        color={styles.primaryButton}
                         height={calculateDimension(25, true, this.props.screenSize)}
                         width={calculateDimension(110, false, this.props.screenSize)}
                         title={'Make active'}
-                        titleColor={'white'}
+                        titleColor={styles.backgroundColor}
                         onPress={() => {
                             this.onPressMakeHubActive(database)
                         }}
@@ -821,10 +820,10 @@ class FirstConfigScreen extends Component {
 const style = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5FCFF'
+        backgroundColor: styles.screenBackgroundColor
     },
     navbarContainer: {
-        backgroundColor: 'white'
+        backgroundColor: styles.backgroundColor
     },
     contentContainerStyle: {
         alignItems: 'center'
@@ -841,7 +840,7 @@ const style = StyleSheet.create({
     welcomeText: {
         fontFamily: 'Roboto-Bold',
         fontSize: 35,
-        color: 'white',
+        color: styles.backgroundColor,
         textAlign: 'left'
     },
     inputsContainer: {
@@ -862,7 +861,7 @@ const style = StyleSheet.create({
     text: {
         fontFamily: 'Roboto-Light',
         fontSize: 16,
-        color: 'white'
+        color: styles.backgroundColor
     }
 });
 

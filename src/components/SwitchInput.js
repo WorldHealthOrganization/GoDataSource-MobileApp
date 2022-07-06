@@ -13,6 +13,7 @@ import TooltipComponent from './TooltipComponent';
 // import Switch from 'react-native-material-switch';
 import {Switch} from 'react-native-ui-lib';
 import {isFunction} from './../utils/typeCheckingFunctions';
+import colors from '../styles/colors';
 
 class SwitchInput extends PureComponent {
 
@@ -39,7 +40,7 @@ class SwitchInput extends PureComponent {
         // console.log('Render switchInput stuff: ', this.props.value);
         let tooltip = getTooltip(this.props.label, this.props.translation, this.props.tooltipsMessage, this.props.tooltipsMessage);
         return (
-            <View style={[{flexDirection: 'row', marginVertical: 10}, this.props.style]}>
+            <View style={[{flexDirection: 'row'}, this.props.style]}>
                 <Text style={[{flex: 1}, this.props.labelStyle]}>
                     {getTranslation(this.props.label, this.props.translation)}
                 </Text>
@@ -47,8 +48,8 @@ class SwitchInput extends PureComponent {
                     value={this.props.value}
                     // onColor={this.props.activeButtonColor}
                     // onTintColor={this.props.activeBackgroundColor}
-                    onColor={'green'}
-                    onTintColor={'white'}
+                    onColor={colors.primaryColor}
+                    onTintColor={colors.backgroundColor}
                     onValueChange={(state) => {
                         // console.log("Value of the SwitchInput changed to: ", state);
                         if (isFunction(this.props.onChange)) {
@@ -61,9 +62,9 @@ class SwitchInput extends PureComponent {
                         }
                     }}
                     height={18}
-                    width={40}
-                    thumbSize={16}
-                    offColor={'gray'}
+                    width={36}
+                    thumbSize={14}
+                    offColor={colors.secondaryColor}
                     onActivate={() => {console.log('OnActivate SwitchInput');}}
                     onDeactivate={() => {console.log('OnDeactivate SwitchInput');}}
                 />
@@ -75,7 +76,7 @@ class SwitchInput extends PureComponent {
                                 flex: 0,
                                 marginTop: 0,
                                 marginBottom: 0,
-                                marginLeft: 5
+                                marginLeft: 8
                             }}
                         />
                     ) : null
@@ -95,10 +96,10 @@ class SwitchInput extends PureComponent {
                     this.props.showValue ? (
                         <Text style={{
                             fontFamily: 'Roboto-Light',
-                            fontSize: 15,
+                            fontSize: 16,
                             textAlign: 'left',
-                            color: 'rgb(60,60,60)',
-                            marginTop: 7,
+                            color: colors.textColor,
+                            marginTop: 8,
                         }}>
                             {this.props.value !== true ? getTranslation(translations.generalLabels.noAnswer, this.props.translation) : getTranslation(translations.generalLabels.yesAnswer, this.props.translation)}
                         </Text>
@@ -112,7 +113,7 @@ class SwitchInput extends PureComponent {
                                 flex: 0,
                                 marginTop: 0,
                                 marginBottom: 0,
-                                marginLeft: 5
+                                marginLeft: 8
                             }}
                         />
                     ) : null

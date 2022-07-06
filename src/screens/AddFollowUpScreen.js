@@ -9,7 +9,6 @@
 import React, {PureComponent} from 'react';
 import {StyleSheet, View} from 'react-native';
 import Button from './../components/Button';
-import styles from './../styles';
 import {connect} from "react-redux";
 import get from 'lodash/get';
 import ElevatedView from 'react-native-elevated-view';
@@ -19,6 +18,7 @@ import DatePicker from './../components/DatePicker';
 import {Dialog} from 'react-native-ui-lib';
 import translations from './../utils/translations';
 import config from './../utils/config';
+import styles from './../styles';
 
 class AddFollowUpScreen extends PureComponent{
 
@@ -48,7 +48,7 @@ class AddFollowUpScreen extends PureComponent{
                     elevation={3}
                     style={{
                         flex: 1,
-                        backgroundColor: 'white',
+                        backgroundColor: styles.backgroundColor,
                         borderRadius: 4,
                         marginVertical: 10,
                     }}>
@@ -83,7 +83,7 @@ class AddFollowUpScreen extends PureComponent{
                         />
                         <Button
                             title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                            color={styles.buttonGreen}
+                            color={styles.primaryButton}
                             titleColor={'white'}
                             onPress={this.onSavePressed}
                             height={25}
@@ -126,8 +126,8 @@ class AddFollowUpScreen extends PureComponent{
 const style = StyleSheet.create({
     container: {
         backgroundColor: 'transparent',
-        width: 200,
-        height: 200
+        height: 200,
+        width: 200
     }
 });
 

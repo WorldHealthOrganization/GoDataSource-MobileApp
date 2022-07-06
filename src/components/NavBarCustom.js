@@ -10,8 +10,8 @@ import {calculateDimension, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
-import styles from './../styles';
 import {Navigation} from "react-native-navigation";
+import styles from './../styles';
 
 class NavBarCustom extends PureComponent {
 
@@ -32,17 +32,16 @@ class NavBarCustom extends PureComponent {
         return (
             <View style={[this.props.style, style.container,
                 {
-                    height: calculateDimension(this.props.children ? 81 : 40.5, true, this.props.screenSize),
-                    marginTop: Platform.OS === 'ios' ? this.props.screenSize.height >= 812 ? 44 : 20 : 0,
-                    marginHorizontal: calculateDimension(16, false, this.props.screenSize)
+                    height: calculateDimension(this.props.children ? 81 : 40, true, this.props.screenSize),
+                    marginTop: Platform.OS === 'ios' ? this.props.screenSize.height >= 812 ? 44 : 20 : 0
                 },
                 Platform.OS === 'ios' && {zIndex: 99}
             ]}
             >
                 <View style={[style.containerUpperNavBar, {flex: this.props.children ? 0.5 : 1, justifyContent: 'space-between'}]}>
                     <View style={[style.containerUpperNavBar, {flex: 1}]}>
-                        <Ripple onPress={this.handlePressNavbarButton} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-                            <Icon name={this.props.iconName}/>
+                        <Ripple style={style.menuTrigger} onPress={this.handlePressNavbarButton} hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
+                            <Icon style={style.menuTriggerIcon} name={this.props.iconName}/>
                         </Ripple>
                         {
                             this.props.customTitle && !this.props.title ? (
@@ -60,10 +59,10 @@ class NavBarCustom extends PureComponent {
                                 elevation={3}
                                 style={{
                                     flex: 0,
-                                    backgroundColor: styles.buttonGreen,
-                                    width: calculateDimension(33, false, this.props.screenSize),
-                                    height: calculateDimension(25, true, this.props.screenSize),
-                                    borderRadius: 4
+                                    backgroundColor: styles.backgroundColor,
+                                    borderRadius: 4,
+                                    width: calculateDimension(30, false, this.props.screenSize),
+                                    height: calculateDimension(30, true, this.props.screenSize)
                                 }}
                             >
                                 <Ripple style={{
@@ -71,7 +70,7 @@ class NavBarCustom extends PureComponent {
                                     justifyContent: 'center',
                                     alignItems: 'center'
                                 }} onPress={this.handleHelpIconClick}>
-                                    <Icon name="help" color={'white'} size={15}/>
+                                    <Icon name="help" color={styles.primaryColor} size={18}/>
                                 </Ripple>
                             </ElevatedView> 
                         ) : null
@@ -119,23 +118,34 @@ NavBarCustom.defaultProps = {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        backgroundColor: 'rgb(237, 237, 237)'
+        backgroundColor: styles.backgroundColor
     },
     containerUpperNavBar: {
-        flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'white'
+        backgroundColor: styles.backgroundColor,
+        flexDirection: 'row'
+    },
+    menuTrigger: {
+        backgroundColor: styles.primaryColor,
+        height: 40,
+        padding: 4,
+        textAlign: 'center',
+        width: 40
+    },
+    menuTriggerIcon: {
+        color: styles.backgroundColor,
+        fontSize: 30
     },
     title: {
-        fontSize: 17,
+        fontSize: 16,
         fontFamily: 'Roboto-Medium',
-        marginLeft: 30
+        marginLeft: 16
     },
     containerLowerNavBar: {
-        flex: 0.5,
-        backgroundColor: 'white',
-        flexDirection: 'row',
         alignItems: 'center',
+        backgroundColor: styles.backgroundColor,
+        flex: 0.5,
+        flexDirection: 'row',
         justifyContent: 'space-between'
     }
 });

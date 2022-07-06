@@ -141,7 +141,7 @@ class EventSingleRelationshipContainer extends Component {
                 textsStyleArray={[
                     {
                         marginLeft: calculateDimension(14, false, this.props.screenSize),
-                        color: styles.buttonGreen,
+                        color: styles.primaryButton,
                         fontFamily: 'Roboto-Medium',
                         fontSize: 12
                     }
@@ -177,7 +177,7 @@ class EventSingleRelationshipContainer extends Component {
                             }}
                             onPress={this.onPressAddExposure}
                         >
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
+                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.primaryButton}}>
                                 {this.props.relationshipType === constants.RELATIONSHIP_TYPE.exposure ?
                                     getTranslation(translations.contactSingleScreen.exposureText, this.props.translation)
                                     :
@@ -221,7 +221,7 @@ class EventSingleRelationshipContainer extends Component {
 const style = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
+        backgroundColor: styles.screenBackgroundColor,
         borderRadius: 2
     },
     containerContent: {
