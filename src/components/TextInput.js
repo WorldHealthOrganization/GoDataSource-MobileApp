@@ -170,7 +170,11 @@ class TextInput extends Component {
     };
 
     formatForNumeric = (text) => {
-        if(this.props.keyboardType === 'numeric'){
+        if (this.props.keyboardType === 'numeric'){
+            text = text.replace(',','.');
+            if (text[text.length - 1] === '.' || text[text.length - 1] === ','){
+                return text;
+            }
             return Number.isNaN(parseFloat(text)) ? text : parseFloat(text).toString();
         }
         return text;
@@ -185,6 +189,11 @@ class TextInput extends Component {
             maskError,
             value
         }, ()=>{
+            if (this.props.keyboardType === 'numeric') {
+                if (value[value.length - 1] === ',' || value[value.length - 1] === '.'){
+                    return;
+                }
+            }
             this.handleSubmitEditingDB();
         })
     };
