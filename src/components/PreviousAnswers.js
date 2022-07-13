@@ -5,7 +5,7 @@ import {Icon} from 'react-native-material-ui';
 import {Alert, StyleSheet, Text, View} from 'react-native';
 import styles from './../styles';
 import {connect} from "react-redux";
-import _, {sortBy} from 'lodash';
+import _, {sortBy, isEqual} from 'lodash';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import translations from './../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
@@ -38,8 +38,7 @@ class PreviousAnswers extends Component {
                     previousAnswers: this.props.previousAnswers || []
                 });
             }else{
-                if( (this.props.previousAnswers[0].date !== prevProps.previousAnswers[0].date)
-                    || (this.props.previousAnswers[0].value !== prevProps.previousAnswers[0].value)){
+                if( !isEqual(this.props.previousAnswers, prevProps.previousAnswers)){
                     this.setState({
                         previousAnswers: this.props.previousAnswers || []
                     });

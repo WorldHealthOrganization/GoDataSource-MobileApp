@@ -120,6 +120,7 @@ class ContactsSingleQuestionnaire extends Component {
                     item={item}
                     isEditMode={this.props.isEditMode}
                     index={index + 1}
+                    rerenderAfterAnswerChange={previousAnswers[item.variable]}
                     isCollapsed={ this.isCollapsed(item)}
                     totalQuestions={totalQuestions}
                     totalNumberOfQuestions={totalNumberOfQuestions}

@@ -37,8 +37,7 @@ class QuestionCard extends PureComponent {
                 const newStateVariable = get(value, `${get(nextProps, 'item.variable', null)}`, null)
                 const oldStateVariable = get(this.state[key], `${get(nextProps, 'item.variable', null)}`, null)
                 if(newStateVariable?.length !== oldStateVariable?.length
-                    || get(newStateVariable, `[0].date`, null) !== get(oldStateVariable, `[0].date`, null)
-                ){
+                    || !isEqual(newStateVariable,oldStateVariable)) {
                     return true;
                 }
             }
@@ -58,14 +57,10 @@ class QuestionCard extends PureComponent {
                         if (nextPropsVariable?.length !== propsVariable?.length) {
                             answer = true;
                             break;
-                        } else if (
-                            (get(nextPropsVariable, `[0].date`, null) && get(nextPropsVariable, `[0].date`, null) !== get(propsVariable, `[0].date`, null))
-                            // || (get(nextPropsVariable, `[0].value`, null) && get(nextPropsVariable, `[0].value`, null) !== get(propsVariable, `[0].value`, null))
-                        ) {
+                        } else {
                             answer = true;
                             break;
                         }
-                        break;
                     default:
                         answer = true;
                         break;
@@ -87,19 +82,22 @@ class QuestionCard extends PureComponent {
     }
 
     componentDidUpdate(prevProps) {
+        const answer = get(this.props, `source[${get(this.props, 'item.variable', null)}]`, null)
+        const prevAnswer = get(prevProps, `source[${get(this.props, 'item.variable', null)}]`, null)
+
         //update previous answers if length is different because item was deleted/added
-        if(get(this.props, `source[${get(this.props, 'item.variable', null)}]`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}].length`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}].length`, null)){
+        if(answer && answer?.length !== prevAnswer?.length){
             this.setState({
                 previousAnswers: this.props.source
             });
         }else{
             //update previous answers if date or value was updated for current answer
-            if ( (get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][0].date`, null) )
-                || (get(this.props, `source[${get(this.props, 'item.variable', null)}][0].value`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}][0].value`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][0].value`, null))) {
+            if (!isEqual(answer, prevAnswer)) {
                 this.setState({
                     previousAnswers: this.props.source
                 })
             }
+
         }
     }
 
