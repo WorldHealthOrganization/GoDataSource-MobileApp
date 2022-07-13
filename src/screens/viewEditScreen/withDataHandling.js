@@ -14,6 +14,7 @@ import {checkArray, checkArrayAndLength, checkInteger, checkObject} from './../.
 import {extractAllQuestions, extractIdFromPouchId} from "../../utils/functions";
 import _, {sortBy} from "lodash";
 import {Navigation} from "react-native-navigation";
+import cloneDeep from "lodash/cloneDeep";
 
 export function enhanceTabsWithDataHandling() {
     return function withEditHandling(WrappedComponent) {
@@ -715,11 +716,21 @@ export function enhanceTabsWithDataHandling() {
             };
             copyAnswerDate = (value) => {
                 let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
-                for(let questionId in previousAnswersClone) {
-                    if(previousAnswersClone.hasOwnProperty(questionId)) {
-                        previousAnswersClone[questionId] = previousAnswersClone[questionId].map((e) => {
-                            return {date: e.date === null ? createDate(value).toISOString() : e.date, value: e.value};
-                        });
+                let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
+                sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswersClone, 0);
+
+                for (let question of sortedQuestions){
+                    if (question.variable && question.answerType !== "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP"){
+                        if (previousAnswersClone[question.variable]){
+                            previousAnswersClone[question.variable] = previousAnswersClone[question.variable].map((e) => {
+                                return {date: e.date || createDate(value).toISOString(), value: e.value || null};
+                            })
+                        } else {
+                            previousAnswersClone[question.variable] = [{
+                                date: createDate(value).toISOString(),
+                                value: null
+                            }]
+                        }
                     }
                 }
                 this.setState({

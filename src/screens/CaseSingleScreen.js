@@ -2312,10 +2312,13 @@ class CaseSingleScreen extends Component {
     };
     handleCopyAnswerDate = (value) => {
         let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
-        for (let question of this.state.mappedQuestions){
+        let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswersClone, 0);
+
+        for (let question of sortedQuestions){
             if (question.variable && question.answerType !== "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP"){
                 if (previousAnswersClone[question.variable]){
-                    previousAnswersClone[question.variable].map((e) => {
+                    previousAnswersClone[question.variable] = previousAnswersClone[question.variable].map((e) => {
                         return {date: e.date || createDate(value).toISOString(), value: e.value || null};
                     })
                 } else {
@@ -2324,13 +2327,6 @@ class CaseSingleScreen extends Component {
                         value: null
                     }]
                 }
-            }
-        }
-        for (let questionId in previousAnswersClone) {
-            if (previousAnswersClone.hasOwnProperty(questionId)) {
-                previousAnswersClone[questionId] = previousAnswersClone[questionId].map((e) => {
-                    return {date: e.date || createDate(value).toISOString(), value: e.value || null};
-                });
             }
         }
         this.setState({
