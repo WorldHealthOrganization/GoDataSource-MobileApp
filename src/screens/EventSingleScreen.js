@@ -1849,7 +1849,7 @@ class EventSingleScreen extends Component {
             if (question.variable && question.answerType !== "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP"){
                 if (previousAnswersClone[question.variable]){
                     previousAnswersClone[question.variable] = previousAnswersClone[question.variable].map((e) => {
-                        return {date: e.date || createDate(value).toISOString(), value: e.value || null};
+                        return Object.assign(e, {date: e.date || createDate(value).toISOString()})
                     })
                 } else {
                     previousAnswersClone[question.variable] = [{
