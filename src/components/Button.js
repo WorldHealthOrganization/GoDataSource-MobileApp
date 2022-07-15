@@ -4,6 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
+import {StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import { RaisedTextButton } from 'react-native-material-buttons';
 import {connect} from "react-redux";
@@ -28,12 +29,7 @@ class Button extends PureComponent {
                 title={getTranslation(this.props.title, this.props.translation)}
                 color={this.props.color}
                 titleColor={this.props.titleColor}
-                titleStyle={[{
-                    fontFamily: 'Roboto-Regular',
-                    fontSize: 11.8,
-                    alignSelf: 'center',
-                    lineHeight: 25
-                }, this.props.titleStyle]}
+                titleStyle={[style.buttonTitle, this.props.titleStyle]}
                 onPress={this.props.onPress}
                 style={[{
                     borderRadius: 4,
@@ -63,5 +59,15 @@ function mapStateToProps(state) {
         translation: state.app.translation
     };
 }
+
+const style = StyleSheet.create({
+    buttonTitle: {
+        alignSelf: 'center',
+        fontFamily: 'Roboto-Medium',
+        fontSize: 14,
+        lineHeight: 20,
+        textTransform: 'capitalize'
+    }
+});
 
 export default connect(mapStateToProps)(Button);

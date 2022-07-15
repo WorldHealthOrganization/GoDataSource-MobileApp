@@ -5,7 +5,6 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
@@ -35,6 +34,7 @@ import {compose} from "redux";
 import {Navigation} from "react-native-navigation";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import constants from "../utils/constants";
+import styles from './../styles';
 
 class ContactsOfContactsScreen extends Component {
 
@@ -119,7 +119,7 @@ class ContactsOfContactsScreen extends Component {
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View style={{flex: 1, flexDirection: 'row'}}>
+                        <View style={style.headerContainer}>
                             <View
                                 style={[style.breadcrumbContainer]}>
                                 <Breadcrumb
@@ -128,32 +128,25 @@ class ContactsOfContactsScreen extends Component {
                                     componentId={this.props.componentId}
                                 />
                             </View>
-                            <View style={{flex: 0.15, marginRight: 10}}>
-                                <Ripple style={{
-                                    flex: 1,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }} onPress={this.handleOnPressQRCode}>
-                                    <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20}/>
+                            <View style={style.headerButtonSpacing}>
+                                <Ripple style={style.headerButtonInner} onPress={this.handleOnPressQRCode}>
+                                    <MaterialCommunityIcons name="qrcode-scan" color={styles.textColor} size={24} />
                                 </Ripple>
                             </View>
 
-                            <View style={{flex: 0.11 /*, marginRight: 10*/}}>
+                            <View>
                                 <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.primaryButton,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
+                                    elevation={0}
+                                    style={[
+                                        style.headerButton, 
+                                        {
+                                            width: calculateDimension(30, false, this.props.screenSize),
+                                            height: calculateDimension(30, true, this.props.screenSize)
+                                        }
+                                    ]}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15}/>
+                                    <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={styles.textColor} size={18} />
                                     </Ripple>
                                 </ElevatedView>
                             </View>
@@ -201,16 +194,8 @@ class ContactsOfContactsScreen extends Component {
                 </View>
                 {
                     this.props.loadMore ? (
-                        <View style={
-                            {
-                                width: '100%',
-                                height: 60,
-                                backgroundColor: styles.backgroundColor,
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}
-                        >
-                            <ActivityIndicator animating size={'large'} />
+                        <View style={style.loadMore}>
+                            <ActivityIndicator animating size={'small'} color={styles.backgroundColor} />
                         </View>
                     ) : (null)
                 }
@@ -332,32 +317,49 @@ class ContactsOfContactsScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
+        flex: 1
+    },
+    headerContainer: {
         flex: 1,
-        backgroundColor: 'white',
-    },
-    containerContent: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundColor,
-        paddingBottom: 25
-    },
-    separatorComponentStyle: {
-        height: 8
-    },
-    title: {
-        fontSize: 17,
-        fontFamily: 'Roboto-Medium',
-    },
-    mapContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF'
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingRight: 16
     },
     breadcrumbContainer: {
-        flex: 0.8,
+        alignItems: 'center',
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'flex-start'
     },
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    headerButtonSpacing: {
+        marginRight: 8
+    },
+    containerContent: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
+    },
+    loadMore: {
+        alignItems: 'center',
+        backgroundColor: styles.primaryColor,
+        height: 30,
+        justifyContent: 'center',
+        width: '100%'
+    },
+    mapContainer: {
+        alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1,
+        justifyContent: 'center'
+    }
 });
 
 function mapStateToProps(state) {

@@ -11,13 +11,12 @@ import {View, Text, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import Ripple from 'react-native-material-ripple';
 import {getTranslation} from './../utils/functions';
-import styles from './../styles';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import PermissionComponent from './PermissionComponent';
+import styles from './../styles';
 
 ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, outbreakPermissions, onPermissionDisable, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation}) => (
     <View style={[style.containerStyle, containerStyle]}>
-        <View style={[style.separatorStyle, {backgroundColor: borderColor, display: hasBorder ? 'flex' : 'none'}]}/>
         {
             isEditMode !== undefined && isEditMode !== null && isEditMode === true ? (
                 <View style={[style.containerText, containerTextStyle]}>
@@ -64,7 +63,7 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
                                                     <Text style={[
                                                         textsStyleArray && Array.isArray(textsStyleArray) &&
                                                         textsStyleArray[index] ? textsStyleArray[index] : style.textStyle,
-                                                        onPermissionDisable[index] ? {color:'gray'} : {}
+                                                        onPermissionDisable[index] ? {backgroundColor: styles.disabledColor} : {}
                                                     ]}
                                                           numberOfLines={1}
                                                     >
@@ -110,28 +109,31 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
 // make a global style in the config directory
 const style = StyleSheet.create({
     containerStyle: {
-        width: '100%',
+        width: '100%'
     },
     containerText: {
+        alignItems: 'center',
         flex: 1,
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        paddingHorizontal: 0
     },
     rippleStyle: {
         display: 'flex',
         flex: 1,
-        height: '100%',
         justifyContent: 'center',
+        marginHorizontal: 4,
+        paddingVertical: 0
     },
     textStyle: {
-        fontFamily: 'Roboto-Medium',
-        fontSize: 12,
-        color: styles.primaryButton
-    },
-    separatorStyle: {
-        width: '100%',
-        height: 1
+        backgroundColor: styles.primaryColorRgb,
+        borderRadius: 4,
+        color: styles.primaryColor,
+        display: 'flex',
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14,
+        lineHeight: 26,
+        textAlign: 'center'
     }
 });
 

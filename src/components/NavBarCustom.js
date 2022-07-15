@@ -59,7 +59,7 @@ class NavBarCustom extends PureComponent {
                                 elevation={3}
                                 style={{
                                     flex: 0,
-                                    backgroundColor: styles.backgroundColor,
+                                    backgroundColor: styles.disabledColor,
                                     borderRadius: 4,
                                     width: calculateDimension(30, false, this.props.screenSize),
                                     height: calculateDimension(30, true, this.props.screenSize)
@@ -70,7 +70,7 @@ class NavBarCustom extends PureComponent {
                                     justifyContent: 'center',
                                     alignItems: 'center'
                                 }} onPress={this.handleHelpIconClick}>
-                                    <Icon name="help" color={styles.primaryColor} size={18}/>
+                                    <Icon name="help" color={styles.backgroundColor} size={18}/>
                                 </Ripple>
                             </ElevatedView> 
                         ) : null
@@ -123,14 +123,17 @@ const style = StyleSheet.create({
     containerUpperNavBar: {
         alignItems: 'center',
         backgroundColor: styles.backgroundColor,
-        flexDirection: 'row'
+        borderBottomColor: styles.separatorColor,
+        borderBottomWidth: 1,
+        flexDirection: 'row',
     },
     menuTrigger: {
         backgroundColor: styles.primaryColor,
-        height: 40,
-        padding: 4,
+        height: 39,
+        paddingVertical: 5,
+        paddingHorizontal: 4,
         textAlign: 'center',
-        width: 40
+        width: 39
     },
     menuTriggerIcon: {
         color: styles.backgroundColor,

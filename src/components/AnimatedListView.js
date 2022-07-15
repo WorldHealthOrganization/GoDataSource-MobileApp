@@ -57,7 +57,7 @@ class AnimatedListView extends Component {
             this.offsetAnim,
         ),
         0,
-        30,
+        40,
     );
 
     handleScroll = Animated.event(
@@ -72,12 +72,12 @@ class AnimatedListView extends Component {
     // and can slow down the app
     render() {
         const navbarTranslate = this.clampedScroll.interpolate({
-            inputRange: [0, 30],
-            outputRange: [0, -30],
+            inputRange: [0, 40],
+            outputRange: [0, -40],
             extrapolate: 'clamp',
         });
         const navbarOpacity = this.clampedScroll.interpolate({
-            inputRange: [0, 30],
+            inputRange: [0, 40],
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });

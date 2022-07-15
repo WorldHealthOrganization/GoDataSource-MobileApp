@@ -9,7 +9,6 @@
 import React, {Component} from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import CalendarPicker from './../components/CalendarPicker';
 import config from './../utils/config';
@@ -37,6 +36,7 @@ import PermissionComponent from './../components/PermissionComponent';
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import withPincode from './../components/higherOrderComponents/withPincode';
 import {Navigation} from "react-native-navigation";
+import styles from './../styles';
 
 class FollowUpsScreen extends Component {
 
@@ -110,7 +110,7 @@ class FollowUpsScreen extends Component {
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingRight: 16}}>
+                        <View style={style.headerContainer}>
                             <View
                                 style={[style.breadcrumbContainer]}>
                                 <Breadcrumb
@@ -119,32 +119,24 @@ class FollowUpsScreen extends Component {
                                     componentId={this.props.componentId}
                                 />
                             </View>
-                            <View style={{marginRight: 8}}>
-                                <Ripple style={{
-                                    flex: 1,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }} onPress={this.handleOnPressQRCode}>
-                                    <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={24} />
+                            <View style={style.headerButtonSpacing}>
+                                <Ripple style={style.headerButtonInner} onPress={this.handleOnPressQRCode}>
+                                    <MaterialCommunityIcons name="qrcode-scan" color={styles.textColor} size={24} />
                                 </Ripple>
                             </View>
-
                             <View>
                                 <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.secondaryColor,
-                                        width: calculateDimension(30, false, this.props.screenSize),
-                                        height: calculateDimension(30, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
+                                    elevation={0}
+                                    style={[
+                                        style.headerButton, 
+                                        {
+                                            width: calculateDimension(30, false, this.props.screenSize),
+                                            height: calculateDimension(30, true, this.props.screenSize)
+                                        }
+                                    ]}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={18}/>
+                                    <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={styles.textColor} size={18} />
                                     </Ripple>
                                 </ElevatedView>
                             </View>
@@ -154,20 +146,23 @@ class FollowUpsScreen extends Component {
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
-                    <CalendarPicker
-                        width={calculateDimension(155, false, this.props.screenSize)}
-                        height={calculateDimension(25, true, this.props.screenSize)}
-                        onDayPress={this.handleDayPress}
-                        value={get(followUpFilter, 'date', createDate(null).toLocaleString())}
-                        pickerOpen={this.state.calendarPickerOpen}
-                        openCalendarModal={this.openCalendarModal}
-                    />
-                    <ValuePicker
-                        top={this.calculateTopForDropdown()}
-                        onSelectValue={this.onSelectValue}
-                        value={getTranslation(get(this.props, 'followUpFilter.statusId.value', translations.followUpsScreenStatusFilterValues.allValue), this.props.translation)}
-                    />
+                    <View style={style.followUpTopBar}>
+                        <CalendarPicker
+                            width={calculateDimension(164, false, this.props.screenSize)}
+                            height={calculateDimension(30, true, this.props.screenSize)}
+                            onDayPress={this.handleDayPress}
+                            value={get(followUpFilter, 'date', createDate(null).toLocaleString())}
+                            pickerOpen={this.state.calendarPickerOpen}
+                            openCalendarModal={this.openCalendarModal}
+                        />
+                        <ValuePicker
+                            top={this.calculateTopForDropdown()}
+                            onSelectValue={this.onSelectValue}
+                            value={getTranslation(get(this.props, 'followUpFilter.statusId.value', translations.followUpsScreenStatusFilterValues.allValue), this.props.translation)}
+                        />
+                    </View>
                 </NavBarCustom>
+                <View style={styles.lineStyle} />
                 <View style={style.containerContent}>
                     <PermissionComponent
                         render={() => (
@@ -200,16 +195,8 @@ class FollowUpsScreen extends Component {
                 </View>
                 {
                     this.props.loadMore ? (
-                        <View style={
-                            {
-                                width: '100%',
-                                height: 60,
-                                backgroundColor: styles.backgroundColor,
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}
-                        >
-                            <ActivityIndicator animating size={'large'} />
+                        <View style={style.loadMore}>
+                            <ActivityIndicator animating size={'small'} color={styles.backgroundColor} />
                         </View>
                     ) : (null)
                 }
@@ -244,7 +231,7 @@ class FollowUpsScreen extends Component {
         let followUpsColors = {};
         let refData = checkArrayAndLength(this.props.referenceData) ? this.props.referenceData.filter((e) => {return e.categoryId === "LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE"}) : {};
         for (let i=0; i<refData.length; i++) {
-            followUpsColors[refData[i].value] = refData[i].colorCode || styles.primaryButton
+            followUpsColors[refData[i].value] = refData[i].colorCode || styles.primaryColor
         }
         this.setState({
                 followUpsColors
@@ -345,47 +332,74 @@ class FollowUpsScreen extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
-    mapContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF'
-    },
     container: {
         flex: 1
     },
-    containerContent: {
+    headerContainer: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundColor
-    },
-    separatorComponentStyle: {
-        height: 8
-    },
-    listViewStyle: {
-
-    },
-    componentContainerStyle: {
-
-    },
-    emptyComponent: {
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    emptyComponentTextView: {
-        fontFamily: 'Roboto-Light',
-        fontSize: 15,
-        color: styles.secondaryColor
-    },
-    buttonEmptyListText: {
-        fontFamily: 'Roboto-Regular',
-        fontSize: 16.8,
-        color: styles.secondaryColor
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingRight: 16
     },
     breadcrumbContainer: {
         alignItems: 'center',
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'flex-start'
+    },
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    headerButtonSpacing: {
+        marginRight: 8
+    },
+    followUpTopBar: {
+        alignItems: 'center',
+        backgroundColor: styles.backgroundColor,
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        paddingVertical: 5
+    },
+    containerContent: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
+    },
+    loadMore: {
+        alignItems: 'center',
+        backgroundColor: styles.primaryColor,
+        height: 30,
+        justifyContent: 'center',
+        width: '100%'
+    },
+    mapContainer: {
+        alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1,
+        justifyContent: 'center'
+    },
+    listViewStyle: {},
+    componentContainerStyle: {},
+    emptyComponent: {
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    emptyComponentTextView: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Light',
+        fontSize: 16
+    },
+    buttonEmptyListText: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 16
     }
 });
 

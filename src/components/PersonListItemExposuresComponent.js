@@ -5,14 +5,13 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import styles from './../styles';
 import translations from './../utils/translations'
 import {calculateDimension, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import lodashGet from 'lodash/get';
-
+import styles from './../styles';
 
 class PersonListItemNameAndAddressComponent extends PureComponent {
     constructor(props) {
@@ -25,22 +24,23 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
         // console.log(`Render PersonListItem subComponent 2`);
         let {data, translation, screenSize} = this.props;
         return (
-            <View style={{
-                marginHorizontal: calculateDimension(16, false, screenSize),
-                justifyContent: 'space-between',
-                marginVertical: 5
-            }}>
+            <View style={style.exposedSection}>
                 {
                     data && data.followUpDay ? (
-                        <View>
-                            <Text style={[style.secondaryText, {marginVertical: 5, marginHorizontal: 7}]} numberOfLines={1}>{getTranslation(translations.personListItem.dayOfFollowUp, translation) + data.followUpDay}</Text>
+                        <View style={style.exposedSectionContent}>
+                            <Text style={[style.secondaryText]} numberOfLines={1}>
+                                {'\u2022 ' + getTranslation(translations.personListItem.dayOfFollowUp, translation)}
+                                <Text style={style.valueText}>{data.followUpDay}</Text>
+                            </Text>
                         </View>
                     ) : (null)
                 }
                 {
                     checkArrayAndLength(lodashGet(data, 'exposures', null)) ? (
                         <View>
-                            <Text style={style.exposedToTextStyle}>{getTranslation(translations.followUpsScreen.exposedToMessage, translation) + ":"}</Text>
+                            <Text style={style.exposedToTextStyle}>
+                                {getTranslation(translations.followUpsScreen.exposedToMessage, translation) + ":"}
+                            </Text>
                             {
                                 data.exposures.map((exposure, index) => {
                                     return this.renderExposures(exposure, index);
@@ -57,7 +57,9 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
     renderExposures = (exposure, index) => {
         return(
             <Ripple disabled={exposure.type !== translations.personTypes.cases || exposure.type !== translations.personTypes.events} key={index} onPress={() => this.props.onPressExposureProp(exposure)}>
-                <Text style={[style.secondaryText, {marginVertical: 5, marginHorizontal: 7}]} numberOfLines={1}>{`\u2022 ${exposure.fullName} ${exposure.visualId ? `(${exposure.visualId})` : ''}`}</Text>
+                <Text style={[style.secondaryText]} numberOfLines={1}>
+                    {`\u2022 ${exposure.fullName} ${exposure.visualId ? `(${exposure.visualId})` : ''}`}
+                </Text>
             </Ripple>
         )
     };
@@ -67,53 +69,64 @@ class PersonListItemNameAndAddressComponent extends PureComponent {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
     },
     firstSectionContainer: {
         justifyContent: 'space-between',
     },
     addressStyle: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Light',
-        fontSize: 12,
-        color: styles.textColor
+        fontSize: 14
     },
     secondSectionContainer: {
         justifyContent: 'center'
     },
     thirdSectionContainer: {
+        alignItems: 'center',
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        justifyContent: 'space-between'
     },
     rippleStyle: {
         height: '100%',
         justifyContent: 'center'
     },
     rippleTextStyle: {
+        color: styles.primaryColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 12,
-        color: styles.primaryButton
+        fontSize: 14
     },
     centerItemContainer: {
         height: '100%',
         justifyContent: 'center'
     },
     primaryText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 18,
-        color: 'black'
+        fontSize: 16
     },
     secondaryText: {
+        color: styles.secondaryColor,
         fontFamily: 'Roboto-Regular',
-        fontSize: 15,
-        color: styles.secondaryColor
+        fontSize: 14
+    },
+    exposedSection: {
+        justifyContent: 'space-between',
+        paddingBottom: 16,
+        paddingHorizontal: 16
     },
     exposedToTextStyle: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 15,
-        color: 'black'
+        fontSize: 14
+    },
+    exposedSectionContent: {
+        marginBottom: 16
+    },
+    valueText: {
+        color: styles.textColor
     }
 });
 

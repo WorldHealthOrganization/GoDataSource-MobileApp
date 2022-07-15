@@ -302,114 +302,119 @@ class ContactsSingleScreen extends Component {
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View
-                            style={[style.breadcrumbContainer]}>
-                            <Breadcrumb
-                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.contactSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.state.contact && this.state.contact.firstName ? (this.state.contact.firstName + " ") : '') + (this.state.contact && this.state.contact.lastName ? this.state.contact.lastName : ''))]}
-                                componentId={this.props.componentId}
-                                onPress={this.handlePressBreadcrumb}
-                            />
-                            <View style={{
-                                flexDirection: 'row',
-                                marginRight: calculateDimension(16, false, this.props.screenSize)
-                            }}>
+                        <View style={style.headerContainer}>
+                            <View
+                                style={[style.breadcrumbContainer]}>
+                                <Breadcrumb
+                                    entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.contactSingleScreen.title, this.props.translation), this.props.isNew ? getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation) : ((this.state.contact && this.state.contact.firstName ? (this.state.contact.firstName + " ") : '') + (this.state.contact && this.state.contact.lastName ? this.state.contact.lastName : ''))]}
+                                    componentId={this.props.componentId}
+                                    onPress={this.handlePressBreadcrumb}
+                                />
+                            </View>
+                            <View style={style.headerButtonSpacing}>
                                 <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.primaryButton,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
+                                    elevation={0}
+                                    style={[
+                                        style.headerButton, 
+                                        {
+                                            width: calculateDimension(30, false, this.props.screenSize),
+                                            height: calculateDimension(30, true, this.props.screenSize)
+                                        }
+                                    ]}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15}/>
+                                    <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={styles.textColor} size={18} />
                                     </Ripple>
                                 </ElevatedView>
-                                {
-                                    !this.props.isNew && this.props.role && checkArrayAndLength(lodashIntersect(this.props.role, [
-                                        constants.PERMISSIONS_FOLLOW_UP.followUpAll,
-                                        constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
-                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
-                                        constants.PERMISSIONS_LAB_RESULT.labResultCreate
-                                    ])) ? (
-                                        <View>
-                                            <Menu
-                                                ref="menuRef"
-                                                button={
-                                                    <Ripple onPress={this.showMenu}
-                                                            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
-                                                        <Icon name="more-vert"/>
-                                                    </Ripple>
-                                                }
-                                            >
-                                                <PermissionComponent
-                                                    render={() => (
-                                                        <MenuItem onPress={this.handleOnPressDelete}>
-                                                            {getTranslation(translations.contactsScreen.delete, this.props.translation)}
-                                                        </MenuItem>
-                                                    )}
-                                                    permissionsList={[
-                                                        constants.PERMISSIONS_CONTACT.contactDelete,
-                                                        constants.PERMISSIONS_CONTACT.contactAll
-                                                    ]}
-                                                />
-                                                <PermissionComponent
-                                                    render={() => (
-                                                        <MenuItem onPress={this.handleOnAddFollowUp}>
-                                                            {getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation)}
-                                                        </MenuItem>
-                                                    )}
-                                                    permissionsList={[constants.PERMISSIONS_FOLLOW_UP.followUpAll, constants.PERMISSIONS_FOLLOW_UP.followUpCreate]}
-                                                    alternativeRender={() => (
-                                                        <View style={[style.rippleStyle, {width: 60}]}/>
-                                                    )}
-                                                />
-                                                {
-                                                    this.props.outbreak?.isContactLabResultsActive && this.props.contact ?
-                                                        <>
-                                                            <PermissionComponent
-                                                                render={() => (
-                                                                    <MenuItem onPress={this.handleOnPressAddLabResult}>
-                                                                        {getTranslation(translations.labResultsSingleScreen.createLabResult, this.props.translation)}
-                                                                    </MenuItem>
-                                                                )}
-                                                                permissionsList={[
-                                                                    constants.PERMISSIONS_LAB_RESULT.labResultAll,
-                                                                    constants.PERMISSIONS_LAB_RESULT.labResultCreate
-                                                                ]}
-                                                            />
-                                                            <PermissionComponent
-                                                                render={() => (
-                                                                    <MenuItem
-                                                                        onPress={this.handleOnPressShowLabResults}>
-                                                                        {getTranslation(translations.labResultsSingleScreen.viewLabResult, this.props.translation)}
-                                                                    </MenuItem>
-                                                                )}
-                                                                permissionsList={[
-                                                                    constants.PERMISSIONS_LAB_RESULT.labResultAll,
-                                                                    constants.PERMISSIONS_LAB_RESULT.labResultList
-                                                                ]}
-                                                            />
-                                                        </>
-                                                        :
-                                                        null
-                                                }
-                                                <AddFollowUpScreen
-                                                    showAddFollowUpScreen={this.state.showAddFollowUpScreen}
-                                                    onCancelPressed={this.handleOnCancelPressed}
-                                                    onSavePressed={this.handleOnSavePressed}
-                                                />
-
-                                            </Menu>
-                                        </View>
-                                    ) : null
-                                }
                             </View>
+                            {
+                                !this.props.isNew && this.props.role && checkArrayAndLength(lodashIntersect(this.props.role, [
+                                    constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                                    constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
+                                    constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                    constants.PERMISSIONS_LAB_RESULT.labResultCreate
+                                ])) ? (
+                                    <View>
+                                        <Menu
+                                            ref="menuRef"
+                                            button={
+                                                <Ripple
+                                                    style={[
+                                                        style.moreMenuButton, 
+                                                        {
+                                                            width: calculateDimension(30, false, this.props.screenSize),
+                                                            height: calculateDimension(30, true, this.props.screenSize)
+                                                        }
+                                                    ]}
+                                                    onPress={this.showMenu}
+                                                    hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                                                    <Icon name="more-vert" color={styles.textColor} size={24} />
+                                                </Ripple>
+                                            }
+                                            style={{top: 36}}
+                                        >
+                                            <PermissionComponent
+                                                render={() => (
+                                                    <MenuItem onPress={this.handleOnPressDelete}>
+                                                        {getTranslation(translations.contactsScreen.delete, this.props.translation)}
+                                                    </MenuItem>
+                                                )}
+                                                permissionsList={[
+                                                    constants.PERMISSIONS_CONTACT.contactDelete,
+                                                    constants.PERMISSIONS_CONTACT.contactAll
+                                                ]}
+                                            />
+                                            <PermissionComponent
+                                                render={() => (
+                                                    <MenuItem onPress={this.handleOnAddFollowUp}>
+                                                        {getTranslation(translations.contactsScreen.addFollowupsButton, this.props.translation)}
+                                                    </MenuItem>
+                                                )}
+                                                permissionsList={[constants.PERMISSIONS_FOLLOW_UP.followUpAll, constants.PERMISSIONS_FOLLOW_UP.followUpCreate]}
+                                                alternativeRender={() => (
+                                                    <View style={[style.rippleStyle, {width: 60}]}/>
+                                                )}
+                                            />
+                                            {
+                                                this.props.outbreak?.isContactLabResultsActive && this.props.contact ?
+                                                    <>
+                                                        <PermissionComponent
+                                                            render={() => (
+                                                                <MenuItem onPress={this.handleOnPressAddLabResult}>
+                                                                    {getTranslation(translations.labResultsSingleScreen.createLabResult, this.props.translation)}
+                                                                </MenuItem>
+                                                            )}
+                                                            permissionsList={[
+                                                                constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                                                constants.PERMISSIONS_LAB_RESULT.labResultCreate
+                                                            ]}
+                                                        />
+                                                        <PermissionComponent
+                                                            render={() => (
+                                                                <MenuItem
+                                                                    onPress={this.handleOnPressShowLabResults}>
+                                                                    {getTranslation(translations.labResultsSingleScreen.viewLabResult, this.props.translation)}
+                                                                </MenuItem>
+                                                            )}
+                                                            permissionsList={[
+                                                                constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                                                constants.PERMISSIONS_LAB_RESULT.labResultList
+                                                            ]}
+                                                        />
+                                                    </>
+                                                    :
+                                                    null
+                                            }
+                                            <AddFollowUpScreen
+                                                showAddFollowUpScreen={this.state.showAddFollowUpScreen}
+                                                onCancelPressed={this.handleOnCancelPressed}
+                                                onSavePressed={this.handleOnSavePressed}
+                                            />
+
+                                        </Menu>
+                                    </View>
+                                ) : null
+                            }
                         </View>
                     }
                     componentId={this.props.componentId}
@@ -650,12 +655,18 @@ class ContactsSingleScreen extends Component {
             <TabBar
                 {...props}
                 indicatorStyle={{
-                    backgroundColor: styles.primaryButton,
+                    backgroundColor: styles.primaryColor,
                     height: 2
                 }}
                 style={{
-                    height: 41,
-                    backgroundColor: 'white'
+                    height: 36,
+                    backgroundColor: styles.backgroundColor
+                }}
+                tabStyle={{
+                    width: 'auto',
+                    paddingHorizontal: 16,
+                    marginHorizontal: 0,
+                    textAlign: 'center'
                 }}
                 onTabPress={({route, preventDefault}) => {
                     preventDefault();
@@ -669,6 +680,8 @@ class ContactsSingleScreen extends Component {
                 }}
                 pressOpacity={this.props.isNew ? 0 : undefined}
                 pressColor={this.props.isNew ? 'transparent' : undefined}
+                activeColor={styles.primaryColor}
+                inactiveColor={styles.secondaryColor}
                 renderLabel={this.handleRenderLabel(props)}
                 scrollEnabled={true}
                 bounces={true}
@@ -691,7 +704,6 @@ class ContactsSingleScreen extends Component {
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
-                color: styles.textColor,
                 flex: 1,
                 alignSelf: 'center'
             }}>
@@ -2241,13 +2253,37 @@ class ContactsSingleScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        flex: 1
     },
-    breadcrumbContainer: {
+    headerContainer: {
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        paddingRight: 16
+    },
+    breadcrumbContainer: {
+        alignItems: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
+    },
+    headerButtonSpacing: {
+        marginRight: 8
+    },
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    moreMenuButton: {
+        alignItems: 'center',
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4,
+        justifyContent: 'center'
     }
 });
 

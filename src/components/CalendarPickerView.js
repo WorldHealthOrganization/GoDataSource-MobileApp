@@ -11,6 +11,7 @@ import Modal from 'react-native-root-modal';
 import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
 import moment from 'moment/min/moment.min';
+import styles from './../styles';
 
 class CalendarPickerView extends PureComponent {
 
@@ -42,12 +43,29 @@ class CalendarPickerView extends PureComponent {
                     width: this.props.width
                 }, Platform.OS === 'android' && {elevation: 2}]}
             >
-                <ElevatedView elevation={4} style={{flex: 1}}>
+                <ElevatedView elevation={4} style={{flex: 1, borderRadius: 4}}>
                     <Calendar
                         current={ this.state.selectedDate }
-                        markedDates={{[this.state.selectedDate]: {marked: true}}}
+                        markedDates={{[this.state.selectedDate]: {selected: true, selectedColor: styles.primaryColor}}}
                         onDayPress={this.handleDateChanged}
                         monthFormat={'MMMM yyyy'}
+                        style={{backgroundColor: styles.backgroundColor, borderRadius: 4}}
+                        theme={{
+                            backgroundColor: 'transparent',
+                            calendarBackground: 'transparent',
+                            todayBackgroundColor: styles.primaryColorRgb,
+                            todayTextColor: styles.primaryColor,
+                            dotColor: styles.warningColor,
+                            selectedDotColor: styles.warningColor,
+                            disabledArrowColor: styles.disabledColor,
+                            arrowColor: styles.primaryColor,
+                            selectedDayTextColor: styles.backgroundColor,
+                            dayTextColor: styles.textColor,
+                            textDisabledColor: styles.disabledColor,
+                            indicatorColor: styles.primaryColor,
+                            textMonthFontFamily: 'Roboto-Bold',
+                            weekVerticalMargin: 4
+                        }}
                     />
                 </ElevatedView>
             </Modal>
@@ -56,7 +74,7 @@ class CalendarPickerView extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     calculateTop = () => {
-        return calculateDimension(74, true, this.props.screenSize) + (Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0);
+        return calculateDimension(80, true, this.props.screenSize) + (Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0);
     };
 
     parseDate = (date) => {
@@ -81,8 +99,7 @@ CalendarPickerView.defaultProps = {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        borderRadius: 5,
-        backgroundColor: 'white'
+        borderRadius: 4
     }
 });
 

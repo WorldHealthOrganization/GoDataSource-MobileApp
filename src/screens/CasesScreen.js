@@ -113,7 +113,7 @@ class CasesScreen extends Component {
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', paddingRight: 16}}>
+                        <View style={style.headerContainer}>
                             <View
                                 style={[style.breadcrumbContainer]}>
                                 <Breadcrumb
@@ -122,32 +122,25 @@ class CasesScreen extends Component {
                                     componentId={this.props.componentId}
                                 />
                             </View>
-                            <View style={{marginRight: 8}}>
-                                <Ripple style={{
-                                    flex: 1,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }} onPress={this.handleOnPressQRCode}>
-                                    <MaterialCommunityIcons name="qrcode-scan" color={styles.textColor} size={24}/>
+                            <View style={style.headerButtonSpacing}>
+                                <Ripple style={style.headerButtonInner} onPress={this.handleOnPressQRCode}>
+                                    <MaterialCommunityIcons name="qrcode-scan" color={styles.textColor} size={24} />
                                 </Ripple>
                             </View>
 
-                            <View style={{marginRight: 8}}>
+                            <View style={style.headerButtonSpacing}>
                                 <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.secondaryColor,
-                                        width: calculateDimension(30, false, this.props.screenSize),
-                                        height: calculateDimension(30, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
+                                    elevation={0}
+                                    style={[
+                                        style.headerButton, 
+                                        {
+                                            width: calculateDimension(30, false, this.props.screenSize),
+                                            height: calculateDimension(30, true, this.props.screenSize)
+                                        }
+                                    ]}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={styles.backgroundColor} size={18}/>
+                                    <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={styles.textColor} size={18} />
                                     </Ripple>
                                 </ElevatedView>
                             </View>
@@ -156,20 +149,17 @@ class CasesScreen extends Component {
                                 render={() => (
                                     <View>
                                         <ElevatedView
-                                            elevation={3}
-                                            style={{
-                                                backgroundColor: styles.primaryColor,
-                                                width: calculateDimension(30, false, this.props.screenSize),
-                                                height: calculateDimension(30, true, this.props.screenSize),
-                                                borderRadius: 4
-                                            }}
+                                            elevation={0}
+                                            style={[
+                                                style.addCaseButton, 
+                                                {
+                                                    width: calculateDimension(30, false, this.props.screenSize),
+                                                    height: calculateDimension(30, true, this.props.screenSize)
+                                                }
+                                            ]}
                                         >
-                                            <Ripple style={{
-                                                flex: 1,
-                                                justifyContent: 'center',
-                                                alignItems: 'center'
-                                            }} onPress={this.handleOnPressAddCase}>
-                                                <Icon name="add" color={styles.backgroundColor} size={18}/>
+                                            <Ripple style={style.headerButtonInner} onPress={this.handleOnPressAddCase}>
+                                                <Icon name="add" color={styles.backgroundColor} size={18} />
                                             </Ripple>
                                         </ElevatedView>
                                     </View>
@@ -218,15 +208,7 @@ class CasesScreen extends Component {
                 </View>
                 {
                     this.props.loadMore ? (
-                        <View style={
-                            {
-                                width: '100%',
-                                height: 30,
-                                backgroundColor: styles.primaryColor,
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}
-                        >
+                        <View style={style.loadMore}>
                             <ActivityIndicator animating size={'small'} color={styles.backgroundColor} />
                         </View>
                     ) : (null)
@@ -357,21 +339,14 @@ class CasesScreen extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the confcig directory
 const style = StyleSheet.create({
-    mapContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF'
-    },
     container: {
         flex: 1
     },
-    containerContent: {
+    headerContainer: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundColor
-    },
-    separatorComponentStyle: {
-        height: 8
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingRight: 16
     },
     breadcrumbContainer: {
         alignItems: 'center',
@@ -379,6 +354,39 @@ const style = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start'
     },
+    addCaseButton: {
+        backgroundColor: styles.primaryColor,
+        borderRadius: 4
+    },
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    headerButtonSpacing: {
+        marginRight: 8
+    },
+    containerContent: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
+    },
+    loadMore: {
+        alignItems: 'center',
+        backgroundColor: styles.primaryColor,
+        height: 30,
+        justifyContent: 'center',
+        width: '100%'
+    },
+    mapContainer: {
+        alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1,
+        justifyContent: 'center'
+    }
 });
 
 function mapStateToProps(state) {

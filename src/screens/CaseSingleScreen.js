@@ -286,99 +286,102 @@ class CaseSingleScreen extends Component {
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View
-                            style={[style.breadcrumbContainer]}>
-                            <Breadcrumb
-                                entities={
-                                    [
-                                        getTranslation(translations.caseSingleScreen.title, this.props.translation),
-                                        this.props.isNew ? getTranslation(translations.caseSingleScreen.addCaseTitle, this.props.translation) : (computeFullName(_.get(this.state, 'case', null)))
-                                    ]
-                                }
-                                componentId={this.props.componentId}
-                                onPress={this.handlePressBreadcrumb}
-                            />
-                            <View style={{
-                                flexDirection: 'row',
-                                marginRight: calculateDimension(16, false, this.props.screenSize)
-                            }}>
+                        <View style={style.headerContainer}>
+                            <View style={[style.breadcrumbContainer]}>
+                                <Breadcrumb
+                                    entities={
+                                        [
+                                            getTranslation(translations.caseSingleScreen.title, this.props.translation),
+                                            this.props.isNew ? getTranslation(translations.caseSingleScreen.addCaseTitle, this.props.translation) : (computeFullName(_.get(this.state, 'case', null)))
+                                        ]
+                                    }
+                                    componentId={this.props.componentId}
+                                    onPress={this.handlePressBreadcrumb}
+                                />
+                            </View>
+                            <View style={style.headerButtonSpacing}>
                                 <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.primaryButton,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
+                                    elevation={0}
+                                    style={[
+                                        style.headerButton, 
+                                        {
+                                            width: calculateDimension(30, false, this.props.screenSize),
+                                            height: calculateDimension(30, true, this.props.screenSize)
+                                        }
+                                    ]}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15}/>
+                                    <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={styles.textColor} size={18} />
                                     </Ripple>
                                 </ElevatedView>
-                                {
-                                    (checkArrayAndLength(_.intersection(
-                                        _.get(this.props, 'role', []),
-                                        [
-                                            constants.PERMISSIONS_LAB_RESULT.labResultAll,
-                                            constants.PERMISSIONS_LAB_RESULT.labResultCreate,
-                                            constants.PERMISSIONS_LAB_RESULT.labResultList,
-                                            constants.PERMISSIONS_CASE.caseDelete,
-                                            constants.PERMISSIONS_CASE.caseAll
-                                        ]
-                                    )) && this.props.case && !this.props.isNew) ? (
-                                        <View
-                                            style={{marginRight: calculateDimension(16, false, this.props.screenSize)}}>
-                                            <Menu
-                                                ref="menuRef"
-                                                button={
-                                                    <Ripple onPress={this.showMenu}
-                                                            hitSlop={{left: 10, right: 10, top: 10, bottom: 10}}>
-                                                        <Icon name="more-vert"/>
-                                                    </Ripple>
-                                                }
-                                            >
-                                                <PermissionComponent
-                                                    render={() => (
-                                                        <MenuItem onPress={this.handleOnPressDelete}>
-                                                            {getTranslation(translations.caseSingleScreen.deleteCase, this.props.translation)}
-                                                        </MenuItem>
-                                                    )}
-                                                    permissionsList={[
-                                                        constants.PERMISSIONS_CASE.caseDelete,
-                                                        constants.PERMISSIONS_CASE.caseAll
-                                                    ]}
-                                                />
-                                                <PermissionComponent
-                                                    render={() => (
-                                                        <MenuItem onPress={this.handleOnPressAddLabResult}>
-                                                            {getTranslation(translations.labResultsSingleScreen.createLabResult, this.props.translation)}
-                                                        </MenuItem>
-                                                    )}
-                                                    permissionsList={[
-                                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
-                                                        constants.PERMISSIONS_LAB_RESULT.labResultCreate
-                                                    ]}
-                                                />
-                                                <PermissionComponent
-                                                    render={() => (
-                                                        <MenuItem onPress={this.handleOnPressShowLabResults}>
-                                                            {getTranslation(translations.labResultsSingleScreen.viewLabResult, this.props.translation)}
-                                                        </MenuItem>
-                                                    )}
-                                                    permissionsList={[
-                                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
-                                                        constants.PERMISSIONS_LAB_RESULT.labResultList
-                                                    ]}
-                                                />
-                                            </Menu>
-                                        </View>
-                                    ) : null
-                                }
                             </View>
+                            {
+                                (checkArrayAndLength(_.intersection(
+                                    _.get(this.props, 'role', []),
+                                    [
+                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                        constants.PERMISSIONS_LAB_RESULT.labResultCreate,
+                                        constants.PERMISSIONS_LAB_RESULT.labResultList,
+                                        constants.PERMISSIONS_CASE.caseDelete,
+                                        constants.PERMISSIONS_CASE.caseAll
+                                    ]
+                                )) && this.props.case && !this.props.isNew) ? (
+                                    <View>
+                                        <Menu
+                                            ref="menuRef"
+                                            button={
+                                                <Ripple
+                                                    style={[
+                                                        style.moreMenuButton, 
+                                                        {
+                                                            width: calculateDimension(30, false, this.props.screenSize),
+                                                            height: calculateDimension(30, true, this.props.screenSize)
+                                                        }
+                                                    ]}
+                                                    onPress={this.showMenu}
+                                                    hitSlop={{left: 10, right: 10, top: 10, bottom: 10}}>
+                                                    <Icon name="more-vert" color={styles.textColor} size={24} />
+                                                </Ripple>
+                                            }
+                                            style={{top: 36}}
+                                        >
+                                            <PermissionComponent
+                                                render={() => (
+                                                    <MenuItem onPress={this.handleOnPressDelete}>
+                                                        {getTranslation(translations.caseSingleScreen.deleteCase, this.props.translation)}
+                                                    </MenuItem>
+                                                )}
+                                                permissionsList={[
+                                                    constants.PERMISSIONS_CASE.caseDelete,
+                                                    constants.PERMISSIONS_CASE.caseAll
+                                                ]}
+                                            />
+                                            <PermissionComponent
+                                                render={() => (
+                                                    <MenuItem onPress={this.handleOnPressAddLabResult}>
+                                                        {getTranslation(translations.labResultsSingleScreen.createLabResult, this.props.translation)}
+                                                    </MenuItem>
+                                                )}
+                                                permissionsList={[
+                                                    constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                                    constants.PERMISSIONS_LAB_RESULT.labResultCreate
+                                                ]}
+                                            />
+                                            <PermissionComponent
+                                                render={() => (
+                                                    <MenuItem onPress={this.handleOnPressShowLabResults}>
+                                                        {getTranslation(translations.labResultsSingleScreen.viewLabResult, this.props.translation)}
+                                                    </MenuItem>
+                                                )}
+                                                permissionsList={[
+                                                    constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                                    constants.PERMISSIONS_LAB_RESULT.labResultList
+                                                ]}
+                                            />
+                                        </Menu>
+                                    </View>
+                                ) : null
+                            }
                         </View>
                     }
                     componentId={this.props.componentId}
@@ -491,12 +494,18 @@ class CaseSingleScreen extends Component {
             <TabBar
                 {...props}
                 indicatorStyle={{
-                    backgroundColor: styles.primaryButton,
+                    backgroundColor: styles.primaryColor,
                     height: 2
                 }}
                 style={{
-                    height: 41,
-                    backgroundColor: 'white'
+                    height: 36,
+                    backgroundColor: styles.backgroundColor
+                }}
+                tabStyle={{
+                    width: 'auto',
+                    paddingHorizontal: 16,
+                    marginHorizontal: 0,
+                    textAlign: 'center'
                 }}
                 onTabPress={({route, preventDefault}) => {
                     preventDefault();
@@ -510,6 +519,8 @@ class CaseSingleScreen extends Component {
                 }}
                 pressOpacity={this.props.isNew ? 0 : undefined}
                 pressColor={this.props.isNew ? 'transparent' : undefined}
+                activeColor={styles.primaryColor}
+                inactiveColor={styles.secondaryColor}
                 renderLabel={this.handleRenderLabel(props)}
                 scrollEnabled={true}
                 bounces={true}
@@ -562,7 +573,6 @@ class CaseSingleScreen extends Component {
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
-                color: styles.textColor,
                 flex: 1,
                 alignSelf: 'center'
             }}>
@@ -2413,13 +2423,37 @@ class CaseSingleScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        flex: 1
     },
-    breadcrumbContainer: {
+    headerContainer: {
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        paddingRight: 16
+    },
+    breadcrumbContainer: {
+        alignItems: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
+    },
+    headerButtonSpacing: {
+        marginRight: 8
+    },
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    moreMenuButton: {
+        alignItems: 'center',
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4,
+        justifyContent: 'center'
     }
 });
 

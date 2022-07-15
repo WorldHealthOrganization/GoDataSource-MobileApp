@@ -69,9 +69,9 @@ class ButtonWithIcons extends PureComponent {
 
 ButtonWithIcons.defaultProps = {
     firstIcon: "3d-rotation",
-    height: 25,
+    height: 30,
     secondIcon: "arrow-drop-down",
-    width: 124
+    width: 125
 };
 
 // Create style outside the class, or for components that will be used by other components (buttons),
@@ -79,7 +79,7 @@ ButtonWithIcons.defaultProps = {
 const style = StyleSheet.create({
     containerButton: {
         alignItems: 'center',
-        backgroundColor: styles.backgroundColor,
+        backgroundColor: styles.disabledColor,
         borderRadius: 4,
         flexDirection: 'row',
         height: '100%'
@@ -89,7 +89,7 @@ const style = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 9
+        paddingHorizontal: 8
     }
 });
 
