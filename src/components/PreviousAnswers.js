@@ -86,28 +86,20 @@ class PreviousAnswers extends Component {
     // and can slow down the app
     render() {
         return (
-            <ViewHOC style={{ flex: 1, backgroundColor: styles.screenBackgroundColor,}}
-                     showLoader={false}
-                     loaderText={"test"}
-            >
-                <View style={{
-                    backgroundColor: styles.screenBackgroundColor,
-                    flexDirection: 'row',
-                    alignSelf: 'center',
-                    width: '100%',
+            <ViewHOC style={style.previousAnswerContainer} showLoader={false} loaderText={"test"}>
+                <View style={[style.previousAnswerInner, {
                     marginHorizontal: calculateDimension(24, false, this.props.screenSize),
-                    marginVertical: calculateDimension(5, true, this.props.screenSize),
-                    justifyContent: 'space-between',
-                    borderTopColor: styles.screenBackgroundColor,
-                    borderTopWidth: 1
-                }}>
-                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 16, marginLeft: 5, }}> { getTranslation(translations.questionCardLabels.previousAnswers, this.props.translation) } </Text>
-                    <Ripple style={{
-                        justifyContent: 'flex-end',
-                        width: calculateDimension(33, false, this.props.screenSize),
+                    marginVertical: calculateDimension(5, true, this.props.screenSize)
+                }]}>
+                    <Text style={style.previousAnswerInnerText}>
+                        { getTranslation(translations.questionCardLabels.previousAnswers, this.props.translation) }
+                    </Text>
+                    <Ripple style={[style.previousAnswerInnerRipple, {
                         height: calculateDimension(25, true, this.props.screenSize),
-                    }} onPress={() => this.props.onCollapse(this.props.item)}>
-                        <Icon name={this.props.isCollapsed ? "arrow-drop-up" : "arrow-drop-down"}/>
+                        width: calculateDimension(36, false, this.props.screenSize)
+                    }]}
+                    onPress={() => this.props.onCollapse(this.props.item)}>
+                        <Icon name={this.props.isCollapsed ? "arrow-drop-down" : "arrow-drop-up"} />
                     </Ripple>
                 </View>
                 { this.props.isCollapsed &&
@@ -147,12 +139,7 @@ class PreviousAnswers extends Component {
         sortedQuestions = extractAllQuestions(sortedQuestions, source, index);
         return (
             <ElevatedView
-                style={{
-                    width: width,
-                    marginVertical: 10,
-                    backgroundColor: 'white',
-                    flexDirection: 'row',
-                }}
+                style={[style.previousAnswerContent, { width: width }]}
                 elevation={5}
                 key={index}
             >
@@ -188,14 +175,11 @@ class PreviousAnswers extends Component {
                     }}
                     copyAnswerDate={this.props.copyAnswerDate}
                 />
-                <View style={{
-                    minHeight: calculateDimension(72, true, this.props.screenSize),
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 25
-                }}>
+                <View style={[style.previousAnswerContentInner, {
+                    minHeight: calculateDimension(72, true, this.props.screenSize)
+                }]}>
                     <Ripple onPress={() => { this.handleDeletePrevAnswer(index)}}>
-                        <Icon name="delete"/>
+                        <Icon name="delete" color={styles.dangerColor} size={18} />
                     </Ripple>
                 </View>
             </ElevatedView>
@@ -361,48 +345,48 @@ class PreviousAnswers extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    previousAnswerContainer: {
+        backgroundColor: styles.screenBackgroundColor,
+        borderBottomLeftRadius: 4,
+        borderBottomRightRadius: 4,
+        flex: 1
+    },
+    previousAnswerInner: {
+        alignSelf: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        borderTopWidth: 1,
+        borderTopColor: styles.screenBackgroundColor,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        width: '100%'
+    },
+    previousAnswerInnerText: {
+        fontFamily: 'Roboto-Medium',
+        fontSize: 16
+    },
+    previousAnswerInnerRipple: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end'
+    },
     mapContainer: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundColor
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     containerContent: {
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center'
     },
-    separatorComponentStyle: {
-        height: 8
+    previousAnswerContent: {
+        backgroundColor: styles.backgroundColor,
+        borderBottomLeftRadius: 4,
+        borderBottomRightRadius: 4,
+        flexDirection: 'row'
     },
-    containerScrollView: {
-        flex: 1,
-        backgroundColor: styles.backgroundColor
-    },
-    contentContainerStyle: {
-        alignItems: 'center'
-    },
-    listViewStyle: {
-
-    },
-    componentContainerStyle: {
-
-    },
-    emptyComponent: {
+    previousAnswerContentInner: {
+        alignItems: 'center',
         justifyContent: 'center',
-        alignItems: 'center'
-    },
-    emptyComponentTextView: {
-        fontFamily: 'Roboto-Light',
-        fontSize: 15,
-        color: styles.secondaryColor
-    },
-    buttonEmptyListText: {
-        fontFamily: 'Roboto-Regular',
-        fontSize: 16.8,
-        color: styles.secondaryColor
-    },
-    breadcrumbContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between'
+        width: 50
     }
 });
 

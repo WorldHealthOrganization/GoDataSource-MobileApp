@@ -67,7 +67,7 @@ class CaseListItem extends Component {
         }
 
         return (
-            <ElevatedView elevation={3} style={[style.container, {
+            <ElevatedView elevation={5} style={[style.container, {
                 marginHorizontal: calculateDimension(16, false, screenSize),
                 height: calculateDimension(178, true, screenSize)
             }]}>

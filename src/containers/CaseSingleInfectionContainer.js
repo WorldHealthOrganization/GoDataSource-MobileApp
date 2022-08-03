@@ -9,7 +9,7 @@ import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} fr
 import config from './../utils/config';
 import {connect} from "react-redux";
 import styles from './../styles';
-import Ripple from 'react-native-material-ripple';
+import Button from './../components/Button';
 import CardComponent from './../components/CardComponent';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
@@ -81,18 +81,16 @@ class CaseSingleInfectionContainer extends Component {
                         </View>
                         {
                             this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
-                                    <Ripple
-                                        style={{
-                                            height: 25,
-                                            justifyContent: 'center'
-                                        }}
+                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize) }}>
+                                    <Button
+                                        title={this.props.case.vaccinesReceived && this.props.case.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
                                         onPress={this.props.onPressAddVaccine}
-                                    >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.primaryButton }}>
-                                            {this.props.case.vaccinesReceived && this.props.case.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
-                                        </Text>
-                                    </Ripple>
+                                        color={styles.backgroundColor}
+                                        titleColor={styles.textColor}
+                                        height={calculateDimension(35, true, this.props.screenSize)}
+                                        width={calculateDimension(175, false, this.props.screenSize)}
+                                        style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                    />
                                 </View>) : null
                         }
                         <View style={style.container}>
@@ -104,18 +102,16 @@ class CaseSingleInfectionContainer extends Component {
                         </View>
                         {
                             this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
-                                    <Ripple
-                                        style={{
-                                            height: 25,
-                                            justifyContent: 'center'
-                                        }}
+                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize) }}>
+                                    <Button
+                                        title={this.props.case.dateRanges && this.props.case.dateRanges.length === 0 ? getTranslation(translations.caseSingleScreen.oneDateRangeText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDateRangeText, this.props.translation)}
                                         onPress={this.props.onPressAddDateRange}
-                                    >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.primaryButton }}>
-                                            {this.props.case.dateRanges && this.props.case.dateRanges.length === 0 ? getTranslation(translations.caseSingleScreen.oneDateRangeText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDateRangeText, this.props.translation)}
-                                        </Text>
-                                    </Ripple>
+                                        color={styles.backgroundColor}
+                                        titleColor={styles.textColor}
+                                        height={calculateDimension(35, true, this.props.screenSize)}
+                                        width={calculateDimension(205, false, this.props.screenSize)}
+                                        style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                    />
                                 </View>
                             ) : null
                         }
@@ -166,10 +162,10 @@ class CaseSingleInfectionContainer extends Component {
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} key={cardIndex} style={[style.containerCardComponent, {
+            <ElevatedView elevation={5} key={cardIndex} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4,
+                marginVertical: 6,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
@@ -490,25 +486,25 @@ class CaseSingleInfectionContainer extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
     },
     subcontainerCardComponent: {
         alignItems: 'center',
         flex: 1
     },
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundColor,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    containerScrollView: {
+    cardStyle: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundColor
+        marginVertical: 6
+    },
+    containerScrollView: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'

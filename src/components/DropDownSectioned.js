@@ -4,14 +4,14 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {View, Text} from 'react-native';
+import {View, StyleSheet, Text} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import stylesGlobal from './../styles';
 import {connect} from "react-redux";
 import SectionedMultiSelect from './SectionedMultiSelect';
 import translations from './../utils/translations'
 import {getTranslation, getTooltip} from './../utils/functions';
-import TooltipComponent from './TooltipComponent'
+import TooltipComponent from './TooltipComponent';
+import styles from './../styles';
 
 class DropDownSectioned extends Component {
 
@@ -38,22 +38,16 @@ class DropDownSectioned extends Component {
     editInput() {
         let tooltip = getTooltip(this.props.label, this.props.translation);
         return (
-            <View style={[this.props.style, {flexDirection: 'row', height: 62, marginBottom: 4, alignItems: 'flex-end'}]}>
-                <View style = {{flex: 1}}>
-                    <Text style={{
-                        fontFamily: 'Roboto-Regular',
-                        fontSize: 16,
-                        textAlign: 'left',
-                        color: 'rgba(0,0,0,0.38)',
-                        paddingVertical: 5
-                    }}>
+            <View style={[this.props.style, {flexDirection: 'row', paddingVertical: 8}]}>
+                <View style={style.dropdownSectionedContainer}>
+                    <Text style={style.dropdownSectionedLabel}>
                         {this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                     </Text>
                     <SectionedMultiSelect
                         items={this.props.userData}
                         allItems={this.props.data}
                         showUnderline={true}
-                        underlineColor={stylesGlobal.secondaryColor}
+                        underlineColor={styles.secondaryColor}
                         selectToggleIconComponent={(<Icon name="check" size={18} />)}
                         dropDownToggleIconDownComponent={(<Icon name="arrow-drop-down" size={18} />)}
                         dropDownToggleIconUpComponent={(<Icon name="arrow-drop-up" size={18} />)}
@@ -70,11 +64,7 @@ class DropDownSectioned extends Component {
                     tooltip.hasTooltip === true ? (
                         <TooltipComponent
                             tooltipMessage={tooltip.tooltipMessage}
-                            style = {{
-                                flex: 0,
-                                marginTop: 7,
-                                marginBottom: 0
-                            }}
+                            style={{flex: 0, marginTop: 7, marginBottom: 0}}
                         />
                     ) : null
                 }
@@ -85,24 +75,12 @@ class DropDownSectioned extends Component {
     viewInput = () => {
         let tooltip = getTooltip(this.props.label, this.props.translation);
         return (
-            <View style={[{flexDirection: 'row', alignSelf: 'center'}, this.props.style]}>
-                <View style = {{flex: 1}}>
-                    <Text style={{
-                        fontFamily: 'Roboto-Regular',
-                        fontSize: 15,
-                        textAlign: 'left',
-                        color: 'rgb(0,0,0)',
-                        marginBottom: 2,
-                        marginTop: 7,
-                    }}>
+            <View style={[{alignSelf: 'center', flexDirection: 'row'}, this.props.style]}>
+                <View style={style.dropdownSectionedContainer}>
+                    <Text style={style.dropdownSectionedLabel}>
                         {getTranslation(this.props.label, this.props.translation)}
                     </Text>
-                    <Text style={{
-                        fontFamily: 'Roboto-Light',
-                        fontSize: 15,
-                        textAlign: 'left',
-                        color: 'rgb(60,60,60)',
-                    }}>
+                    <Text style={style.dropdownSectionedValue}>
                         {this.props.value}
                     </Text>
                 </View>
@@ -139,6 +117,22 @@ class DropDownSectioned extends Component {
         this.props.onChange(selectedItems, this.props.index);
     };
 }
+
+const style = StyleSheet.create({
+    dropdownSectionedContainer: {
+        flex: 1
+    },
+    dropdownSectionedLabel: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    },
+    dropdownSectionedValue: {
+        color: styles.textColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14,
+    }
+});
 
 function mapStateToProps(state) {
     return {

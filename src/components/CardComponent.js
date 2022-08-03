@@ -26,7 +26,7 @@ import ActionsBar from './ActionsBar';
 import translations from './../utils/translations';
 import SearchableDropdown from './SearchableDropdown';
 import PermissionComponent from './PermissionComponent';
-import colors from "../styles/colors";
+import styles from "./../styles";
 
 class CardComponent extends Component {
 
@@ -71,7 +71,7 @@ class CardComponent extends Component {
 
     renderElements = () => {
         let width = calculateDimension(315, false, this.props.screenSize);
-        let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
+        let marginHorizontal = calculateDimension(16, false, this.props.screenSize);
 
         let mask = null;
         let editMode = this.props.item.isEditMode;
@@ -88,9 +88,10 @@ class CardComponent extends Component {
                 return (
                     <Section
                         label={get(this.props, 'item.label', null)}
+                        labelSize='medium'
                         hasBorderBottom={this.props.item.hasBorderBottom}
                         borderBottomColor={this.props.item.borderBottomColor}
-                        containerStyle={{height: calculateDimension(54, true, this.props.screenSize)}}
+                        containerStyle={this.props.item.containerStyle}
                         translation={this.props.translation}
                     />
                 );
@@ -105,7 +106,7 @@ class CardComponent extends Component {
                         isRequired={this.props.item.isRequired}
                         multiline={this.props.item.multiline}
                         style={{width: width, marginHorizontal: marginHorizontal}}
-                        textStyle={this.props.item.id === 'phoneNumber' ? {color: colors.primaryColor} : undefined}
+                        textStyle={this.props.item.id === 'phoneNumber' ? {color: styles.primaryColor} : undefined}
                         objectType={this.props.item.objectType}
                         keyboardType={this.props.item.keyboardType}
                         translation={this.props.translation}
@@ -196,14 +197,7 @@ class CardComponent extends Component {
                         index={this.props.index}
                         value={this.props.value}
                         showValue={true}
-                        labelStyle={{
-                            fontFamily: 'Roboto-Regular',
-                            fontSize: 15,
-                            textAlign: 'left',
-                            color: 'rgb(0,0,0)',
-                            marginBottom: 2,
-                            marginTop: 7,
-                        }}
+                        labelStyle={style.switchInputLabelStyle}
                         isEditMode={this.props.isEditMode}
                         isRequired={this.props.item.isRequired}
                         onChange={this.props.onChangeSwitch}
@@ -254,7 +248,10 @@ class CardComponent extends Component {
                         value={this.props.item.value}
                         min={this.props.item.min}
                         max={this.props.item.max}
-                        style={{width, marginHorizontal}}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        selectedStyle={styles.primaryColor}
+                        unselectedStyle={styles.secondaryColor}
+                        markerColor={styles.primaryColor}
                         onChange={this.props.onChangeInterval}
                         objectType={this.props.item.objectType}
                         allowOverlap={this.props.item.allowOverlap}
@@ -331,8 +328,8 @@ class CardComponent extends Component {
                 );
             default:
                 return (
-                    <View style={{backgroundColor: 'red'}}>
-                        <Text>{"TODO: item type: " + this.props.item.type + " is not implemented yet"}</Text>
+                    <View style={style.todoFieldWrapper}>
+                        <Text style={style.todoFieldText}>{"TODO: item type: " + this.props.item.type + " is not implemented yet"}</Text>
                     </View>
                 )
         }
@@ -345,12 +342,26 @@ class CardComponent extends Component {
  */
 const style = StyleSheet.create({
     container: {
-        backgroundColor: colors.backgroundColor,
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
     },
     containerCardComponent: {
         alignItems: 'center',
         flex: 1
+    },
+    switchInputLabelStyle: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    },
+    todoFieldWrapper: {
+        paddingHorizontal: 16,
+        paddingBottom: 16
+    },
+    todoFieldText: {
+        color: styles.warningColor,
+        fontSize: 12,
+        fontStyle: 'italic'
     }
 });
 

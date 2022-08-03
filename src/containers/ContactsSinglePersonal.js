@@ -8,12 +8,10 @@ import {InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-nati
 import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import {LoaderScreen} from 'react-native-ui-lib';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
-import Ripple from 'react-native-material-ripple';
 import _ from 'lodash';
 import lodashGet from "lodash/get";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
@@ -21,6 +19,8 @@ import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT, PERMISSION_CREATE_CONTACT, PERMISSION_CREATE_CONTACT_OF_CONTACT, PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT} from "./../utils/constants";
 import {getTeamsForUserRequest} from './../queries/user';
+import Button from './../components/Button';
+import styles from './../styles';
 
 class ContactsSinglePersonal extends Component {
 
@@ -60,7 +60,7 @@ class ContactsSinglePersonal extends Component {
     render() {
         if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'} />
+                <LoaderScreen overlay={true} backgroundColor={styles.backgroundColor} />
             )
         }
 
@@ -72,7 +72,7 @@ class ContactsSinglePersonal extends Component {
         }
 
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{flex: 1}}>
                 <View style={style.viewContainer}>
                     <PermissionComponent
                         render={() => (
@@ -92,63 +92,59 @@ class ContactsSinglePersonal extends Component {
 
                     <ScrollView
                         style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 16 }]}
                     >
-                    <View style={style.container}>
-                        {
-                            this.state.fields.map((item, i) => {
-                                return this.handleRenderItem(item, i)
-                            })
-                        }
-
                         <View style={style.container}>
                             {
-                                checkArrayAndLength(_.get(this.props, 'contact.vaccinesReceived', [])) && _.get(this.props, 'contact.vaccinesReceived', []).map((item, index) => {
-                                    return this.handleRenderItemForVaccinesList(item, index)
+                                this.state.fields.map((item, i) => {
+                                    return this.handleRenderItem(item, i)
                                 })
                             }
-                        </View>
-                        {
-                            this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
-                                    <Ripple
-                                        style={{
-                                            height: 25,
-                                            justifyContent: 'center'
-                                        }}
-                                        onPress={this.props.onPressAddVaccine}
-                                    >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.primaryButton }}>
-                                            {!_.get(this.props, 'contact.vaccinesReceived', null) || checkArray(this.props.contact.vaccinesReceived) && this.props.contact.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
-                                        </Text>
-                                    </Ripple>
-                                </View>) : null
-                        }
 
-                        <View style={style.container}>
+                            <View style={style.container}>
+                                {
+                                    checkArrayAndLength(_.get(this.props, 'contact.vaccinesReceived', [])) && _.get(this.props, 'contact.vaccinesReceived', []).map((item, index) => {
+                                        return this.handleRenderItemForVaccinesList(item, index)
+                                    })
+                                }
+                            </View>
                             {
-                                checkArray(_.get(this.props, 'contact.documents', [])) && _.get(this.props, 'contact.documents', []).map((item, index) => {
-                                    return this.handleRenderItemForDocumentsList(item, index)
-                                })
+                                this.props.isEditMode ? (
+                                    <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}>
+                                        <Button
+                                            title={!_.get(this.props, 'contact.vaccinesReceived', null) || checkArray(this.props.contact.vaccinesReceived) && this.props.contact.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
+                                            onPress={this.props.onPressAddVaccine}
+                                            color={styles.backgroundColor}
+                                            titleColor={styles.textColor}
+                                            height={calculateDimension(35, true, this.props.screenSize)}
+                                            width={calculateDimension(160, false, this.props.screenSize)}
+                                            style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                        />
+                                    </View>) : null
+                            }
+
+                            <View style={style.container}>
+                                {
+                                    checkArray(_.get(this.props, 'contact.documents', [])) && _.get(this.props, 'contact.documents', []).map((item, index) => {
+                                        return this.handleRenderItemForDocumentsList(item, index)
+                                    })
+                                }
+                            </View>
+                            {
+                                this.props.isEditMode ? (
+                                    <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}>
+                                        <Button
+                                            title={!_.get(this.props, 'contact.documents', null) || checkArray(this.props.contact.documents) && this.props.contact.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
+                                            onPress={this.props.onPressAddDocument}
+                                            color={styles.backgroundColor}
+                                            titleColor={styles.textColor}
+                                            height={calculateDimension(35, true, this.props.screenSize)}
+                                            width={calculateDimension(175, false, this.props.screenSize)}
+                                            style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                        />
+                                    </View>) : null
                             }
                         </View>
-                        {
-                            this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
-                                    <Ripple
-                                        style={{
-                                            height: 25,
-                                            justifyContent: 'center'
-                                        }}
-                                        onPress={this.props.onPressAddDocument}
-                                    >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.primaryButton }}>
-                                            {!_.get(this.props, 'contact.documents', null) || checkArray(this.props.contact.documents) && this.props.contact.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
-                                        </Text>
-                                    </Ripple>
-                                </View>) : null
-                        }
-                    </View>
                     </ScrollView>
                 </View>
             </View>
@@ -179,13 +175,13 @@ class ContactsSinglePersonal extends Component {
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView key={cardIndex} elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView key={cardIndex} elevation={5} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4,
-                minHeight: calculateDimension(72, true, this.props.screenSize)
+                marginVertical: 6,
+                minHeight: calculateDimension(72, true, this.props.screenSize),
+                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -198,7 +194,7 @@ class ContactsSinglePersonal extends Component {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
+            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -383,33 +379,33 @@ class ContactsSinglePersonal extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    container: {
+        flex: 1
+    },
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        paddingVertical: 8
     },
     subcontainerCardComponent: {
         alignItems: 'center',
         flex: 1
     },
     viewContainer: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundColor,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    containerScrollView: {
+    cardStyle: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundColor
+        marginVertical: 6
+    },
+    containerScrollView: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'
-    },
-    container: {
-        flex: 1,
-        marginBottom: 10
     }
 });
 

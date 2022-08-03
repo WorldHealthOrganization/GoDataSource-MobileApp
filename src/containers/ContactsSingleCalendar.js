@@ -6,7 +6,6 @@
 import React, {Component} from 'react';
 import {InteractionManager, StyleSheet, View} from 'react-native';
 import {connect} from "react-redux";
-import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import FollowUpAgenda from './../components/FollowUpAgenda';
@@ -22,6 +21,7 @@ import {
     PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
 } from "../utils/constants";
 import translations from "../utils/translations";
+import styles from './../styles';
 
 class ContactsSingleCalendar extends Component {
 
@@ -55,7 +55,7 @@ class ContactsSingleCalendar extends Component {
     render() {
         if(!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'}/>
+                <LoaderScreen overlay={true} backgroundColor={styles.backgroundColor}/>
             )
         }
 
@@ -72,7 +72,7 @@ class ContactsSingleCalendar extends Component {
         }
 
         return (
-            <ElevatedView elevation={3} style={[style.container]}>
+            <ElevatedView elevation={5} style={[style.container]}>
                 <FollowUpAgenda
                     contact={this.props.contact}
                     followUps={followUps}
@@ -104,9 +104,9 @@ class ContactsSingleCalendar extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: styles.screenBackgroundColor,
-        borderRadius: 2
+        borderRadius: 4,
+        flex: 1
     }
 });
 

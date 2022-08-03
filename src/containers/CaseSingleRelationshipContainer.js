@@ -11,7 +11,7 @@ import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import GeneralListItem from '../components/GeneralListItem';
-import Ripple from 'react-native-material-ripple';
+import Button from './../components/Button';
 import moment from 'moment/min/moment.min';
 import translations from './../utils/translations';
 import config from './../utils/config';
@@ -60,7 +60,7 @@ class CaseSingleRelationshipContainer extends Component {
         }
 
         return (
-            <ElevatedView elevation={3} style={[style.container]}>
+            <ElevatedView elevation={5} style={[style.container]}>
                 <PermissionComponent
                     render={() => (
                         <TopContainerButtons
@@ -167,24 +167,18 @@ class CaseSingleRelationshipContainer extends Component {
 
     listEmptyComponent = () => {
         return (
-            <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+            <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}>
                 {
                     this.props.isEditMode !== null && this.props.isEditMode !== undefined && this.props.isEditMode === true ? (
-                        <Ripple
-                            style={{
-                                height: 25,
-                                justifyContent: 'center'
-                            }}
+                        <Button
+                            title={this.props.relationshipType === constants.RELATIONSHIP_TYPE.exposure ? getTranslation(translations.contactSingleScreen.exposureText, this.props.translation) : getTranslation(translations.casesScreen.addContactButtonLabel)}
                             onPress={this.onPressAddExposure}
-                        >
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.primaryButton}}>
-                                {this.props.relationshipType === constants.RELATIONSHIP_TYPE.exposure ?
-                                    getTranslation(translations.contactSingleScreen.exposureText, this.props.translation)
-                                    :
-                                    getTranslation(translations.casesScreen.addContactButtonLabel)
-                                }
-                            </Text>
-                        </Ripple>
+                            color={styles.backgroundColor}
+                            titleColor={styles.textColor}
+                            height={calculateDimension(35, true, this.props.screenSize)}
+                            width={calculateDimension(175, false, this.props.screenSize)}
+                            style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                        />
                     ) : null
                 }
             </View>
@@ -220,20 +214,20 @@ class CaseSingleRelationshipContainer extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: styles.screenBackgroundColor,
-        borderRadius: 2
+        borderRadius: 4,
+        flex: 1
     },
     containerContent: {
         // flex: 1,
-        backgroundColor: 'rgba(217, 217, 217, 0.5)'
+        backgroundColor: styles.disabledColor
     },
     separatorComponentStyle: {
         height: 8
     },
     listViewStyle: {
         // flex: 1,
-        paddingTop: 10
+        paddingTop: 8
     }
 });
 

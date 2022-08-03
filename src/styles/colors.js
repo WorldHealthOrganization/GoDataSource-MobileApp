@@ -6,7 +6,6 @@ const secondaryColor = '#999EA3';
 const textColor = '#333333';
 const backgroundColor = '#FFFFFF';
 const screenBackgroundColor = '#EFEFEF';
-const questionsBackgroundColor = '#D6D6D6';
 const dangerColor = '#D72631';
 const warningColor = '#FDA322';
 const successColor = '#1D741B';
@@ -14,6 +13,7 @@ const successColor = '#1D741B';
 /* RGB */
 const separatorColor = 'rgba(153, 158, 163, 0.25)';
 const disabledColor = 'rgba(153, 158, 163, 0.5)';
+const overlayColor = 'rgba(51, 51, 51, 0.75)';
 const primaryColorRgb = 'rgba(47, 121, 119, 0.1)';
 const backgroundColorRgb = 'rgba(153, 158, 163, 0.1)';
 const dangerColorRgb = 'rgba(215, 38, 49, 0.1)';
@@ -25,12 +25,12 @@ export default {
     textColor,
     backgroundColor,
     screenBackgroundColor,
-    questionsBackgroundColor,
     dangerColor,
     warningColor,
     successColor,
     separatorColor,
     disabledColor,
+    overlayColor,
     primaryColorRgb,
     backgroundColorRgb,
     dangerColorRgb

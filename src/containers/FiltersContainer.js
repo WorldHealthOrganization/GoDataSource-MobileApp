@@ -8,9 +8,9 @@ import get from 'lodash/get';
 import {calculateDimension, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import Button from './../components/Button';
-import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import translations from './../utils/translations';
+import styles from './../styles';
 
 class FiltersContainer extends PureComponent {
     constructor(props) {
@@ -29,13 +29,12 @@ class FiltersContainer extends PureComponent {
                 <Button
                     title={getTranslation(translations.generalButtons.nextButtonLabel, translation)}
                     onPress={handleMoveToNextScreenButton}
-                    color={styles.primaryButton}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, screenSize)}
-                    width={calculateDimension(130, false, screenSize)}
-                    style={{
-                        marginVertical: calculateDimension(12.5, true, screenSize),
-                    }} />
+                    color={styles.backgroundColor}
+                    titleColor={styles.textColor}
+                    height={calculateDimension(35, true, screenSize)}
+                    width={calculateDimension(164, false, screenSize)}
+                    style={{marginVertical: calculateDimension(16, true, screenSize)}}
+                />
                 <KeyboardAwareScrollView
                     style={style.containerScrollView}
                     contentContainerStyle={[style.contentContainerStyle, { paddingBottom: screenSize.height < 600 ? 70 : 20 }]}
@@ -50,27 +49,22 @@ class FiltersContainer extends PureComponent {
                 <View style={style.containerButtonApplyFilters}>
                     <Button
                         title={getTranslation(translations.generalLabels.applyFiltersButton, translation)}
-                        color={styles.primaryButton}
-                        onPress={onPressApplyFilters}
-                        width={calculateDimension(247.5, false, screenSize)}
-                        height={calculateDimension(32, true, screenSize)}
-                        style={{
-                            marginRight: calculateDimension(6.5, false, screenSize),
-                        }}
+                        color={styles.primaryColor}
                         titleStyle={{ fontFamily: 'Roboto-Medium', fontSize: 14 }}
-                        titleColor={'white'}
+                        titleColor={styles.backgroundColor}
+                        onPress={onPressApplyFilters}
+                        width={calculateDimension(245, false, screenSize)}
+                        height={calculateDimension(35, true, screenSize)}
+                        style={{marginRight: calculateDimension(8, false, screenSize)}}
                     />
                     <Button
                         title={getTranslation(translations.generalLabels.resetFiltersButton, translation)}
                         color={styles.backgroundColor}
-                        onPress={onPressResetFilters}
-                        width={calculateDimension(80.5, false, screenSize)}
-                        height={calculateDimension(32, true, screenSize)}
-                        style={{
-                            marginLeft: calculateDimension(6.5, false, screenSize),
-                        }}
                         titleStyle={{ fontFamily: 'Roboto-Medium', fontSize: 14 }}
-                        titleColor={'black'}
+                        titleColor={styles.textColor}
+                        onPress={onPressResetFilters}
+                        width={calculateDimension(90, false, screenSize)}
+                        height={calculateDimension(35, true, screenSize)}
                     />
                 </View>
             </View>
@@ -86,13 +80,13 @@ class FiltersContainer extends PureComponent {
         const { designScreenSize } = config;
 
         return (
-            <ElevatedView key={cardIndex} elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView key={cardIndex} elevation={5} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, screenSize),
+                marginVertical: 6,
+                minHeight: calculateDimension(72, true, screenSize),
                 width: calculateDimension(designScreenSize.width - 32, false, screenSize),
-                marginVertical: 4,
-                minHeight: calculateDimension(72, true, screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -105,7 +99,7 @@ class FiltersContainer extends PureComponent {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
+            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -225,31 +219,30 @@ class FiltersContainer extends PureComponent {
 }
 
 const style = StyleSheet.create({
+    container: {
+        alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
+    },
+    containerScrollView: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
+    },
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
     },
     subcontainerCardComponent: {
         alignItems: 'center',
+        borderRadius: 4,
         flex: 1
-    },
-    container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundColor,
-        borderRadius: 2,
-        alignItems: 'center',
     },
     containerButtonApplyFilters: {
         flex: 0,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 22,
-        marginTop: 10
-    },
-    containerScrollView: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundColor,
-    },
+        marginVertical: 16
+    }
 });
 
 function mapStateToProps(state) {

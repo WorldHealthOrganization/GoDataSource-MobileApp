@@ -91,13 +91,13 @@ class FollowUpsSingleContainer extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundColor,
         alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     containerScrollView: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundColor
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'

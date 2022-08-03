@@ -4,8 +4,8 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import PropTypes from 'prop-types';
-import styles from './../styles';
 import {getTranslation} from './../utils/functions';
+import styles from './../styles';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -32,7 +32,7 @@ Section = React.memo(({label, hasBorderBottom, borderBottomColor, containerStyle
                     {getTranslation(label, translation)}
                 </Text>
             </View>
-            <View style={[style.separatorStyle, {backgroundColor: borderBottomColor, display: hasBorderBottom ? 'flex' : 'none'}]}/>
+            <View style={[styles.lineStyle, {backgroundColor: borderBottomColor, display: hasBorderBottom ? 'flex' : 'none'}]}/>
         </View>
     )
 });
@@ -41,42 +41,37 @@ Section = React.memo(({label, hasBorderBottom, borderBottomColor, containerStyle
 // make a global style in the config directory
 const style = StyleSheet.create({
     containerStyle: {
+        backgroundColor: styles.backgroundColorRgb,
         width: '100%',
         // flex: 1
     },
     containerText: {
         // justifyContent: 'center',
         // flex: 1,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        paddingVertical: 4,
+        paddingHorizontal: 16
     },
     largeTextStyle: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 18,
-        color: 'black',
-        marginLeft: 15
+        fontSize: 18
     },
     mediumTextStyle: {
-        fontFamily: 'Roboto-Medium',
-        fontSize: 16,
         color: styles.textColor,
-        marginLeft: 15
+        fontFamily: 'Roboto-Medium',
+        fontSize: 16
     },
     normalTextStyle: {
-        fontFamily: 'Roboto-Regular',
-        fontSize: 15,
         color: styles.textColor,
-        marginLeft: 15,
-        flexShrink: 1
+        flexShrink: 1,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
     },
     smallTextStyle: {
-        fontFamily: 'Roboto-Light',
-        fontSize: 15,
         color: styles.textColor,
-        marginLeft: 15
-    },
-    separatorStyle: {
-        width: '100%',
-        height: 1
+        fontFamily: 'Roboto-Light',
+        fontSize: 12
     }
 });
 

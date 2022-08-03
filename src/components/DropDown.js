@@ -52,54 +52,49 @@ class DropDown extends PureComponent {
         let tooltip = getTooltip(translations.dropDownLabels.selectedAnswersLabel, this.props.translation);
         return (
             <View style={[{flexDirection: 'row'}, this.props.style]}>
-                <Ripple style={{
-                        flex: 1,
-                        marginTop: 25,
-                        marginBottom: 14,
-                        alignSelf: 'center',
-                    }} onPress={this.handleOnPress}
-                >
-                    <View style={style.innerTextContainer}>
-                        <Text style={style.labelStyle}>
-                            {this.state.selectedItems.length === 0 ? this.props.isRequired === false ? getTranslation(translations.dropDownLabels.selectedAnswersLabel, this.props.translation) : getTranslation(translations.dropDownLabels.selectedAnswersLabel, this.props.translation) + '*' : (getTranslation(translations.dropDownLabels.selectedLabel, this.props.translation) + ' ' + this.state.selectedItems.length + ' ' + getTranslation(translations.dropDownLabels.answersLabel, this.props.translation))}</Text>
-                        <Icon name="arrow-drop-down"/>
+                <Ripple style={style.dropdownContainer} onPress={this.handleOnPress}>
+                    <View style={style.dropdownInnerText}>
+                        <Text style={style.dropdownLabel}>
+                            {this.state.selectedItems.length === 0 ? this.props.isRequired === false ? getTranslation(translations.dropDownLabels.selectedAnswersLabel, this.props.translation) : getTranslation(translations.dropDownLabels.selectedAnswersLabel, this.props.translation) + ' *' : (getTranslation(translations.dropDownLabels.selectedLabel, this.props.translation) + ' ' + this.state.selectedItems.length + ' ' + getTranslation(translations.dropDownLabels.answersLabel, this.props.translation))}</Text>
+                        <Icon name="arrow-drop-down" />
                     </View>
-                    <View style={[{height: 1, backgroundColor: styles.secondaryColor, marginTop: 14}]} />
+                    <View style={styles.lineStyle} />
                     <Modal
                         isVisible={this.state.showDropdown}
                         style={[this.props.dropDownStyle, {
-                            position: 'absolute',
                             top: this.props.screenSize.height / 4,
-                            height: this.props.screenSize.height / 2,
-                            backgroundColor: 'transparent'
+                            maxHeight: this.props.screenSize.height / 2
                         }]}
                         onBackdropPress={() => this.setState({ showDropdown: false }, () => {
                             this.props.onChange(this.state.selectedItems, this.props.id);
                         })}
                     >
-                        <ElevatedView elevation={3} style={[{backgroundColor: 'white'}]}>
+                        <ElevatedView elevation={5} style={style.dropdownModal}>
                             <Ripple 
-                                style={style.navbarContainer}
+                                style={style.dropdownModalTopHeader}
                                 onPress={() => this.setState({ showDropdown: false },()=> {
                                     this.props.onChange(this.state.selectedItems, this.props.id);
                                 })}
                                 hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}
                             >
-                                <Icon name="close"/>
+                                <Icon name="close" />
                             </Ripple>
+                            <View style={styles.lineStyle} />
                             <SelectMultiple
                                 items={this.props.data !== undefined && this.props.data !== null ? this.props.data : []}
                                 selectedItems={this.state.selectedItems}
                                 onSelectionsChange={this.handleOnselectionChange}
+                                style={{borderRadius: 4}}
+                                rowStyle={{borderBottomColor: styles.separatorColor, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 8}}
+                                labelStyle={{color: styles.textColor}}
+                                selectedLabelStyle={{color: styles.primaryColor}}
                             />
                         </ElevatedView>
                     </Modal>
                 </Ripple>
                 {
                     tooltip.hasTooltip === true ? (
-                        <TooltipComponent
-                            tooltipMessage={tooltip.tooltipMessage}
-                        />
+                        <TooltipComponent tooltipMessage={tooltip.tooltipMessage} />
                     ) : null
                 }
             </View>
@@ -112,7 +107,7 @@ class DropDown extends PureComponent {
             <View style={[{flexDirection: 'row'}, this.props.style]}>
                 {
                     this.props.value.length > 0 ? (
-                        <Text style={style.labelStyle}>
+                        <Text style={style.dropdownLabel}>
                             {this.state.selectedItems.map((e, index) => {return getTranslation(e.label, this.props.translation) + (index === (this.state.selectedItems.length - 1) ? '' : ', ')})}
                         </Text>
                     ) : (null)
@@ -121,11 +116,7 @@ class DropDown extends PureComponent {
                     tooltip.hasTooltip === true ? (
                         <TooltipComponent
                             tooltipMessage={tooltip.tooltipMessage}
-                            style = {{
-                                flex: 0,
-                                marginTop: 0,
-                                marginBottom: 0
-                            }}
+                            style={{flex: 0, marginTop: 0, marginBottom: 0}}
                         />
                     ) : null
                 }
@@ -153,29 +144,40 @@ class DropDown extends PureComponent {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
     },
-    dropdownStyle: {
-        marginHorizontal: 14
-    },
-    navbarContainer: {
-        paddingRight: 10, 
-        paddingTop: 10, 
-        paddingBottom: 0, 
-        margin: 0, 
-        flexDirection: 'row', 
-        justifyContent: 'flex-end'
-    },
-    labelStyle: {
+    dropdownContainer: {
+        alignSelf: 'center',
         flex: 1,
-        fontFamily: 'Roboto-Light',
-        fontSize: 15,
-        color: styles.textColor
+        marginVertical: 8
     },
-    innerTextContainer: {
+    dropdownInnerText: {
+        alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'space-between'
+    },
+    dropdownLabel: {
+        color: styles.secondaryColor,
+        flex: 1,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14,
+    },
+    dropdownModal: {
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
+    },
+    dropdownModalTopHeader: {
+        backgroundColor: styles.backgroundColorRgb,
+        flexDirection: 'row', 
+        justifyContent: 'flex-end',
+        padding: 8
+    },
+    dropdownStyle: {
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        marginHorizontal: 16,
+        position: 'absolute'
     }
 });
 

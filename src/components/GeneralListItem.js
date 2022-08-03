@@ -26,9 +26,13 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                     firstComponent ? (
                         firstComponent
                     ) : (
-                        <Text style={style.title}>
-                            {getTranslation(title, translation)}
-                        </Text>
+                        <View style={style.cardHeader}>
+                            <View style={style.cardHeaderTitle}>
+                                <Text numberOfLines={1}>
+                                    {getTranslation(title, translation)}
+                                </Text>
+                            </View>
+                        </View>
                     )
                 }
                 {
@@ -85,17 +89,30 @@ const style = StyleSheet.create({
     containerStyle: {
         width: '100%'
     },
-    title: {
+    cardHeader: {
+        alignItems: 'center',
+        backgroundColor: styles.backgroundColorRgb,
+        borderTopLeftRadius: 4,
+        borderTopRightRadius: 4,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    cardHeaderTitle: {
         color: styles.textColor,
+        flex: 1,
         fontFamily: 'Roboto-Medium',
         fontSize: 16,
-        lineHeight: 20
+        lineHeight: 20,
+        paddingVertical: 4,
+        paddingHorizontal: 8
     },
     primaryText: {
-        color: styles.secondaryColor,
+        color: styles.textColor,
         fontFamily: 'Roboto-Regular',
-        fontSize: 14
-    }
+        fontSize: 14,
+        paddingHorizontal: 16,
+        paddingVertical: 8
+    },
 });
 
 export default (GeneralListItem);

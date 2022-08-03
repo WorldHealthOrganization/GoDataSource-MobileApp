@@ -254,20 +254,20 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     mainContainer: {
-        flex: 1,
+        alignItems: 'center',
         backgroundColor: styles.screenBackgroundColor,
-        alignItems: 'center'
+        flex: 1
     },
     container: {
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1,
-        backgroundColor: styles.screenBackgroundColor
     },
     contentContainerStyle: {
         alignItems: 'center'
     },
     containerButtons: {
-        flexDirection: 'row',
         alignItems: 'center',
+        flexDirection: 'row',
         justifyContent: 'center'
     }
 });

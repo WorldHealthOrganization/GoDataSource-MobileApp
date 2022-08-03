@@ -37,7 +37,7 @@ class TooltipComponent extends PureComponent {
                     height: 18
                 }]}
             > 
-                <ElevatedView elevation={3} style={style.elevatedView}>
+                <ElevatedView elevation={5} style={style.elevatedView}>
                     <Ripple style={style.ripple} onPress={this.handleOnPressTooltip}>
                         <Icon name='help' color={styles.textColor} size={18}/>
                     </Ripple>
@@ -53,7 +53,7 @@ class TooltipComponent extends PureComponent {
                     }]}
                     onBackdropPress={() => this.setState({ showModal: false })}
                 >
-                    <ElevatedView elevation={3} style={style.modalText}>
+                    <ElevatedView elevation={5} style={style.modalText}>
                         <Text>
                             {getTranslation(this.props.tooltipMessage, this.props.translation)}
                         </Text>
