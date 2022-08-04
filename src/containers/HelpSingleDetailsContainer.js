@@ -117,7 +117,7 @@ const style = StyleSheet.create({
     containerCardComponent: {
         backgroundColor: styles.backgroundColor,
         borderRadius: 4,
-        paddingTop: 8
+        paddingVertical: 8
     },
     subcontainerCardComponent: {
         alignItems: 'center',

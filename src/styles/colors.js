@@ -17,6 +17,7 @@ const overlayColor = 'rgba(51, 51, 51, 0.75)';
 const primaryColorRgb = 'rgba(47, 121, 119, 0.1)';
 const backgroundColorRgb = 'rgba(153, 158, 163, 0.1)';
 const dangerColorRgb = 'rgba(215, 38, 49, 0.1)';
+const warningColorRgb = 'rgba(253, 163, 34, 0.25)';
 
 export default {
     primaryColor,
@@ -33,5 +34,6 @@ export default {
     overlayColor,
     primaryColorRgb,
     backgroundColorRgb,
-    dangerColorRgb
+    dangerColorRgb,
+    warningColorRgb
 }

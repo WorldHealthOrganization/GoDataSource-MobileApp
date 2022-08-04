@@ -45,7 +45,7 @@ class QuestionCardContent extends PureComponent {
                                     isEditMode={!!(this.props.isEditMode && this.props.editableQuestionDate)}
                                     isRequired={true}
                                     style={{
-                                        width: this.props.isEditMode ? (this.props.viewWidth / 2) - 16 : this.props.viewWidth - 16,
+                                        width: this.props.isEditMode ? (this.props.viewWidth / 2) - 40 : this.props.viewWidth - 40,
                                     }}
                                     onChange={(value, id) => {
                                         this.onChangeAnswerDate(value, this.props.item.variable, this.props.index)
@@ -56,10 +56,10 @@ class QuestionCardContent extends PureComponent {
                                         minHeight: calculateDimension(60, true, this.props.screenSize),
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        width: 8
+                                        width: 16
                                     }}>
                                         {
-                                            answerDate !== null && <Ripple onPress={() => this.handleCopyAnswerDate(answerDate)}><Icon name="content-copy" /></Ripple>
+                                            answerDate !== null && <Ripple onPress={() => this.handleCopyAnswerDate(answerDate)}><Icon name="content-copy" color={styles.primaryColor} size={18} /></Ripple>
                                         }
                                     </View>
                                 }
@@ -362,7 +362,7 @@ class QuestionCardContent extends PureComponent {
             default:
                 return(
                     item.answerType !== undefined ? (
-                        <View style={customStyles.questionTodoFieldWrapper}>
+                        <View>
                             <Text style={customStyles.questionTodoFieldText}>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
                         </View>
                     ) : null
@@ -378,12 +378,14 @@ class QuestionCardContent extends PureComponent {
             >
                 {
                     additionalQuestion.answerType !== 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP' ? (
-                        <Section label={getTranslation(additionalQuestion.text, this.props.translation)} labelSize={'medium'} style={{margin: 0}} />
+                        <Section label={getTranslation(additionalQuestion.text, this.props.translation)} labelSize={'normal'} style={{margin: 0}} containerStyle={customStyles.additionalQuestionContainer} textStyle={customStyles.additionalQuestionText} />
                     ) : (null)
                 }
+                <View style={customStyles.additionalQuestionContent}>
                 {
                     this.handleRenderItemByType(additionalQuestion, parentId)
                 }
+                </View>
             </View>
         )
     };
@@ -433,7 +435,9 @@ class QuestionCardContent extends PureComponent {
 // make a global style in the config directory
 const customStyles = StyleSheet.create({
     containerCardComponent: {
-        justifyContent: 'center'
+        justifyContent: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 8
     },
     containerQuestion: {
         alignItems: 'center',
@@ -453,22 +457,30 @@ const customStyles = StyleSheet.create({
         fontFamily: 'Roboto-Regular',
         fontSize: 14
     },
-    questionTodoFieldWrapper: {
-        paddingHorizontal: 16,
-        paddingBottom: 16
-    },
     questionTodoFieldText: {
         color: styles.warningColor,
         fontSize: 12,
         fontStyle: 'italic'
     },
     questionMarkupHeader: {
-        backgroundColor: styles.primaryAltColor,
+        backgroundColor: styles.warningColorRgb,
         borderRadius: 4,
-        margin: 0
+        marginHorizontal: -16,
+        marginVertical: -8,
+        width: 360
     },
     questionMarkupHeaderText: {
-        color: styles.backgroundColor
+        color: styles.primaryAltColor
+    },
+    additionalQuestionContainer: {
+        backgroundColor: styles.backgroundColorRgb
+    },
+    additionalQuestionText: {
+        color: styles.overlayColor
+    },
+    additionalQuestionContent: {
+        paddingHorizontal: 16,
+        paddingVertical: 8
     }
 });
 
