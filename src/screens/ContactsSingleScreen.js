@@ -7,7 +7,6 @@ import React, {Component} from 'react';
 import geolocation from '@react-native-community/geolocation';
 import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
@@ -62,6 +61,7 @@ import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import {getContactRelationForContact} from "../actions/contacts";
+import styles from './../styles';
 
 const initialLayout = {
     height: 0,

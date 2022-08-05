@@ -4,9 +4,9 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import lodashGet from 'lodash/get';
 import translations from "../utils/translations";
-import styles from "../styles";
 import {calculateDimension, getTranslation} from "../utils/functions";
 import Button from './Button';
+import styles from "../styles";
 
 class TopContainerButtons extends Component {
     constructor(props) {

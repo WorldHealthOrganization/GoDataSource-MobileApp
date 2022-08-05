@@ -8,7 +8,6 @@ import {Alert, StyleSheet, Text, View} from 'react-native';
 import constants from "./../utils/constants";
 import Button from './../components/Button';
 import {Icon} from 'react-native-material-ui';
-import styles from './../styles';
 import ViewHOC from './../components/ViewHOC';
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
@@ -33,6 +32,7 @@ import {insertOrUpdateExposure} from "../actions/exposure";
 import withPincode from './../components/higherOrderComponents/withPincode';
 import {Navigation} from "react-native-navigation";
 import _ from "lodash";
+import styles from './../styles';
 
 class RelationshipScreen extends Component {
 

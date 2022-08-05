@@ -135,12 +135,12 @@ class NavigationDrawerListItem extends PureComponent {
                                                 ]}
                                             >
                                                 <ElevatedView
-                                                    elevation={3}
+                                                    elevation={0}
                                                     style={[
                                                         style.permissionAddButton,
                                                         {
-                                                            width: calculateDimension(36, false, this.props.screenSize),
-                                                            height: calculateDimension(24, true, this.props.screenSize)
+                                                            width: calculateDimension(40, false, this.props.screenSize),
+                                                            height: calculateDimension(40, true, this.props.screenSize)
                                                         }
                                                     ]}
                                                 >

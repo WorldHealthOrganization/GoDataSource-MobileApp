@@ -56,7 +56,7 @@ class SearchFilterView extends Component {
                         <ElevatedView elevation={4} style={{backgroundColor: 'transparent'}}>
                             <IconButton
                                 label={this.props.filterText}
-                                containerButton={{backgroundColor: 'white'}}
+                                containerButton={{backgroundColor: styles.backgroundColor}}
                                 onPress={this.props.onPress}
                                 firstIcon={null}
                                 isFirstIconPureMaterial={null}
@@ -111,11 +111,11 @@ const style = StyleSheet.create({
         flexDirection: 'row'
     },
     textInput: {
-        width: '50%',
         alignSelf: 'center',
         borderBottomWidth: 1,
-        borderBottomColor: 'red',
-        paddingVertical: 5
+        borderBottomColor: styles.dangerColor,
+        paddingVertical: 5,
+        width: '50%',
     }
 });
 

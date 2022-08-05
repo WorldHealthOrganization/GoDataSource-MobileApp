@@ -3,7 +3,6 @@
 import React, {Component} from 'react';
 import {Icon} from 'react-native-material-ui';
 import {Alert, StyleSheet, Text, View} from 'react-native';
-import styles from './../styles';
 import {connect} from "react-redux";
 import _, {sortBy} from 'lodash';
 import {calculateDimension, getTranslation} from './../utils/functions';
@@ -19,6 +18,7 @@ import {extractAllQuestions} from "../utils/functions";
 import Ripple from 'react-native-material-ripple';
 import uniqueId from "lodash/uniqueId";
 import {Navigation} from "react-native-navigation";
+import styles from './../styles';
 
 class PreviousAnswers extends Component {
 

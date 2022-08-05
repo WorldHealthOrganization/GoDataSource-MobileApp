@@ -9,12 +9,12 @@ import {calculateDimension, extractIdFromPouchId, getTranslation} from '../utils
 import config from '../utils/config';
 import {connect} from "react-redux";
 import moment from "moment";
-import styles from '../styles';
 import CardComponent from '../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import {getTeamsForUserRequest} from "../queries/user";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import styles from '../styles';
 
 class FollowUpsSingleGetInfoContainer extends PureComponent {
 

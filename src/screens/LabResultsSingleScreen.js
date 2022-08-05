@@ -7,7 +7,6 @@ import React, {Component} from 'react';
 import geolocation from '@react-native-community/geolocation';
 import {Alert, Animated, BackHandler, Platform, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import {connect} from "react-redux";
@@ -40,6 +39,7 @@ import withPincode from './../components/higherOrderComponents/withPincode';
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import {setDisableOutbreakChange} from "../actions/outbreak";
+import styles from './../styles';
 
 class LabResultsSingleScreen extends Component {
 

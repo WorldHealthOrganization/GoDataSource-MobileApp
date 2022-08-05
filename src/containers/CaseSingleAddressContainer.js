@@ -9,7 +9,6 @@ import {LoaderScreen} from 'react-native-ui-lib';
 import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import styles from './../styles';
 import constants from './../utils/constants';
 import CardComponent from './../components/CardComponent';
 import Button from './../components/Button';
@@ -20,6 +19,7 @@ import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import {validateRequiredFields, checkValidEmails} from './../utils/formValidators';
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import styles from './../styles';
 
 class CaseSingleAddressContainer extends React.Component {
 
@@ -53,7 +53,7 @@ class CaseSingleAddressContainer extends React.Component {
     render() {
         if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'} />
+                <LoaderScreen overlay={true} backgroundColor={styles.backgroundColor} />
             )
         }
         return (

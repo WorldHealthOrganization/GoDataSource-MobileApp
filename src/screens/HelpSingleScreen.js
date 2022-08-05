@@ -18,6 +18,7 @@ import withPincode from './../components/higherOrderComponents/withPincode';
 import ViewHOC from "../components/ViewHOC";
 import {Navigation} from "react-native-navigation";
 import {setDisableOutbreakChange} from "../actions/outbreak";
+import styles from './../styles';
 
 class HelpSingleScreen extends Component {
 
@@ -115,8 +116,8 @@ class HelpSingleScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: styles.backgroundColor,
+        flex: 1
     },
     breadcrumbContainer: {
         flex: 1,

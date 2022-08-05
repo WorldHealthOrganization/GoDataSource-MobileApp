@@ -279,13 +279,13 @@ const style = StyleSheet.create({
         flexDirection: 'row'
     },
     cardContentGender: {
-        color: styles.primaryAltColor,
+        color: styles.textColor,
         fontFamily: 'Roboto-Regular',
         fontSize: 14,
         marginRight: 16
     },
     cardContentAge: {
-        color: styles.primaryAltColor,
+        color: styles.textColor,
         fontFamily: 'Roboto-Regular',
         fontSize: 14
     },

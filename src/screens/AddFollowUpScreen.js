@@ -75,19 +75,18 @@ class AddFollowUpScreen extends PureComponent{
                     <View style={{flex: 0.2, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
                         <Button
                             title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
-                            color="white"
-                            titleColor={"black"}
+                            style={styles.secondaryButton}
                             onPress={this.onCancelPressed}
-                            height={25}
-                            width="40%"
+                            height={35}
+                            width={165}
                         />
                         <Button
                             title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                            color={styles.primaryButton}
-                            titleColor={'white'}
+                            color={styles.primaryColor}
+                            titleColor={styles.backgroundColor}
                             onPress={this.onSavePressed}
-                            height={25}
-                            width="40%"
+                            height={35}
+                            width={165}
                         />
                     </View>
                 </ElevatedView>

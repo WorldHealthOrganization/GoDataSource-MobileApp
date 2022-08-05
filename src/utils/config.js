@@ -29,12 +29,12 @@ const sideMenuItems = {
         label: translations.navigationDrawer.contactsLabel,
     },
     [sideMenuKeys[2]]: {
-        name: 'people',
+        name: 'groups',
         label: translations.contactsOfContactsScreen.contactsTitle,
         // addButton: true
     },
     [sideMenuKeys[3]]: {
-        name: 'create-new-folder',
+        name: 'person',
         label: translations.navigationDrawer.casesLabel,
         addButton: true
     },
@@ -43,7 +43,7 @@ const sideMenuItems = {
         label: translations.navigationDrawer.labResultsLabel
     },
     [sideMenuKeys[5]]: {
-        name: 'insert-invitation',
+        name: 'event',
         label: translations.navigationDrawer.eventsLabel
     }
 };

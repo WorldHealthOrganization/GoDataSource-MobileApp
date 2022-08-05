@@ -12,7 +12,6 @@ import {bindActionCreators, compose} from "redux";
 import NavBarCustom from './../components/NavBarCustom';
 import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
-import styles from './../styles';
 import config, {sideMenuKeys} from './../utils/config';
 import _, {sortBy, findIndex} from 'lodash';
 import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalContainer';
@@ -57,6 +56,7 @@ import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import Menu, {MenuItem} from "react-native-material-menu";
 import PermissionComponent from "../components/PermissionComponent";
 import {setDisableOutbreakChange} from "../actions/outbreak";
+import styles from './../styles';
 
 const initialLayout = {
     height: 0,

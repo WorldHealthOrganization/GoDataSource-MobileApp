@@ -7,14 +7,14 @@ import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import Ripple from 'react-native-material-ripple';
-import styles from './../styles';
 import {connect} from "react-redux";
 import Modal from 'react-native-modal';
 import ElevatedView from "react-native-elevated-view";
 import SelectMultiple from 'react-native-select-multiple';
 import translations from './../utils/translations'
 import {getTranslation, getTooltip} from './../utils/functions';
-import TooltipComponent from './TooltipComponent'
+import TooltipComponent from './TooltipComponent';
+import styles from './../styles';
 
 class DropDown extends PureComponent {
 

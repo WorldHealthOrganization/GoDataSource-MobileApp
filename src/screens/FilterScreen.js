@@ -5,7 +5,6 @@ import {bindActionCreators} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
@@ -15,6 +14,7 @@ import SortContainer from './../containers/SortContainer';
 import translations from './../utils/translations';
 import {Navigation} from "react-native-navigation";
 import throttle from 'lodash/throttle';
+import styles from './../styles';
 
 class FilterScreen extends Component {
 

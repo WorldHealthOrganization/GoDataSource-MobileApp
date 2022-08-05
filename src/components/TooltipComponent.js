@@ -32,14 +32,10 @@ class TooltipComponent extends PureComponent {
     render() {
         let width = calculateDimension(315, false, this.props.screenSize);
         return (
-            <View style={[this.props.style ? this.props.style : style.container, {
-                    width: 18, 
-                    height: 18
-                }]}
-            > 
+            <View style={[this.props.style ? this.props.style : style.container, {height: 18, width: 18}]}> 
                 <ElevatedView elevation={5} style={style.elevatedView}>
                     <Ripple style={style.ripple} onPress={this.handleOnPressTooltip}>
-                        <Icon name='help' color={styles.textColor} size={18}/>
+                        <Icon name='help' color={styles.textColor} size={18} />
                     </Ripple>
                 </ElevatedView>
 
@@ -48,8 +44,7 @@ class TooltipComponent extends PureComponent {
                     style={[style.modal, {
                         width: width,
                         top: this.props.screenSize.height / 4,
-                        height: this.props.screenSize.height / 2,
-                        borderRadius: 4
+                        height: this.props.screenSize.height / 2
                     }]}
                     onBackdropPress={() => this.setState({ showModal: false })}
                 >
@@ -76,29 +71,29 @@ const style = StyleSheet.create({
         flex: 0
     },
     elevatedView: {
-        flex: 1,
-        // backgroundColor: 'white',
         borderRadius: 150,
+        flex: 1
     },
     ripple: {
+        alignItems: 'center',
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
+        justifyContent: 'center'
     },
     modal: {
         alignSelf: 'center',
+        backgroundColor: 'transparent',
+        borderRadius: 4,
         position: 'absolute',
-        backgroundColor: 'transparent'
     },
     modalText: {
-        backgroundColor: 'white',
-        padding: 16,
-        justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: styles.backgroundColor,
         borderRadius: 4,
         color: styles.textColor,
         fontFamily: 'Roboto-Regular',
-        fontSize: 16
+        fontSize: 16,
+        justifyContent: 'center',
+        padding: 16
     }
 });
 

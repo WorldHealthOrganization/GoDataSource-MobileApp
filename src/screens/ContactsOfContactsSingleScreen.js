@@ -7,7 +7,6 @@ import React, {Component} from 'react';
 import geolocation from '@react-native-community/geolocation';
 import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ViewHOC from './../components/ViewHOC';
 import config from './../utils/config';
@@ -47,6 +46,7 @@ import {Navigation} from "react-native-navigation";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import Menu, {MenuItem} from "react-native-material-menu";
 import PermissionComponent from "../components/PermissionComponent";
+import styles from './../styles';
 
 const initialLayout = {
     height: 0,

@@ -37,12 +37,12 @@ class ButtonWithIcons extends PureComponent {
                 <View style={style.containerInnerView}>
                     {
                         this.props.isFirstIconPureMaterial ? (
-                            <Icon size={calculateDimension(15, false, this.props.screenSize)} color={styles.primaryButton} name={this.props.firstIcon}
+                            <Icon size={calculateDimension(15, false, this.props.screenSize)} color={styles.textColor} name={this.props.firstIcon}
                                   style={{display: this.props.isFirstIconPureMaterial ? 'flex' : 'none'}}/>
                         ) : (
                             <IconMaterial style={{display: this.props.isFirstIconPureMaterial ? 'none' : 'flex'}}
                                           name={this.props.firstIcon} size={calculateDimension(15, false, this.props.screenSize)}
-                                          color={styles.primaryButton}/>
+                                          color={styles.textColor}/>
                         )
                     }
                     <Text>
@@ -55,7 +55,7 @@ class ButtonWithIcons extends PureComponent {
                         ) : (
                             <IconMaterial style={{display: this.props.isSecondIconPureMaterial ? 'none' : 'flex'}}
                                 name={this.props.firstIcon} size={calculateDimension(11, false, this.props.screenSize)}
-                                color={styles.primaryButton}/>
+                                color={styles.textColor}/>
                         )
                     }
                 </View>

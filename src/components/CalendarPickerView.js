@@ -37,19 +37,18 @@ class CalendarPickerView extends PureComponent {
             <Modal
                 visible={this.props.showPicker}
                 style={[style.container, {
-                    position: 'absolute',
                     top: this.calculateTop(),
                     left: calculateDimension(16, false, this.props.screenSize),
                     width: this.props.width
                 }, Platform.OS === 'android' && {elevation: 2}]}
             >
-                <ElevatedView elevation={4} style={{flex: 1, borderRadius: 4}}>
+                <ElevatedView elevation={4} style={style.calendarWrapper}>
                     <Calendar
                         current={ this.state.selectedDate }
                         markedDates={{[this.state.selectedDate]: {selected: true, selectedColor: styles.primaryColor}}}
                         onDayPress={this.handleDateChanged}
                         monthFormat={'MMMM yyyy'}
-                        style={{backgroundColor: styles.backgroundColor, borderRadius: 4}}
+                        style={style.calendarStyle}
                         theme={{
                             backgroundColor: 'transparent',
                             calendarBackground: 'transparent',
@@ -99,6 +98,15 @@ CalendarPickerView.defaultProps = {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
+        borderRadius: 4,
+        position: 'absolute'
+    },
+    calendarWrapper: {
+        borderRadius: 4,
+        flex: 1
+    },
+    calendarStyle: {
+        backgroundColor: styles.backgroundColor,
         borderRadius: 4
     }
 });

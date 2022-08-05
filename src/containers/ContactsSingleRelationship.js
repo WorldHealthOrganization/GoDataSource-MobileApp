@@ -66,7 +66,7 @@ class ContactsSingleRelationship extends Component {
         // console.log("### contact data: ", this.props.contact);
         if(!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'}/>
+                <LoaderScreen overlay={true} backgroundColor={styles.backgroundColor} />
             )
         }
 

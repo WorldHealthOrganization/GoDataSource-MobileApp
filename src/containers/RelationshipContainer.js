@@ -8,10 +8,10 @@ import {InteractionManager, ScrollView, StyleSheet, View} from 'react-native';
 import {calculateDimension, computeFullName, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
+import styles from './../styles';
 
 class RelationshipContainer extends PureComponent {
 

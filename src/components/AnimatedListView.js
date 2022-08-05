@@ -7,7 +7,6 @@ import React, {Component} from 'react';
 import {View, Text, ActivityIndicator, Animated, FlatList, Alert, StyleSheet} from 'react-native';
 import geolocation from '@react-native-community/geolocation';
 import {calculateDimension, getTranslation} from './../utils/functions';
-import styles from './../styles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import translations from './../utils/translations';
@@ -18,6 +17,7 @@ import SearchFilterView from "./SearchFilterView";
 import config from "../utils/config";
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import styles from './../styles';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -122,16 +122,15 @@ class AnimatedListView extends Component {
                             onEndEditing={this.handleOnEndEditing}
                             filterText={this.props.filterText}
                         />
-                        <Animated.View style={{
+                        <Animated.View style={[style.searchResultsContainer, {
                             transform: [{
                                 translateY: navbarTranslate
                             }],
                             opacity: navbarOpacity,
                             width: calculateDimension(375 - 32, false, this.props.screenSize),
-                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                            backgroundColor: '#eeeeee'
-                        }}>
-                            <Text style={{ marginBottom: 5, fontWeight: 'bold'}}>{this.props.dataCount} RESULTS</Text>
+                            marginHorizontal: calculateDimension(16, false, this.props.screenSize)
+                        }]}>
+                            <Text style={style.searchResultsContainerText}>{this.props.dataCount} RESULTS</Text>
                         </Animated.View>
                     </View>
                 }
@@ -670,12 +669,19 @@ AnimatedListView.defaultProps = {
 // make a global style in the config directory
 const style = StyleSheet.create({
     emptyComponent: {
-        justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     separatorComponentStyle: {
         height: 8
     },
+    searchResultsContainer: {
+        backgroundColor: '#eeeeee'
+    },
+    searchResultsContainerText: {
+        fontWeight: 'bold',
+        marginBottom: 5
+    }
 });
 
 function mapStateToProps(state) {

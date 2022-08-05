@@ -7,7 +7,6 @@ import React, {Component} from 'react';
 import {Animated, FlatList, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {calculateDimension, computeFullName, createStackFromComponent, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
-import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import GeneralListItem from '../components/GeneralListItem';
@@ -20,6 +19,7 @@ import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
 import {Navigation} from "react-native-navigation";
+import styles from './../styles';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -55,7 +55,7 @@ class CaseSingleRelationshipContainer extends Component {
     render() {
         if(!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'}/>
+                <LoaderScreen overlay={true} backgroundColor={styles.backgroundColor} />
             )
         }
 
@@ -141,7 +141,7 @@ class CaseSingleRelationshipContainer extends Component {
                 textsStyleArray={[
                     {
                         marginLeft: calculateDimension(14, false, this.props.screenSize),
-                        color: styles.primaryButton,
+                        color: styles.textColor,
                         fontFamily: 'Roboto-Medium',
                         fontSize: 12
                     }
@@ -219,14 +219,12 @@ const style = StyleSheet.create({
         flex: 1
     },
     containerContent: {
-        // flex: 1,
         backgroundColor: styles.disabledColor
     },
     separatorComponentStyle: {
         height: 8
     },
     listViewStyle: {
-        // flex: 1,
         paddingTop: 8
     }
 });

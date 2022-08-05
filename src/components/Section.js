@@ -42,12 +42,9 @@ Section = React.memo(({label, hasBorderBottom, borderBottomColor, containerStyle
 const style = StyleSheet.create({
     containerStyle: {
         backgroundColor: styles.backgroundColorRgb,
-        width: '100%',
-        // flex: 1
+        width: '100%'
     },
     containerText: {
-        // justifyContent: 'center',
-        // flex: 1,
         flexDirection: 'row',
         paddingVertical: 4,
         paddingHorizontal: 16

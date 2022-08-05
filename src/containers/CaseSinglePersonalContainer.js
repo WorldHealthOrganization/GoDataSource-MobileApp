@@ -8,7 +8,6 @@ import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {calculateDimension, createDate, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import Button from './../components/Button';
 import ElevatedView from 'react-native-elevated-view';
@@ -18,6 +17,7 @@ import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
 import {checkArray} from "../utils/typeCheckingFunctions";
+import styles from './../styles';
 
 class CaseSinglePersonalContainer extends Component {
 

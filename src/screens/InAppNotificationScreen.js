@@ -19,14 +19,14 @@ class InAppNotificationScreen extends Component {
                 height: 70,
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: styles.primaryButton
+                backgroundColor: styles.primaryColor
             }}>
                 <Text
                     style={{
-                        color: 'white',
+                        color: styles.backgroundColor,
                         marginTop: Platform.OS === 'ios' ? 20 : 0,
                         fontFamily: 'Roboto-Medium',
-                        fontSize: 15
+                        fontSize: 16
                     }}
                     numberOfLines={1}
                 >{this.props.text}</Text>

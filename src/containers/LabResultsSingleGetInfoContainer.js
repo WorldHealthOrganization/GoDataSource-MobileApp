@@ -8,10 +8,10 @@ import {ScrollView, StyleSheet, View} from 'react-native';
 import {calculateDimension, getTranslation} from '../utils/functions';
 import config from '../utils/config';
 import {connect} from "react-redux";
-import styles from '../styles';
 import CardComponent from '../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
+import styles from '../styles';
 
 class LabResultsSingleGetInfoContainer extends PureComponent {
 

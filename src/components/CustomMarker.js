@@ -13,30 +13,12 @@ CustomMarker = React.memo(({markerStyle, style, currentValue, markerColor}) => {
         formMarkerStyle = markerStyle[1];
     }
     return (
-        <View
-            style={[style, styleLocal.container]}
-        >
-
-            <Text
-                style={[{
-                    fontFamily: 'Roboto-Medium',
-                    fontSize: 15,
-                    width: '100%',
-                    alignSelf: 'center',
-                    color: markerColor || 'black'
-                }]}
-            >
+        <View style={[style, styleLocal.container]}>
+            <Text style={[styleLocal.customMarkerText, {color: markerColor || 'black'}]}>
                 {currentValue}
             </Text>
 
-            <View style={[{
-                borderRadius: 18,
-                width: 9,
-                height: 9,
-                justifyContent: 'center',
-                marginBottom: 14,
-                backgroundColor: styles.primaryButton
-            },markerStyle]}/>
+            <View style={[styleLocal.customMarkerView, markerStyle]}/>
         </View>
 )});
 
@@ -44,8 +26,22 @@ CustomMarker = React.memo(({markerStyle, style, currentValue, markerColor}) => {
 // make a global style in the config directory
 const styleLocal = StyleSheet.create({
     container: {
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    customMarkerText: {
+        alignSelf: 'center',
+        fontFamily: 'Roboto-Medium',
+        fontSize: 14,
+        width: '100%'
+    },
+    customMarkerView: {
+        backgroundColor: styles.primaryColor,
+        borderRadius: 16,
+        height: 10,
         justifyContent: 'center',
-        alignItems: 'center'
+        marginBottom: 16,
+        width: 10
     }
 });
 
