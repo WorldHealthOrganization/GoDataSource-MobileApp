@@ -502,7 +502,7 @@ const qrScanScreen = {
 };
 
 const manualConfigScreen = {
-    title: 'HUB configuration',
+    title: 'Hub configuration',
     nameLabel: 'HUB Name',
     hubUrlLabel: 'HUB URL',
     clientIdLabel: 'Client ID',
