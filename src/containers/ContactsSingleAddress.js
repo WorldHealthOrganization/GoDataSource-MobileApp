@@ -9,9 +9,8 @@ import {LoaderScreen} from 'react-native-ui-lib';
 import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import styles from './../styles';
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
-import Ripple from 'react-native-material-ripple';
+import Button from './../components/Button';
 import CardComponent from './../components/CardComponent';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
@@ -23,6 +22,7 @@ import {
     PERMISSION_CREATE_CONTACT_OF_CONTACT,
     PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
 } from "../utils/constants";
+import styles from './../styles';
 
 class ContactsSingleAddress extends Component {
 
@@ -57,7 +57,7 @@ class ContactsSingleAddress extends Component {
     render() {
         if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'} />
+                <LoaderScreen overlay={true} backgroundColor={styles.backgroundColor} />
             )
         }
 
@@ -88,7 +88,7 @@ class ContactsSingleAddress extends Component {
                     />
                     <ScrollView
                         style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 16 }]}
                     >
                     <View style={style.container}>
                         {
@@ -99,18 +99,16 @@ class ContactsSingleAddress extends Component {
                     </View>
                     {
                         this.props.isEditMode !== null && this.props.isEditMode !== undefined && this.props.isEditMode === true ? (
-                            <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
-                                <Ripple
-                                    style={{
-                                        height: 25,
-                                        justifyContent: 'center'
-                                    }}
+                            <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}>
+                                <Button
+                                    title={this.props.contact.addresses && this.props.contact.addresses.length === 0 ? getTranslation(translations.contactSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.contactSingleScreen.moreAddressesText, this.props.translation)}
                                     onPress={this.props.onPressAddAdrress}
-                                >
-                                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
-                                        {this.props.contact.addresses && this.props.contact.addresses.length === 0 ? getTranslation(translations.contactSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.contactSingleScreen.moreAddressesText, this.props.translation)}
-                                    </Text>
-                                </Ripple>
+                                    color={styles.backgroundColor}
+                                    titleColor={styles.textColor}
+                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                    width={calculateDimension(170, false, this.props.screenSize)}
+                                    style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                />
                             </View>
                         ) : null
                     }
@@ -130,13 +128,13 @@ class ContactsSingleAddress extends Component {
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView elevation={5} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4,
-                minHeight: calculateDimension(72, true, this.props.screenSize)
+                marginVertical: 6,
+                minHeight: calculateDimension(72, true, this.props.screenSize),
+                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -149,7 +147,7 @@ class ContactsSingleAddress extends Component {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
+            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -170,7 +168,7 @@ class ContactsSingleAddress extends Component {
             item.onPressArray = [this.props.onDeletePress];
             if (this.props.isNew) {
                 item.textsArray = [item.textsArray[0], translations.addressFieldLabels.copyAddress];
-                item.textsStyleArray = [item.textsStyleArray[0], {color: styles.buttonGreen}];
+                item.textsStyleArray = [item.textsStyleArray[0], {color: styles.textColor}];
                 item.onPressArray = [item.onPressArray[0], this.props.onPressCopyAddress];
             }
         }
@@ -327,33 +325,33 @@ class ContactsSingleAddress extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    container: {
+        flex: 1
+    },
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        paddingBottom: 8
     },
     subcontainerCardComponent: {
         alignItems: 'center',
         flex: 1
     },
     viewContainer: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    containerScrollView: {
+    cardStyle: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        marginVertical: 6
+    },
+    containerScrollView: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'
-    },
-    container: {
-        flex: 1,
-        marginBottom: 30
     }
 });
 

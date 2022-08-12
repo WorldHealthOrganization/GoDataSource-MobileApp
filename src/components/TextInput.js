@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import {Text, View, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import {getTooltip, getTranslation} from './../utils/functions';
 import {TextField} from 'react-native-material-textfield';
@@ -13,6 +13,7 @@ import lodashGet from 'lodash/get';
 import lodashDebounce from 'lodash/debounce';
 import Ripple from "react-native-material-ripple";
 import translations from "../utils/translations";
+import styles from './../styles';
 
 class TextInput extends Component {
     fieldRef = React.createRef();
@@ -76,34 +77,36 @@ class TextInput extends Component {
             value = '';
         }
         return (
-            <View style={[{flexDirection: 'row'},this.props.style]}>
+            <View style={[style.textInput, this.props.style]}>
                 <View style={{flex: 1}}>
                     <TextField
                         label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                         value={value ? value.toString() : ''}
                         onChangeText={this.handleOnChangeText}
-                        textColor='rgb(0,0,0)'
-                        fontSize={15}
+                        tintColor={styles.primaryColor}
+                        baseColor={styles.secondaryColor}
+                        textColor={styles.textColor}
+                        fontSize={14}
                         error={this.state.maskError ? getTranslation(translations.contactSingleScreen.contactIdMaskError, this.props.translation).replace('{{mask}}', this.props.outbreakMask) : null}
-                        labelFontSize={15}
+                        errorColor={styles.dangerColor}
+                        labelFontSize={14}
                         // labelHeight={30}
-                        labelTextStyle={{
-                            fontFamily: 'Roboto',
-                            textAlign: 'left'
-                        }}
+                        labelTextStyle={{fontFamily: 'Roboto-Regular'}}
                         ref={this.fieldRef}
-                        tintColor='rgb(77,176,160)'
                         multiline={this.props.multiline !== undefined ? this.props.multiline : false}
                         keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
                         formatText={this.formatForNumeric}
                         secureTextEntry={this.props.secureTextEntry}
+                        lineWidth={1}
+                        lineType={'solid'}
+                        activeLineWidth={2}
+                        disabledLineWidth={1}
+                        disabledLineType={'solid'}
                     />
                 </View>
                 {
                     tooltip.hasTooltip === true ? (
-                        <TooltipComponent
-                            tooltipMessage={tooltip.tooltipMessage}
-                        />
+                        <TooltipComponent tooltipMessage={tooltip.tooltipMessage} />
                     ) : null
                 }
             </View>
@@ -114,38 +117,24 @@ class TextInput extends Component {
         let localValue = this.extractAgeForViewInput();
         let tooltip = getTooltip(this.props.label, this.props.translation);
         return (
-            <View style={[{flexDirection: 'row', marginTop: 25},this.props.style]}>
+            <View style={[style.textInput, this.props.style]}>
                 <View style={{flex: 1}}>
                     {
                         this.props.skipLabel ? (null) : (
-                            <Text style={{
-                                fontFamily: 'Roboto-Regular',
-                                fontSize: 15,
-                                textAlign: 'left',
-                                color: 'rgb(0,0,0)',
-                                marginBottom: 2
-                            }}>
+                            <Text style={style.textInputLabel}>
                                 {getTranslation(this.props.label, this.props.translation)}
                             </Text>
                         )
                     }
                     <Ripple disabled={!this.props.onClickAction} onPress={()=>{this.props.onClickAction(localValue)}}>
-                        <Text style={{
-                            fontFamily: 'Roboto-Light',
-                            fontSize: 15,
-                            textAlign: 'left',
-                            color: 'rgb(60,60,60)',
-                            ...this.props.textStyle
-                        }}>
+                        <Text style={[style.textInputValue, this.props.textStyle]}>
                             {localValue}
                         </Text>
                     </Ripple>
                 </View>
                 {
                     tooltip.hasTooltip === true ? (
-                        <TooltipComponent
-                            tooltipMessage={tooltip.tooltipMessage}
-                        />
+                        <TooltipComponent tooltipMessage={tooltip.tooltipMessage} />
                     ) : null
                 }
             </View>
@@ -223,6 +212,22 @@ class TextInput extends Component {
         }
     };
 }
+
+const style = StyleSheet.create({
+    textInput: {
+        flexDirection: 'row'
+    },
+    textInputLabel: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    },
+    textInputValue: {
+        color: styles.textColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    }
+});
 
 TextInput.propTypes = {
     id: PropTypes.string.isRequired,

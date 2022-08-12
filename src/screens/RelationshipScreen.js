@@ -8,7 +8,6 @@ import {Alert, StyleSheet, Text, View} from 'react-native';
 import constants from "./../utils/constants";
 import Button from './../components/Button';
 import {Icon} from 'react-native-material-ui';
-import styles from './../styles';
 import ViewHOC from './../components/ViewHOC';
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
@@ -33,6 +32,7 @@ import {insertOrUpdateExposure} from "../actions/exposure";
 import withPincode from './../components/higherOrderComponents/withPincode';
 import {Navigation} from "react-native-navigation";
 import _ from "lodash";
+import styles from './../styles';
 
 class RelationshipScreen extends Component {
 
@@ -84,79 +84,69 @@ class RelationshipScreen extends Component {
                 person = this.props.contact;
         }
         return (
-            <ViewHOC style={style.viewHocContainer}
+            <ViewHOC style={style.container}
                 showLoader={this && this.state && this.state.loading}
                 loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}>
-                    <View style={style.container}>
-                        <NavBarCustom style = {style.navbarContainer}
-                            customTitle={
+                    <NavBarCustom
+                        customTitle={
+                            <View style={style.headerContainer}>
                                 <View
-                                    style={{
-                                        flex: 1,
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        height: '100%'
-                                    }}
-                                >
-                                    <Text style={[style.title, {marginLeft: 30}]}>
+                                    style={[style.breadcrumbContainer]}>
+                                    <Text style={[style.title]}>
                                         {this.renderTitle()}
                                     </Text>
-                                    <ElevatedView
-                                        elevation={3}
-                                        style={{
-                                            backgroundColor: styles.buttonGreen,
-                                            width: calculateDimension(33, false, this.props.screenSize),
-                                            height: calculateDimension(25, true, this.props.screenSize),
-                                            borderRadius: 4
-                                        }}
-                                    >
-                                        <Ripple style={{
-                                            flex: 1,
-                                            justifyContent: 'center',
-                                            alignItems: 'center'
-                                        }} onPress={this.goToHelpScreen}>
-                                            <Icon name="help" color={'white'} size={15}/>
-                                        </Ripple>
-                                    </ElevatedView> 
                                 </View>
-                            }
-                            title={null}
-                            componentId={this.props.componentId}
-                            iconName="close"
-                            handlePressNavbarButton={this.handlePressNavbarButton}
-                        />
-                        <View style={style.containContainer}>
-                            <View style={{flexDirection: 'row'}}>
-                                    <Button
-                                        title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                                        onPress={this.handleSaveExposure}
-                                        color={styles.buttonGreen}
-                                        titleColor={'white'}
-                                        height={calculateDimension(25, true, this.props.screenSize)}
-                                        width={calculateDimension(130, false, this.props.screenSize)}
-                                        style={{
-                                            marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                            marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                                        }}/>
-
+                                <View>
+                                    <ElevatedView
+                                        elevation={0}
+                                        style={[
+                                            style.headerButton, 
+                                            {
+                                                width: calculateDimension(30, false, this.props.screenSize),
+                                                height: calculateDimension(30, true, this.props.screenSize)
+                                            }
+                                        ]}
+                                    >
+                                        <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                            <Icon name="help" color={styles.textColor} size={18} />
+                                        </Ripple>
+                                    </ElevatedView>
+                                </View>
                             </View>
-                            <RelationshipContainer
-                                exposure={this.state.exposure}
-                                person={person}
-                                fromRelationshipScreen={true}
-                                type={this.props.type}
-                                isEditMode={this.props.isEditMode}
-                                onChangeText={this.handleOnChangeData}
-                                onChangeDropDown={this.handleOnChangeDropDown}
-                                onChangeDate={this.handleOnChangeData}
-                                onChangeSwitch={this.handleOnChangeData}
-                                onSelectExposure={this.handleOnSelectExposure}
-                                relationshipType={this.props.relationshipType}
-                                selectedExposure={this.state.selectedExposure}
-                                addContactFromCasesScreen={this.props.addContactFromCasesScreen}
-                            />
+                        }
+                        title={null}
+                        componentId={this.props.componentId}
+                        iconName="close"
+                        handlePressNavbarButton={this.handlePressNavbarButton}
+                    />
+                    <View style={style.containContainer}>
+                        <View style={{flexDirection: 'row'}}>
+                                <Button
+                                    title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
+                                    onPress={this.handleSaveExposure}
+                                    color={styles.primaryColor}
+                                    titleColor={styles.backgroundColor}
+                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                    width={calculateDimension(164, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(16, true, this.props.screenSize)
+                                    }}/>
                         </View>
+                        <RelationshipContainer
+                            exposure={this.state.exposure}
+                            person={person}
+                            fromRelationshipScreen={true}
+                            type={this.props.type}
+                            isEditMode={this.props.isEditMode}
+                            onChangeText={this.handleOnChangeData}
+                            onChangeDropDown={this.handleOnChangeDropDown}
+                            onChangeDate={this.handleOnChangeData}
+                            onChangeSwitch={this.handleOnChangeData}
+                            onSelectExposure={this.handleOnSelectExposure}
+                            relationshipType={this.props.relationshipType}
+                            selectedExposure={this.state.selectedExposure}
+                            addContactFromCasesScreen={this.props.addContactFromCasesScreen}
+                        />
                     </View>
             </ViewHOC>
         )
@@ -454,52 +444,39 @@ class RelationshipScreen extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
-    containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
-    },
-    subcontainerCardComponent: {
-        alignItems: 'center',
-        flex: 1
-    },
     container: {
-        flex: 1,
-    },
-    navbarContainer: {
-        backgroundColor: 'white'
-    },
-    containContainer: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
-        alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
         flex: 1
     },
-    containerScrollView: {
+    headerContainer: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
-    },
-    contentContainerStyle: {
-        alignItems: 'center'
-    },
-    innerContainer: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
-    },
-    buttonContainer: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingRight: 16
+    },
+    breadcrumbContainer: {
         alignItems: 'center',
-        justifyContent: 'space-between'
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
     },
     title: {
-        fontSize: 17,
-        fontFamily: 'Roboto-Medium',
+        fontFamily: 'Roboto-Regular',
+        fontSize: 16,
+        paddingHorizontal: 16
     },
-    viewHocContainer: {
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
         flex: 1,
-        backgroundColor: 'white',
+        justifyContent: 'center'
+    },
+    containContainer: {
+        alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     }
 });
 

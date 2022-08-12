@@ -29,12 +29,12 @@ const sideMenuItems = {
         label: translations.navigationDrawer.contactsLabel,
     },
     [sideMenuKeys[2]]: {
-        name: 'people',
+        name: 'groups',
         label: translations.contactsOfContactsScreen.contactsTitle,
         // addButton: true
     },
     [sideMenuKeys[3]]: {
-        name: 'create-new-folder',
+        name: 'person',
         label: translations.navigationDrawer.casesLabel,
         addButton: true
     },
@@ -43,7 +43,7 @@ const sideMenuItems = {
         label: translations.navigationDrawer.labResultsLabel
     },
     [sideMenuKeys[5]]: {
-        name: 'insert-invitation',
+        name: 'event',
         label: translations.navigationDrawer.eventsLabel
     }
 };
@@ -264,8 +264,8 @@ const addressFields = {
             value: '',
             isRequired: false,
             isEditMode: true,
-            activeButtonColor: styles.missedRedColor,
-            activeBackgroundColor: styles.missedRedColorWithOpacity,
+            activeButtonColor: styles.backgroundColor,
+            activeBackgroundColor: styles.dangerColor,
             objectType: 'Address'
         },
         // Add coordinates support
@@ -301,7 +301,7 @@ const addressFields = {
             type: 'ActionsBar',
             labelValue: 'test',
             textsArray: [translations.addressFieldLabels.deleteButton],
-            textsStyleArray: [{color: styles.missedRedColor}],
+            textsStyleArray: [{color: styles.dangerColor}],
             onPressArray: [],
             objectType: 'Address'
         }
@@ -355,8 +355,8 @@ const followUpsSingleScreen = {
                     value: false,
                     isRequired: true,
                     isEditMode: true,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
                     objectType: 'FollowUp'
                 },
             ]
@@ -528,8 +528,8 @@ const labResultsSingleScreen = {
                     isRequired: false,
                     isEditMode: true,
                     objectType: 'LabResult',
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
                 },
                 {
                     cardNumber: 2,
@@ -610,7 +610,7 @@ const labResultsFilterScreenNoContactPermission = {
                 label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
-                borderBottomColor: styles.navigationDrawerSeparatorGrey
+                borderBottomColor: styles.separatorColor
             },
             {
                 cardNumber: 1,
@@ -638,7 +638,7 @@ const labResultsFilterScreenNoContactPermission = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.dangerColor}],
                 onPressArray: [],
                 objectType: 'Sort'
             }
@@ -654,7 +654,7 @@ const labResultsFilterScreen = {
                     label: translations.labResultsFilter.personType,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 1,
@@ -674,7 +674,7 @@ const labResultsFilterScreen = {
                 label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
-                borderBottomColor: styles.navigationDrawerSeparatorGrey
+                borderBottomColor: styles.separatorColor
             },
             {
                 cardNumber: 1,
@@ -702,7 +702,7 @@ const labResultsFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.dangerColor}],
                 onPressArray: [],
                 objectType: 'Sort'
             }
@@ -847,8 +847,8 @@ const caseSingleScreen = {
                     value: false,
                     isRequired: false,
                     isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
                     objectType: 'Case'
                 },
             ]
@@ -910,7 +910,7 @@ const caseSingleScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.dangerColor}],
                 onPressArray: [],
                 objectType: 'Documents'
             }
@@ -955,7 +955,7 @@ const caseSingleScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.dangerColor}],
                 onPressArray: [],
                 objectType: 'Vaccines'
             }
@@ -994,8 +994,8 @@ const caseSingleScreen = {
                     value: false,
                     isRequired: false,
                     isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
                     objectType: 'Case'
                 },
                 {
@@ -1049,8 +1049,8 @@ const caseSingleScreen = {
                     value: false,
                     isRequired: false,
                     isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
                     objectType: 'Case'
                 },
                 // {
@@ -1061,8 +1061,8 @@ const caseSingleScreen = {
                 //     value: false,
                 //     isRequired: false,
                 //     isEditMode: false,
-                //     activeButtonColor: styles.missedRedColor,
-                //     activeBackgroundColor: styles.missedRedColorWithOpacity,
+                //     activeButtonColor: styles.backgroundColor,
+                //     activeBackgroundColor: styles.dangerColor,
                 //     objectType: 'Case'
                 // },
                 {
@@ -1073,8 +1073,8 @@ const caseSingleScreen = {
                     value: false,
                     isRequired: false,
                     isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
                     objectType: 'Case'
                 },
                 {
@@ -1197,7 +1197,7 @@ const caseSingleScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.dangerColor}],
                 onPressArray: [],
                 objectType: 'DateRanges'
             }
@@ -1216,7 +1216,7 @@ const eventsFilterScreen = {
                 label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
-                borderBottomColor: styles.navigationDrawerSeparatorGrey
+                borderBottomColor: styles.separatorColor
             },
             {
                 cardNumber: 1,
@@ -1244,7 +1244,7 @@ const eventsFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.dangerColor}],
                 onPressArray: [],
                 objectType: 'Sort'
             }
@@ -1297,8 +1297,8 @@ const eventSingleScreen = {
                     value: false,
                     isRequired: false,
                     isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
                     objectType: 'Event'
                 },
                 // {
@@ -1431,8 +1431,8 @@ const eventSingleScreen = {
                     value: '',
                     isRequired: false,
                     isEditMode: true,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
                     objectType: 'Address'
                 },
                 // Add coordinates support
@@ -1493,7 +1493,7 @@ const eventSingleScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.dangerColor}],
                 onPressArray: [],
                 objectType: 'Documents'
             }
@@ -1510,7 +1510,7 @@ const personFilterScreen = {
                     label: translations.followUpFilter.gender,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 1,
@@ -1529,7 +1529,7 @@ const personFilterScreen = {
                     label: translations.followUpFilter.ageRange,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 2,
@@ -1548,7 +1548,7 @@ const personFilterScreen = {
                     label: translations.followUpFilter.area,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 3,
@@ -1569,7 +1569,7 @@ const personFilterScreen = {
                     label: translations.personFilter.vaccine,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },{
                     cardNumber: 4,
                     id: 'vaccines',
@@ -1589,7 +1589,7 @@ const personFilterScreen = {
                     label: translations.personFilter.vaccineStatus,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },{
                     cardNumber: 5,
                     id: 'vaccineStatuses',
@@ -1609,7 +1609,7 @@ const personFilterScreen = {
                     label: translations.personFilter.pregnancyStatus,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },{
                     cardNumber: 6,
                     id: 'pregnancyStatuses',
@@ -1630,7 +1630,7 @@ const personFilterScreen = {
                 label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
-                borderBottomColor: styles.navigationDrawerSeparatorGrey
+                borderBottomColor: styles.separatorColor
             },
             {
                 cardNumber: 1,
@@ -1658,7 +1658,7 @@ const personFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.dangerColor}],
                 onPressArray: [],
                 objectType: 'Sort'
             }
@@ -1676,7 +1676,7 @@ const contactFilterScreen = {
                     label: translations.followUpFilter.dayOfFollowUp,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 7,
@@ -1708,7 +1708,7 @@ const followUpsFilterScreen = {
                     label: translations.followUpFilter.gender,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 1,
@@ -1727,7 +1727,7 @@ const followUpsFilterScreen = {
                     label: translations.followUpFilter.ageRange,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 2,
@@ -1746,7 +1746,7 @@ const followUpsFilterScreen = {
                     label: translations.followUpFilter.area,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 3,
@@ -1767,7 +1767,7 @@ const followUpsFilterScreen = {
                     label: translations.followUpFilter.dayOfFollowUp,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 4,
@@ -1792,7 +1792,7 @@ const followUpsFilterScreen = {
                 label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
-                borderBottomColor: styles.navigationDrawerSeparatorGrey
+                borderBottomColor: styles.separatorColor
             },
             {
                 cardNumber: 1,
@@ -1820,7 +1820,7 @@ const followUpsFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.dangerColor}],
                 onPressArray: [],
                 objectType: 'Sort'
             }
@@ -1837,7 +1837,7 @@ const helpFilterScreen = {
                     label: translations.helpFilter.category,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 3,
@@ -1859,7 +1859,7 @@ const helpFilterScreen = {
                 label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
-                borderBottomColor: styles.navigationDrawerSeparatorGrey
+                borderBottomColor: styles.separatorColor
             },
             {
                 cardNumber: 1,
@@ -1887,7 +1887,7 @@ const helpFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.dangerColor}],
                 onPressArray: [],
                 objectType: 'Sort'
             }
@@ -1904,7 +1904,7 @@ const casesFilterScreen = {
                     label: translations.casesFilter.gender,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 1,
@@ -1923,7 +1923,7 @@ const casesFilterScreen = {
                     label: translations.casesFilter.ageRange,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 2,
@@ -1942,7 +1942,7 @@ const casesFilterScreen = {
                     label: translations.casesFilter.classification,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 3,
@@ -1962,7 +1962,7 @@ const casesFilterScreen = {
                     label: translations.casesFilter.area,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 4,
@@ -1983,7 +1983,7 @@ const casesFilterScreen = {
                     label: translations.personFilter.vaccine,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },{
                     cardNumber: 5,
                     id: 'vaccines',
@@ -2003,7 +2003,7 @@ const casesFilterScreen = {
                     label: translations.personFilter.vaccineStatus,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },{
                     cardNumber: 6,
                     id: 'vaccineStatuses',
@@ -2023,7 +2023,7 @@ const casesFilterScreen = {
                     label: translations.personFilter.pregnancyStatus,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },{
                     cardNumber: 7,
                     id: 'pregnancyStatuses',
@@ -2044,7 +2044,7 @@ const casesFilterScreen = {
                 label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
-                borderBottomColor: styles.navigationDrawerSeparatorGrey
+                borderBottomColor: styles.separatorColor
             },
             {
                 cardNumber: 1,
@@ -2072,7 +2072,7 @@ const casesFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.dangerColor}],
                 onPressArray: [],
                 objectType: 'Sort'
             }
@@ -2175,7 +2175,7 @@ const addFollowUpScreen = [
         label: translations.addFollowUpScreen.addFollowUpLabel,
         type: 'Section',
         hasBorderBottom: false,
-        borderBottomColor: styles.navigationDrawerSeparatorGrey
+        borderBottomColor: styles.separatorColor
     },
     {
         cardNumber: 1,
@@ -2243,8 +2243,8 @@ const addRelationshipScreen = [
         value: false,
         isRequired: false,
         isEditMode: true,
-        activeButtonColor: styles.missedRedColor,
-        activeBackgroundColor: styles.missedRedColorWithOpacity
+        activeButtonColor: styles.backgroundColor,
+        activeBackgroundColor: styles.dangerColor
     },
     {
         cardNumber: 1,
@@ -2785,8 +2785,8 @@ const contactsSingleScreen = {
                 value: false,
                 isRequired: false,
                 isEditMode: true,
-                activeButtonColor: styles.missedRedColor,
-                activeBackgroundColor: styles.missedRedColorWithOpacity,
+                activeButtonColor: styles.backgroundColor,
+                activeBackgroundColor: styles.dangerColor,
                 objectType: 'Exposure'
             },
             {

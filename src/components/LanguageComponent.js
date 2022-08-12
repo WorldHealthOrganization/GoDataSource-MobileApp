@@ -14,7 +14,7 @@ import {selectTranslations, selectUserLanguage, selectUser, selectAllLanguages, 
 import {useSetStateWithCallback} from "../utils/hooks";
 import translations from './../utils/translations';
 import {Navigation} from "react-native-navigation";
-
+import styles from './../styles';
 
 const selectReduxDataForLanguageComponent = createSelector(
     [selectTranslations, selectUserLanguage, selectAllLanguages, selectUser, selectOutbreak],
@@ -88,6 +88,9 @@ const LanguageComponent = React.memo(({style, componentId}) => {
                     data={availableLanguages}
                     value={selectedLanguage}
                     onChangeText={setUserLanguage}
+                    inputContainerStyle={{borderBottomColor: 'transparent'}}
+                    pickerStyle={{width: '80%'}}
+                    selectedItemColor={styles.primaryColor}
                 />
             </View>
             <LanguageModalComponent

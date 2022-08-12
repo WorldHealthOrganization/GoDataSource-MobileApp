@@ -5,7 +5,6 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Alert, Animated, BackHandler, FlatList, StyleSheet, Text, View} from 'react-native';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
@@ -28,6 +27,7 @@ import withPincode from './../components/higherOrderComponents/withPincode';
 import config from "../utils/config";
 import PermissionComponent from './../components/PermissionComponent';
 import {Navigation} from "react-native-navigation";
+import styles from './../styles';
 
 let AnimatedListView = Animated.createAnimatedComponent(FlatList);
 
@@ -135,7 +135,7 @@ class HelpScreen extends Component {
             this.offsetAnim,
         ),
         0,
-        30,
+        40,
     );
 
     handleScroll = Animated.event(
@@ -148,12 +148,12 @@ class HelpScreen extends Component {
     // and can slow down the app
     render() {
         const navbarTranslate = this.clampedScroll.interpolate({
-            inputRange: [0, 30],
-            outputRange: [0, -30],
+            inputRange: [0, 40],
+            outputRange: [0, -40],
             extrapolate: 'clamp',
         });
         const navbarOpacity = this.clampedScroll.interpolate({
-            inputRange: [0, 30],
+            inputRange: [0, 40],
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
@@ -183,16 +183,8 @@ class HelpScreen extends Component {
                 {
                     this.state.displayModalFormat === true ? (
                         <NavBarCustom customTitle={
-                            <View
-                                style={{
-                                    flex: 1,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    height: '100%'
-                                }}
-                            >
-                                <Text style={[style.title, {marginLeft: 30}]}>
+                            <View style={style.headerContainer}>
+                                <Text style={style.title}>
                                     {`${helpTitle[1]} ${getTranslation(translations.helpScreen.itemsForMessage, this.props.translation)} ${this.state.pageAskingHelpFromNameToDisplay}`}
                                 </Text>
                             </View>
@@ -241,7 +233,7 @@ class HelpScreen extends Component {
                                 onScroll={this.handleScroll}
                                 refreshing={this.state.refreshing}
                                 onRefresh={this.handleOnRefresh}
-                                getItemLayout={this.getItemLayout}
+                                // getItemLayout={this.getItemLayout}
                             />
                         )}
                         permissionsList={[]}
@@ -284,11 +276,11 @@ class HelpScreen extends Component {
         />)
     };
 
-    getItemLayout = (data, index) => ({
-        length: calculateDimension(178, true, this.props.screenSize),
-        offset: calculateDimension(178, true, this.props.screenSize) * index,
-        index
-    });
+    // getItemLayout = (data, index) => ({
+    //     length: calculateDimension(178, true, this.props.screenSize),
+    //     offset: calculateDimension(178, true, this.props.screenSize) * index,
+    //     index
+    // });
 
     keyExtractor = (item, index) => {
        return item._id;
@@ -485,48 +477,44 @@ class HelpScreen extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
-    mapContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF'
-    },
     container: {
+        flex: 1
+    },
+    headerContainer: {
         flex: 1,
-        backgroundColor: 'white',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingRight: 16
+    },
+    breadcrumbContainer: {
+        alignItems: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
+    },
+    title: {
+        color: styles.textColor,
+        fontFamily: 'Roboto-Medium',
+        fontSize: 18,
+        marginLeft: 16
     },
     containerContent: {
-        flex: 1,
-        backgroundColor: styles.appBackground,
-        paddingBottom: 25
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     separatorComponentStyle: {
-        height: 8
+        height: 4
     },
-    listViewStyle: {
-
-    },
-    componentContainerStyle: {
-
-    },
+    listViewStyle: {},
+    componentContainerStyle: {},
     emptyComponent: {
         justifyContent: 'center',
         alignItems: 'center'
     },
     emptyComponentTextView: {
+        color: styles.secondaryColor,
         fontFamily: 'Roboto-Light',
-        fontSize: 15,
-        color: styles.textEmptyList
-    },
-    buttonEmptyListText: {
-        fontFamily: 'Roboto-Regular',
-        fontSize: 16.8,
-        color: styles.buttonTextGray
-    },
-    breadcrumbContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between'
+        fontSize: 14
     }
 });
 

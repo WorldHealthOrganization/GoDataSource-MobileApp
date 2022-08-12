@@ -9,7 +9,6 @@ import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import Button from './Button';
-import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations';
 import QuestionCardTitle from './QuestionCardTitle';
@@ -19,6 +18,7 @@ import {sortBy} from "lodash";
 import PreviousAnswers from "./PreviousAnswers";
 import uniqueId from "lodash/uniqueId";
 import isEqual from "lodash/isEqual";
+import styles from './../styles';
 
 class QuestionCard extends PureComponent {
 
@@ -108,17 +108,17 @@ class QuestionCard extends PureComponent {
     render() {
         let viewWidth = calculateDimension(315, false, this.props.screenSize);
         let viewHeight = calculateDimension(30, true, this.props.screenSize);
-        let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
-        let buttonHeight = calculateDimension(25, true, this.props.screenSize);
-        let buttonWidth = calculateDimension(165.5, false, this.props.screenSize);
+        let marginHorizontal = calculateDimension(16, false, this.props.screenSize);
+        let buttonHeight = calculateDimension(35, true, this.props.screenSize);
+        let buttonWidth = calculateDimension(150, false, this.props.screenSize);
         let index = this.calculateIndex(this.props.totalQuestions, this.props.index);
         return (
-            <ElevatedView elevation={3}
-                          style={[this.props.style, style.container, {
-                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4
-            }]}
+            <ElevatedView
+                elevation={5}
+                style={[this.props.style, style.container, {
+                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                    width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
+                }]}
                 onPress={() => {this.setState({showDropdown: false})}}
             >
                 {
@@ -126,8 +126,8 @@ class QuestionCard extends PureComponent {
                         <QuestionCardTitle
                             height={calculateDimension(43, true, this.props.screenSize)}
                             paddingRight={calculateDimension(34, true, this.props.screenSize)}
-                            paddingLeft={calculateDimension(14, true, this.props.screenSize)}
-                            paddingTopBottom={calculateDimension(5, false, this.props.screenSize)}
+                            paddingLeft={calculateDimension(16, true, this.props.screenSize)}
+                            paddingTopBottom={calculateDimension(4, false, this.props.screenSize)}
                             marginLeft={calculateDimension(8, false, this.props.screenSize)}
                             marginRight={calculateDimension(34, false, this.props.screenSize)}
                             questionNumber={getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + index}
@@ -140,23 +140,19 @@ class QuestionCard extends PureComponent {
                     {
                         this.props.item.multiAnswer && this.props.isEditMode && !this.props.hideButtons ? (
                             <View
-                                style={{
-                                    flexDirection: 'row',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    width: viewWidth,
-                                    marginHorizontal,
+                                style={[style.addAnswerStyle, {
                                     height: viewHeight,
-                                    marginVertical: 5
-                                }}
+                                    marginHorizontal,
+                                    width: viewWidth
+                                }]}
                             >
                                 {/*Add answer button*/}
                                 <Button
                                     title={getTranslation(translations.questionCardLabels.addAnswer, this.props.translation)}
                                     width={buttonWidth}
                                     height={buttonHeight}
-                                    titleColor={'white'}
-                                    color={styles.buttonGreen}
+                                    titleColor={styles.backgroundColor}
+                                    color={styles.primaryColor}
                                     onPress={() => {
                                         this.props.onCollapse(this.props.item, true);
                                         this.props.onClickAddNewMultiFrequencyAnswer(this.props.item)
@@ -238,31 +234,15 @@ class QuestionCard extends PureComponent {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        marginVertical: 6
     },
-    containerQuestion: {
+    addAnswerStyle: {
+        alignItems: 'center',
         flexDirection: 'row',
-        backgroundColor: styles.colorBackgroundQuestions,
-        alignItems: 'center'
-    },
-    containerQuestionNumber: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        backgroundColor: 'white',
         justifyContent: 'center',
-        alignItems: 'center'
-    },
-    questionText: {
-        fontFamily: 'Roboto-Regular',
-        fontSize: 13,
-        color: 'black'
-    },
-    containerCardComponent: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
+        marginVertical: 16
     }
 });
 

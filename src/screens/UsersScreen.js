@@ -6,7 +6,6 @@
 import React, {Component} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import Ripple from 'react-native-material-ripple';
@@ -26,6 +25,7 @@ import call from 'react-native-phone-call';
 import get from 'lodash/get';
 import withPincode from './../components/higherOrderComponents/withPincode';
 import {Navigation} from "react-native-navigation";
+import styles from './../styles';
 
 class UsersScreen extends Component {
 
@@ -73,7 +73,7 @@ class UsersScreen extends Component {
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View style={{flex: 1, flexDirection: 'row'}}>
+                        <View style={style.headerContainer}>
                             <View
                                 style={[style.breadcrumbContainer]}>
                                 <Breadcrumb
@@ -82,24 +82,19 @@ class UsersScreen extends Component {
                                     componentId={this.props.componentId}
                                 />
                             </View>
-                            <View style={{ flex: 0.15 }}>
-                            </View>
-                            <View style={{ flex: 0.15 }}>
+                            <View>
                                 <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.buttonGreen,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4, marginLeft: 10
-                                    }}
+                                    elevation={0}
+                                    style={[
+                                        style.headerButton, 
+                                        {
+                                            width: calculateDimension(30, false, this.props.screenSize),
+                                            height: calculateDimension(30, true, this.props.screenSize)
+                                        }
+                                    ]}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15}/>
+                                    <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={styles.textColor} size={18} />
                                     </Ripple>
                                 </ElevatedView>
                             </View>
@@ -174,29 +169,34 @@ class UsersScreen extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the confcig directory
 const style = StyleSheet.create({
-    mapContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF'
-    },
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        flex: 1
     },
-    containerContent: {
+    headerContainer: {
         flex: 1,
-        backgroundColor: styles.appBackground,
-        paddingBottom: 25
-    },
-    separatorComponentStyle: {
-        height: 8
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingRight: 16
     },
     breadcrumbContainer: {
-        flex: 0.8,
+        alignItems: 'center',
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'flex-start'
     },
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    containerContent: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
+    }
 });
 
 function mapStateToProps(state) {

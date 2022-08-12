@@ -2,11 +2,12 @@
  * Created by mobileclarisoft on 16/07/2018.
  */
 import React, {PureComponent} from 'react';
-import {View} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import SwitchSelector from 'react-native-switch-selector';
 import config from './../utils/config'
 import {getTranslation} from './../utils/functions';
+import styles from './../styles';
 
 class TextSwitchSelector extends PureComponent {
 
@@ -36,20 +37,19 @@ class TextSwitchSelector extends PureComponent {
         })
 
         return (
-            <View style={[{
-                width: '100%',
-            }, this.props.style]}>
+            <View style={[{width: '100%'}, this.props.style]}>
                 <SwitchSelector
                     initial={this.props.selectedItem}
                     onPress={(value) => this.onChangeItem(value)}
-                    textColor={'black'}
-                    selectedColor={'white'}
-                    buttonColor={'#3f51b5'}
-                    borderColor={'black'}
-                    hasPadding
-                    fontSize={13}
+                    textColor={styles.textColor}
+                    selectedColor={styles.backgroundColor}
+                    buttonColor={styles.primaryColor}
+                    borderColor={'transparent'}
+                    fontSize={14}
                     height={30}
                     options={options}
+                    borderRadius={4}
+                    style={style.switchSelectorStyle}
                 />
             </View>
         );
@@ -68,6 +68,15 @@ class TextSwitchSelector extends PureComponent {
         this.props.onChange(selectedValueIndex, this.props.selectedItemIndexForTextSwitchSelector)
     }
 }
+
+const style = StyleSheet.create({
+    switchSelectorStyle: {
+        borderWidth: 1,
+        borderColor: styles.secondaryColor,
+        borderRadius: 4,
+        padding: 2
+    }
+});
 
 TextSwitchSelector.propTypes = {
     selectedItem: PropTypes.bool.isRequired,

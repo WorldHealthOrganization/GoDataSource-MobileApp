@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react';
 import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
-import styles from './../styles';
 import cloneDeep from "lodash/cloneDeep";
 import translations from "../utils/translations";
 import {calculateDimension, getTranslation} from "../utils/functions";
@@ -15,6 +14,7 @@ import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
 import uniqueId from "lodash/uniqueId";
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
+import styles from './../styles';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 class QuestionCardContent extends PureComponent {
@@ -28,15 +28,13 @@ class QuestionCardContent extends PureComponent {
     render() {
         let answerDate = get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null);
         return (
-            <ScrollView
-                        scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
-
+            <ScrollView scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
                 {
                     this.props.item.multiAnswer ? (
                         <View style = {{
                             flex: 1,
-                            width: this.props.viewWidth,
-                            flexDirection: this.props.isEditMode ? 'row' : 'column'
+                            flexDirection: this.props.isEditMode ? 'row' : 'column',
+                            width: this.props.viewWidth
                         }}>
                             <View style={{flexDirection: 'row', marginHorizontal: this.props.viewMarginHorizontal}}>
                                 <DatePicker
@@ -47,7 +45,7 @@ class QuestionCardContent extends PureComponent {
                                     isEditMode={!!(this.props.isEditMode && this.props.editableQuestionDate)}
                                     isRequired={true}
                                     style={{
-                                        width: this.props.isEditMode ? (this.props.viewWidth / 2) - 25 : this.props.viewWidth - 25,
+                                        width: this.props.isEditMode ? (this.props.viewWidth / 2) - 40 : this.props.viewWidth - 40,
                                     }}
                                     onChange={(value, id) => {
                                         this.onChangeAnswerDate(value, this.props.item.variable, this.props.index)
@@ -58,10 +56,10 @@ class QuestionCardContent extends PureComponent {
                                         minHeight: calculateDimension(60, true, this.props.screenSize),
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        width: 25
+                                        width: 16
                                     }}>
                                         {
-                                            answerDate !== null && <Ripple onPress={() => this.handleCopyAnswerDate(answerDate)}><Icon name="content-copy"/></Ripple>
+                                            answerDate !== null && <Ripple onPress={() => this.handleCopyAnswerDate(answerDate)}><Icon name="content-copy" color={styles.primaryColor} size={18} /></Ripple>
                                         }
                                     </View>
                                 }
@@ -70,7 +68,7 @@ class QuestionCardContent extends PureComponent {
                                 flexDirection: 'row',
                                 width: this.props.isEditMode ? (this.props.viewWidth / 2) : this.props.viewWidth,
                             }}>
-                                <View style={{maxWidth:  this.props.isEditMode ? ( this.props.index === 0 ? (this.props.viewWidth / 2 ) - 25 : (this.props.viewWidth / 2 )) : this.props.viewWidth }}>
+                                <View style={{maxWidth:  this.props.isEditMode ? ( this.props.index === 0 ? (this.props.viewWidth / 2 ) - 16 : (this.props.viewWidth / 2 )) : this.props.viewWidth }}>
                                     { this.handleRenderItem(this.props.item) }
                                 </View>
                                 {   this.props.isEditMode && !this.props.isCollapsed && this.props.index === 0 &&  Array.isArray(this.props.source[this.props.item.variable]) && this.props.source[this.props.item.variable].length > 1 &&
@@ -78,10 +76,10 @@ class QuestionCardContent extends PureComponent {
                                         minHeight: calculateDimension(60, true, this.props.screenSize),
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        width: 25
+                                        width: 8
                                     }}>
                                         <Ripple onPress={() => { this.handleDeletePrevAnswer(0)}}>
-                                            <Icon name="delete"/>
+                                            <Icon name="delete" color={styles.dangerColor} size={18} />
                                         </Ripple>
                                     </View>
                                 }
@@ -92,7 +90,7 @@ class QuestionCardContent extends PureComponent {
                 {
                     checkArrayAndLength(this.props.item.additionalQuestions) ? (
                         <View>
-                            <Section label={translations.questionCardLabels.additionalQuestions} containerStyle={{marginBottom: 8}}/>
+                            <Section label={translations.questionCardLabels.additionalQuestions} containerStyle={{marginBottom: 8}} />
                             {
                                 this.props.item.additionalQuestions.map((additionalQuestion, i) => {
                                     return this.handleRenderAdditionalQuestions(additionalQuestion, this.props.item.variable, i);
@@ -109,11 +107,7 @@ class QuestionCardContent extends PureComponent {
     handleRenderItem = (item) => {
         // console.log('handleRenderItem: ', item);
         return (
-            <View style={[style.containerCardComponent, {
-                minHeight: calculateDimension(60, true, this.props.screenSize),
-                maxWidth: this.props.viewWidth,
-                justifyContent: 'center'
-            }]}>
+            <View style={customStyles.containerCardComponent}>
                 {
                     this.handleRenderItemByType(item)
                 }
@@ -123,16 +117,11 @@ class QuestionCardContent extends PureComponent {
 
     handleRenderItemByType = (item, parentId) => {
         let answerDate = get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null);
-        let calculateWidth = this.props.isEditMode ? ( this.props.item.multiAnswer && !parentId ? (this.props.viewWidth / 2 ) - (this.props.isCollapsed ? 0 : 25) : 300) : 300;
-        let width = calculateDimension(300, false, this.props.screenSize);
+        let calculateWidth = this.props.isEditMode ? ( this.props.item.multiAnswer && !parentId ? (this.props.viewWidth / 2 ) - (this.props.isCollapsed ? 0 : 16) : 300) : 300;
+        let width = calculateDimension(140, false, this.props.screenSize);
         let alternateWidth = calculateDimension(calculateWidth, false, this.props.screenSize);
-        let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
-        let marginVertical = calculateDimension(8, true, this.props.screenSize);
         let style = {
-            width: item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? width : alternateWidth,
-            marginHorizontal,
-            marginTop: parentId ? 2 : 4,
-            marginBottom: parentId ? 8 : 4
+            width: item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? width : alternateWidth
         };
         let source = cloneDeep(this.props.source);
         if (!source) {
@@ -362,19 +351,19 @@ class QuestionCardContent extends PureComponent {
                             this.props.onChangeMultipleSelection(valueToSend, id, parentId, this.props.index);
                         }}
                         style={style}
-                        dropDownStyle={{width: width, alignSelf: 'center'}}
+                        dropDownStyle={{width: 300, alignSelf: 'center'}}
                         showDropdown={this.state.showDropdown}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP':
                 return (
-                    <Section key={item.variable} label={getTranslation(item.text, this.props.translation)} containerStyle={{marginBottom: 8}} />
+                    <Section key={item.variable} label={getTranslation(item.text, this.props.translation)} containerStyle={customStyles.questionMarkupHeader} textStyle={customStyles.questionMarkupHeaderText} />
                 );
             default:
                 return(
                     item.answerType !== undefined ? (
                         <View>
-                            <Text>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
+                            <Text style={customStyles.questionTodoFieldText}>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
                         </View>
                     ) : null
                 )
@@ -389,12 +378,14 @@ class QuestionCardContent extends PureComponent {
             >
                 {
                     additionalQuestion.answerType !== 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP' ? (
-                        <Section label={getTranslation(additionalQuestion.text, this.props.translation)} labelSize={'medium'} style={{marginBottom: 3}} />
+                        <Section label={getTranslation(additionalQuestion.text, this.props.translation)} labelSize={'normal'} style={{margin: 0}} containerStyle={customStyles.additionalQuestionContainer} textStyle={customStyles.additionalQuestionText} />
                     ) : (null)
                 }
+                <View style={customStyles.additionalQuestionContent}>
                 {
                     this.handleRenderItemByType(additionalQuestion, parentId)
                 }
+                </View>
             </View>
         )
     };
@@ -442,24 +433,54 @@ class QuestionCardContent extends PureComponent {
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
-const style = StyleSheet.create({
+const customStyles = StyleSheet.create({
+    containerCardComponent: {
+        justifyContent: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 8
+    },
     containerQuestion: {
-        flexDirection: 'row',
-        backgroundColor: styles.colorBackgroundQuestions,
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: styles.backgroundColorRgb,
+        flexDirection: 'row'
     },
     containerQuestionNumber: {
-        width: 28,
+        alignItems: 'center',
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 25,
         height: 28,
-        borderRadius: 14,
-        backgroundColor: 'white',
         justifyContent: 'center',
-        alignItems: 'center'
+        width: 28
     },
     questionText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Regular',
-        fontSize: 13,
-        color: 'black'
+        fontSize: 14
+    },
+    questionTodoFieldText: {
+        color: styles.warningColor,
+        fontSize: 12,
+        fontStyle: 'italic'
+    },
+    questionMarkupHeader: {
+        backgroundColor: styles.warningColorRgb,
+        borderRadius: 4,
+        marginHorizontal: -16,
+        marginVertical: -8,
+        width: 360
+    },
+    questionMarkupHeaderText: {
+        color: styles.primaryAltColor
+    },
+    additionalQuestionContainer: {
+        backgroundColor: styles.backgroundColorRgb
+    },
+    additionalQuestionText: {
+        color: styles.overlayColor
+    },
+    additionalQuestionContent: {
+        paddingHorizontal: 16,
+        paddingVertical: 8
     }
 });
 

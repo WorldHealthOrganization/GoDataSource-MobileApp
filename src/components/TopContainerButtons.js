@@ -4,16 +4,15 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import lodashGet from 'lodash/get';
 import translations from "../utils/translations";
-import styles from "../styles";
 import {calculateDimension, getTranslation} from "../utils/functions";
 import Button from './Button';
+import styles from "../styles";
 
 class TopContainerButtons extends Component {
     constructor(props) {
         super(props);
 
     }
-
 
     render() {
         return (
@@ -24,7 +23,6 @@ class TopContainerButtons extends Component {
                             this.props.index === this.props.numberOfTabs - 1 ? this.renderIsNewModeLastTab() :
                                 this.renderIsNewModeIntermediaryTab() :
                         this.props.isEditMode ? this.renderEditModeTab() : this.renderViewModeButtons()
-
                 }
             </View>
         );
@@ -36,13 +34,12 @@ class TopContainerButtons extends Component {
             <Button
                 title={getTranslation(translations.generalButtons.editButtonLabel, this.props.translation)}
                 onPress={this.props.onPressEdit}
-                color={styles.buttonGreen}
-                titleColor={'white'}
-                height={calculateDimension(25, true, this.props.screenSize)}
-                width={calculateDimension(166, false, this.props.screenSize)}
+                color={styles.primaryColor}
+                titleColor={styles.backgroundColor}
+                height={calculateDimension(35, true, this.props.screenSize)}
+                width={calculateDimension(164, false, this.props.screenSize)}
                 style={{
-                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                    marginRight: 10
+                    marginVertical: calculateDimension(16, true, this.props.screenSize)
                 }} />
         )
     }
@@ -54,24 +51,24 @@ class TopContainerButtons extends Component {
                 <Button
                     title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                     onPress={this.props.onPressSaveEdit}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(166, false, this.props.screenSize)}
+                    color={styles.primaryColor}
+                    titleColor={styles.backgroundColor}
+                    height={calculateDimension(35, true, this.props.screenSize)}
+                    width={calculateDimension(164, false, this.props.screenSize)}
                     style={{
-                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                        marginRight: 10,
+                        marginVertical: calculateDimension(16, true, this.props.screenSize),
+                        marginRight: 8
                     }} />
                 <Button
                     title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
                     onPress={this.props.onPressCancelEdit}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(166, false, this.props.screenSize)}
+                    color={styles.primaryColor}
+                    titleColor={styles.backgroundColor}
+                    height={calculateDimension(35, true, this.props.screenSize)}
+                    width={calculateDimension(164, false, this.props.screenSize)}
                     style={{
-                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                        marginRight: 10,
+                        marginVertical: calculateDimension(16, true, this.props.screenSize),
+                        marginLeft: 8
                     }} />
             </View>
         )
@@ -83,13 +80,12 @@ class TopContainerButtons extends Component {
             <Button
                 title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
                 onPress={this.props.onPressNextButton}
-                color={styles.buttonGreen}
-                titleColor={'white'}
-                height={calculateDimension(25, true, this.props.screenSize)}
-                width={calculateDimension(130, false, this.props.screenSize)}
+                color={styles.primaryColor}
+                titleColor={styles.backgroundColor}
+                height={calculateDimension(35, true, this.props.screenSize)}
+                width={calculateDimension(164, false, this.props.screenSize)}
                 style={{
-                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                    marginRight: 10,
+                    marginVertical: calculateDimension(16, true, this.props.screenSize)
                 }} />
         )
     }
@@ -101,24 +97,24 @@ class TopContainerButtons extends Component {
                 <Button
                     title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
                     onPress={this.props.onPressPreviousButton}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(130, false, this.props.screenSize)}
+                    color={styles.primaryColor}
+                    titleColor={styles.backgroundColor}
+                    height={calculateDimension(35, true, this.props.screenSize)}
+                    width={calculateDimension(164, false, this.props.screenSize)}
                     style={{
-                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                        marginVertical: calculateDimension(16, true, this.props.screenSize),
+                        marginRight: 8
                     }} />
                 <Button
                     title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
                     onPress={this.props.onPressSaveEdit}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(130, false, this.props.screenSize)}
+                    color={styles.primaryColor}
+                    titleColor={styles.backgroundColor}
+                    height={calculateDimension(35, true, this.props.screenSize)}
+                    width={calculateDimension(164, false, this.props.screenSize)}
                     style={{
-                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                        marginVertical: calculateDimension(16, true, this.props.screenSize),
+                        marginLeft: 8
                     }} />
             </View>
         )
@@ -131,24 +127,24 @@ class TopContainerButtons extends Component {
                 <Button
                     title={getTranslation(translations.generalButtons.backButtonLabel, this.props.translation)}
                     onPress={this.props.onPressPreviousButton}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(130, false, this.props.screenSize)}
+                    color={styles.primaryColor}
+                    titleColor={styles.backgroundColor}
+                    height={calculateDimension(35, true, this.props.screenSize)}
+                    width={calculateDimension(164, false, this.props.screenSize)}
                     style={{
-                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                        marginVertical: calculateDimension(16, true, this.props.screenSize),
+                        marginRight: 8
                     }} />
                 <Button
                     title={getTranslation(translations.generalButtons.nextButtonLabel, this.props.translation)}
                     onPress={this.props.onPressNextButton}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(130, false, this.props.screenSize)}
+                    color={styles.primaryColor}
+                    titleColor={styles.backgroundColor}
+                    height={calculateDimension(35, true, this.props.screenSize)}
+                    width={calculateDimension(164, false, this.props.screenSize)}
                     style={{
-                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                        marginVertical: calculateDimension(16, true, this.props.screenSize),
+                        marginLeft: 8
                     }} />
             </View>
         )

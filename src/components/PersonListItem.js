@@ -10,7 +10,6 @@ import React, {Component} from 'react';
 import moment from 'moment/min/moment.min';
 import {InteractionManager, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
-import styles from './../styles';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import GeneralListItem from './GeneralListItem';
@@ -24,6 +23,7 @@ import get from 'lodash/get';
 import constants from './../utils/constants';
 import translations from "../utils/translations";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import styles from './../styles';
 
 class PersonListItem extends Component {
     constructor(props) {
@@ -82,8 +82,8 @@ class PersonListItem extends Component {
                 onPermissionDisable={this.props.onPermissionDisable}
                 outbreakPermissions={this.props.outbreakPermissions}
                 secondaryOutbreakPermissions={this.props.secondaryOutbreakPermissions}
-                hasSecondaryActionsBar={this.props.secondaryTextsArray?.length}
-                secondaryTextsArray={this.props.secondaryTextsArray}
+                // hasSecondaryActionsBar={this.props.secondaryTextsArray?.length}  // I commented this to hide the last button from Contacts and Cases listing
+                // secondaryTextsArray={this.props.secondaryTextsArray}
                 secondaryTextsStyleArray={this.props.secondaryTextsStyleArray}
                 secondaryOnPressArray={this.props.secondaryOnPressTextsArray}
                 secondaryArrayPermissions={this.props.secondaryArrayPermissions}
@@ -100,7 +100,7 @@ class PersonListItem extends Component {
             age: '',
             visualId: '',
             addressString: '',
-            primaryColor: 'black',
+            primaryColor: styles.textColor,
             status: null,
             institutionName: '',
             telephoneNumbers: '',
@@ -238,53 +238,53 @@ class PersonListItem extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
     },
     firstSectionContainer: {
         justifyContent: 'space-between',
     },
     addressStyle: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Light',
-        fontSize: 12,
-        color: styles.navigationDrawerItemText
+        fontSize: 14
     },
     secondSectionContainer: {
         justifyContent: 'center'
     },
     thirdSectionContainer: {
+        alignItems: 'center',
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        justifyContent: 'space-between'
     },
     rippleStyle: {
         height: '100%',
         justifyContent: 'center'
     },
     rippleTextStyle: {
+        color: styles.primaryColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 12,
-        color: styles.buttonGreen
+        fontSize: 14
     },
     centerItemContainer: {
         height: '100%',
         justifyContent: 'center'
     },
     primaryText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 18,
-        color: 'black'
+        fontSize: 16
     },
     secondaryText: {
+        color: styles.secondaryColor,
         fontFamily: 'Roboto-Regular',
-        fontSize: 15,
-        color: styles.buttonTextGray
+        fontSize: 14
     },
     exposedToTextStyle: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 15,
-        color: 'black'
+        fontSize: 14
     }
 });
 

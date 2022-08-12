@@ -12,6 +12,7 @@ import ElevatedView from 'react-native-elevated-view';
 import ButtonWithIcons from './ButtonWithIcons';
 import {Dropdown} from 'react-native-material-dropdown';
 import lodashGet from 'lodash/get';
+import styles from './../styles';
 
 const selectValuePickerReduxData = createSelector(
     state => lodashGet(state, 'referenceData', []),
@@ -60,11 +61,11 @@ export default ValuePicker = React.memo(({value, onSelectValue, top}) => {
     };
 
     return (
-        <ElevatedView elevation={2}>
+        <ElevatedView elevation={2} style={{backgroundColor: 'transparent'}}>
             <ButtonWithIcons
                 label={value}
-                width={calculateDimension(155, false, screenSize)}
-                height={calculateDimension(25, true, screenSize)}
+                width={calculateDimension(164, false, screenSize)}
+                height={calculateDimension(30, true, screenSize)}
                 firstIcon="visibility"
                 secondIcon="arrow-drop-down"
                 isFirstIconPureMaterial={true}
@@ -84,6 +85,12 @@ export default ValuePicker = React.memo(({value, onSelectValue, top}) => {
                     }}
                     dropdownPosition={0}
                     onChangeText={handleChangeText}
+                    baseColor={styles.textColor}
+                    textColor={styles.textColor}
+                    itemColor={styles.secondaryColor}
+                    selectedItemColor={styles.primaryColor}
+                    disabledItemColor={styles.disabledColor}
+                    pickerStyle={{borderRadius: 4, marginTop: 5, marginLeft: -4, width: 172}}
                 />
             </ButtonWithIcons>
         </ElevatedView>

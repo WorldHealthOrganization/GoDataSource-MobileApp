@@ -12,7 +12,6 @@ import {bindActionCreators, compose} from "redux";
 import NavBarCustom from './../components/NavBarCustom';
 import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
-import styles from './../styles';
 import config, {sideMenuKeys} from './../utils/config';
 import _, {sortBy, findIndex} from 'lodash';
 import EventSinglePersonalContainer from './../containers/EventSinglePersonalContainer';
@@ -54,6 +53,7 @@ import Menu, {MenuItem} from "react-native-material-menu";
 import PermissionComponent from "../components/PermissionComponent";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import EventSingleRelationshipContainer from "../containers/EventSingleRelationshipContainer";
+import styles from './../styles';
 
 const initialLayout = {
     height: 0,
@@ -253,77 +253,80 @@ class EventSingleScreen extends Component {
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View
-                            style={[style.breadcrumbContainer]}>
-                            <Breadcrumb
-                                entities={
-                                    [
-                                        getTranslation(translations.eventSingleScreen.title, this.props.translation),
-                                        this.props.isNew ? getTranslation(translations.eventSingleScreen.addEventTitle, this.props.translation) : (computeFullName(_.get(this.state, 'event', null)))
-                                    ]
-                                }
-                                componentId={this.props.componentId}
-                                onPress={this.handlePressBreadcrumb}
-                            />
-                            <View style={{
-                                flexDirection: 'row',
-                                marginRight: calculateDimension(16, false, this.props.screenSize)
-                            }}>
+                        <View style={style.headerContainer}>
+                            <View style={[style.breadcrumbContainer]}>
+                                <Breadcrumb
+                                    entities={
+                                        [
+                                            getTranslation(translations.eventSingleScreen.title, this.props.translation),
+                                            this.props.isNew ? getTranslation(translations.eventSingleScreen.addEventTitle, this.props.translation) : (computeFullName(_.get(this.state, 'event', null)))
+                                        ]
+                                    }
+                                    componentId={this.props.componentId}
+                                    onPress={this.handlePressBreadcrumb}
+                                />
+                            </View>
+                            <View style={style.headerButtonSpacing}>
                                 <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.buttonGreen,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
+                                    elevation={0}
+                                    style={[
+                                        style.headerButton, 
+                                        {
+                                            width: calculateDimension(30, false, this.props.screenSize),
+                                            height: calculateDimension(30, true, this.props.screenSize)
+                                        }
+                                    ]}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15}/>
+                                    <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={styles.textColor} size={18} />
                                     </Ripple>
                                 </ElevatedView>
-                                {
-                                    (checkArrayAndLength(_.intersection(
-                                        _.get(this.props, 'role', []),
-                                        [
-                                            constants.PERMISSIONS_LAB_RESULT.labResultAll,
-                                            constants.PERMISSIONS_LAB_RESULT.labResultCreate,
-                                            constants.PERMISSIONS_LAB_RESULT.labResultList,
-                                            constants.PERMISSIONS_EVENT.eventDelete,
-                                            constants.PERMISSIONS_EVENT.eventAll
-                                        ]
-                                    )) && this.props.event && !this.props.isNew) ? (
-                                        <View
-                                            style={{marginRight: calculateDimension(16, false, this.props.screenSize)}}>
-                                            <Menu
-                                                ref="menuRef"
-                                                button={
-                                                    <Ripple onPress={this.showMenu}
-                                                            hitSlop={{left: 10, right: 10, top: 10, bottom: 10}}>
-                                                        <Icon name="more-vert"/>
-                                                    </Ripple>
-                                                }
-                                            >
-                                                <PermissionComponent
-                                                    render={() => (
-                                                        <MenuItem onPress={this.handleOnPressDelete}>
-                                                            {getTranslation(translations.eventSingleScreen.deleteEvent, this.props.translation)}
-                                                        </MenuItem>
-                                                    )}
-                                                    permissionsList={[
-                                                        constants.PERMISSIONS_EVENT.eventDelete,
-                                                        constants.PERMISSIONS_EVENT.eventAll
-                                                    ]}
-                                                />
-                                            </Menu>
-                                        </View>
-                                    ) : null
-                                }
                             </View>
+                            {
+                                (checkArrayAndLength(_.intersection(
+                                    _.get(this.props, 'role', []),
+                                    [
+                                        constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                                        constants.PERMISSIONS_LAB_RESULT.labResultCreate,
+                                        constants.PERMISSIONS_LAB_RESULT.labResultList,
+                                        constants.PERMISSIONS_EVENT.eventDelete,
+                                        constants.PERMISSIONS_EVENT.eventAll
+                                    ]
+                                )) && this.props.event && !this.props.isNew) ? (
+                                    <View>
+                                        <Menu
+                                            ref="menuRef"
+                                            button={
+                                                <Ripple
+                                                    style={[
+                                                        style.moreMenuButton, 
+                                                        {
+                                                            width: calculateDimension(30, false, this.props.screenSize),
+                                                            height: calculateDimension(30, true, this.props.screenSize)
+                                                        }
+                                                    ]}
+                                                    onPress={this.showMenu}
+                                                    hitSlop={{left: 10, right: 10, top: 10, bottom: 10}}>
+                                                    <Icon name="more-vert" color={styles.textColor} size={24} />
+                                                </Ripple>
+                                            }
+                                            style={{top: 36}}
+                                        >
+                                            <PermissionComponent
+                                                render={() => (
+                                                    <MenuItem onPress={this.handleOnPressDelete}>
+                                                        {getTranslation(translations.eventSingleScreen.deleteEvent, this.props.translation)}
+                                                    </MenuItem>
+                                                )}
+                                                permissionsList={[
+                                                    constants.PERMISSIONS_EVENT.eventDelete,
+                                                    constants.PERMISSIONS_EVENT.eventAll
+                                                ]}
+                                            />
+                                        </Menu>
+                                    </View>
+                                ) : null
+                            }
                         </View>
                     }
                     componentId={this.props.componentId}
@@ -436,12 +439,18 @@ class EventSingleScreen extends Component {
             <TabBar
                 {...props}
                 indicatorStyle={{
-                    backgroundColor: styles.buttonGreen,
+                    backgroundColor: styles.primaryColor,
                     height: 2
                 }}
                 style={{
-                    height: 41,
-                    backgroundColor: 'white'
+                    height: 36,
+                    backgroundColor: styles.backgroundColor
+                }}
+                tabStyle={{
+                    width: 'auto',
+                    paddingHorizontal: 20,
+                    marginHorizontal: 0,
+                    textAlign: 'center'
                 }}
                 onTabPress={({route, preventDefault}) => {
                     preventDefault();
@@ -455,9 +464,9 @@ class EventSingleScreen extends Component {
                 }}
                 pressOpacity={this.props.isNew ? 0 : undefined}
                 pressColor={this.props.isNew ? 'transparent' : undefined}
+                activeColor={styles.primaryColor}
+                inactiveColor={styles.secondaryColor}
                 renderLabel={this.handleRenderLabel(props)}
-                scrollEnabled={true}
-                bounces={true}
             />
         )
     };
@@ -496,7 +505,7 @@ class EventSingleScreen extends Component {
         // const inputRange = props.navigationState.routes.map((x, i) => i);
         // let index = props.navigationState.index;
         // const outputRange = inputRange.map(
-        //     inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
+        //     inputIndex => (inputIndex === index ? styles.textColor : styles.disabledColor)
         // );
         // const color = props.position.interpolate({
         //     inputRange,
@@ -507,7 +516,6 @@ class EventSingleScreen extends Component {
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
-                color: styles.colorLabelActiveTab,
                 flex: 1,
                 alignSelf: 'center'
             }}>
@@ -1925,13 +1933,37 @@ class EventSingleScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        flex: 1
     },
-    breadcrumbContainer: {
+    headerContainer: {
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        paddingRight: 16
+    },
+    breadcrumbContainer: {
+        alignItems: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
+    },
+    headerButtonSpacing: {
+        marginRight: 8
+    },
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    moreMenuButton: {
+        alignItems: 'center',
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4,
+        justifyContent: 'center'
     }
 });
 

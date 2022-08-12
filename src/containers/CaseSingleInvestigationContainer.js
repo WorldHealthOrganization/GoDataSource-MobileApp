@@ -7,7 +7,6 @@ import React, {Component} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {createDate, extractAllQuestions} from '../utils/functions';
 import {connect} from "react-redux";
-import styles from '../styles';
 import QuestionCard from '../components/QuestionCard';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
@@ -17,6 +16,7 @@ import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
 import config from "./../utils/config";
+import styles from '../styles';
 
 class CaseSingleInvestigationContainer extends Component {
 
@@ -188,17 +188,17 @@ class CaseSingleInvestigationContainer extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    containerScrollView: {
+    cardStyle: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        marginVertical: 6
+    },
+    containerScrollView: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'

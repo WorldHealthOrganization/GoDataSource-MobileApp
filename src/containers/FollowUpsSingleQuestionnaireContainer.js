@@ -7,7 +7,6 @@ import React, {Component} from 'react';
 import {Alert, InteractionManager, ScrollView, StyleSheet, View} from 'react-native';
 import {checkRequiredQuestions, createDate, extractAllQuestions, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
-import styles from './../styles';
 import QuestionCard from './../components/QuestionCard';
 import {LoaderScreen} from 'react-native-ui-lib';
 import _, {sortBy} from 'lodash';
@@ -18,6 +17,7 @@ import cloneDeep from "lodash/cloneDeep";
 import uniqueId from "lodash/uniqueId";
 import TopContainerButtons from './../components/TopContainerButtons';
 import PermissionComponent from './../components/PermissionComponent';
+import styles from './../styles';
 
 class FollowUpsSingleQuestionnaireContainer extends Component {
 
@@ -47,7 +47,7 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
     render() {
         if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'} />
+                <LoaderScreen overlay={true} backgroundColor={styles.backgroundColor} />
             )
         }
 
@@ -254,20 +254,20 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     mainContainer: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     container: {
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
     },
     contentContainerStyle: {
         alignItems: 'center'
     },
     containerButtons: {
-        flexDirection: 'row',
         alignItems: 'center',
+        flexDirection: 'row',
         justifyContent: 'center'
     }
 });

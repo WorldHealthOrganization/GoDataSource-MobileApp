@@ -9,7 +9,6 @@ import {LoaderScreen} from 'react-native-ui-lib';
 import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import styles from './../styles';
 import constants from './../utils/constants';
 import CardComponent from './../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
@@ -20,6 +19,7 @@ import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import {validateRequiredFields, checkValidEmails} from './../utils/formValidators';
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import styles from './../styles';
 
 class EventSingleAddressContainer extends React.Component {
 
@@ -53,7 +53,7 @@ class EventSingleAddressContainer extends React.Component {
     render() {
         if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'} />
+                <LoaderScreen overlay={true} backgroundColor={styles.backgroundColor} />
             )
         }
         return (
@@ -106,10 +106,10 @@ class EventSingleAddressContainer extends React.Component {
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} key={cardIndex} style={[style.containerCardComponent, {
+            <ElevatedView elevation={5} key={cardIndex} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4,
+                marginVertical: 6,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
@@ -324,25 +324,26 @@ class EventSingleAddressContainer extends React.Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        paddingBottom: 8
     },
     subcontainerCardComponent: {
         alignItems: 'center',
         flex: 1
     },
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    containerScrollView: {
+    cardStyle: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        marginVertical: 6
+    },
+    containerScrollView: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'

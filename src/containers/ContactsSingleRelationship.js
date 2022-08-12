@@ -10,11 +10,9 @@ import React, {Component} from 'react';
 import {Animated, FlatList, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {calculateDimension, computeFullName, createStackFromComponent, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
-import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import GeneralListItem from '../components/GeneralListItem';
-import Ripple from 'react-native-material-ripple';
 import moment from 'moment/min/moment.min';
 import translations from './../utils/translations';
 import RelationshipContainer from '../containers/RelationshipContainer';
@@ -29,6 +27,8 @@ import {
     PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
 } from "../utils/constants";
 import {Navigation} from "react-native-navigation";
+import Button from './../components/Button';
+import styles from './../styles';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -66,7 +66,7 @@ class ContactsSingleRelationship extends Component {
         // console.log("### contact data: ", this.props.contact);
         if(!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'}/>
+                <LoaderScreen overlay={true} backgroundColor={styles.backgroundColor} />
             )
         }
 
@@ -78,8 +78,8 @@ class ContactsSingleRelationship extends Component {
         }
 
         return (
-            <ElevatedView elevation={3} style={[style.container]}>
-                <View style = {{alignItems: 'center'}}>
+            <ElevatedView elevation={5} style={[style.container]}>
+                <View style={{alignItems: 'center'}}>
 
                     <PermissionComponent
                         render={() => (
@@ -182,7 +182,7 @@ class ContactsSingleRelationship extends Component {
                 textsStyleArray={[
                     {
                         marginLeft: calculateDimension(14, false, this.props.screenSize),
-                        color: styles.buttonGreen,
+                        color: styles.primaryColor,
                         fontFamily: 'Roboto-Medium',
                         fontSize: 12
                     }
@@ -211,24 +211,18 @@ class ContactsSingleRelationship extends Component {
 
     listEmptyComponent = () => {
         return (
-            <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20}}>
+            <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}>
             {
                 this.props.isEditMode !== null && this.props.isEditMode !== undefined && this.props.isEditMode === true ? (
-                    <Ripple
-                        style={{
-                            height: 25,
-                            justifyContent: 'center'
-                        }}
+                    <Button
+                        title={this.props.relationshipType === constants.RELATIONSHIP_TYPE.exposure ? getTranslation(translations.contactSingleScreen.exposureText, this.props.translation) : getTranslation(translations.casesScreen.addContactButtonLabel)}
                         onPress={this.onPressAddExposure}
-                    >
-                        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen}}>
-                            {this.props.relationshipType === constants.RELATIONSHIP_TYPE.exposure ?
-                                getTranslation(translations.contactSingleScreen.exposureText, this.props.translation)
-                                :
-                                getTranslation(translations.casesScreen.addContactButtonLabel)
-                            }
-                        </Text>
-                    </Ripple>
+                        color={styles.backgroundColor}
+                        titleColor={styles.textColor}
+                        height={calculateDimension(35, true, this.props.screenSize)}
+                        width={calculateDimension(160, false, this.props.screenSize)}
+                        style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                    />
                 ) : null
             }
             </View>
@@ -265,20 +259,20 @@ class ContactsSingleRelationship extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
-        borderRadius: 2
+        backgroundColor: styles.screenBackgroundColor,
+        borderRadius: 4,
+        flex: 1
     },
     containerContent: {
-        flex: 1,
-        backgroundColor: 'rgba(217, 217, 217, 0.5)'
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     separatorComponentStyle: {
         height: 8
     },
     listViewStyle: {
         flex: 1,
-        paddingTop: 10
+        paddingTop: 8
     }
 });
 

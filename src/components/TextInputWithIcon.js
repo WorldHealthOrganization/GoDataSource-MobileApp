@@ -10,6 +10,7 @@ import {getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import translations from './../utils/translations';
 import get from 'lodash/get';
+import styles from './../styles';
 
 class TextInputWithIcon extends Component {
     searchRef = React.createRef();
@@ -33,7 +34,7 @@ class TextInputWithIcon extends Component {
     render() {
         return (
             <View style={[style.container]}>
-                <Icon name="search" size={20} style={{alignSelf: 'center'}} />
+                <Icon name="search" size={20} style={{color: styles.primaryColor}} />
                 <TextInput
                     label={getTranslation(translations.generalLabels.searchLabel, this.props.translation)}
                     ref={this.searchRef}
@@ -74,17 +75,19 @@ class TextInputWithIcon extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
+        alignItems: 'center',
         flexDirection: 'row',
-        borderBottomColor: 'gray',
-        borderBottomWidth: 1,
+        borderWidth: 0,
         flex: 1,
-        marginRight: 9
+        marginTop: 0,
+        marginLeft: -16,
+        marginRight: 8,
+        paddingLeft: 16,
+        height: 30
     },
     textInput: {
-        width: '100%',
-        alignSelf: 'center',
         paddingVertical: 5,
-        flex: 0.75
+        flex: 1
     }
 });
 

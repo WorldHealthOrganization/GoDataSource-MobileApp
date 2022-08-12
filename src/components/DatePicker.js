@@ -13,6 +13,7 @@ import moment from 'moment/min/moment.min';
 import {getTranslation, getTooltip, createDate} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
 import {useDarkMode} from 'react-native-dark-mode';
+import stylesGlobal from './../styles';
 
 const DatePicker = React.memo(({
             id,
@@ -44,34 +45,22 @@ const DatePicker = React.memo(({
     const editInput = () => {
         let newDate = date;
         let tooltip = getTooltip(label, translation);
-        let customStyle = newDate !== undefined && newDate !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle;
+        let customStyle = newDate !== undefined && newDate !== null ? customStyles.hasDateTooltipStyle : customStyles.emptyDateTooltipStyle;
         if (newDate && typeof newDate === 'string' && newDate !== '') {
             newDate = new Date(value);
         }
 
         return (
-            <View style={[{marginVertical: 10, flexDirection: 'row', marginBottom: 7.5}, style]}>
-                <View style = {{flex: 1}}>
+            <View style={[{flexDirection: 'row', marginVertical: 8}, style]}>
+                <View style={{flex: 1}}>
                     {newDate !== null && newDate !== undefined && newDate !== '' ? (
                             <View>
                                 <Ripple onPress={handleShowDatePicker}>
-                                    <Text style={{
-                                        fontFamily: 'Roboto',
-                                        fontSize: 15,
-                                        textAlign: 'left',
-                                        color: 'rgba(0, 0, 0, .38)',
-                                    }}>
+                                    <Text style={customStyles.datePickerLabel}>
                                         {isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)}
                                     </Text>
 
-                                    <Text
-                                        style={{
-                                            fontFamily: 'Roboto-Regular',
-                                            fontSize: 15,
-                                            textAlign: 'left',
-                                            lineHeight: 30,
-                                            color: 'rgb(60,60,60)'
-                                        }}>
+                                    <Text style={customStyles.datePickerValue}>
                                         {moment.utc(newDate).format('MM/DD/YYYY') || ''}
                                     </Text>
                                 </Ripple>
@@ -79,16 +68,11 @@ const DatePicker = React.memo(({
                         ) : (
                             <Ripple onPress={handleShowDatePicker}>
                                 <TextField
-                                    label={isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)} textColor='rgb(0,0,0)'
-                                    labelFontSize={15}
-                                    // labelHeight={30}
-                                    labelTextStyle={{
-                                        fontFamily: 'Roboto',
-                                        textAlign: 'left',
-                                        marginBottom: 2,
-                                        marginTop: 2,
-                                    }}
-                                    tintColor='rgb(77,176,160)'
+                                    label={isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)}
+                                    textColor={stylesGlobal.textColor}
+                                    fontSize={14}
+                                    labelTextStyle={{fontFamily: 'Roboto-Regular'}}
+                                    tintColor={stylesGlobal.primaryColor}
                                 >
                                 </TextField>
                             </Ripple>
@@ -115,7 +99,7 @@ const DatePicker = React.memo(({
                     tooltip.hasTooltip === true ? (
                         <TooltipComponent
                             tooltipMessage={tooltip.tooltipMessage}
-                            style = {customStyle}
+                            style={customStyle}
                         />
                     ) : null
                 }
@@ -127,28 +111,16 @@ const DatePicker = React.memo(({
     const viewInput = () => {
         let tooltip = getTooltip(label, translation);
         return (
-            <View style={[{flexDirection: 'row', marginTop: 7}, style]}>
+            <View style={[{flexDirection: 'row', marginVertical: 8}, style]}>
                 <View style={{flex: 1}}>
                     {
                         skipLabel ? (null) : (
-                            <Text style={{
-                                fontFamily: 'Roboto-Regular',
-                                fontSize: 15,
-                                textAlign: 'left',
-                                color: 'rgb(0,0,0)',
-                                marginBottom: 2
-                            }}>
+                            <Text style={customStyles.datePickerLabel}>
                                 {getTranslation(label, translation)}
                             </Text>
                         )
                     }
-                    <Text
-                        style={{
-                            fontFamily: 'Roboto-Light',
-                            fontSize: 15,
-                            textAlign: 'left',
-                            color: 'rgb(60,60,60)',
-                        }}>
+                    <Text style={customStyles.datePickerValue}>
                         {value !== null && value !== undefined && value !== '' ? moment.utc(value).format('MM/DD/YYYY') : ''}
                     </Text>
                 </View>
@@ -200,19 +172,28 @@ const DatePicker = React.memo(({
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
-const styles = StyleSheet.create({
+const customStyles = StyleSheet.create({
+    datePickerLabel: {
+        color: stylesGlobal.secondaryColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    },
+    datePickerValue: {
+        color: stylesGlobal.textColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    },
     hasDateTooltipStyle: {
         flex: 0,
-        marginTop: 15,
-        marginBottom: 15
+        marginTop: 16,
+        marginBottom: 16
     },
     emptyDateTooltipStyle: {
         flex: 0,
-        marginTop: 30,
+        marginTop: 32,
         marginBottom: 8
     }
 });
-
 
 DatePicker.propTypes = {
     id: PropTypes.string.isRequired,

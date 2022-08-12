@@ -1,6 +1,4 @@
-/**
- * Created by florinpopa on 03/07/2018.
- */
+/* Global Styles */
 import buttons from './buttons';
 import colors from './colors';
 import views from './views';

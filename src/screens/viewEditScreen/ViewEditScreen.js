@@ -24,7 +24,6 @@ import {
     getTranslation,
     updateRequiredFields
 } from "../../utils/functions";
-import styles from "../../styles";
 import translations from "../../utils/translations";
 import config from "../../utils/config";
 import constants from './../../utils/constants';
@@ -35,6 +34,7 @@ import FollowUpsSingleContainer from './../../containers/FollowUpsSingleContaine
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../../utils/animations";
 import ContactsSingleRelationship from "../../containers/ContactsSingleRelationship";
+import styles from "../../styles";
 
 class ViewEditScreen extends Component {
     constructor(props) {
@@ -76,49 +76,49 @@ class ViewEditScreen extends Component {
     render() {
         if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'} />
+                <LoaderScreen overlay={true} backgroundColor={styles.backgroundColor} />
             )
         }
 
         return (
             <ViewHOC
-                style={{flex: 1}}
-                     showLoader={this && this.state && this.state.loading}
-                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
+                style={style.container}
+                showLoader={this && this.state && this.state.loading}
+                loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
             >
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View
-                            style={[style.breadcrumbContainer]}>
-                            <Breadcrumb
-                                entities={
-                                    [
-                                        getTranslation(lodashGet(this.props, 'previousScreen', translations.followUpsSingleScreen.title), this.props.translation),
-                                        computeFullName(this.props.elementType === 'followUp' ? this.props.additionalData : this.props.element)
-                                    ]
-                                }
-                                componentId={this.props.componentId}
-                                onPress={this.handlePressBreadcrumb}
-                            />
-                            <View style={{ flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize) }}>
+                        <View style={style.headerContainer}>
+                            <View style={[style.breadcrumbContainer]}>
+                                <Breadcrumb
+                                    entities={
+                                        [
+                                            getTranslation(lodashGet(this.props, 'previousScreen', translations.followUpsSingleScreen.title), this.props.translation),
+                                            computeFullName(this.props.elementType === 'followUp' ? this.props.additionalData : this.props.element)
+                                        ]
+                                    }
+                                    componentId={this.props.componentId}
+                                    onPress={this.handlePressBreadcrumb}
+                                />
+                            </View>
+                            <View style={style.headerButtonSpacing}>
                                 <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.buttonGreen,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
+                                    elevation={0}
+                                    style={[
+                                        style.headerButton, 
+                                        {
+                                            width: calculateDimension(30, false, this.props.screenSize),
+                                            height: calculateDimension(30, true, this.props.screenSize)
+                                        }
+                                    ]}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15} />
+                                    <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={styles.textColor} size={18} />
                                     </Ripple>
                                 </ElevatedView>
+                            </View>
+                            <View>
                                 {
                                     this.renderNavBarContent()
                                 }
@@ -276,13 +276,21 @@ class ViewEditScreen extends Component {
             <TabBar
                 {...props}
                 indicatorStyle={{
-                    backgroundColor: styles.buttonGreen,
+                    backgroundColor: styles.primaryColor,
                     height: 2
                 }}
                 style={{
-                    height: 41,
-                    backgroundColor: 'Red'
+                    height: 36,
+                    backgroundColor: styles.backgroundColor
                 }}
+                tabStyle={{
+                    width: 'auto',
+                    paddingHorizontal: 16,
+                    marginHorizontal: 0,
+                    textAlign: 'center'
+                }}
+                activeColor={styles.primaryColor}
+                inactiveColor={styles.secondaryColor}
                 renderLabel={this.handleRenderLabel(props)}
                 scrollEnabled={this.props.elementType !== 'followUp'}
                 bounces={this.props.elementType !== 'followUp'}
@@ -295,7 +303,7 @@ class ViewEditScreen extends Component {
         // const inputRange = props.navigationState.routes.map((x, i) => i);
         //
         // const outputRange = inputRange.map(
-        //     inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
+        //     inputIndex => (inputIndex === index ? styles.textColor : styles.disabledColor)
         // );
         // const color = props.position.interpolate({
         //     inputRange,
@@ -306,7 +314,7 @@ class ViewEditScreen extends Component {
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
-                color: styles.colorLabelActiveTab,
+                color: styles.textColor,
                 flex: 1,
                 alignSelf: 'center'
             }}>
@@ -851,13 +859,37 @@ ViewEditScreen.defaultProps = {
 
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        flex: 1
     },
-    breadcrumbContainer: {
+    headerContainer: {
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
+        paddingRight: 16
+    },
+    breadcrumbContainer: {
+        alignItems: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
+    },
+    headerButtonSpacing: {
+        marginRight: 8
+    },
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    moreMenuButton: {
+        alignItems: 'center',
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4,
+        justifyContent: 'center'
     }
 });
 

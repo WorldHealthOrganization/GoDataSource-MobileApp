@@ -5,7 +5,6 @@ import {bindActionCreators} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
@@ -15,6 +14,7 @@ import SortContainer from './../containers/SortContainer';
 import translations from './../utils/translations';
 import {Navigation} from "react-native-navigation";
 import throttle from 'lodash/throttle';
+import styles from './../styles';
 
 class FilterScreen extends Component {
 
@@ -279,13 +279,20 @@ class FilterScreen extends Component {
             <TabBar
                 {...props}
                 indicatorStyle={{
-                    backgroundColor: styles.buttonGreen,
+                    backgroundColor: styles.primaryColor,
                     height: 2
                 }}
                 style={{
-                    height: 41,
-                    backgroundColor: 'white'
+                    height: 36,
+                    backgroundColor: styles.backgroundColor
                 }}
+                tabStyle={{
+                    paddingHorizontal: 16,
+                    marginHorizontal: 0,
+                    textAlign: 'center'
+                }}
+                activeColor={styles.primaryColor}
+                inactiveColor={styles.secondaryColor}
                 renderLabel={this.handleRenderLabel(props)}
             />
         )
@@ -298,7 +305,7 @@ class FilterScreen extends Component {
             // const inputRange = props.navigationState.routes.map((x, i) => i);
             //
             // const outputRange = inputRange.map(
-            //     inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
+            //     inputIndex => (inputIndex === index ? styles.textColor : styles.disabledColor)
             // );
             // const color = props.position.interpolate({
             //     inputRange,
@@ -309,7 +316,7 @@ class FilterScreen extends Component {
                 <Animated.Text style={{
                     fontFamily: 'Roboto-Medium',
                     fontSize: 12,
-                    color: styles.colorLabelActiveTab,
+                    color: styles.textColor,
                     flex: 1,
                     alignSelf: 'center'
                 }}>
@@ -508,8 +515,8 @@ class FilterScreen extends Component {
 
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: styles.backgroundColor,
+        flex: 1
     }
 });
 

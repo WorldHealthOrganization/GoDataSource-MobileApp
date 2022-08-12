@@ -8,10 +8,10 @@ import {InteractionManager, ScrollView, StyleSheet, View} from 'react-native';
 import {calculateDimension, computeFullName, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
+import styles from './../styles';
 
 class RelationshipContainer extends PureComponent {
 
@@ -65,14 +65,14 @@ class RelationshipContainer extends PureComponent {
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView elevation={5} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4,
-                minHeight: calculateDimension(72, true, this.props.screenSize)
+                marginVertical: 6,
+                minHeight: calculateDimension(72, true, this.props.screenSize),
+                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
             }, style.cardStyle]}>
                 <ScrollView scrollEnabled={false}
-                            nestedScrollEnabled={true} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+                            nestedScrollEnabled={true} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -85,7 +85,7 @@ class RelationshipContainer extends PureComponent {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
+            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -206,33 +206,32 @@ class RelationshipContainer extends PureComponent {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    container: {
+        flex: 1
+    },
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
     },
     subcontainerCardComponent: {
         alignItems: 'center',
         flex: 1
     },
     viewContainer: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    containerScrollView: {
+    cardStyle: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        marginVertical: 6
+    },
+    containerScrollView: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'
-    },
-    container: {
-        flex: 1,
-        marginBottom: 30
     }
 });
 

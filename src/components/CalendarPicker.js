@@ -31,7 +31,7 @@ class CalendarPicker extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <ElevatedView elevation={2} style={[style.container, {width: this.props.width, height: this.props.height}]}>
+            <ElevatedView elevation={2} style={[style.container, {backgroundColor: 'transparent', width: this.props.width, height: this.props.height}]}>
                 <ButtonWithIcons
                     height={this.props.height}
                     width={this.props.width}
@@ -44,7 +44,7 @@ class CalendarPicker extends PureComponent {
                 />
                 <CalendarPickerView
                     showPicker={this.props.pickerOpen}
-                    width={2.21 * this.props.width}
+                    width={2.1 * this.props.width}
                     dateChanged={this.handleDateChanged}
                     value={this.props.value}
                 />
@@ -84,11 +84,10 @@ const style = StyleSheet.create({
 
     },
     containerButton: {
-        height: '100%',
-        flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 4,
-        backgroundColor: 'red'
+        flexDirection: 'row',
+        height: '100%'
     }
 });
 

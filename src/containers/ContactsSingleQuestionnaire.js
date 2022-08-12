@@ -7,7 +7,6 @@ import React, {Component} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {createDate, extractAllQuestions} from '../utils/functions';
 import {connect} from "react-redux";
-import styles from '../styles';
 import QuestionCard from '../components/QuestionCard';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
@@ -22,6 +21,7 @@ import constants, {
 } from "./../utils/constants";
 import config from "./../utils/config";
 import translations from "../utils/translations";
+import styles from './../styles';
 
 class ContactsSingleQuestionnaire extends Component {
 
@@ -77,7 +77,7 @@ class ContactsSingleQuestionnaire extends Component {
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswers, 0);
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{flex: 1}}>
                 <View style={style.container}>
                     <PermissionComponent
                         render={() => (
@@ -97,7 +97,7 @@ class ContactsSingleQuestionnaire extends Component {
                     />
                     <ScrollView
                         style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 16 }]}
                     >
                         {
                             sortedQuestions.map((item, index) => {
@@ -195,17 +195,17 @@ class ContactsSingleQuestionnaire extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    containerScrollView: {
+    cardStyle: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        marginVertical: 6
+    },
+    containerScrollView: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'

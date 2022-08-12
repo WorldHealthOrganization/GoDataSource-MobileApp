@@ -8,7 +8,6 @@ import {Alert, Image, Platform, StyleSheet, Text, View} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Button, Icon} from 'react-native-material-ui';
 import {TextField} from 'react-native-material-textfield';
-import styles from './../styles';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {loginUser} from './../actions/user';
@@ -36,6 +35,7 @@ import appConfig from './../../app.config';
 import LocalButton from './../components/Button';
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
+import styles from './../styles';
 
 class ManualConfigScreen extends PureComponent {
     nameRef = React.createRef();
@@ -189,47 +189,29 @@ class ManualConfigScreen extends PureComponent {
         }
         return (
             <View style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height >= 812 ? 44 : 20 : 0}]}>
-                <View style={{width: '100%', paddingTop: 10}}>
-                    <View style={{
-                        width: '75%',
-                        alignSelf: 'center',
-                        justifyContent: 'space-between',
-                        flexDirection: 'row',
-                    }}>
-                        <Ripple
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                left: -20
-                            }}
-                            onPress={this.handleOnPressBack}>
-                            <Icon name="arrow-back"/>
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>New hub</Text>
+                <View style={style.topSectionContainer}>
+                    <View style={style.topSection}>
+                        <Ripple style={[style.topNavLinks, {left: -4}]} onPress={this.handleOnPressBack}>
+                            <Icon name="arrow-back" style={style.topNavLinksIcon} />
+                            <Text style={[style.topNavLinksText, {marginLeft: 4}]}>New hub</Text>
                         </Ripple>
 
                         {
                             this.props && this.props.activeDatabase && !this.props.allowBack ? (
-                                <Ripple style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    right: -20
-                                }} onPress={this.handleOnPressForward}>
-                                    <Text
-                                        style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Login</Text>
-                                    <Icon name="arrow-forward"/>
+                                <Ripple style={[style.topNavLinks, {right: -4}]} onPress={this.handleOnPressForward}>
+                                    <Text style={[style.topNavLinksText, {marginRight: 4}]}>Login</Text>
+                                    <Icon name="arrow-forward" style={style.topNavLinksIcon} />
                                 </Ripple>
                             ) : (null)
                         }
                     </View>
-                    <View
-                        style={[{width: '75%', alignSelf: 'center'}]}>
+                    <View style={style.welcomeTextContainer}>
                         <Text style={[style.welcomeText]}>
                             {getTranslation(translations.manualConfigScreen.title, null)}
                         </Text>
                     </View>
                 </View>
                 <KeyboardAwareScrollView
-                    style={{backgroundColor: '#55b5a6'}}
                     contentContainerStyle={style.contentContainerStyle}
                     keyboardShouldPersistTaps={'always'}
                 >
@@ -244,9 +226,9 @@ class ManualConfigScreen extends PureComponent {
                             onChangeText={this.handleTextChange}
                             label={getTranslation(translations.manualConfigScreen.nameLabel, this.props.translation)}
                             autoCapitalize={'none'}
-                            tintColor={styles.colorTint}
-                            baseColor={styles.colorBase}
-                            textColor={styles.colorWhite}
+                            tintColor={styles.primaryColor}
+                            baseColor={styles.secondaryColor}
+                            textColor={styles.textColor}
                         />
                         <TextField
                             ref={this.urlRef}
@@ -258,9 +240,9 @@ class ManualConfigScreen extends PureComponent {
                             onChangeText={this.handleTextChange}
                             label={getTranslation(translations.manualConfigScreen.hubUrlLabel, null)}
                             autoCapitalize={'none'}
-                            tintColor={styles.colorTint}
-                            baseColor={styles.colorBase}
-                            textColor={styles.colorWhite}
+                            tintColor={styles.primaryColor}
+                            baseColor={styles.secondaryColor}
+                            textColor={styles.textColor}
                         />
                         <TextField
                             ref={this.clientIdRef}
@@ -272,9 +254,9 @@ class ManualConfigScreen extends PureComponent {
                             onChangeText={this.handleTextChange}
                             label={getTranslation(translations.manualConfigScreen.clientIdLabel, null)}
                             autoCapitalize={'none'}
-                            tintColor={styles.colorTint}
-                            baseColor={styles.colorBase}
-                            textColor={styles.colorWhite}
+                            tintColor={styles.primaryColor}
+                            baseColor={styles.secondaryColor}
+                            textColor={styles.textColor}
                         />
                         <TextField
                             ref={this.clientSecretRef}
@@ -287,9 +269,9 @@ class ManualConfigScreen extends PureComponent {
                             label={getTranslation(translations.manualConfigScreen.clientSecretPass, null)}
                             secureTextEntry={true}
                             autoCapitalize={'none'}
-                            tintColor={styles.colorTint}
-                            baseColor={styles.colorBase}
-                            textColor={styles.colorWhite}
+                            tintColor={styles.primaryColor}
+                            baseColor={styles.secondaryColor}
+                            textColor={styles.textColor}
                         />
                         <TextField
                             ref={this.userEmailRef}
@@ -302,9 +284,9 @@ class ManualConfigScreen extends PureComponent {
                             onChangeText={this.handleTextChange}
                             label={getTranslation(translations.manualConfigScreen.userEmailLabel, null)}
                             autoCapitalize={'none'}
-                            tintColor={styles.colorTint}
-                            baseColor={styles.colorBase}
-                            textColor={styles.colorWhite}
+                            tintColor={styles.primaryColor}
+                            baseColor={styles.secondaryColor}
+                            textColor={styles.textColor}
                         />
                         <SwitchInput
                             id="encryptedData"
@@ -314,10 +296,10 @@ class ManualConfigScreen extends PureComponent {
                             isEditMode={true}
                             isRequired={false}
                             onChange={this.handleCheck}
-                            activeButtonColor={'green'}
-                            activeBackgroundColor={'white'}
-                            style={{width: '100%'}}
-                            labelStyle={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}
+                            activeButtonColor={styles.primaryColor}
+                            activeBackgroundColor={styles.backgroundColor}
+                            style={style.switchInput}
+                            labelStyle={style.switchInputLabel}
                             hasTooltip={true}
                             tooltipsMessage={'Encrypted connection is more secure but the sync will take more time'}
                         />
@@ -328,15 +310,12 @@ class ManualConfigScreen extends PureComponent {
                             min={500}
                             max={5000}
                             step={500}
-                            style={{
-                                width: '100%',
-                                backgroundColor: styles.backgroundGreen
-                            }}
-                            selectedStyle={'white'}
-                            unselectedStyle={'white'}
-                            sliderLength={calculateDimension(240, false, this.props.screenSize)}
+                            style={style.intervalPicker}
+                            selectedStyle={styles.primaryColor}
+                            unselectedStyle={styles.secondaryColor}
+                            sliderLength={calculateDimension(260, false, this.props.screenSize)}
                             onChange={this.onChangeInterval}
-                            markerColor={'white'}
+                            markerColor={styles.primaryColor}
                             hasTooltip={true}
                             tooltipsMessage={constants.CHUNK_SIZE_TOOLTIP}
                         />
@@ -344,25 +323,19 @@ class ManualConfigScreen extends PureComponent {
                             this.props && this.props.activeDatabase && !this.props.isNewHub ? (
                                 <Button upperCase={false} onPress={() => {
                                     this.checkFields('editCurrentConfiguration')
-                                }} text={'Edit current configuration'} style={styles.buttonLogin}/>
+                                }} text={'Edit current configuration'} style={styles.secondaryButton}/>
                             ) : (null)
                         }
                         <Button upperCase={false} onPress={() => {
                             this.checkFields('saveHubConfiguration', true)
                         }} text={getTranslation(translations.manualConfigScreen.saveHubConfigButton, null)}
-                                style={styles.buttonLogin}/>
+                                style={styles.primaryButton}/>
                     </View>
                     {
                         Platform.OS === 'ios' && this.props && this.props.screenSize.height < 600 && this.props.activeDatabase ? (null) : (
                             <View style={style.logoContainer}>
                                 <Image source={{uri: 'logo_app'}} style={style.logoStyle}/>
-                                <Text
-                                    style={{
-                                        color: 'white',
-                                        fontFamily: 'Roboto-Medium',
-                                        fontSize: 14
-                                    }}
-                                >
+                                <Text style={style.version}>
                                     {`Version: ${VersionNumber.appVersion} - build ${VersionNumber.buildVersion}`}
                                 </Text>
                             </View>
@@ -383,21 +356,13 @@ class ManualConfigScreen extends PureComponent {
                         key={'languageSelect'}
                         animationOutTiming={150}
                     >
-                            <ElevatedView elevation={4} style={{
-                                backgroundColor: 'white',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginHorizontal: 16,
-                                borderRadius: 8
-                            }}>
-                                <Text
-                                    style={style.titleText}
-                                    key={'languageSelectTtitle'}
-                                >Available HUB language</Text>
-                                <Text
-                                    style={style.subText}
-                                    key={'languageSelectSubText'}
-                                >Please select the language that you want the use. If you click continue without selecting a language the app will download all languages, resulting in potential long sync time</Text>
+                            <ElevatedView elevation={4} style={style.modalStyle}>
+                                <Text style={style.titleText} key={'languageSelectTtitle'}>
+                                    Available HUB language
+                                </Text>
+                                <Text style={style.subText} key={'languageSelectSubText'}>
+                                    Please select the language that you want the use. If you click continue without selecting a language the app will download all languages, resulting in potential long sync time
+                                </Text>
                                 <DropdownInput
                                     id={'languages'}
                                     label={'Select language'}
@@ -407,20 +372,15 @@ class ManualConfigScreen extends PureComponent {
                                     isRequired={false}
                                     onChange={this.selectLanguage}
                                     screenSize={this.props.screenSize}
-                                    style={{marginHorizontal: 16}}
                                 />
                                 <LocalButton
                                     id={'languageSelectContinueSync'}
                                     title={'Continue sync'}
                                     onPress={this.continueSync}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
+                                    color={styles.primaryColor}
+                                    titleColor={styles.backgroundColor}
                                     height={calculateDimension(35, true, this.props.screenSize)}
-                                    width={calculateDimension(166, false, this.props.screenSize)}
-                                    style={{
-                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-                                        marginRight: 10
-                                    }} />
+                                    width={calculateDimension(166, false, this.props.screenSize)} />
                             </ElevatedView>
                     </Modal>
 
@@ -697,54 +657,109 @@ class ManualConfigScreen extends PureComponent {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#55b5a6'
+        flex: 1
     },
     contentContainerStyle: {
-        justifyContent: 'space-around',
         alignItems: 'center',
-        flexGrow: 1
+        flexGrow: 1,
+        justifyContent: 'space-around',
+        paddingHorizontal: 24
     },
-    textInput: {
-        width: '100%',
-        alignSelf: 'center'
+    topSectionContainer: {
+        paddingTop: 16,
+        width: '100%'
+    },
+    topSection: {
+        alignSelf: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 24,
+        width: '100%'
+    },
+    topNavLinks: {
+        alignItems: 'center',
+        flexDirection: 'row'
+    },
+    topNavLinksIcon: {
+        color: styles.secondaryColor,
+        fontSize: 18
+    },
+    topNavLinksText: {
+        color: styles.primaryAltColor,
+        fontFamily: 'Roboto-Medium',
+        fontSize: 16
     },
     welcomeTextContainer: {
-        flex: 0.35,
-        width: '75%',
-        justifyContent: 'center'
+        alignSelf: 'center',
+        marginTop: 16,
+        paddingHorizontal: 24,
+        width: '100%'
     },
     welcomeText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Bold',
         fontSize: 25,
-        color: 'white',
         textAlign: 'left'
     },
     inputsContainer: {
         flex: 0.15,
-        width: '75%',
         justifyContent: 'space-around',
+        width: '100%'
+    },
+    textInput: {
+        alignSelf: 'center',
+        width: '100%'
+    },
+    switchInput: {
+        marginVertical: 16,
+        width: '100%'
+    },
+    switchInputLabel: {
+        color: styles.textColor,
+        fontFamily: 'Roboto-Medium',
+        fontSize: 16
+    },
+    intervalPicker: {
+        backgroundColor: styles.separatorColor,
+        width: '100%'
     },
     logoContainer: {
+        alignItems: 'center',
         flex: 0.5,
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center'
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        width: '100%'
     },
     logoStyle: {
-        width: 180,
-        height: 34
+        height: 34,
+        width: 180
     },
-    titleText: {
-        fontFamily: 'Roboto-Medium',
-        fontSize: 18,
-        marginVertical: 10
-    },
-    subText: {
+    version: {
+        color: styles.secondaryColor,
         fontFamily: 'Roboto-Light',
-        fontSize: 16,
+        fontSize: 12,
         textAlign: 'center'
     },
+    modalStyle: {
+        alignItems: 'center',
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        justifyContent: 'center',
+        marginHorizontal: 16,
+        padding: 16
+    },
+    titleText: {
+        color: styles.textColor,
+        fontFamily: 'Roboto-Medium',
+        fontSize: 18,
+        marginBottom: 16
+    },
+    subText: {
+        color: styles.textColor,
+        fontFamily: 'Roboto-Light',
+        fontSize: 16,
+        marginBottom: 16
+    }
 });
 
 function mapStateToProps(state) {

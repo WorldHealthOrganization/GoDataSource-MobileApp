@@ -13,6 +13,7 @@ import KeyboardManager from 'react-native-keyboard-manager';
 import ModalSyncStatus from './ModalSyncStatus';
 import {setLoaderState, setSyncState} from "../actions/app";
 import isFunction from 'lodash/isFunction';
+import styles from "../styles";
 
 if (Platform.OS === 'ios') {
     KeyboardManager.setEnable(true);
@@ -48,6 +49,7 @@ class ViewHOC extends Component {
                     this.props.showLoader || this.props.showLoading ? (
                         <LoaderScreen
                             overlay={true}
+                            loaderColor={styles.primaryColor}
                             backgroundColor={'rgba(255, 255, 255, 0.8)'}
                             // message={loaderText}
                             message={'Loading'}

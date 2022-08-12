@@ -7,13 +7,13 @@ import React, {Component} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {connect} from "react-redux";
 import get from 'lodash/get';
-import styles from '../styles';
 import constants from './../utils/constants';
 import config from './../utils/config';
 // import LabResultsSingleAddressContainer from './LabResultsSingleAddressContainer'
 import LabResultsSingleGetInfoContainer from './LabResultsSingleGetInfoContainer'
 import TopContainerButtons from './../components/TopContainerButtons';
 import PermissionComponent from './../components/PermissionComponent';
+import styles from '../styles';
 
 class LabResultsSingleContainer extends Component {
 
@@ -86,13 +86,13 @@ class LabResultsSingleContainer extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     containerScrollView: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'
