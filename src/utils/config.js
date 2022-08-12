@@ -187,6 +187,16 @@ const addressFields = {
         },
         {
             cardNumber: 1,
+            id: 'emailAddress',
+            label: 'Email',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
             id: 'phoneNumber',
             label: translations.caseSingleScreen.phoneNumber,
             type: 'TextInput',
@@ -194,16 +204,6 @@ const addressFields = {
             isRequired: false,
             isEditMode: true,
             keyboardType: 'phone-pad',
-            objectType: 'Address'
-        },
-        {
-            cardNumber: 1,
-            id: 'emailAddress',
-            label: 'Email',
-            type: 'TextInput',
-            value: '',
-            isRequired: false,
-            isEditMode: true,
             objectType: 'Address'
         },
         {
@@ -301,9 +301,10 @@ const addressFields = {
             type: 'ActionsBar',
             labelValue: 'test',
             textsArray: [translations.addressFieldLabels.deleteButton],
-            textsStyleArray: [{color: styles.dangerColor}],
+            textsStyleArray: [{color: styles.backgroundColor}],
             onPressArray: [],
-            objectType: 'Address'
+            objectType: 'Address',
+            icon: 'delete'
         }
     ]
 };
@@ -638,9 +639,10 @@ const labResultsFilterScreenNoContactPermission = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.dangerColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Sort'
+                objectType: 'Sort',
+                icon: 'delete'
             }
         ]
     }
@@ -702,9 +704,10 @@ const labResultsFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.dangerColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Sort'
+                objectType: 'Sort',
+                icon: 'delete'
             }
         ]
     }
@@ -910,9 +913,10 @@ const caseSingleScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.dangerColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Documents'
+                objectType: 'Documents',
+                icon: 'delete'
             }
         ]
     },
@@ -955,9 +959,10 @@ const caseSingleScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.dangerColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Vaccines'
+                objectType: 'Vaccines',
+                icon: 'delete'
             }
         ]
     },
@@ -1197,9 +1202,10 @@ const caseSingleScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.dangerColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'DateRanges'
+                objectType: 'DateRanges',
+                icon: 'delete'
             }
         ]
     },
@@ -1244,9 +1250,10 @@ const eventsFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.dangerColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Sort'
+                objectType: 'Sort',
+                icon: 'delete'
             }
         ]
     }
@@ -1493,9 +1500,10 @@ const eventSingleScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.dangerColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Documents'
+                objectType: 'Documents',
+                icon: 'delete'
             }
         ]
     },
@@ -1658,9 +1666,10 @@ const personFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.dangerColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Sort'
+                objectType: 'Sort',
+                icon: 'delete'
             }
         ]
     }
@@ -1820,9 +1829,10 @@ const followUpsFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.dangerColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Sort'
+                objectType: 'Sort',
+                icon: 'delete'
             }
         ]
     }
@@ -1887,9 +1897,10 @@ const helpFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.dangerColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Sort'
+                objectType: 'Sort',
+                icon: 'delete'
             }
         ]
     }
@@ -2072,9 +2083,10 @@ const casesFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.dangerColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Sort'
+                objectType: 'Sort',
+                icon: 'delete'
             }
         ]
     }

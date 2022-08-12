@@ -269,6 +269,7 @@ class CardComponent extends Component {
                         containerTextStyle={{width, marginHorizontal, height: calculateDimension(46, true, this.props.screenSize)}}
                         isEditMode={this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true}
                         translation={this.props.translation}
+                        icon={this.props.item.icon}
                     />
                 );
             case 'TextSwitchSelector':

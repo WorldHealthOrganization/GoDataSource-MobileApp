@@ -55,7 +55,10 @@ class CaseSingleRelationshipContainer extends Component {
     render() {
         if(!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={styles.backgroundColor} />
+                <LoaderScreen
+                    overlay={true}
+                    loaderColor={styles.primaryColor}
+                    backgroundColor={'rgba(255, 255, 255, 0.8)'} />
             )
         }
 

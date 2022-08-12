@@ -731,8 +731,8 @@ const style = StyleSheet.create({
         width: '100%'
     },
     logoStyle: {
-        height: 34,
-        width: 180
+        height: 30,
+        width: 159
     },
     version: {
         color: styles.secondaryColor,

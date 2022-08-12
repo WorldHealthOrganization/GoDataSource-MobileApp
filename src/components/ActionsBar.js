@@ -13,9 +13,10 @@ import Ripple from 'react-native-material-ripple';
 import {getTranslation} from './../utils/functions';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import PermissionComponent from './PermissionComponent';
+import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 
-ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, outbreakPermissions, onPermissionDisable, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation}) => (
+ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, outbreakPermissions, onPermissionDisable, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation, icon}) => (
     <View style={[style.containerStyle, containerStyle]}>
         {
             isEditMode !== undefined && isEditMode !== null && isEditMode === true ? (
@@ -80,13 +81,16 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
                             return (
                                 <Ripple
                                     key={index}
-                                    style={[style.rippleStyle]}
+                                    style={style.deleteBtn}
                                     onPress={onPressArray && onPressArray[index] ? () => {
                                         onPressArray[index](addressIndex)
                                     } : () => {
                                         console.log("Default ")
                                     }}
                                 >
+                                    {
+                                        icon ? <Icon name="delete" color={styles.backgroundColor} size={18} /> : null
+                                    }
                                     <Text style={[
                                         textsStyleArray && Array.isArray(textsStyleArray) &&
                                         textsStyleArray[index] ? textsStyleArray[index] : style.textStyle
@@ -119,8 +123,10 @@ const style = StyleSheet.create({
         paddingHorizontal: 0
     },
     rippleStyle: {
+        alignItems: 'center',
         display: 'flex',
         flex: 1,
+        flexDirection: 'row',
         justifyContent: 'center',
         marginHorizontal: 4,
         paddingVertical: 0
@@ -130,10 +136,23 @@ const style = StyleSheet.create({
         borderRadius: 4,
         color: styles.primaryColor,
         display: 'flex',
+        flex: 1,
         fontFamily: 'Roboto-Regular',
         fontSize: 14,
         lineHeight: 26,
         textAlign: 'center'
+    },
+    deleteBtn: {
+        alignItems: 'center',
+        backgroundColor: styles.dangerColor,
+        borderRadius: 4,
+        color: styles.backgroundColor,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginHorizontal: 0,
+        paddingVertical: 4,
+        paddingHorizontal: 8
     }
 });
 
