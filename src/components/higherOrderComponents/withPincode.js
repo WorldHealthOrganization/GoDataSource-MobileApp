@@ -7,6 +7,7 @@ import {logoutUser} from './../../actions/user';
 import appConfig from './../../../app.config';
 import {LoaderScreen} from 'react-native-ui-lib';
 import {Navigation} from "react-native-navigation";
+import styles from './../../styles';
 
 export default function withPincode() {
     return function withPincodeFunction (WrappedComponent) {
@@ -184,6 +185,8 @@ export default function withPincode() {
                 <View>
                     <LoaderScreen
                         overlay={true}
+                        loaderColor={styles.primaryColor}
+                        backgroundColor={'rgba(255, 255, 255, 0.8)'}
                         message={"Loading..."}
                     />
                 </View>
