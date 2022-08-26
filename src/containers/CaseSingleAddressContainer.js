@@ -105,7 +105,7 @@ class CaseSingleAddressContainer extends React.Component {
                                         color={styles.backgroundColor}
                                         titleColor={styles.textColor}
                                         height={calculateDimension(35, true, this.props.screenSize)}
-                                        width={calculateDimension(175, false, this.props.screenSize)}
+                                        width={'100%'}
                                         style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
                                     />
                                 </View>

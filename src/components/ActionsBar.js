@@ -81,7 +81,7 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
                             return (
                                 <Ripple
                                     key={index}
-                                    style={style.deleteBtn}
+                                    style={[icon ? style.deleteBtn : style.defaultBtn]}
                                     onPress={onPressArray && onPressArray[index] ? () => {
                                         onPressArray[index](addressIndex)
                                     } : () => {
@@ -153,6 +153,9 @@ const style = StyleSheet.create({
         marginHorizontal: 0,
         paddingVertical: 4,
         paddingHorizontal: 8
+    },
+    defaultBtn: {
+        width: '100%'
     }
 });
 
