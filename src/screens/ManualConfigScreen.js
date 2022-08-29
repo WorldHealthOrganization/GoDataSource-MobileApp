@@ -657,6 +657,7 @@ class ManualConfigScreen extends PureComponent {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
+        backgroundColor: styles.backgroundColor,
         flex: 1
     },
     contentContainerStyle: {

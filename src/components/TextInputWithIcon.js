@@ -86,6 +86,7 @@ const style = StyleSheet.create({
         height: 30
     },
     textInput: {
+        color: styles.textColor,
         paddingVertical: 5,
         flex: 1
     }

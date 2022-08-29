@@ -68,7 +68,7 @@ class QuestionCardContent extends PureComponent {
                                 flexDirection: 'row',
                                 width: this.props.isEditMode ? (this.props.viewWidth / 2) : this.props.viewWidth,
                             }}>
-                                <View style={{maxWidth:  this.props.isEditMode ? ( this.props.index === 0 ? (this.props.viewWidth / 2 ) - 16 : (this.props.viewWidth / 2 )) : this.props.viewWidth }}>
+                                <View style={{width:  this.props.isEditMode ? ( this.props.index === 0 ? (this.props.viewWidth / 2 ) - 16 : (this.props.viewWidth / 2 )) : this.props.viewWidth }}>
                                     { this.handleRenderItem(this.props.item) }
                                 </View>
                                 {   this.props.isEditMode && !this.props.isCollapsed && this.props.index === 0 &&  Array.isArray(this.props.source[this.props.item.variable]) && this.props.source[this.props.item.variable].length > 1 &&
@@ -76,7 +76,9 @@ class QuestionCardContent extends PureComponent {
                                         minHeight: calculateDimension(60, true, this.props.screenSize),
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        width: 8
+                                        width: 16,
+                                        position: 'absolute',
+                                        right: 0
                                     }}>
                                         <Ripple onPress={() => { this.handleDeletePrevAnswer(0)}}>
                                             <Icon name="delete" color={styles.dangerColor} size={18} />

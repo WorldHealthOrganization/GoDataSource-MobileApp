@@ -23,7 +23,7 @@ class ModalSyncStatus extends PureComponent {
                 transparent={false}
                 visible={this.props.showModal}
             >
-                <View style={{flex: 1, alignItems: 'center', padding: 24}}>
+                <View style={{flex: 1, alignItems: 'center', padding: 24, paddingTop: 48}}>
                     <Text style={{fontFamily: 'Roboto-Bold', fontSize: 24, color: styles.textColor}}>Sync status</Text>
                     <ScrollView style={{width: '100%'}} contentContainerStyle={{flexGrow: 1, justifyContent: 'center', alignItems: 'center'}}>
                         <Text style={{fontFamily: 'Roboto-Medium', fontSize: 16, color: styles.textColor, marginBottom: 36}}>

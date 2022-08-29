@@ -179,7 +179,7 @@ class EventSingleRelationshipContainer extends Component {
                             color={styles.backgroundColor}
                             titleColor={styles.textColor}
                             height={calculateDimension(35, true, this.props.screenSize)}
-                            width={calculateDimension(170, false, this.props.screenSize)}
+                            width={'100%'}
                             style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
                         />
                     ) : null
