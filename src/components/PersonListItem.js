@@ -82,8 +82,8 @@ class PersonListItem extends Component {
                 onPermissionDisable={this.props.onPermissionDisable}
                 outbreakPermissions={this.props.outbreakPermissions}
                 secondaryOutbreakPermissions={this.props.secondaryOutbreakPermissions}
-                // hasSecondaryActionsBar={this.props.secondaryTextsArray?.length}  // I commented this to hide the last button from Contacts and Cases listing
-                // secondaryTextsArray={this.props.secondaryTextsArray}
+                hasSecondaryActionsBar={this.props.secondaryTextsArray?.length}
+                secondaryTextsArray={this.props.secondaryTextsArray}
                 secondaryTextsStyleArray={this.props.secondaryTextsStyleArray}
                 secondaryOnPressArray={this.props.secondaryOnPressTextsArray}
                 secondaryArrayPermissions={this.props.secondaryArrayPermissions}
