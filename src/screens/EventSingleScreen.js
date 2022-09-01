@@ -54,6 +54,7 @@ import PermissionComponent from "../components/PermissionComponent";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import EventSingleRelationshipContainer from "../containers/EventSingleRelationshipContainer";
 import styles from './../styles';
+import colors from "../styles/colors";
 
 const initialLayout = {
     height: 0,
@@ -500,24 +501,15 @@ class EventSingleScreen extends Component {
     };
 
     //Render label for TabBar
-    handleRenderLabel = (props) => ({route, focused, color}) => {
-
-        // const inputRange = props.navigationState.routes.map((x, i) => i);
-        // let index = props.navigationState.index;
-        // const outputRange = inputRange.map(
-        //     inputIndex => (inputIndex === index ? styles.textColor : styles.disabledColor)
-        // );
-        // const color = props.position.interpolate({
-        //     inputRange,
-        //     outputRange: outputRange,
-        // });
+    handleRenderLabel = (props) => ({route, focused}) => {
 
         return (
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
                 flex: 1,
-                alignSelf: 'center'
+                alignSelf: 'center',
+                color: focused ? colors.primaryColor : this.props.isNew ? colors.secondaryColor : colors.textColor
             }}>
                 {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
@@ -1080,14 +1072,25 @@ class EventSingleScreen extends Component {
         })
     };
     handleOnPressDeleteVaccines = (index) => {
-        let eventVaccinesReceived = _.cloneDeep(this.state.event.vaccinesReceived);
-        eventVaccinesReceived.splice(index, 1);
-        this.setState(prevState => ({
-            event: Object.assign({}, prevState.event, {vaccinesReceived: eventVaccinesReceived}),
-            isModified: true
-        }), () => {
-            console.log("After deleting the Vaccines: ", this.state.event);
-        })
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteVaccine, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
+                    console.log('Cancel pressed')
+                }
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    let eventVaccinesReceived = _.cloneDeep(this.state.event.vaccinesReceived);
+                    eventVaccinesReceived.splice(index, 1);
+                    this.setState(prevState => ({
+                        event: Object.assign({}, prevState.event, {vaccinesReceived: eventVaccinesReceived}),
+                        isModified: true
+                    }), () => {
+                        console.log("After deleting the Vaccines: ", this.state.event);
+                    })
+                }
+            }
+        ]);
     };
     onChangeSectionedDropDownIsolation = (selectedItems, index) => {
         // Here selectedItems is always an array with just one value and should pe mapped to the locationId field from the address from index

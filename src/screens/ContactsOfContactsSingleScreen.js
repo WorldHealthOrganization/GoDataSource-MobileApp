@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import geolocation from '@react-native-community/geolocation';
-import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View} from 'react-native';
+import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View, Text} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import NavBarCustom from './../components/NavBarCustom';
 import ViewHOC from './../components/ViewHOC';
@@ -47,6 +47,7 @@ import {setDisableOutbreakChange} from "../actions/outbreak";
 import Menu, {MenuItem} from "react-native-material-menu";
 import PermissionComponent from "../components/PermissionComponent";
 import styles from './../styles';
+import colors from "../styles/colors";
 
 const initialLayout = {
     height: 0,
@@ -498,23 +499,33 @@ class ContactsOfContactsSingleScreen extends Component {
 
     };
 
+
     handleRenderTabBar = (props) => {
         return (
             <TabBar
                 {...props}
                 indicatorStyle={{
                     backgroundColor: styles.primaryColor,
-                    height: 2
+                    height: 2,
+
+                    color: 'red'
                 }}
                 style={{
                     height: 36,
-                    backgroundColor: styles.backgroundColor
+                    backgroundColor: styles.backgroundColor,
+
+                    color: 'red'
                 }}
                 tabStyle={{
                     width: 'auto',
                     paddingHorizontal: 34,
                     marginHorizontal: 0,
-                    textAlign: 'center'
+                    textAlign: 'center',
+
+                    color: 'red'
+                }}
+                labelStyle={{
+                    color: 'red'
                 }}
                 onTabPress={({route, preventDefault}) => {
                     preventDefault();
@@ -535,23 +546,15 @@ class ContactsOfContactsSingleScreen extends Component {
         )
     };
 
-    handleRenderLabel = (props) => ({route, index}) => {
-        // const inputRange = props.navigationState.routes.map((x, i) => i);
-        //
-        // const outputRange = inputRange.map(
-        //     inputIndex => (inputIndex === index ? styles.textColor : styles.disabledColor)
-        // );
-        // const color = props.position.interpolate({
-        //     inputRange,
-        //     outputRange: outputRange,
-        // });
+    handleRenderLabel = (props) => ({route, focused}) => {
 
         return (
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
                 flex: 1,
-                alignSelf: 'center'
+                alignSelf: 'center',
+                color: focused ? colors.primaryColor : this.props.isNew ? colors.secondaryColor : colors.textColor
             }}>
                 {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
@@ -765,15 +768,25 @@ class ContactsOfContactsSingleScreen extends Component {
         })
     };
     handleOnPressDeleteVaccines = (index) => {
-        console.log("DeletePressed: ", index);
-        let vaccinesReceived = _.cloneDeep(this.state.contact.vaccinesReceived);
-        vaccinesReceived.splice(index, 1);
-        this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, {vaccinesReceived: vaccinesReceived}),
-            isModified: true
-        }), () => {
-            // console.log("After deleting the Vaccines: ", this.state.contact);
-        })
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteVaccine, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
+                    console.log('Cancel pressed')
+                }
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    let vaccinesReceived = _.cloneDeep(this.state.contact.vaccinesReceived);
+                    vaccinesReceived.splice(index, 1);
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {vaccinesReceived: vaccinesReceived}),
+                        isModified: true
+                    }), () => {
+                        // console.log("After deleting the Vaccines: ", this.state.contact);
+                    })
+                }
+            }
+        ]);
     };
 
     // Contact changes handlers
