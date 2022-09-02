@@ -63,6 +63,7 @@ import {setDisableOutbreakChange} from "../actions/outbreak";
 import {getContactRelationForContact} from "../actions/contacts";
 import styles from './../styles';
 import get from "lodash/get";
+import colors from "../styles/colors";
 
 const initialLayout = {
     height: 0,
@@ -690,14 +691,15 @@ class ContactsSingleScreen extends Component {
         )
     };
 
-    handleRenderLabel = (props) => ({route, index}) => {
+    handleRenderLabel = (props) => ({route, focused}) => {
 
         return (
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
                 flex: 1,
-                alignSelf: 'center'
+                alignSelf: 'center',
+                color: focused ? colors.primaryColor : this.props.isNew ? colors.secondaryColor : colors.textColor
             }}>
                 {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
@@ -1006,15 +1008,25 @@ class ContactsSingleScreen extends Component {
         })
     };
     handleOnPressDeleteVaccines = (index) => {
-        console.log("DeletePressed: ", index);
-        let vaccinesReceived = _.cloneDeep(this.state.contact.vaccinesReceived);
-        vaccinesReceived.splice(index, 1);
-        this.setState(prevState => ({
-            contact: Object.assign({}, prevState.contact, {vaccinesReceived: vaccinesReceived}),
-            isModified: true
-        }), () => {
-            // console.log("After deleting the Vaccines: ", this.state.contact);
-        })
+        Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.deleteVaccine, this.state.translation), [
+            {
+                text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
+                    console.log('Cancel pressed')
+                }
+            },
+            {
+                text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
+                    let vaccinesReceived = _.cloneDeep(this.state.contact.vaccinesReceived);
+                    vaccinesReceived.splice(index, 1);
+                    this.setState(prevState => ({
+                        contact: Object.assign({}, prevState.contact, {vaccinesReceived: vaccinesReceived}),
+                        isModified: true
+                    }), () => {
+                        // console.log("After deleting the Vaccines: ", this.state.contact);
+                    })
+                }
+            }
+        ]);
     };
 
     // Contact changes handlers
@@ -2255,7 +2267,7 @@ class ContactsSingleScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
     },
     headerContainer: {
         flex: 1,

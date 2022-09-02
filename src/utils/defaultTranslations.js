@@ -395,6 +395,7 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DOCUMENT': 'Are you sure you want to delete this document?',
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ADDRESS': 'Are you sure you want to delete this address?',
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE': 'Are you sure you want to delete this date range?',
+    'LNG_DIALOG_CONFIRM_DELETE_VACCINE': 'Are you sure you want to delete this vaccine?',
 
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ANSWER': 'Are you sure you want to delete this answer?',
     //TODO add to backend

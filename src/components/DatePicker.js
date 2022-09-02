@@ -4,7 +4,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {useState} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, TouchableWithoutFeedback} from 'react-native';
 import PropTypes from 'prop-types';
 import { TextField } from 'react-native-material-textfield';
 import DateTimePicker from 'react-native-modal-datetime-picker';
@@ -52,6 +52,9 @@ const DatePicker = React.memo(({
 
         return (
             <View style={[{flexDirection: 'row', marginVertical: 8}, style]}>
+                <TouchableWithoutFeedback
+                    onPress={handleDateCancelled}
+                >
                 <View style={{flex: 1}}>
                     {newDate !== null && newDate !== undefined && newDate !== '' ? (
                             <View>
@@ -95,6 +98,7 @@ const DatePicker = React.memo(({
                         ) : new Date()}
                     />
                 </View>
+                </TouchableWithoutFeedback>
                 {
                     tooltip.hasTooltip === true ? (
                         <TooltipComponent

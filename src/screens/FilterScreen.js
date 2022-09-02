@@ -298,19 +298,10 @@ class FilterScreen extends Component {
         )
     };
 
-    handleRenderLabel = (props) => ({ route, index }) => {
+    handleRenderLabel = (props) => ({ route, focused }) => {
         const { translation } = this.props;
 
         if (props.navigationState.routes !== null) {
-            // const inputRange = props.navigationState.routes.map((x, i) => i);
-            //
-            // const outputRange = inputRange.map(
-            //     inputIndex => (inputIndex === index ? styles.textColor : styles.disabledColor)
-            // );
-            // const color = props.position.interpolate({
-            //     inputRange,
-            //     outputRange: outputRange,
-            // });
 
             return (
                 <Animated.Text style={{

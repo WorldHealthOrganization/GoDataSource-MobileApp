@@ -40,6 +40,7 @@ import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import styles from './../styles';
+import colors from "../styles/colors";
 
 class FollowUpsSingleScreen extends Component {
 
@@ -361,23 +362,15 @@ class FollowUpsSingleScreen extends Component {
         )
     };
 
-    handleRenderLabel = (props) => ({ route, index }) => {
-        // const inputRange = props.navigationState.routes.map((x, i) => i);
-        //
-        // const outputRange = inputRange.map(
-        //     inputIndex => (inputIndex === index ? styles.textColor : styles.disabledColor)
-        // );
-        // const color = props.position.interpolate({
-        //     inputRange,
-        //     outputRange: outputRange,
-        // });
+    handleRenderLabel = (props) => ({ route, focused }) => {
 
         return (
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
                 flex: 1,
-                alignSelf: 'center'
+                alignSelf: 'center',
+                color: focused ? colors.primaryColor : this.props.isNew ? colors.secondaryColor : colors.textColor
             }}>
                 {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
