@@ -338,7 +338,7 @@ const style = StyleSheet.create({
         justifyContent: 'space-between'
     },
     sectionedMultiSelectDropdownLabel: {
-        color: styles.secondaryColor,
+        color: styles.textColor,
         fontFamily: 'Roboto-Regular',
         fontSize: 14
     },
