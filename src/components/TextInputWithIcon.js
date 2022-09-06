@@ -11,6 +11,7 @@ import {connect} from "react-redux";
 import translations from './../utils/translations';
 import get from 'lodash/get';
 import styles from './../styles';
+import colors from "../styles/colors";
 
 class TextInputWithIcon extends Component {
     searchRef = React.createRef();
@@ -41,6 +42,7 @@ class TextInputWithIcon extends Component {
                     value={this.props.value}
                     style={style.textInput}
                     placeholder={getTranslation(translations.generalLabels.searchLabel, this.props.translation)}
+                    placeholderTextColor={colors.secondaryColor}
                     underlineColorAndroid={'transparent'}
                     onChangeText={this.handleTextChange}
                     onSubmitEditing={this.handleOnSubmitEditing}

@@ -304,7 +304,7 @@ const addressFields = {
             textsStyleArray: [{color: styles.backgroundColor}],
             onPressArray: [],
             objectType: 'Address',
-            icon: 'delete'
+            iconArray: ['delete']
         }
     ]
 };
@@ -642,7 +642,7 @@ const labResultsFilterScreenNoContactPermission = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                icon: 'delete'
+                iconArray: ['delete']
             }
         ]
     }
@@ -707,7 +707,7 @@ const labResultsFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                icon: 'delete'
+                iconArray: ['delete']
             }
         ]
     }
@@ -916,7 +916,7 @@ const caseSingleScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Documents',
-                icon: 'delete'
+                iconArray: ['delete']
             }
         ]
     },
@@ -962,7 +962,7 @@ const caseSingleScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Vaccines',
-                icon: 'delete'
+                iconArray: ['delete']
             }
         ]
     },
@@ -1205,7 +1205,7 @@ const caseSingleScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'DateRanges',
-                icon: 'delete'
+                iconArray: ['delete']
             }
         ]
     },
@@ -1253,7 +1253,7 @@ const eventsFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                icon: 'delete'
+                iconArray: ['delete']
             }
         ]
     }
@@ -1503,7 +1503,7 @@ const eventSingleScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Documents',
-                icon: 'delete'
+                iconArray: ['delete']
             }
         ]
     },
@@ -1669,7 +1669,7 @@ const personFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                icon: 'delete'
+                iconArray: ['delete']
             }
         ]
     }
@@ -1832,7 +1832,7 @@ const followUpsFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                icon: 'delete'
+                iconArray: ['delete']
             }
         ]
     }
@@ -1900,7 +1900,7 @@ const helpFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                icon: 'delete'
+                iconArray: ['delete']
             }
         ]
     }
@@ -2086,7 +2086,7 @@ const casesFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                icon: 'delete'
+                iconArray: ['delete']
             }
         ]
     }

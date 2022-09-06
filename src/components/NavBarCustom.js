@@ -142,7 +142,8 @@ const style = StyleSheet.create({
     title: {
         fontSize: 16,
         fontFamily: 'Roboto-Medium',
-        marginLeft: 16
+        marginLeft: 16,
+        textTransform: 'capitalize'
     },
     containerLowerNavBar: {
         alignItems: 'center',
