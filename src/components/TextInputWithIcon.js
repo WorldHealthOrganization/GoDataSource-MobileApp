@@ -41,6 +41,7 @@ class TextInputWithIcon extends Component {
                     value={this.props.value}
                     style={style.textInput}
                     placeholder={getTranslation(translations.generalLabels.searchLabel, this.props.translation)}
+                    placeholderTextColor={styles.secondaryColor}
                     underlineColorAndroid={'transparent'}
                     onChangeText={this.handleTextChange}
                     onSubmitEditing={this.handleOnSubmitEditing}
