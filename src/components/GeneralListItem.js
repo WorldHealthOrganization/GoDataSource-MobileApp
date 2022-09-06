@@ -10,9 +10,13 @@ import {StyleSheet, Text, View} from 'react-native';
 // the material ui library, since it provides design and animations out of the box
 import ElevatedView from 'react-native-elevated-view';
 import ActionsBar from './ActionsBar';
-import {getTranslation} from './../utils/functions';
+import {checkPermissions, getTranslation} from './../utils/functions';
 import styles from './../styles';
-import { ISO_8601 } from 'moment';
+import {ISO_8601} from 'moment';
+import PermissionComponent from "./PermissionComponent";
+import lodashGet from "lodash/get";
+import {connect} from "react-redux";
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
 GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondComponent, thirdComponent, hasActionsBar, textsArray, textsStyleArray, onPressArray, arrayPermissions, onPermissionDisable, outbreakPermissions, secondaryOutbreakPermissions, actionsBarContainerStyle, containerStyle, translation, hasSecondaryActionsBar, secondaryTextsArray, secondaryTextsStyleArray, secondaryOnPressArray, secondaryArrayPermissions}) => {
     // console.log('GeneralListItem render called');
@@ -67,16 +71,22 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                     />) : (null)
                 }
                 {
-                    hasSecondaryActionsBar ? (<ActionsBar
-                        textsArray={secondaryTextsArray}
-                        // textsStyleArray={secondaryTextsStyleArray}  // I commented this because it cancels the style from ActionBar for card buttons
-                        onPressArray={secondaryOnPressArray}
-                        containerStyle={{height: secondaryTextsArray.length !== 0 ? 32 : 0}}
-                        isEditMode={true}
-                        translation={translation}
-                        outbreakPermissions={secondaryOutbreakPermissions}
-                        arrayPermissions={secondaryArrayPermissions}
-                    />) : (null)
+                    hasSecondaryActionsBar ?
+                        (<PermissionComponent
+                                render={() => (<ActionsBar
+                                    textsArray={secondaryTextsArray}
+                                    // textsStyleArray={secondaryTextsStyleArray}  // I commented this because it cancels the style from ActionBar for card buttons
+                                    onPressArray={secondaryOnPressArray}
+                                    containerStyle={{height: secondaryTextsArray.length !== 0 ? 32 : 0}}
+                                    isEditMode={true}
+                                    translation={translation}
+                                    outbreakPermissions={secondaryOutbreakPermissions}
+                                    arrayPermissions={secondaryArrayPermissions}
+                                />)}
+                                outbreakPermissions={[].concat.apply([],secondaryOutbreakPermissions)}
+                                permissionsList={[].concat.apply([],secondaryArrayPermissions)}
+                            />
+                        ) : (null)
                 }
             </View>
         </ElevatedView>
@@ -115,4 +125,13 @@ const style = StyleSheet.create({
     },
 });
 
-export default (GeneralListItem);
+function mapStateToProps(state) {
+    return {
+        permissions: lodashGet(state, 'role', []),
+        outbreak: lodashGet(state, 'outbreak', null)
+    };
+}
+
+export default connect(
+    mapStateToProps,
+)(GeneralListItem);

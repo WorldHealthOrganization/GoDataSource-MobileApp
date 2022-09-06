@@ -366,7 +366,8 @@ const style = StyleSheet.create({
     container: {
         backgroundColor: styles.backgroundColor,
         flex: 1,
-        width: '100%'
+        width: '100%',
+        paddingRight: Platform.OS === 'ios' ? 10 : undefined
     },
     topNavContainer: {
         borderBottomWidth: 1,

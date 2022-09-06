@@ -16,7 +16,7 @@ import PermissionComponent from './PermissionComponent';
 import {Icon} from 'react-native-material-ui';
 import styles from './../styles';
 
-ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, outbreakPermissions, onPermissionDisable, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation, icon}) => (
+ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, outbreakPermissions, onPermissionDisable, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation, iconArray}) => (
     <View style={[style.containerStyle, containerStyle]}>
         {
             isEditMode !== undefined && isEditMode !== null && isEditMode === true ? (
@@ -81,7 +81,7 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
                             return (
                                 <Ripple
                                     key={index}
-                                    style={[icon ? style.deleteBtn : style.defaultBtn]}
+                                    style={[Array.isArray(iconArray) && iconArray[index] ? style.deleteBtn : style.defaultBtn]}
                                     onPress={onPressArray && onPressArray[index] ? () => {
                                         onPressArray[index](addressIndex)
                                     } : () => {
@@ -89,7 +89,7 @@ ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArra
                                     }}
                                 >
                                     {
-                                        icon ? <Icon name="delete" color={styles.backgroundColor} size={18} /> : null
+                                        Array.isArray(iconArray) && iconArray[index] ? <Icon name="delete" color={styles.backgroundColor} size={18} /> : null
                                     }
                                     <Text style={[
                                         textsStyleArray && Array.isArray(textsStyleArray) &&
@@ -155,7 +155,16 @@ const style = StyleSheet.create({
         paddingHorizontal: 8
     },
     defaultBtn: {
-        width: '100%'
+        alignItems: 'center',
+        backgroundColor: styles.primaryColor,
+        borderRadius: 4,
+        color: styles.backgroundColor,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginHorizontal: 0,
+        paddingVertical: 4,
+        paddingHorizontal: 8
     }
 });
 

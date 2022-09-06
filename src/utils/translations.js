@@ -531,6 +531,7 @@ const addressFieldLabels = {
     latitude: 'LNG_ADDRESS_FIELD_LABEL_LATITUDE',
     deleteButton: 'LNG_COMMON_BUTTON_DELETE',
     copyAddress: 'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS',
+    copyAddressContact: 'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS_CONTACT',
     isThePersonNextToYou: 'LNG_ADDRESS_FIELD_LABEL_IS_THE_PERSON_NEXT_TO_YOU'
 };
 

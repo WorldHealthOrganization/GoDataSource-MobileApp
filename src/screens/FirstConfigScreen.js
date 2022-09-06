@@ -220,7 +220,8 @@ const style = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         position: "absolute",
-        top: 24
+        top: 24,
+        zIndex: 10
     },
     topNavLinksIcon: {
         color: styles.secondaryColor,
