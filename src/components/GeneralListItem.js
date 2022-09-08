@@ -60,7 +60,7 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                 {
                     hasActionsBar ? (<ActionsBar
                         textsArray={textsArray}
-                        // textsStyleArray={textsStyleArray}  // I commented this because it cancels the style from ActionBar for card buttons
+                        textsStyleArray={textsStyleArray}
                         onPressArray={onPressArray}
                         containerStyle={{height: textsArray.length !== 0 ? 30 : 0}}
                         isEditMode={true}
@@ -75,7 +75,7 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                         (<PermissionComponent
                                 render={() => (<ActionsBar
                                     textsArray={secondaryTextsArray}
-                                    // textsStyleArray={secondaryTextsStyleArray}  // I commented this because it cancels the style from ActionBar for card buttons
+                                    textsStyleArray={secondaryTextsStyleArray}
                                     onPressArray={secondaryOnPressArray}
                                     containerStyle={{height: secondaryTextsArray.length !== 0 ? 32 : 0}}
                                     isEditMode={true}

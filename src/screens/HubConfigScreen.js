@@ -337,7 +337,8 @@ class FirstConfigScreen extends Component {
                                     {
                                         // height: this.state.databaseId === this.state.databaseToBeDeleted && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId)) ? '45%' :'25%',
                                         justifyContent: 'space-between',
-                                        margin: 15
+                                        margin: 15,
+                                        backgroundColor: styles.backgroundColor
                                     }
                                     ]
                             }>
@@ -346,17 +347,18 @@ class FirstConfigScreen extends Component {
                                     label={getTranslation(translations.hubConfigScreen.deleteHubButton, this.props.translation)}
                                     // containerStyle={{height: 20}}
                                 />
-                                <Section label={getTranslation(translations.hubConfigScreen.confirmationDeleteHub, this.props.translation)} labelSize={'normal'}
+                                <Section label={getTranslation(translations.hubConfigScreen.confirmationDeleteHub, this.props.translation)} labelSize={'normal'} containerStyle={{backgroundColor: styles.backgroundColor}}
                                          />
                             </View>
 
                             {
                                 this.state.databaseId === this.state.databaseToBeDeleted && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId)) ? (
-                                    <View style={{marginHorizontal}}>
+                                    <View style={{marginHorizontal, backgroundColor: styles.backgroundColor}}>
                                         <Section
                                             label={getTranslation(translations.hubConfigScreen.replacementHubsLabel, this.props.translation)}
                                             labelSize={'normal'}
                                             textStyle={{marginLeft: 0}}
+                                            containerStyle={{backgroundColor: styles.backgroundColor}}
                                         />
                                         <DropdownInput
                                             id={'hubReplacement'}

@@ -105,7 +105,8 @@ class NavigationDrawerListItem extends PureComponent {
                                 onPress={this.onPress}
                                 style={{
                                     container: {
-                                        backgroundColor: this.props.isSelected ? styles.primaryColorRgb : styles.backgroundColor
+                                        backgroundColor: this.props.isSelected ? styles.primaryColorRgb : styles.backgroundColor,
+                                        paddingRight: Platform.OS === 'ios' ? 10 : undefined
                                     },
                                     leftElementContainer: {
                                         marginLeft: 11

@@ -361,7 +361,7 @@ class ManualConfigScreen extends PureComponent {
                                     Available HUB language
                                 </Text>
                                 <Text style={style.subText} key={'languageSelectSubText'}>
-                                    Please select the language that you want the use. If you click continue without selecting a language the app will download all languages, resulting in potential long sync time
+                                    Please select the language that you want to use. If you click continue without selecting a language the app will download all languages, resulting in potential long sync time.
                                 </Text>
                                 <DropdownInput
                                     id={'languages'}

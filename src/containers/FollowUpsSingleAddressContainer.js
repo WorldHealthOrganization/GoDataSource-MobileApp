@@ -169,7 +169,8 @@ const style = StyleSheet.create({
     },
     subcontainerCardComponent: {
         alignItems: 'center',
-        flex: 1
+        flex: 1,
+        marginVertical: 4
     },
     container: {
         alignItems: 'center',

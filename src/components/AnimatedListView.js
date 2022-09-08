@@ -430,7 +430,7 @@ class AnimatedListView extends Component {
                     getTranslation(translations.usersScreen.phoneButtonLabel, this.props.translation)
                 ];
                 textsStyleArray = [
-                    [styles.buttonTextActionsBar, {}],
+                    [styles.buttonTextActionsBar, {color: styles.backgroundColor}],
                     [styles.buttonTextActionsBar, {fontSize: 14}],
                     [styles.buttonTextActionsBar, {}]];
                 onPressTextsArray = [

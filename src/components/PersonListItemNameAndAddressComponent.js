@@ -269,8 +269,8 @@ const style = StyleSheet.create({
         width: 30
     },
     cardHeaderMapIcon: {
-        height: 28,
-        width: 28
+        height: 30,
+        width: 30
     },
     cardContent: {
         padding: 16
