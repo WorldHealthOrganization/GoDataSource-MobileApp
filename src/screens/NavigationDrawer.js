@@ -144,7 +144,7 @@ class NavigationDrawer extends Component {
                     }
                 </View>
                 
-                <ScrollView scrollEnabled={true} style={{flex: 0.9}} contentContainerStyle={{flexGrow: 1}}>
+                <ScrollView scrollEnabled={true} style={{flex: 0.9}} contentContainerStyle={{flexGrow: 1, marginRight: 8}}>
                     {
                         Object.keys(config.sideMenuItems).map((item, index) => {
                             let addButton = false;
