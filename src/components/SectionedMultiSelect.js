@@ -95,6 +95,7 @@ class SectionedMultiSelect extends PureComponent {
                                     onChangeText={this.handleOnChangeText}
                                     // onSubmitEditing={this.handleOnChangeTextSearch}
                                     placeholder={this.props.searchPlaceholderText}
+                                    placeholderTextColor={styles.secondaryColor}
                                 />
                             </View>
                             {/** Toggle list button */}
@@ -367,6 +368,7 @@ const style = StyleSheet.create({
         paddingLeft: 16
     },
     sectionedMultiSelectModalSearchInput: {
+        color: styles.textColor,
         paddingHorizontal: 16,
         paddingVertical: 8
     },

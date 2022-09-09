@@ -47,10 +47,15 @@ const dangerButton = {
 };
 
 const buttonTextActionsBar = {
+    backgroundColor: colors.primaryColorRgb,
+    borderRadius: 4,
     color: colors.primaryColor,
-    fontFamily: 'Roboto-Medium',
-    fontSize: 16,
-    textAlign: 'center'
+    fontFamily: 'Roboto-Regular',
+    fontSize: 14,
+    justifyContent: 'center',
+    lineHeight: 26,
+    textAlign: 'center',
+    width: '100%'
 };
 
 export default {

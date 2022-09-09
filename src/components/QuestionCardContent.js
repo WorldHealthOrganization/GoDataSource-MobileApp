@@ -482,7 +482,7 @@ const customStyles = StyleSheet.create({
     },
     additionalQuestionContent: {
         paddingHorizontal: 16,
-        paddingVertical: 8
+        paddingVertical: 8,
     }
 });
 
