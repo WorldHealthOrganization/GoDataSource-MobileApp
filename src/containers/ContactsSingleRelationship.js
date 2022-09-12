@@ -182,14 +182,7 @@ class ContactsSingleRelationship extends Component {
                 secondaryText={secondaryText}
                 hasActionsBar={true}
                 textsArray={textsArray}
-                textsStyleArray={[
-                    {
-                        marginLeft: calculateDimension(14, false, this.props.screenSize),
-                        color: styles.primaryColor,
-                        fontFamily: 'Roboto-Medium',
-                        fontSize: 12
-                    }
-                ]}
+                textsStyleArray={style.editButtonStyle}
                 onPressArray={[
                     () => {this.props.onPressEditExposure(relation.item, relation.index)}
                     // () => {this.props.onPressDeleteExposure(relation.item, relation.index)}
@@ -276,6 +269,16 @@ const style = StyleSheet.create({
     listViewStyle: {
         flex: 1,
         paddingTop: 8
+    },
+    editButtonStyle: {
+        backgroundColor: styles.primaryColorRgb,
+        borderRadius: 4,
+        color: styles.primaryColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14,
+        lineHeight: 26,
+        textAlign: 'center',
+        width: '100%'
     }
 });
 
