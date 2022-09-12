@@ -123,7 +123,7 @@ class QuestionCardContent extends PureComponent {
         let width = calculateDimension(140, false, this.props.screenSize);
         let alternateWidth = calculateDimension(calculateWidth, false, this.props.screenSize);
         let style = {
-            width: item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? width : alternateWidth
+            width: item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? alternateWidth : alternateWidth
         };
         let source = cloneDeep(this.props.source);
         if (!source) {
