@@ -105,8 +105,7 @@ class NavigationDrawerListItem extends PureComponent {
                                 onPress={this.onPress}
                                 style={{
                                     container: {
-                                        backgroundColor: this.props.isSelected ? styles.primaryColorRgb : styles.backgroundColor,
-                                        paddingRight: Platform.OS === 'ios' ? 10 : undefined
+                                        backgroundColor: this.props.isSelected ? styles.primaryColorRgb : styles.backgroundColor
                                     },
                                     leftElementContainer: {
                                         marginLeft: 11
@@ -184,6 +183,7 @@ NavigationDrawerListItem.defaultProps = {
 const style = StyleSheet.create({
     container: {
         flexDirection: 'row',
+        paddingRight: Platform.OS === 'ios' ? 10 : 0,
         width: '100%'
     },
     containerWrapper: {

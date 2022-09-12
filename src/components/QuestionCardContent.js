@@ -469,7 +469,7 @@ const customStyles = StyleSheet.create({
         borderRadius: 4,
         marginHorizontal: -16,
         marginVertical: -8,
-        width: 360
+        width: 400
     },
     questionMarkupHeaderText: {
         color: styles.primaryAltColor
