@@ -7,21 +7,21 @@ import React, {Component} from 'react';
 import {Alert, BackHandler, StyleSheet, View} from 'react-native';
 import NavBarCustom from './../components/NavBarCustom';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import {bindActionCreators, compose} from "redux";
 import lodashGet from 'lodash/get';
 import HelpSingleDetailsContainer from './../containers/HelpSingleDetailsContainer';
 import Breadcrumb from './../components/Breadcrumb';
 import {removeErrors} from './../actions/errors';
 import {getTranslation} from './../utils/functions';
 import translations from './../utils/translations';
-import config from './../utils/config';
+import withPincode from './../components/higherOrderComponents/withPincode';
 import ViewHOC from "../components/ViewHOC";
+import {Navigation} from "react-native-navigation";
+import {setDisableOutbreakChange} from "../actions/outbreak";
+import styles from './../styles';
 
 class HelpSingleScreen extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -35,15 +35,23 @@ class HelpSingleScreen extends Component {
     }
 
     componentDidMount() {
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setDisableOutbreakChange(true);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
     }
 
     componentWillUnmount() {
+        this.navigationListener.remove();
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
     }
     
     handleBackButtonClick() {
-        this.props.navigator.pop();
+        Navigation.pop(this.props.componentId);
         return true;
     };
 
@@ -75,12 +83,12 @@ class HelpSingleScreen extends Component {
                                     getTranslation(translations.helpScreen.helpTitle, this.props.translation),
                                     getTranslation(translations.helpScreen.helpViewItemTitle, this.props.translation)
                                 ]}
-                                navigator={this.props.navigator}
+                                componentId={this.props.componentId}
                                 onPress={this.handlePressBreadcrumb}
                             />
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
@@ -94,11 +102,13 @@ class HelpSingleScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 }
 
@@ -106,8 +116,8 @@ class HelpSingleScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: styles.backgroundColor,
+        flex: 1
     },
     breadcrumbContainer: {
         flex: 1,
@@ -126,8 +136,12 @@ function mapStateToProps(state) {
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        removeErrors
+        removeErrors,
+        setDisableOutbreakChange
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(HelpSingleScreen);
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchProps)
+)(HelpSingleScreen);

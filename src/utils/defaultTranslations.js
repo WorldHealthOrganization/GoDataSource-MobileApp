@@ -1,4 +1,48 @@
 export default {
+
+    'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL': "Lab Results",
+    //labResultsScreen
+    'LNG_PAGE_LIST_LAB_RESULTS_TITLE': "Lab Results",
+    'LNG_LAB_RESULTS_NO_RESULTS_FOUND_LABEL': "There are no lab results to be displayed",
+    'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME': "Lab name",
+    'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT': "Date of the result",
+    'LNG_LAB_RESULT_FIELD_LABEL_STATUS': "Status",
+    'LNG_LAB_RESULT_FIELD_LABEL_RESULT': "Result",
+    'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN': "Sample taken",
+
+    'LNG_RELATIONSHIP_FIELD_LABEL_RELATION': 'Context of exposure',
+
+    //labResultSingleScreen
+    'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID': "Sample lab ID",
+    'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED': "Sample delivered to lab",
+    'LNG_LAB_RESULT_FIELD_LABEL_NOTES': "Notes",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE': 'Variant / Strain',
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE': "Has variant / strain?",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON': "Reason",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT': "Date sample sent for determining variant / strain",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB': "Laboratory",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT': "Variant / Strain result date",
+    'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT': "Variant / Strain result",
+    'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING': "Sample tested",
+    'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE': "Sample type",
+    'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE': "Test type",
+    'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR': "Tested for",
+    'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT': "Quantitative result",
+    'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT': "Modify lab result",
+    'LNG_MENU_ITEM_VIEW_LAB_RESULTS': "View lab results",
+    'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT': "Are you sure you want to delete this lab result?",
+    'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_LAB_RESULT': "Delete lab result",
+    'LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON': "Create lab result",
+    'LNG_DIALOG_CONFIRM_DELETE_ITEM': 'Are you sure you want to delete this item?',
+
+    //labResultsFilter
+    'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_TYPE': "Person type",
+
+    //eventsFilter
+    //TODO: Add to the API
+    'LNG_EVENT_FILTER_SCREEN_TITLE': 'Events filters',
+
+
     //navigationDrawer
     'LNG_NAVIGATION_DRAWER_ACTIVE_OUTBREAK': 'Active outbreak',
     'LNG_NAVIGATION_DRAWER_FOLLOW_UPS': 'Follow-ups',
@@ -11,7 +55,6 @@ export default {
     'LNG_NAVIGATION_DRAWER_LOGOUT': 'Logout',
     'LNG_LAYOUT_MENU_ITEM_HELP_LABEL': 'Help & support',
 
-    // TODO add to backend
     'LNG_NAVIGATION_DRAWER_ADD_LANGUAGE_PACKS': 'Add languagePacks',
     'LNG_MOBILE_NAVIGATION_DRAWER_COMMUNITY_LINK': 'Community',
 
@@ -97,6 +140,9 @@ export default {
     'LNG_ISOLATION_ADD_ANOTHER_ISOLATION_MESSAGE': 'Add another isolation date range',
     'LNG_DOCUMENT_ADD_NEW_DOCUMENT_MESSAGE': 'Add document',
     'LNG_DOCUMENT_ADD_ANOTHER_DOCUMENT_MESSAGE': 'Add another document',
+    'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT_OF_CONTACT': 'Delete contact of contact',
+
+    'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE': 'Delete case',
 
     'LNG_CASE_FIELD_LABEL_FIRST_NAME': 'First name',
     'LNG_CASE_FIELD_LABEL_MIDDLE_NAME': 'Middle name',
@@ -114,8 +160,24 @@ export default {
     'LNG_CASE_FIELD_LABEL_CASE_ID': 'Case ID',
     'LNG_MOBILE_CASE_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
 
+    'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE': 'Details',
+    'LNG_PAGE_MODIFY_EVENT_TAB_ADDRESS_TITLE': 'Address',
+
+    'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT': 'Delete event',
+    //TODO: Add translations to API
+    'LNG_EVENT_SINGLE_SCREEN_ADD_NEW_EVENT_TITLE_LABEL': 'Add event',
+    'LNG_CASE_LIST_SCREEN_NO_EVENTS': 'There are no events to display',
+
     'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE': 'Document Type',
     'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER': 'Document number',
+    'LNG_PAGE_LIST_EVENTS_TITLE': 'Events',
+    'LNG_LOCATION_FIELD_LABEL_NAME': 'Name',
+    'LNG_EVENT_FIELD_LABEL_NAME': 'Name',
+    'LNG_EVENT_FIELD_LABEL_DATE' : 'Date',
+    'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING': 'Date of reporting',
+    'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Date of reporting approximate',
+    'LNG_EVENT_FIELD_LABEL_DESCRIPTION': 'Description',
+    'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID': 'Assigned User',
 
     'LNG_CASE_FIELD_LABEL_CLASSIFICATION': 'Classification',
     'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET': 'Date of onset',
@@ -127,8 +189,11 @@ export default {
     'LNG_CASE_FIELD_LABEL_DECEASED': 'Deceased',
     'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL': 'Was Burial Safety Performed?',
     'LNG_CASE_FIELD_LABEL_DATE_OF_DECEASE': 'Date of decease',
-    'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION': 'Place of burial',
-    'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION': 'Burial Place Name',
+    'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL': 'Place of burial',
+    'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME': 'Burial Place Name',
+    'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME': 'Center name',
+
+    'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP': 'Day of follow-up',
 
     'LNG_DATE_FIELD_LABEL_FROM': 'From',
     'LNG_DATE_FIELD_LABEL_TO': 'To',
@@ -165,13 +230,20 @@ export default {
 
     'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID': 'Follow-up assigned team',
 
+    'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK': 'Invalid ID (accepted: {{mask}})',
+
+    'LNG_ENTITY_FIELD_LABEL_VACCINE': 'Vaccine',
+    'LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS': 'Vaccine status',
+    'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS': 'Pregnancy status',
+
 
     //exposureScreen
     'LNG_RELATIONSHIP_SCREEN_EDIT_EXPOSURE_TITLE': 'Edit exposure',
     'LNG_RELATIONSHIP_SCREEN_ADD_EXPOSURE_TITLE': 'Add exposure',
 
-    'LNG_RELATIONSHIP_LABEL_CHOOSE_CASE_OR_EVENT': 'Choose a case/event',
+    'LNG_RELATIONSHIP_LABEL_CHOOSE_CASE_OR_EVENT': 'Person',
     'LNG_RELATIONSHIP_LABEL_DATE_OF_LAST_CONTACT': 'Date of last contact',
+    'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT': 'Date of first contact',
     'LNG_RELATIONSHIP_LABEL_IS_CONTACT_DATE_ESTIMATED': 'Is contact date estimated?',
     'LNG_RELATIONSHIP_LABEL_CERTAINTY_LEVEL': 'Certainty level',
     'LNG_RELATIONSHIP_LABEL_EXPOSURE_TYPE': 'Exposure type',
@@ -189,17 +261,19 @@ export default {
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_QUESTIONNAIRE_TAB': 'Questionnaire',
 
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_MISSING': 'Missing',
-    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE': 'Deleted',
+    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE': 'Delete follow-up',
     'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE': 'Deceased',
 
-    // TODO change backand translation
-    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT': 'View contact',
+    'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT': 'Edit contact',
+
+    'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CONTACT': 'View contact',
 
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_FOLLOW_UP': 'Are you sure you want to delete this follow-up?',
 
     'LNG_FOLLOW_UP_FIELD_LABEL_DATE': 'Date',
     'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID': 'Status',
     'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED': 'Targeted',
+    'LNG_FOLLOW_UP_FIELD_LABEL_TEAM': 'Team',
 
 
     //casesScreen
@@ -248,12 +322,17 @@ export default {
     'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_QUESTIONNAIRE': 'Questionnaire',
     'LNG_FOLLOW_UP_AGENDA_FOLLOW_UP_ADDRESS': 'Address',
 
+    'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT': 'Add contact of contact',
+
     //followUpsScreenStatusFilterValues
     'LNG_FOLLOW_UPS_DROP_DOWN_FILTER_STATUS_LABEL_ALL': 'All',
     'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED': 'Not Performed',
     'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_ATTEMPTED': 'Not Attempted',
     'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED': 'Missed',
 
+    'LNG_DIAL_NUMBER_DESCRIPTION': 'Are you sure you want to dial this number?',
+
+    'LNG_LAB_RESULTS_FILTER_TITLE': 'Lab results filters',
 
     //alertMessages
     // alert general
@@ -277,6 +356,10 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_CASE': 'Are you sure you want to delete this case?',
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DISCARD_ALL_CHANGES': 'Are you sure you want to discard all changes?',
 
+    //events
+    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_EVENT': 'Are you sure you want to delete this event?',
+    'LNG_DIALOG_CONFIRM_DELETE_EVENT': 'Are you sure you want to delete this event?',
+
     // contacts
     'LNG_DIALOG_ALERT_MESSAGE_CANNOT_DELETE_CONTACT_LAST_EXPOSURE': 'Cannot delete the contact last exposure',
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_EXPOSURE': 'The exposure will be removed from the database. Are you sure you want to delete this exposure?',
@@ -294,6 +377,11 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_MAKE_SURE_YOU_COMPLETE_ALL_FIELDS': 'Please make sure you have completed the fields',
     'LNG_DIALOG_ALERT_MESSAGE_ERROR_OCCURED_WHILE_GETTING_CONTACTS': 'An error occurred while getting contacts',
 
+    'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION': "The ID should match the pattern defined for this outbreak: {{mask}}",
+
+    //TODO add to backend
+    "LNG_MOBILE_DIALOG_ALERT_MESSAGE_INVALID_EMAIL_ADDRESSES": "Invalid email addresses",
+
     // mapsPopup
     'LNG_DIALOG_ALERT_MESSAGE_SELECT_MAPS_APP_THAT_YOU_WOULD_LIKE_TO_USER': 'Select the maps application that you would like to use',
 
@@ -307,6 +395,7 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DOCUMENT': 'Are you sure you want to delete this document?',
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ADDRESS': 'Are you sure you want to delete this address?',
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE': 'Are you sure you want to delete this date range?',
+    'LNG_DIALOG_CONFIRM_DELETE_VACCINE': 'Are you sure you want to delete this vaccine?',
 
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ANSWER': 'Are you sure you want to delete this answer?',
     //TODO add to backend
@@ -352,6 +441,8 @@ export default {
     'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER': 'Write answer',
     'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE': 'Select date',
     'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER': 'Select answer',
+    // TODO add to backend
+    'LNG_QUESTIONNAIRE_LABEL_ADDITIONAL_QUESTIONS': 'Additional Questions',
 
 
     //firstConfigScreen
@@ -393,6 +484,7 @@ export default {
     'LNG_ADDRESS_FIELD_LABEL_LATITUDE': 'Latitude',
     'LNG_COMMON_BUTTON_DELETE': 'Delete',
     'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS': 'Copy case address',
+    'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS_CONTACT': 'Copy contact address',
     'LNG_ADDRESS_FIELD_LABEL_IS_THE_PERSON_NEXT_TO_YOU': 'Capture coordinates',
 
 
@@ -459,7 +551,12 @@ export default {
     'LNG_HUB_CONFIGURATION_SCREEN_ADD_HUB_BUTTON': 'Add HUB',
     'LNG_HUB_CONFIGURATION_SCREEN_OTHER_HUB_CONFIGURATIONS_LABEL': 'Other hub configurations',
     'LNG_HUB_CONFIGURATION_SCREEN_MAKE_ACTIVE_ACTION': 'Make Active',
-
+    // TODO add to backend translation
+    'LNG_HUB_CONFIGURATION_SCREEN_DELETE_HUB': 'Delete Hub',
+    'LNG_HUB_CONFIGURATION_SCREEN_CONFIRM_DELETE_HUB': "Are you sure you want to delete the hub?",
+    "LNG_HUB_CONFIGURATION_SCREEN_REPLACEMENT_HUBS": "Replacement Hubs",
+    "LNG_HUB_CONFIGURATION_SCREEN_REPLACEMENT_HUBS_LABEL": "Please select the Hub that you would like to switch to",
+    'LNG_HUB_CONFIGURATION_SCREEN_DELETE_HUB_SYNC_DATA': "There is data that has not been sent to the server and will be lost. Please synchronize your data first, then try to delete the hub again.",
     // Errors
     'LNG_HUB_CONFIGURATION_SCREEN_ERROR_SET_ACTIVE_HUB': 'Error set active HUB',
     'LNG_HUB_CONFIGURATION_SCREEN_ERROR_OCCURED_WHILE_SETTING_ACTIVE_HUB': 'An error occurred while setting the new active HUB',
@@ -503,7 +600,6 @@ export default {
 
 
     // LanguageModalComponent
-    //TODO add all to backend
     'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_INFO_MESSAGE': 'Please select the packs that you want to download. \nClicking download means that a new sync will start so please make sure that you are connected to the internet before proceeding.',
     'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_DOWNLOAD_BUTTON': 'Download language packs',
     'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_ALERT_NO_LANGUAGE': 'Please select at least one language before proceeding to download',

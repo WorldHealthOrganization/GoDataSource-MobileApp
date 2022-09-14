@@ -164,7 +164,7 @@ function createQueryFollowUps(outbreakId, followUpsFilter, userTeams, contactsFi
         query.group = `${aliasForFollowUps}._id`;
     }
 
-    if (get(contactsFilter, 'sort', null) !== null && offset) {
+    if (get(contactsFilter, 'sort', null) !== null && offset && lastElement) {
         query.offset = offset;
     }
 
@@ -194,6 +194,12 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
     }
     if (followUpFilter.statusId) {
         condition[`${aliasFollowUps}.statusId`] = followUpFilter.statusId
+    }
+    if (contactsFilter?.selectedIndexDay && contactsFilter.selectedIndexDay.length){
+        condition['indexDay'] = {
+            ['$gte']: get(contactsFilter, 'selectedIndexDay[0]', 0),
+            ['$lte']: get(contactsFilter, 'selectedIndexDay[1]', 150)
+        };
     }
     if (checkArrayAndLength(userTeams)) {
         condition['$or'] = [
@@ -327,7 +333,10 @@ export function getFollowUpsForContactId(contactId, outbreakId, userTeams) {
         ],
         condition: {
             'personId': contactId,
-            'teamId': {'$in': userTeams.map((e) => e.teamId)},
+            '$or': [
+                {'teamId': {'$in': userTeams.map((e) => e.teamId)}},
+                {'teamId': {'$is': null}},
+            ],
             'outbreakId': outbreakId,
             'deleted': 0
         }

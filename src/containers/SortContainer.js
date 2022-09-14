@@ -3,14 +3,14 @@ import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scroll-view';
 import get from 'lodash/get';
 import {calculateDimension, getTranslation} from '../utils/functions';
 import config from '../utils/config';
 import Button from '../components/Button';
-import styles from '../styles';
 import CardComponent from '../components/CardComponent';
-import translations from '../utils/translations'
+import translations from '../utils/translations';
+import styles from './../styles';
 
 class SortContainer extends Component {
     constructor(props) {
@@ -41,14 +41,11 @@ class SortContainer extends Component {
                 <Button
                     title={'Back'}
                     onPress={handleMoveToPrevieousScreenButton}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
-                    height={calculateDimension(25, true, screenSize)}
-                    width={calculateDimension(130, false, screenSize)}
-                    style={{
-                        marginVertical: calculateDimension(12.5, true, screenSize),
-                        marginHorizontal: calculateDimension(16, false, screenSize),
-                    }}
+                    color={styles.backgroundColor}
+                    titleColor={styles.textColor}
+                    height={calculateDimension(35, true, screenSize)}
+                    width={calculateDimension(164, false, screenSize)}
+                    style={{marginVertical: calculateDimension(16, true, screenSize)}}
                 />
 
                 <KeyboardAwareScrollView
@@ -65,45 +62,38 @@ class SortContainer extends Component {
                     </View>
                     {
                         filter.sort.length < sortCriteriaDropDownItems.length ?
-                            <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, screenSize), marginVertical: 20 }}>
-                                <Ripple
-                                    style={{
-                                        height: 25,
-                                        justifyContent: 'center'
-                                    }}
+                            <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, screenSize)}}>
+                                <Button
+                                    title={addSortRuleText}
                                     onPress={onPressAddSortRule}
-                                >
-                                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
-                                        {addSortRuleText}
-                                    </Text>
-                                </Ripple>
+                                    color={styles.primaryColor}
+                                    titleColor={styles.backgroundColor}
+                                    height={calculateDimension(35, true, screenSize)}
+                                    width={calculateDimension(130, false, screenSize)}
+                                    style={{marginVertical: calculateDimension(16, true, screenSize)}}
+                                />
                             </View> : null
                     }
                 </KeyboardAwareScrollView>
                 <View style={style.containerButtonApplyFilters}>
                     <Button
                         title={getTranslation(translations.generalLabels.applyFiltersButton, translation)}
-                        color={styles.buttonGreen}
-                        onPress={onPressApplyFilters}
-                        width={calculateDimension(247.5, false, screenSize)}
-                        height={calculateDimension(32, true, screenSize)}
-                        style={{
-                            marginRight: calculateDimension(6.5, false, screenSize),
-                        }}
+                        color={styles.primaryColor}
                         titleStyle={{ fontFamily: 'Roboto-Medium', fontSize: 14 }}
-                        titleColor={'white'}
+                        titleColor={styles.backgroundColor}
+                        onPress={onPressApplyFilters}
+                        width={calculateDimension(245, false, screenSize)}
+                        height={calculateDimension(35, true, screenSize)}
+                        style={{marginRight: calculateDimension(8, false, screenSize)}}
                     />
                     <Button
                         title={getTranslation(translations.generalLabels.resetFiltersButton, translation)}
-                        color={styles.buttonWhite}
-                        onPress={onPressResetFilters}
-                        width={calculateDimension(80.5, false, screenSize)}
-                        height={calculateDimension(32, true, screenSize)}
-                        style={{
-                            marginLeft: calculateDimension(6.5, false, screenSize),
-                        }}
+                        color={styles.backgroundColor}
                         titleStyle={{ fontFamily: 'Roboto-Medium', fontSize: 14 }}
-                        titleColor={'black'}
+                        titleColor={styles.textColor}
+                        onPress={onPressResetFilters}
+                        width={calculateDimension(90, false, screenSize)}
+                        height={calculateDimension(35, true, screenSize)}
                     />
                 </View>
             </View>
@@ -121,13 +111,12 @@ class SortContainer extends Component {
         const { screenSize } = this.props;
         const { designScreenSize } = config;
         return (
-            <ElevatedView key={cardIndex} elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView key={cardIndex} elevation={5} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, screenSize),
-                width: calculateDimension(designScreenSize.width - 32, false, screenSize),
-                marginVertical: 4,
-                minHeight: calculateDimension(72, true, screenSize)
+                minHeight: calculateDimension(72, true, screenSize),
+                width: calculateDimension(designScreenSize.width - 32, false, screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -140,7 +129,7 @@ class SortContainer extends Component {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
+            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -177,8 +166,6 @@ class SortContainer extends Component {
                 isEditModeForDropDownInput={true}
                 value={value}
                 index={cardIndex}
-                filter={filter}
-
                 onChangeSectionedDropDown={onChangeSectionedDropDown}
                 onChangeDropDown={onChangeDropDown}
                 onDeletePress={onDeletePress}
@@ -201,27 +188,27 @@ class SortContainer extends Component {
 };
 
 const style = StyleSheet.create({
+    container: {
+        alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        borderRadius: 4,
+        flex: 1
+    },
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
     },
     subcontainerCardComponent: {
         alignItems: 'center',
         flex: 1
     },
-    container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
-        borderRadius: 2,
-        alignItems: 'center',
-    },
     cardStyle: {
-        marginVertical: 4,
-        flex: 1
+        flex: 1,
+        marginVertical: 6
     },
     containerScrollView: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'
@@ -230,8 +217,7 @@ const style = StyleSheet.create({
         flex: 0,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 22,
-        marginTop: 10
+        marginVertical: 16
     }
 });
 

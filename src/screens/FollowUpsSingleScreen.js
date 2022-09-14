@@ -4,25 +4,24 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
+import geolocation from '@react-native-community/geolocation';
 import {Alert, Animated, BackHandler, Platform, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import {bindActionCreators, compose} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
 import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
 import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import {createFollowUp, updateFollowUpAndContact} from './../actions/followUps';
-import {removeErrors} from './../actions/errors';
+import {addFollowUp, createFollowUp, updateFollowUpAndContact} from './../actions/followUps';
 import _, {cloneDeep, sortBy} from 'lodash';
 import {
     calculateDimension,
-    createDate,
+    createDate, createStackFromComponent, daysSince,
     getTranslation,
     mapAnswers,
     reMapAnswers,
@@ -36,13 +35,14 @@ import moment from 'moment/min/moment.min';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import {checkRequiredQuestions, extractAllQuestions} from "../utils/functions";
 import constants from './../utils/constants';
-import lodashGet from "lodash/get";
+import withPincode from './../components/higherOrderComponents/withPincode';
+import {Navigation} from "react-native-navigation";
+import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
+import {setDisableOutbreakChange} from "../actions/outbreak";
+import styles from './../styles';
+import colors from "../styles/colors";
 
 class FollowUpsSingleScreen extends Component {
-
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -67,6 +67,13 @@ class FollowUpsSingleScreen extends Component {
     }
 
     componentDidMount() {
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setDisableOutbreakChange(true);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
 
         let isEditMode = _.get(this.props, 'isEditMode', true);
@@ -107,6 +114,8 @@ class FollowUpsSingleScreen extends Component {
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+
+        this.navigationListener.remove();
     }
 
     handleBackButtonClick() {
@@ -115,12 +124,7 @@ class FollowUpsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop(
-                            //     {
-                            //     animated: true,
-                            //     animationType: 'fade'
-                            // }
-                        )
+                        Navigation.pop(this.props.componentId)
                     }
                 },
                 {
@@ -130,12 +134,7 @@ class FollowUpsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop(
-                //     {
-                //     animated: true,
-                //     animationType: 'fade'
-                // }
-            )
+            Navigation.pop(this.props.componentId)
         }
         return true;
     }
@@ -147,85 +146,96 @@ class FollowUpsSingleScreen extends Component {
         return (
             <ViewHOC style={style.container}
                 showLoader={this && this.state && this.state.loading}
-                loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
+                loaderText={
+                    this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)
+                }
             >
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View
-                            style={[style.breadcrumbContainer]}>
-                            <Breadcrumb
-                                entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.followUpsSingleScreen.title, this.props.translation), ((this.state.contact && this.state.contact.firstName ? (this.state.contact.firstName + " ") : '') + (this.state.contact && this.state.contact.lastName ? this.state.contact.lastName : ''))]}
-                                navigator={this.props.navigator}
-                                onPress={this.handlePressBreadcrumb}
-                            />
-                            <View style={{ flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize) }}>
+                        <View style={style.headerContainer}>
+                            <View style={[style.breadcrumbContainer]}>
+                                <Breadcrumb
+                                    entities={[getTranslation(this.props && this.props.previousScreen ? this.props.previousScreen : translations.followUpsSingleScreen.title, this.props.translation), ((this.state.contact && this.state.contact.firstName ? (this.state.contact.firstName + " ") : '') + (this.state.contact && this.state.contact.lastName ? this.state.contact.lastName : ''))]}
+                                    componentId={this.props.componentId}
+                                    onPress={this.handlePressBreadcrumb}
+                                />
+                            </View>
+                            <View style={style.headerButtonSpacing}>
                                 <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.buttonGreen,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
+                                    elevation={0}
+                                    style={[
+                                        style.headerButton, 
+                                        {
+                                            width: calculateDimension(30, false, this.props.screenSize),
+                                            height: calculateDimension(30, true, this.props.screenSize)
+                                        }
+                                    ]}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15} />
+                                    <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={styles.textColor} size={18} />
                                     </Ripple>
                                 </ElevatedView>
-                                {
-                                    checkArrayAndLength(_.intersection(
-                                        _.get(this.props, 'role', []),
-                                        [
-                                            constants.PERMISSIONS_FOLLOW_UP.followUpAll,
-                                            constants.PERMISSIONS_FOLLOW_UP.followUpDelete,
-                                            constants.PERMISSIONS_CONTACT.contactAll,
-                                            constants.PERMISSIONS_CONTACT.contactView,
-                                        ]
-                                    )) ? (
-                                        <View>
-                                            <Menu
-                                                ref="menuRef"
-                                                button={
-                                                    <Ripple onPress={this.showMenu} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                                                        <Icon name="more-vert" />
-                                                    </Ripple>
-                                                }
-                                            >
-                                                <PermissionComponent
-                                                    render={() => (
-                                                        <MenuItem onPress={this.handleEditContact}>
-                                                            {getTranslation(translations.followUpsSingleScreen.editContactButton, this.props.translation)}
-                                                        </MenuItem>
-                                                    )}
-                                                    permissionsList={[
-                                                        constants.PERMISSIONS_CONTACT.contactAll,
-                                                        constants.PERMISSIONS_CONTACT.contactView
-                                                    ]}
-                                                />
-                                                <PermissionComponent
-                                                    render={() => (
-                                                        <MenuItem onPress={this.handleOnPressDelete}>
-                                                            {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
-                                                        </MenuItem>
-                                                    )}
-                                                    permissionsList={[
-                                                        constants.PERMISSIONS_FOLLOW_UP.followUpAll,
-                                                        constants.PERMISSIONS_FOLLOW_UP.followUpDelete
-                                                    ]}
-                                                />
-                                            </Menu>
-                                        </View>
-                                    ) : null
-                                }
                             </View>
+                            {
+                                checkArrayAndLength(_.intersection(
+                                    _.get(this.props, 'role', []),
+                                    [
+                                        constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                                        constants.PERMISSIONS_FOLLOW_UP.followUpDelete,
+                                        constants.PERMISSIONS_CONTACT.contactAll,
+                                        constants.PERMISSIONS_CONTACT.contactView,
+                                    ]
+                                )) ? (
+                                    <View>
+                                        <Menu
+                                            ref="menuRef"
+                                            button={
+                                                <Ripple
+                                                    style={[
+                                                        style.moreMenuButton, 
+                                                        {
+                                                            width: calculateDimension(30, false, this.props.screenSize),
+                                                            height: calculateDimension(30, true, this.props.screenSize)
+                                                        }
+                                                    ]}
+                                                    onPress={this.showMenu}
+                                                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                                                >
+                                                    <Icon name="more-vert" color={styles.textColor} size={24} />
+                                                </Ripple>
+                                            }
+                                            style={{top: 36}}
+                                        >
+                                            <PermissionComponent
+                                                render={() => (
+                                                    <MenuItem onPress={this.handleEditContact}>
+                                                        {getTranslation(translations.followUpsSingleScreen.editContactButton, this.props.translation)}
+                                                    </MenuItem>
+                                                )}
+                                                permissionsList={[
+                                                    constants.PERMISSIONS_CONTACT.contactAll,
+                                                    constants.PERMISSIONS_CONTACT.contactView
+                                                ]}
+                                            />
+                                            <PermissionComponent
+                                                render={() => (
+                                                    <MenuItem onPress={this.handleOnPressDelete}>
+                                                        {getTranslation(translations.followUpsSingleScreen.deleteButton, this.props.translation)}
+                                                    </MenuItem>
+                                                )}
+                                                permissionsList={[
+                                                    constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                                                    constants.PERMISSIONS_FOLLOW_UP.followUpDelete
+                                                ]}
+                                            />
+                                        </Menu>
+                                    </View>
+                                ) : null
+                            }
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
@@ -248,16 +258,18 @@ class FollowUpsSingleScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
-    handleOnIndexChange = (index) => {
+    handleOnIndexChange = _.throttle((index) => {
         this.setState({ index });
-    };
+    }, 300);
 
     handleRenderScene = ({ route }) => {
 
@@ -265,6 +277,7 @@ class FollowUpsSingleScreen extends Component {
             case 'genInfo':
                 return (
                     <FollowUpsSingleContainer
+                        routeKey={this.state.routes[this.state.index].key}
                         isNew={this.props.isNew}
                         isEditMode={this.state.isEditMode}
                         item={this.state.item}
@@ -290,7 +303,7 @@ class FollowUpsSingleScreen extends Component {
                         previousAnswers={this.state.previousAnswers}
                         contact={this.state.contact}
                         isNew={this.props.isNew}
-                        isEditMode={this.state.isEditMode}
+                        isEditMode={this.state.isEditMode && moment().diff(this.state.item.date) >= 0}
                         activeIndex={this.state.index}
                         onChangeTextAnswer={this.onChangeTextAnswer}
                         onChangeDateAnswer={this.onChangeDateAnswer}
@@ -330,36 +343,34 @@ class FollowUpsSingleScreen extends Component {
             <TabBar
                 {...props}
                 indicatorStyle={{
-                    backgroundColor: styles.buttonGreen,
+                    backgroundColor: styles.primaryColor,
                     height: 2
                 }}
                 style={{
-                    height: 41,
-                    backgroundColor: 'white'
+                    height: 36,
+                    backgroundColor: styles.backgroundColor
                 }}
+                tabStyle={{
+                    paddingHorizontal: 16,
+                    marginHorizontal: 0,
+                    textAlign: 'center'
+                }}
+                activeColor={styles.primaryColor}
+                inactiveColor={styles.secondaryColor}
                 renderLabel={this.handleRenderLabel(props)}
             />
         )
     };
 
-    handleRenderLabel = (props) => ({ route, index }) => {
-        const inputRange = props.navigationState.routes.map((x, i) => i);
-
-        const outputRange = inputRange.map(
-            inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
-        );
-        const color = props.position.interpolate({
-            inputRange,
-            outputRange: outputRange,
-        });
+    handleRenderLabel = (props) => ({ route, focused }) => {
 
         return (
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
                 flex: 1,
-                color: color,
-                alignSelf: 'center'
+                alignSelf: 'center',
+                color: focused ? colors.primaryColor : this.props.isNew ? colors.secondaryColor : colors.textColor
             }}>
                 {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
@@ -367,8 +378,11 @@ class FollowUpsSingleScreen extends Component {
     };
 
     checkRequiredFields = () => {
+        if (this.state.item.deleted){
+            return [];
+        }
         let checkRequiredFields = [];
-        if (this.state.item.statusId === config.followUpStatuses.notPerformed || this.state.item.statusId === translations.generalLabels.noneLabel) {
+        if (this.state.item.statusId === translations.generalLabels.noneLabel) {
             checkRequiredFields.push(getTranslation(_.get(config, 'followUpsSingleScreen.fields[1].label', 'Status'), this.props.translation));
         }
         return checkRequiredFields
@@ -399,7 +413,7 @@ class FollowUpsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        this.props.navigator.pop()
+                        Navigation.pop(this.props.componentId)
                     }
                 },
                 {
@@ -409,7 +423,7 @@ class FollowUpsSingleScreen extends Component {
                 }
             ])
         } else {
-            this.props.navigator.pop();
+            Navigation.pop(this.props.componentId);
         }
     };
 
@@ -439,16 +453,31 @@ class FollowUpsSingleScreen extends Component {
         }
     };
     onChangeDate = (value, id, objectType) => {
-        console.log("onChangeDate: ", value, id);
 
         if (objectType === 'FollowUp') {
+            let status = this.state.item.statusId;
+            let currentAnswers = this.state.currentAnswers;
+            let previousAnswers = this.state.previousAnswers;
+            let mappedQuestions = this.state.mappedQuestions;
+            let fillLocation = this.state.item.fillLocation;
+            if (id === 'date' && moment().diff(value) < 0){
+                status = translations.followUpStatuses.notPerformed;
+                fillLocation = false;
+            } else if (id === 'date' && moment().diff(value) >= 0) {
+                currentAnswers = {};
+                previousAnswers = {};
+                mappedQuestions = [];
+            }
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({}, prevState.item, { [id]: value }),
-                    isModified: true
+                    item: Object.assign({}, prevState.item, { [id]: value, statusId: status, fillLocation }),
+                    isModified: true,
+                    currentAnswers,
+                    previousAnswers,
+                    mappedQuestions,
                 })
                 , () => {
-                    console.log("onChangeDate", id, " ", value, " ", this.state.item);
+                    console.log("onChangeDate statusId", id, " ", value, " ", this.state.item);
                 }
             )
         } else {
@@ -468,7 +497,7 @@ class FollowUpsSingleScreen extends Component {
     onChangeSwitch = (value, id, objectType) => {
         // console.log("onChangeSwitch: ", value, id, this.state.item);
         if (id === 'fillLocation') {
-            navigator.geolocation.getCurrentPosition((position) => {
+            geolocation.getCurrentPosition((position) => {
                 this.setState(
                     (prevState) => ({
                         item: Object.assign({}, prevState.item, { [id]: value ? {geoLocation: { lat: position.coords.latitude, lng: position.coords.longitude }} : {geoLocation: { lat: null, lng: null }} }),
@@ -516,7 +545,7 @@ class FollowUpsSingleScreen extends Component {
 
     };
     onChangeDropDown = (value, id, objectType) => {
-        // console.log("onChangeDropDown: ", value, id, this.state.item);
+        console.log("onChangeDropDown: ", value, id, this.state.item);
         if (objectType === 'FollowUp' || id === 'address') {
             if (id === 'address') {
                 if (!this.state.item[id]) {
@@ -590,7 +619,7 @@ class FollowUpsSingleScreen extends Component {
         })
     };
     onChangeDateAnswer = (value, id, parentId, index) => {
-        // console.log ('onChangeDateAnswer', value, id)
+        console.log ('onChangeDateAnswer', value, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
@@ -650,7 +679,6 @@ class FollowUpsSingleScreen extends Component {
         }))
     };
     onChangeMultipleSelection = (value, id, parentId, index) => {
-        // console.log ('onChangeMultipleSelection', selections, id)
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {
@@ -658,7 +686,7 @@ class FollowUpsSingleScreen extends Component {
                 questionnaireAnswers[parentId] = [];
             }
             if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
-                if (_.get(questionnaireAnswers, `[${parentId}][0].subAnswers`, null) || typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
+                if (!_.get(questionnaireAnswers, `[${parentId}][0].subAnswers`, null) || (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0)) {
                     questionnaireAnswers[parentId][0].subAnswers = {};
                 }
                 if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
@@ -744,17 +772,25 @@ class FollowUpsSingleScreen extends Component {
                             delete followUpClone.address.location;
                         }
 
+                        followUpClone.index = daysSince(_.get(this.props, 'contact.followUp.startDate', null), followUpClone.date) + 1;
+
                         if (this.props.isNew) {
-                            followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp');
+                            followUpClone = updateRequiredFields(this.props.outbreak._id, this.props.user._id, Object.assign({}, followUpClone), action = 'create', 'followUp');
                             // console.log('followUpClone create', JSON.stringify(followUpClone))
                             createFollowUp(followUpClone)
                                 .then((responseCreateFollowUp) => {
                                     // this.props.refresh();
-                                    this.props.navigator.resetTo(
+                                    Navigation.setStackRoot(this.props.componentId,
                                         {
-                                            screen: 'ContactsScreen',
-                                            animated: true,
-                                            animationType: 'fade',
+                                            component:{
+                                                name: 'ContactsScreen',
+                                                options:{
+                                                    animations:{
+                                                        pop: fadeOutAnimation,
+                                                        push: fadeInAnimation
+                                                    }
+                                                }
+                                            }
                                         }
                                     )
                                 })
@@ -763,21 +799,16 @@ class FollowUpsSingleScreen extends Component {
                                 })
                         } else {
                             if (this.state.deletePressed === false) {
-                                followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'update');
+                                followUpClone = updateRequiredFields(this.props.outbreak._id, this.props.user._id, Object.assign({}, followUpClone), action = 'update');
                                 // console.log('followUpClone update', JSON.stringify(followUpClone))
                             } else {
-                                followUpClone = updateRequiredFields(this.props.user.activeOutbreakId, this.props.user._id, Object.assign({}, followUpClone), action = 'delete');
+                                followUpClone = updateRequiredFields(this.props.outbreak._id, this.props.user._id, Object.assign({}, followUpClone), action = 'delete');
                                 // console.log('followUpClone delete', JSON.stringify(followUpClone))
                             }
                             updateFollowUpAndContact(followUpClone)
                                 .then((responseUpdateFollowUp) => {
                                     this.props.refresh();
-                                    this.props.navigator.pop(
-                                        {
-                                            animated: true,
-                                            animationType: 'fade',
-                                        }
-                                    )
+                                    Navigation.pop(this.props.componentId)
                                 })
                                 .catch((errorUpdateFollowUp) => {
                                     console.log(errorUpdateFollowUp);
@@ -855,12 +886,14 @@ class FollowUpsSingleScreen extends Component {
     handleEditContact = () => {
         this.hideMenu();
 
-        this.props.navigator.push({
-            screen: 'ContactsSingleScreen',
-            passProps: {
-                contact: this.state.contact,
-                handleUpdateContactFromFollowUp: this.handleUpdateContactFromFollowUp,
-                refresh: this.props.refresh
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'ContactsSingleScreen',
+                passProps: {
+                    contact: this.state.contact,
+                    handleUpdateContactFromFollowUp: this.handleUpdateContactFromFollowUp,
+                    refresh: this.props.refresh
+                }
             }
         })
     };
@@ -951,13 +984,12 @@ class FollowUpsSingleScreen extends Component {
                 pageAskingHelpFrom = 'followUpSingleScreenView'
             }
         }
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
             passProps: {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     // used for adding multi-frequency answers
@@ -977,16 +1009,26 @@ class FollowUpsSingleScreen extends Component {
             isModified: true
         }), () => {
             // console.log('Updated previousAnswers: ', this.state.previousAnswers);
-            this.props.navigator.dismissAllModals();
+            Navigation.dismissAllModals();
         })
     };
     handleCopyAnswerDate = (value) => {
         let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
-        for(let questionId in previousAnswersClone) {
-            if(previousAnswersClone.hasOwnProperty(questionId)) {
-                previousAnswersClone[questionId] = previousAnswersClone[questionId].map((e) => {
-                    return {date: e.date === null ? createDate(value).toISOString() : e.date, value: e.value};
-                });
+        let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswersClone, 0);
+
+        for (let question of sortedQuestions){
+            if (question.variable && question.answerType !== "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP"){
+                if (previousAnswersClone[question.variable]){
+                    previousAnswersClone[question.variable] = previousAnswersClone[question.variable].map((e) => {
+                        return Object.assign(e, {date: e.date || createDate(value).toISOString()})
+                    })
+                } else {
+                    previousAnswersClone[question.variable] = [{
+                        date: createDate(value).toISOString(),
+                        value: null
+                    }]
+                }
             }
         }
         this.setState({
@@ -1065,19 +1107,44 @@ class FollowUpsSingleScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        flex: 1
     },
-    breadcrumbContainer: {
+    headerContainer: {
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
+        paddingRight: 16
+    },
+    breadcrumbContainer: {
+        alignItems: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
+    },
+    headerButtonSpacing: {
+        marginRight: 8
+    },
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    moreMenuButton: {
+        alignItems: 'center',
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4,
+        justifyContent: 'center'
     }
 });
 
 function mapStateToProps(state) {
     return {
         user: _.get(state, 'user', {_id: null, activeOutbreakId: null}),
+        outbreak: _.get(state, 'outbreak', {_id: null}),
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         questions: _.get(state, 'outbreak.contactFollowUpTemplate', null),
         translation: _.get(state, 'app.translation', []),
@@ -1085,4 +1152,13 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(FollowUpsSingleScreen);
+function matchDispatchProps(dispatch) {
+    return bindActionCreators({
+        setDisableOutbreakChange
+    }, dispatch);
+};
+
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchProps)
+)(FollowUpsSingleScreen);

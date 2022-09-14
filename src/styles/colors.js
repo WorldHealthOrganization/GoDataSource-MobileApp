@@ -1,52 +1,39 @@
-/**
- * Created by florinpopa on 05/07/2018.
- */
-const screenBackgroundGrey = '#efefef';
-const buttonGreen = 'rgb(77, 176, 160)';
-const buttonWhite = 'rgb(255, 255, 255)';
-const buttonBlack = 'rgb(0,0,0)';
-const backgroundGreen = 'rgba(77, 176, 160, 0.15)';
-const navigationDrawerItemText = 'rgb(60, 60, 60)';
-const navigationDrawerBackgroundColor = 'rgba(1, 1, 1, 0.24)';
-const navigationDrawerSeparatorGrey = 'rgb(211, 211, 211)';
-const buttonTextGray = 'rgb(71, 70, 70)';
-const textEmptyList = 'rgb(55, 55, 55)';
-const missedRedColor = 'rgb(255, 60, 56)';
-const missedRedColorWithOpacity = 'rgba(255, 60, 56, 0.3)';
-const appBackground = 'rgba(217, 217, 217, 0.5)';
-const colorLabelActiveTab = 'rgb(46, 46, 46)';
-const colorLabelInactiveTab = 'rgba(46, 46, 46, 0.35)';
-const colorBackgroundQuestions = 'rgb(214, 214, 214)';
-const textFieldUnderline = 'rgb(176, 176, 176)';
-const colorLoginButtonText = 'rgb(39, 39, 39)';
-const colorUnselectedItem = 'rgb(237, 237, 237)';
-const colorUnselectedItemText = 'rgb(49, 49, 49)';
-const colorTint = '#f5f5f5';
-const colorBase = '#dcdcdc';
-const colorWhite = 'white';
+/* Color Scheme */
+/* HEX */
+const primaryColor = '#2F7977';
+const primaryAltColor = '#004E6F';
+const secondaryColor = '#999EA3';
+const textColor = '#333333';
+const backgroundColor = '#FFFFFF';
+const screenBackgroundColor = '#EFEFEF';
+const dangerColor = '#D72631';
+const warningColor = '#FDA322';
+const successColor = '#1D741B';
+
+/* RGB */
+const separatorColor = 'rgba(153, 158, 163, 0.25)';
+const disabledColor = 'rgba(153, 158, 163, 0.5)';
+const overlayColor = 'rgba(51, 51, 51, 0.75)';
+const primaryColorRgb = 'rgba(47, 121, 119, 0.1)';
+const backgroundColorRgb = 'rgba(153, 158, 163, 0.1)';
+const dangerColorRgb = 'rgba(215, 38, 49, 0.1)';
+const warningColorRgb = 'rgba(253, 163, 34, 0.25)';
 
 export default {
-    screenBackgroundGrey,
-    buttonGreen,
-    buttonWhite,
-    backgroundGreen,
-    navigationDrawerItemText,
-    navigationDrawerBackgroundColor,
-    navigationDrawerSeparatorGrey,
-    buttonTextGray,
-    textEmptyList,
-    missedRedColor,
-    missedRedColorWithOpacity,
-    appBackground,
-    colorLabelActiveTab,
-    colorLabelInactiveTab,
-    colorBackgroundQuestions,
-    textFieldUnderline,
-    colorLoginButtonText,
-    colorUnselectedItem,
-    colorUnselectedItemText,
-    buttonBlack,
-    colorTint,
-    colorBase,
-    colorWhite
+    primaryColor,
+    primaryAltColor,
+    secondaryColor,
+    textColor,
+    backgroundColor,
+    screenBackgroundColor,
+    dangerColor,
+    warningColor,
+    successColor,
+    separatorColor,
+    disabledColor,
+    overlayColor,
+    primaryColorRgb,
+    backgroundColorRgb,
+    dangerColorRgb,
+    warningColorRgb
 }

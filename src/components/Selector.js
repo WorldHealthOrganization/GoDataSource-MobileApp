@@ -6,8 +6,9 @@
 import React, {PureComponent} from 'react';
 import {FlatList, StyleSheet, Text, View} from 'react-native';
 import Ripple from 'react-native-material-ripple';
-import styles from './../styles';
 import {connect} from "react-redux";
+import {getTranslation} from "../utils/functions";
+import styles from './../styles';
 
 class Selector extends PureComponent {
 
@@ -44,20 +45,21 @@ class Selector extends PureComponent {
                 style={[
                     style.itemStyle,
                     {
-                        backgroundColor: item.selected ? styles.buttonGreen : styles.colorUnselectedItem,
-                        marginHorizontal: index === 0 ? 0 : 10
+                        backgroundColor: item.selected ? styles.primaryColor : styles.disabledColor,
+                        marginHorizontal: index === 0 ? 0 : 8
                     }
                     ]}
                 onPress={() => {this.handleSelectItem(item, index)}}
             >
-                <Text style={[style.itemTextStyle, {color: item.selected ? 'white' : styles.colorUnselectedItemText}]}>
-                    {item.value}
+                <Text style={[style.itemTextStyle, {color: item.selected ? styles.backgroundColor : styles.textColor}]}>
+                    {this.props.shouldTranslate ? getTranslation(item.value, this.props.translation) : item.value}
                 </Text>
             </Ripple>
         )
     };
 
     handleSelectItem = (item, index) => {
+        console.log("What item", item);
         this.props.selectItem(item, index, this.props.id);
     }
 }
@@ -70,18 +72,19 @@ Selector.defaultProps = {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        paddingVertical: 8
     },
     itemStyle: {
-        height: 25,
-        justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 12.5
+        borderRadius: 16,
+        height: 30,
+        justifyContent: 'center'
     },
     itemTextStyle: {
-        paddingHorizontal: 18,
         fontFamily: 'Roboto-Regular',
-        fontSize: 11
+        fontSize: 14,
+        paddingHorizontal: 16
     }
 });
 

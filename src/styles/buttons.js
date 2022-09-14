@@ -1,51 +1,66 @@
-/**
- * Created by florinpopa on 04/07/2018.
- */
+/* Buttons */
 import colors from './colors';
-import styles from "./index";
 
-const buttonGreen = {
+const primaryButton = {
     container: {
-        backgroundColor: 'green',
+        backgroundColor: colors.primaryColor,
+        borderRadius: 4,
+        justifyContent: 'center',
+        marginTop: 16,
+        width: '100%'
     },
     text: {
-        color: 'white'
-    }
-};
-
-const buttonRed = {
-    container: {
-        backgroundColor: 'red'
-    },
-    text: {
-        color: 'black'
-    }
-};
-
-const buttonLogin = {
-    container: {
-        backgroundColor: 'rgba(255, 255, 255, 0.7)',
-        width: '100%',
-        borderRadius: 5,
-        justifyContent: 'space-evenly',
-        marginVertical: 2.5
-    },
-    text: {
+        color: colors.backgroundColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 18,
-        color: colors.colorLoginButtonText
+        fontSize: 14
+    }
+};
+
+const secondaryButton = {
+    container: {
+        backgroundColor: colors.disabledColor,
+        borderRadius: 4,
+        justifyContent: 'center',
+        marginTop: 16,
+        width: '100%'
+    },
+    text: {
+        color: colors.textColor,
+        fontFamily: 'Roboto-Medium',
+        fontSize: 14
+    }
+};
+
+const dangerButton = {
+    container: {
+        backgroundColor: colors.dangerColor,
+        borderRadius: 4,
+        justifyContent: 'center',
+        marginTop: 16,
+        width: '100%'
+    },
+    text: {
+        color: colors.backgroundColor,
+        fontFamily: 'Roboto-Medium',
+        fontSize: 14
     }
 };
 
 const buttonTextActionsBar = {
-    fontFamily: 'Roboto-Medium',
-    fontSize: 16,
-    color: colors.buttonGreen
+    backgroundColor: colors.primaryColorRgb,
+    borderRadius: 4,
+    color: colors.primaryColor,
+    fontFamily: 'Roboto-Regular',
+    fontSize: 14,
+    justifyContent: 'center',
+    lineHeight: 26,
+    textAlign: 'center',
+    width: '100%'
 };
 
 export default {
-    buttonGreen,
-    buttonRed,
-    buttonLogin,
+    primaryButton,
+    secondaryButton,
+    dangerButton,
     buttonTextActionsBar
 }

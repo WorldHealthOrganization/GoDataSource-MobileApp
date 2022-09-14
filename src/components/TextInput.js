@@ -4,38 +4,55 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import {Text, View, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import {getTooltip, getTranslation} from './../utils/functions';
 import {TextField} from 'react-native-material-textfield';
 import TooltipComponent from './TooltipComponent';
 import lodashGet from 'lodash/get';
 import lodashDebounce from 'lodash/debounce';
+import Ripple from "react-native-material-ripple";
+import translations from "../utils/translations";
+import styles from './../styles';
 
 class TextInput extends Component {
+    fieldRef = React.createRef();
+
     constructor(props) {
         super(props);
         this.state = {
-            value: lodashGet(this.props, 'value', ' ')
+            value: lodashGet(this.props, 'value', ' '),
+            maskError: false
         };
 
+        this.handleSubmitEditingDB = lodashDebounce(this.handleSubmitEditing, 300);
+
         // If there are any bugs with saving data, please change the delay accordingly
-        this.handleSubmitEditing = lodashDebounce(this.handleSubmitEditing, 1000);
+    }
+
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        let nextPropsValue = lodashGet(nextProps, 'value', ' ');
+        let answer = !(nextPropsValue !== this.props.value && this.state.value === nextPropsValue)
+        return answer;
     }
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
-        // console.log('CDM TextInput: ', this.props.label, this.props.value);
         this.setState({
             value: lodashGet(this.props, 'value', ' ')
         })
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.isEditMode !== this.props.isEditMode || prevProps.value !== this.props.value) {
-            this.setState({
-                value: lodashGet(this.props, 'value', ' ')
-            })
+        let propsValue = lodashGet(this.props, 'value', ' ');
+        if (prevProps.isEditMode !== this.props.isEditMode || prevProps.value !== propsValue) {
+            if(this.state.value !== propsValue && this.fieldRef.current){
+                console.log("What's the ref", this.fieldRef.current);
+                this.fieldRef.current.setValue(propsValue);
+                this.setState({
+                    value: propsValue
+                })
+            }
         }
     }
 
@@ -54,36 +71,42 @@ class TextInput extends Component {
     editInput = () => {
         let tooltip = getTooltip(this.props.label, this.props.translation);
         let value = lodashGet(this.state, 'value', ' ');
+        if(value || value === 0){
+            value = value.toString()
+        } else {
+            value = '';
+        }
         return (
-            <View style={[{flexDirection: 'row'},this.props.style]}>
-                <View style={{flex: 1}}> 
+            <View style={[style.textInput, this.props.style]}>
+                <View style={{flex: 1}}>
                     <TextField
                         label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                         value={value ? value.toString() : ''}
                         onChangeText={this.handleOnChangeText}
-                        textColor='rgb(0,0,0)'
-                        fontSize={15}
-                        labelFontSize={15}
+                        tintColor={styles.primaryColor}
+                        baseColor={styles.secondaryColor}
+                        textColor={styles.textColor}
+                        fontSize={14}
+                        error={this.state.maskError ? getTranslation(translations.contactSingleScreen.contactIdMaskError, this.props.translation).replace('{{mask}}', this.props.outbreakMask) : null}
+                        errorColor={styles.dangerColor}
+                        labelFontSize={14}
                         // labelHeight={30}
-                        labelTextStyle={{
-                            fontFamily: 'Roboto',
-                            textAlign: 'left'
-                        }}
-                        tintColor='rgb(77,176,160)'
+                        labelTextStyle={{fontFamily: 'Roboto-Regular'}}
+                        ref={this.fieldRef}
                         multiline={this.props.multiline !== undefined ? this.props.multiline : false}
-                        onPress={() => {console.log("On press textInput")}}
                         keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
-                        // onEndEditing={this.handleSubmitEditing}
+                        formatText={this.formatForNumeric}
                         secureTextEntry={this.props.secureTextEntry}
-                        onFocus={this.props.onFocus}
-                        // onBlur={this.handleBlur}
+                        lineWidth={1}
+                        lineType={'solid'}
+                        activeLineWidth={2}
+                        disabledLineWidth={1}
+                        disabledLineType={'solid'}
                     />
                 </View>
                 {
                     tooltip.hasTooltip === true ? (
-                        <TooltipComponent
-                            tooltipMessage={tooltip.tooltipMessage}
-                        />
+                        <TooltipComponent tooltipMessage={tooltip.tooltipMessage} />
                     ) : null
                 }
             </View>
@@ -94,32 +117,24 @@ class TextInput extends Component {
         let localValue = this.extractAgeForViewInput();
         let tooltip = getTooltip(this.props.label, this.props.translation);
         return (
-            <View style={[{flexDirection: 'row'},this.props.style]}>
+            <View style={[style.textInput, this.props.style, {marginTop: 7}]}>
                 <View style={{flex: 1}}>
-                    <Text style={{
-                        fontFamily: 'Roboto-Regular',
-                        fontSize: 15,
-                        textAlign: 'left',
-                        color: 'rgb(0,0,0)',
-                        marginBottom: 2,
-                        marginTop: 7,
-                    }}>
-                        {getTranslation(this.props.label, this.props.translation)}
-                    </Text>
-                    <Text style={{
-                        fontFamily: 'Roboto-Light',
-                        fontSize: 15,
-                        textAlign: 'left',
-                        color: 'rgb(60,60,60)',
-                    }}>
-                        {localValue}
-                    </Text>
+                    {
+                        this.props.skipLabel ? (null) : (
+                            <Text style={[style.textInputLabel, {marginBottom: 2}]}>
+                                {getTranslation(this.props.label, this.props.translation)}
+                            </Text>
+                        )
+                    }
+                    <Ripple disabled={!this.props.onClickAction} onPress={()=>{this.props.onClickAction(localValue)}}>
+                        <Text style={[style.textInputValue, this.props.textStyle]}>
+                            {localValue}
+                        </Text>
+                    </Ripple>
                 </View>
                 {
                     tooltip.hasTooltip === true ? (
-                        <TooltipComponent
-                            tooltipMessage={tooltip.tooltipMessage}
-                        />
+                        <TooltipComponent tooltipMessage={tooltip.tooltipMessage} />
                     ) : null
                 }
             </View>
@@ -143,15 +158,41 @@ class TextInput extends Component {
         return localValue
     };
 
-    handleOnChangeText = (state) => {
-        this.setState({value: state});
-        this.handleSubmitEditing();
+    formatForNumeric = (text) => {
+        if (this.props.keyboardType === 'numeric'){
+            text = text.replace(',','.');
+            if (text[text.length - 1] === '.' || text[text.length - 1] === ','){
+                return text;
+            }
+            return Number.isNaN(parseFloat(text)) ? text : parseFloat(text).toString();
+        }
+        return text;
+    }
+    handleOnChangeText = (value) => {
+        value = value.trim();
+        let maskError = false;
+        if(this.props.mask && value){
+            maskError = !this.props.mask.test(value);
+        }
+        this.setState({
+            maskError,
+            value
+        }, ()=>{
+            if (this.props.keyboardType === 'numeric') {
+                if (value[value.length - 1] === ',' || value[value.length - 1] === '.'){
+                    return;
+                }
+            }
+            this.handleSubmitEditingDB();
+        })
     };
 
     handleSubmitEditing = () => {
+        if(!this.props.isEditMode || this.props.value === this.state.value){
+            return;
+        }
         if (this.props.labelValue) {
             //QuestionCard
-            console.log("textInput has this.props.labelValue: ", this.props.data, this.state.value);
             this.props.onChange(
                 this.state.value,
                 this.props.id
@@ -161,8 +202,9 @@ class TextInput extends Component {
             this.props.onChange(
                 this.state.value,
                 this.props.id,
-                this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'LabResult' || this.props.objectType === 'Documents' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
-                this.props.objectType
+                this.props.objectType ? (this.props.objectType === 'Address' || this.props.objectType === 'Documents' || this.props.objectType === 'DateRanges' ? this.props.index : this.props.objectType) : null,
+                this.props.objectType,
+                this.state.maskError
             )
         }
         if ( this.props.onSubmitEditing !== undefined) {
@@ -170,6 +212,22 @@ class TextInput extends Component {
         }
     };
 }
+
+const style = StyleSheet.create({
+    textInput: {
+        flexDirection: 'row'
+    },
+    textInputLabel: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    },
+    textInputValue: {
+        color: styles.textColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    }
+});
 
 TextInput.propTypes = {
     id: PropTypes.string.isRequired,
@@ -179,7 +237,9 @@ TextInput.propTypes = {
     isRequired: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
     style: PropTypes.object,
-    multiline: PropTypes.bool
+    multiline: PropTypes.bool,
+    skipLabel: PropTypes.bool,
+    onClickAction: PropTypes.func
 };
 
 export default TextInput;

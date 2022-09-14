@@ -9,7 +9,6 @@ import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
 import Button from './Button';
-import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations';
 import QuestionCardTitle from './QuestionCardTitle';
@@ -18,6 +17,8 @@ import get from "lodash/get";
 import {sortBy} from "lodash";
 import PreviousAnswers from "./PreviousAnswers";
 import uniqueId from "lodash/uniqueId";
+import isEqual from "lodash/isEqual";
+import styles from './../styles';
 
 class QuestionCard extends PureComponent {
 
@@ -29,20 +30,74 @@ class QuestionCard extends PureComponent {
         };
     }
 
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        let answer = false;
+        for(const [key, value] of Object.entries(nextState)){
+            if (this.state[key] !== value) {
+                const newStateVariable = get(value, `${get(nextProps, 'item.variable', null)}`, null)
+                const oldStateVariable = get(this.state[key], `${get(nextProps, 'item.variable', null)}`, null)
+                if(newStateVariable?.length !== oldStateVariable?.length
+                    || !isEqual(newStateVariable,oldStateVariable)) {
+                    return true;
+                }
+            }
+        }
+        for (const [key, value] of Object.entries(nextProps)) {
+            if (!isEqual(this.props[key], value)) {
+                switch (key) {
+                    case 'item':
+                        if (this.props[key].id !== value.id) {
+                            answer=true;
+                            break;
+                        }
+                        break;
+                    case 'source':
+                        const nextPropsVariable = get(nextProps, `source[${get(nextProps, 'item.variable', null)}]`, null);
+                        const propsVariable =  get(this.props, `source[${get(this.props, 'item.variable', null)}]`, null)
+                        if (nextPropsVariable?.length !== propsVariable?.length) {
+                            answer = true;
+                            break;
+                        } else {
+                            answer = true;
+                            break;
+                        }
+                    default:
+                        answer = true;
+                        break;
+                }
+                if(answer) break;
+            } else {
+                switch (key) {
+                    case 'item':
+                        if(this.props.item.variable !== nextProps.item.variable){
+                            answer = true;
+                            break;
+                        }
+                        break;
+                }
+                if(answer) break;
+            }
+        }
+        return answer;
+    }
+
     componentDidUpdate(prevProps) {
+        const answer = get(this.props, `source[${get(this.props, 'item.variable', null)}]`, null)
+        const prevAnswer = get(prevProps, `source[${get(this.props, 'item.variable', null)}]`, null)
+
         //update previous answers if length is different because item was deleted/added
-        if(get(this.props, `source[${get(this.props, 'item.variable', null)}]`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}].length`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}].length`, null)){
+        if(answer && answer?.length !== prevAnswer?.length){
             this.setState({
                 previousAnswers: this.props.source
             });
         }else{
             //update previous answers if date or value was updated for current answer
-            if ( (get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}][0].date`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][0].date`, null) )
-                || (get(this.props, `source[${get(this.props, 'item.variable', null)}][0].value`, null) && get(this.props, `source[${get(this.props, 'item.variable', null)}][0].value`, null) !== get(prevProps, `source[${get(prevProps, 'item.variable', null)}][0].value`, null))) {
+            if (!isEqual(answer, prevAnswer)) {
                 this.setState({
                     previousAnswers: this.props.source
                 })
             }
+
         }
     }
 
@@ -53,16 +108,17 @@ class QuestionCard extends PureComponent {
     render() {
         let viewWidth = calculateDimension(315, false, this.props.screenSize);
         let viewHeight = calculateDimension(30, true, this.props.screenSize);
-        let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
-        let buttonHeight = calculateDimension(25, true, this.props.screenSize);
-        let buttonWidth = calculateDimension(165.5, false, this.props.screenSize);
+        let marginHorizontal = calculateDimension(16, false, this.props.screenSize);
+        let buttonHeight = calculateDimension(35, true, this.props.screenSize);
+        let buttonWidth = calculateDimension(150, false, this.props.screenSize);
         let index = this.calculateIndex(this.props.totalQuestions, this.props.index);
         return (
-            <ElevatedView elevation={3} key={uniqueId('key_')} style={[this.props.style, style.container, {
-                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4
-            }]}
+            <ElevatedView
+                elevation={5}
+                style={[this.props.style, style.container, {
+                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                    width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
+                }]}
                 onPress={() => {this.setState({showDropdown: false})}}
             >
                 {
@@ -70,8 +126,8 @@ class QuestionCard extends PureComponent {
                         <QuestionCardTitle
                             height={calculateDimension(43, true, this.props.screenSize)}
                             paddingRight={calculateDimension(34, true, this.props.screenSize)}
-                            paddingLeft={calculateDimension(14, true, this.props.screenSize)}
-                            paddingTopBottom={calculateDimension(5, false, this.props.screenSize)}
+                            paddingLeft={calculateDimension(16, true, this.props.screenSize)}
+                            paddingTopBottom={calculateDimension(4, false, this.props.screenSize)}
                             marginLeft={calculateDimension(8, false, this.props.screenSize)}
                             marginRight={calculateDimension(34, false, this.props.screenSize)}
                             questionNumber={getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + index}
@@ -80,26 +136,23 @@ class QuestionCard extends PureComponent {
                                 ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''}
                         />
                 }
-                <View key={uniqueId('key_')}>
+                <View>
                     {
                         this.props.item.multiAnswer && this.props.isEditMode && !this.props.hideButtons ? (
                             <View
-                                style={{
-                                    flexDirection: 'row',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    width: viewWidth,
-                                    marginHorizontal,
+                                style={[style.addAnswerStyle, {
                                     height: viewHeight,
-                                    marginVertical: 5
-                                }}
+                                    marginHorizontal,
+                                    width: viewWidth
+                                }]}
                             >
+                                {/*Add answer button*/}
                                 <Button
                                     title={getTranslation(translations.questionCardLabels.addAnswer, this.props.translation)}
                                     width={buttonWidth}
                                     height={buttonHeight}
-                                    titleColor={'white'}
-                                    color={styles.buttonGreen}
+                                    titleColor={styles.backgroundColor}
+                                    color={styles.primaryColor}
                                     onPress={() => {
                                         this.props.onCollapse(this.props.item, true);
                                         this.props.onClickAddNewMultiFrequencyAnswer(this.props.item)
@@ -110,7 +163,6 @@ class QuestionCard extends PureComponent {
                     }
                     {this.props.item.multiAnswer && this.props.isEditMode && this.props.isCollapsed ? null :
                         <QuestionCardContent
-                            key={uniqueId('key_')}
                             index={0}
                             item={this.props.item}
                             isCollapsed={this.props.isCollapsed}
@@ -182,31 +234,15 @@ class QuestionCard extends PureComponent {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        marginVertical: 6
     },
-    containerQuestion: {
+    addAnswerStyle: {
+        alignItems: 'center',
         flexDirection: 'row',
-        backgroundColor: styles.colorBackgroundQuestions,
-        alignItems: 'center'
-    },
-    containerQuestionNumber: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        backgroundColor: 'white',
         justifyContent: 'center',
-        alignItems: 'center'
-    },
-    questionText: {
-        fontFamily: 'Roboto-Regular',
-        fontSize: 13,
-        color: 'black'
-    },
-    containerCardComponent: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
+        marginVertical: 16
     }
 });
 

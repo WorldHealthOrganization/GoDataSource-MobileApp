@@ -12,20 +12,26 @@ import {
     ACTION_TYPE_SAVE_HELP_ITEM,
     ACTION_TYPE_SAVE_HUB_CONFIGURATION,
     ACTION_TYPE_SAVE_SCREEN_SIZE,
+    ACTION_TYPE_CHANGES_EXIST,
     ACTION_TYPE_SAVE_SELECTED_SCREEN,
     ACTION_TYPE_SAVE_TRANSLATION,
     ACTION_TYPE_SET_LOADER_STATE,
     ACTION_TYPE_SET_LOGIN_STATE,
     ACTION_TYPE_SET_SYNC_STATE
 } from './../utils/enums';
+import {sideMenuKeys} from './../utils/config';
 
 // Do not add unnecessary business logic in the reducer. Here should only be updated the store
-export default function app(state = { root: undefined, screenSize: {width: 375, height: 667}, selectedScreen: '', filters: {}, translation: {}, helpCategory: {}, helpItem: {}, availableLanguages: [], hubConfiguration:{}, syncState: '', generatedFollowUps: '', loginState: '',  loaderState: false, activeDatabase: '' }, action = {}) {
+export default function app(state = { root: undefined, screenSize: {width: 375, height: 667}, changesExist: 'Unverified', selectedScreen: sideMenuKeys[0], filters: {}, translation: {}, helpCategory: {}, helpItem: {}, availableLanguages: [], hubConfiguration:{}, syncState: '', generatedFollowUps: '', loginState: '',  loaderState: false, activeDatabase: '' }, action = {}) {
     let stateClone = null;
     switch (action.type) {
         case ACTION_TYPE_ROOT_CHANGE:
             return Object.assign({}, state, {
                 root: action.root
+            });
+        case ACTION_TYPE_CHANGES_EXIST:
+            return Object.assign({}, state, {
+                changesExist: action.changesExist
             });
         case ACTION_TYPE_SAVE_SCREEN_SIZE:
             return Object.assign({}, state, {

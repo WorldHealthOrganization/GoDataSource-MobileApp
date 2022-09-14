@@ -26,7 +26,7 @@ export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFi
     }, computeCount)
         .then((results) => {
             // console.log('results', results);
-            return Promise.resolve({data: results.data, dataCount: results.dataCount || undefined});
+            return Promise.resolve({data: results.data, dataCount: results?.dataCount});
         })
         .catch((error) => {
             console.log('error', error);
@@ -222,8 +222,39 @@ export function getExposuresForContact(contactId, outbreakId) {
         ],
         condition: {
             'relationship.targetId': contactId,
-            // 'relationship.outbreakId': outbreakId,
-            'person.outbreakId': outbreakId
+            'relationship.deleted': 0
+        }
+    };
+
+    return executeQuery(query);
+}
+
+export function getContactRelationForContact(contactId, outbreakId) {
+    let query = {
+        type: 'select',
+        table: 'relationship',
+        fields: [
+            {
+                table: 'relationship',
+                name: 'json',
+                alias: 'relationshipData'
+            },
+            {
+                table: 'person',
+                name: 'json',
+                alias: 'caseData'
+            }
+        ],
+        join: [
+            {
+                type: 'inner',
+                table: 'person',
+                on: {'person._id': 'relationship.targetId'}
+            }
+        ],
+        condition: {
+            'relationship.sourceId': contactId,
+            'relationship.deleted': 0
         }
     };
 

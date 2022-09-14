@@ -2,7 +2,7 @@
  * Created by mobileclarisoft on 16/07/2018.
  */
 import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import {Text, View, StyleSheet} from 'react-native';
 import config from './../utils/config'
 import PropTypes from 'prop-types';
 import {TextField} from 'react-native-material-textfield';
@@ -11,6 +11,7 @@ import translations from './../utils/translations';
 import {getDropDownInputDisplayParameters, getTooltip, getTranslation} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
 import get from 'lodash/get';
+import styles from './../styles';
 
 class TextInputWithDropDown extends Component {
 
@@ -73,8 +74,8 @@ class TextInputWithDropDown extends Component {
 
         const dropDownParams = getDropDownInputDisplayParameters(this.props.screenSize, dropDownData.length);
         return (
-            <View style={[{width: '100%'},this.props.style]}>
-                <View style={{flexDirection: 'row',  justifyContent: 'space-between'}}>
+            <View style={[style.textWithDropdownContainer, this.props.style]}>
+                <View style={style.textWithDropdown}>
                 {
                     this.state.noneValueSelectedInDropdown === false ? (
                         <View style={{width: '45%'}}>
@@ -82,18 +83,16 @@ class TextInputWithDropDown extends Component {
                             label={this.props.isRequired ? textLabel + ' * ' : textLabel}
                             value={stringValue}
                             onChangeText={(value) => this.handleOnChangeText(value)}
-                            textColor='rgb(0,0,0)'
-                            fontSize={15}
-                            labelFontSize={15}
+                            textColor={styles.textColor}
+                            fontSize={14}
+                            labelFontSize={14}
                             // labelHeight={30}
-                            labelTextStyle={{
-                                fontFamily: 'Roboto',
-                                textAlign: 'left'
-                            }}
-                            tintColor='rgb(77,176,160)'
+                            labelTextStyle={{fontFamily: 'Roboto-Regular'}}
+                            tintColor={styles.primaryColor}
                             multiline={this.props.multiline != undefined ? this.props.multiline : false}
                             onPress={() => {console.log("On press textInput")}}
                             keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
+                            formatText={this.formatForNumeric}
                             onSubmitEditing={this.props.onSubmitEditing}
                         />
                     </View>
@@ -109,9 +108,9 @@ class TextInputWithDropDown extends Component {
                                 ? 'None'
                                 : get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].value`, '')
                         }
-                        fontSize={15}
-                        labelFontSize={12.5}
-                        selectedItemColor={'rgb(255,60,56)'}
+                        fontSize={14}
+                        labelFontSize={14}
+                        selectedItemColor={styles.primaryColor}
                         dropdownMargins={{min: 4, max: 8}}
                         dropdownPosition={dropDownParams.dropdownPosition}
                         itemCount={dropDownParams.itemCount}
@@ -129,6 +128,13 @@ class TextInputWithDropDown extends Component {
         );
     }
 
+    formatForNumeric = (text) => {
+        if(this.props.keyboardType === 'numeric'){
+            return Number.isNaN(parseFloat(text)) ? text : parseFloat(text).toString();
+        }
+        return text;
+    }
+
     viewInput() {
         let tooltip = getTooltip(this.props.label, this.props.translation);
         const unit =  get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].value`, '');
@@ -140,25 +146,13 @@ class TextInputWithDropDown extends Component {
         }
         
         return (
-            <View style={[{width: '100%'},this.props.style]}>
-                <View style={{flexDirection: 'row',  justifyContent: 'space-between'}}>
+            <View style={[style.textWithDropdownContainer, this.props.style]}>
+                <View style={[style.textWithDropdown, {marginVertical: 8}]}>
                     <View style={{width: '45%'}}>
-                        <Text style={{
-                            fontFamily: 'Roboto-Regular',
-                            fontSize: 15,
-                            textAlign: 'left',
-                            color: 'rgb(0,0,0)',
-                            marginBottom: 2,
-                            marginTop: 7,
-                        }}>
+                        <Text style={style.textWithDropdownLabel}>
                             {getTranslation(this.props.label, this.props.translation)}
                         </Text>
-                        <Text style={{
-                            fontFamily: 'Roboto-Light',
-                            fontSize: 15,
-                            textAlign: 'left',
-                            color: 'rgb(60,60,60)',
-                        }}>
+                        <Text style={style.textWithDropdownValue}>
                             {stringValue !== '' ? stringValue + ' ' + get(config, `[${this.props.dropDownData}][${this.props.selectedDropDownItemIndex}].value`, '') : ''}
                         </Text>
                     </View>
@@ -202,6 +196,26 @@ class TextInputWithDropDown extends Component {
         )
     }
 }
+
+const style = StyleSheet.create({
+    textWithDropdownContainer: {
+        width: '100%'
+    },
+    textWithDropdown: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    textWithDropdownLabel: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    },
+    textWithDropdownValue: {
+        color: styles.textColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    }
+});
 
 TextInputWithDropDown.propTypes = {
     id: PropTypes.string.isRequired,

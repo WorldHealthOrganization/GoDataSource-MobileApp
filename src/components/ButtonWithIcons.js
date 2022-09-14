@@ -9,8 +9,8 @@ import {Icon} from 'react-native-material-ui';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import Ripple from 'react-native-material-ripple';
 import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons';
-import styles from './../styles';
 import {connect} from "react-redux";
+import styles from './../styles';
 
 class ButtonWithIcons extends PureComponent {
 
@@ -37,12 +37,12 @@ class ButtonWithIcons extends PureComponent {
                 <View style={style.containerInnerView}>
                     {
                         this.props.isFirstIconPureMaterial ? (
-                            <Icon size={calculateDimension(15, false, this.props.screenSize)} color={styles.buttonGreen} name={this.props.firstIcon}
+                            <Icon size={calculateDimension(15, false, this.props.screenSize)} color={styles.textColor} name={this.props.firstIcon}
                                   style={{display: this.props.isFirstIconPureMaterial ? 'flex' : 'none'}}/>
                         ) : (
                             <IconMaterial style={{display: this.props.isFirstIconPureMaterial ? 'none' : 'flex'}}
                                           name={this.props.firstIcon} size={calculateDimension(15, false, this.props.screenSize)}
-                                          color={styles.buttonGreen}/>
+                                          color={styles.textColor}/>
                         )
                     }
                     <Text>
@@ -50,12 +50,12 @@ class ButtonWithIcons extends PureComponent {
                     </Text>
                     {
                         this.props.isSecondIconPureMaterial ? (
-                            <Icon size={calculateDimension(18, false, this.props.screenSize)} color={'black'} name={this.props.secondIcon}
+                            <Icon size={calculateDimension(18, false, this.props.screenSize)} color={styles.textColor} name={this.props.secondIcon}
                                   style={{display: this.props.isSecondIconPureMaterial ? 'flex' : 'none'}}/>
                         ) : (
                             <IconMaterial style={{display: this.props.isSecondIconPureMaterial ? 'none' : 'flex'}}
                                 name={this.props.firstIcon} size={calculateDimension(11, false, this.props.screenSize)}
-                                color={styles.buttonGreen}/>
+                                color={styles.textColor}/>
                         )
                     }
                 </View>
@@ -68,28 +68,28 @@ class ButtonWithIcons extends PureComponent {
 }
 
 ButtonWithIcons.defaultProps = {
-    width: 124,
-    height: 25,
     firstIcon: "3d-rotation",
-    secondIcon: "arrow-drop-down"
+    height: 30,
+    secondIcon: "arrow-drop-down",
+    width: 125
 };
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
     containerButton: {
-        height: '100%',
-        flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'white',
+        backgroundColor: styles.disabledColor,
         borderRadius: 4,
+        flexDirection: 'row',
+        height: '100%'
     },
     containerInnerView: {
-        flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 9,
+        flex: 1,
+        flexDirection: 'row',
         justifyContent: 'space-between',
-        flex: 1
+        paddingHorizontal: 8
     }
 });
 

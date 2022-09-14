@@ -1,0 +1,63 @@
+diff --git a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/affix/index.js b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/affix/index.js
+index d6c9d64..fe8eb0a 100644
+--- a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/affix/index.js
++++ b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/affix/index.js
+@@ -1,6 +1,6 @@
+ import PropTypes from 'prop-types';
+ import React, { PureComponent } from 'react';
+-import { Animated } from 'react-native';
++import { Animated, Text } from 'react-native';
+ 
+ import styles from './styles';
+ 
+@@ -24,7 +24,7 @@ export default class Affix extends PureComponent {
+     baseColor: PropTypes.string.isRequired,
+     animationDuration: PropTypes.number.isRequired,
+ 
+-    style: Animated.Text.propTypes.style,
++    style: Text.propTypes.style,
+ 
+     children: PropTypes.oneOfType([
+       PropTypes.arrayOf(PropTypes.node),
+diff --git a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/helper/index.js b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/helper/index.js
+index 60184ea..84e6e3a 100644
+--- a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/helper/index.js
++++ b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/helper/index.js
+@@ -1,6 +1,6 @@
+ import PropTypes from 'prop-types';
+ import React, { PureComponent } from 'react';
+-import { View, Animated } from 'react-native';
++import { View, Animated, Text } from 'react-native';
+ 
+ import styles from './styles';
+ 
+@@ -10,7 +10,7 @@ export default class Helper extends PureComponent {
+   };
+ 
+   static propTypes = {
+-    style: Animated.Text.propTypes.style,
++    style: Text.propTypes.style,
+     children: PropTypes.oneOfType([
+       PropTypes.arrayOf(PropTypes.node),
+       PropTypes.node,
+diff --git a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/label/index.js b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/label/index.js
+index ac3ed53..bf551e3 100644
+--- a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/label/index.js
++++ b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/label/index.js
+@@ -1,6 +1,6 @@
+ import PropTypes from 'prop-types';
+ import React, { PureComponent } from 'react';
+-import { Animated } from 'react-native';
++import { Animated, Text } from 'react-native';
+ 
+ export default class Label extends PureComponent {
+   static defaultProps = {
+@@ -29,7 +29,7 @@ export default class Label extends PureComponent {
+ 
+     animationDuration: PropTypes.number.isRequired,
+ 
+-    style: Animated.Text.propTypes.style,
++    style: Text.propTypes.style,
+ 
+     children: PropTypes.oneOfType([
+       PropTypes.arrayOf(PropTypes.node),

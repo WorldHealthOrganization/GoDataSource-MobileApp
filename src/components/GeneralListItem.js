@@ -10,23 +10,33 @@ import {StyleSheet, Text, View} from 'react-native';
 // the material ui library, since it provides design and animations out of the box
 import ElevatedView from 'react-native-elevated-view';
 import ActionsBar from './ActionsBar';
-import {getTranslation} from './../utils/functions';
+import {checkPermissions, getTranslation} from './../utils/functions';
+import styles from './../styles';
+import {ISO_8601} from 'moment';
+import PermissionComponent from "./PermissionComponent";
+import lodashGet from "lodash/get";
+import {connect} from "react-redux";
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 
-GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondComponent, thirdComponent, hasActionsBar, textsArray, textsStyleArray, onPressArray, arrayPermissions, actionsBarContainerStyle, containerStyle, translation}) => {
+GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondComponent, thirdComponent, hasActionsBar, textsArray, textsStyleArray, onPressArray, arrayPermissions, onPermissionDisable, outbreakPermissions, secondaryOutbreakPermissions, actionsBarContainerStyle, containerStyle, translation, hasSecondaryActionsBar, secondaryTextsArray, secondaryTextsStyleArray, secondaryOnPressArray, secondaryArrayPermissions}) => {
     // console.log('GeneralListItem render called');
     return (
         <ElevatedView
-            elevation={3}
-            style={[{borderRadius: 2, backgroundColor: 'white'}, containerStyle]}
+            elevation={5}
+            style={[{borderRadius: 4, backgroundColor: styles.backgroundColor, marginBottom: 4}, containerStyle]}
         >
             <View containerStyle={containerStyle}>
                 {
                     firstComponent ? (
                         firstComponent
                     ) : (
-                        <Text style={style.title}>
-                            {getTranslation(title, translation)}
-                        </Text>
+                        <View style={style.cardHeader}>
+                            <View style={style.cardHeaderTitle}>
+                                <Text numberOfLines={1}>
+                                    {getTranslation(title, translation)}
+                                </Text>
+                            </View>
+                        </View>
                     )
                 }
                 {
@@ -52,11 +62,31 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
                         textsArray={textsArray}
                         textsStyleArray={textsStyleArray}
                         onPressArray={onPressArray}
-                        containerStyle={{height: 54}}
+                        containerStyle={{height: textsArray.length !== 0 ? 30 : 0}}
                         isEditMode={true}
                         translation={translation}
+                        onPermissionDisable={onPermissionDisable}
+                        outbreakPermissions={outbreakPermissions}
                         arrayPermissions={arrayPermissions}
                     />) : (null)
+                }
+                {
+                    hasSecondaryActionsBar ?
+                        (<PermissionComponent
+                                render={() => (<ActionsBar
+                                    textsArray={secondaryTextsArray}
+                                    textsStyleArray={secondaryTextsStyleArray}
+                                    onPressArray={secondaryOnPressArray}
+                                    containerStyle={{height: secondaryTextsArray.length !== 0 ? 32 : 0}}
+                                    isEditMode={true}
+                                    translation={translation}
+                                    outbreakPermissions={secondaryOutbreakPermissions}
+                                    arrayPermissions={secondaryArrayPermissions}
+                                />)}
+                                outbreakPermissions={[].concat.apply([],secondaryOutbreakPermissions)}
+                                permissionsList={[].concat.apply([],secondaryArrayPermissions)}
+                            />
+                        ) : (null)
                 }
             </View>
         </ElevatedView>
@@ -67,22 +97,41 @@ GeneralListItem = ({title, primaryText, secondaryText, firstComponent, secondCom
 // make a global style in the config directory
 const style = StyleSheet.create({
     containerStyle: {
-        width: '100%',
+        width: '100%'
     },
-    title: {
+    cardHeader: {
+        alignItems: 'center',
+        backgroundColor: styles.backgroundColorRgb,
+        borderTopLeftRadius: 4,
+        borderTopRightRadius: 4,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    cardHeaderTitle: {
+        color: styles.textColor,
+        flex: 1,
         fontFamily: 'Roboto-Medium',
-        fontSize: 18,
-        color: 'black',
-        marginVertical: 10,
-        marginHorizontal: 14
+        fontSize: 16,
+        lineHeight: 20,
+        paddingVertical: 4,
+        paddingHorizontal: 8
     },
     primaryText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Regular',
-        fontSize: 13,
-        color: 'black',
-        marginHorizontal: 14,
-        marginVertical: 8
-    }
+        fontSize: 14,
+        paddingHorizontal: 16,
+        paddingVertical: 8
+    },
 });
 
-export default (GeneralListItem);
+function mapStateToProps(state) {
+    return {
+        permissions: lodashGet(state, 'role', []),
+        outbreak: lodashGet(state, 'outbreak', null)
+    };
+}
+
+export default connect(
+    mapStateToProps,
+)(GeneralListItem);

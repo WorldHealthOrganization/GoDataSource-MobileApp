@@ -3,9 +3,14 @@ import {executeQuery} from './helperMethods';
 import lodashGet from 'lodash/get';
 import lodashSet from 'lodash/set';
 import {checkArrayAndLength} from "../../utils/typeCheckingFunctions";
+import get from "lodash/get";
+import {createDate} from "../../utils/functions";
+var jsonSql = require('json-sql')();
+jsonSql.configure({separatedValues: false});
 
 export function getPersonWithRelationsForOutbreakId({outbreakId, filter, search, lastElement, offset, personType}, computeCount) {
 
+    console.log("Important cases inside", filter);
     let countPromise = null;
     let mainPromise = executeQuery(createGeneralQuery({
         outbreakId: outbreakId,
@@ -54,45 +59,50 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
 
     // Take care of inner query conditions. This will do the preliminary filtering of the data, before moving to relationships, searching and sorting
     let innerCondition = {
-        '$or': [
+        '$and': [
             {
-                [`${innerQueryAlias}.deleted`]: 0,
+                '$or': [
+                    {
+                        [`${innerQueryAlias}.deleted`]: 0,
+                    },
+                    {
+                        [`${innerQueryAlias}.deleted`]: {'$is': null}
+                    }
+                ]
             },
-            {
-                [`${innerQueryAlias}.deleted`]: {'$is': null}
-            }
-        ],
-        [`${innerQueryAlias}.type`]: type,
-        [`${innerQueryAlias}.outbreakId`]: outbreakId,
+            {[`${innerQueryAlias}.type`]: type},
+            {[`${innerQueryAlias}.outbreakId`]: outbreakId},
+        ]
     };
+    const innerAnd = innerCondition.$and;
 
     if (checkArrayAndLength(lodashGet(innerFilter, 'age', null)) && innerFilter.age.length === 2) {
-        innerCondition[`${innerQueryAlias}.age`] = {
+        innerAnd.push({[`${innerQueryAlias}.age`] : {
             ['$gte']: lodashGet(innerFilter, 'age[0]', 0),
             ['$lte']: lodashGet(innerFilter, 'age[1]', 150)
-        };
+        }});
     }
     if (lodashGet(innerFilter, 'gender', null) !== null) {
-        innerCondition[`${innerQueryAlias}.gender`] = innerFilter.gender;
+        innerAnd.push({[`${innerQueryAlias}.gender`] : innerFilter.gender});
     }
     if (checkArrayAndLength(lodashGet(innerFilter, 'categories', null))) {
-        innerCondition[`${innerQueryAlias}.categoryId`] = {
+        innerAnd.push({[`${innerQueryAlias}.categoryId`] : {
             ['$in']: innerFilter.categories
-        };
+        }});
     }
     if (checkArrayAndLength(lodashGet(innerFilter, 'classification', null))) {
-        innerCondition[`${innerQueryAlias}.classification`] = {
-            ['$in']: innerFilter.classification
-        };
+        innerAnd.push({[`${innerQueryAlias}.classification`] : {
+            ['$in']: innerFilter.classification.map(i=>i?.value)
+        }});
     }
     if (checkArrayAndLength(lodashGet(innerFilter, 'selectedLocations', null))) {
-        innerCondition[`${innerQueryAlias}.locationId`] = {
+        innerAnd.push({[`${innerQueryAlias}.locationId`] : {
             ['$in']: innerFilter.selectedLocations
-        };
+        }});
     }
 
     // Take care of the outer query conditions like searching
-    let mainCondition = {
+    let deletedCheck = {
         $or: [
             {
                 [`${filteredExposuresAlias}.deleted`]: 0
@@ -109,28 +119,65 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         ]
     };
 
-    if (search) {
-        mainCondition['$or'] = [
+    let searchCondition = {
+        $or:[]
+    };
+    // TODO handle email
+    let shouldSearchEmail = false;
+    if (search && search.text) {
+        shouldSearchEmail = true;
+        searchCondition['$or'] = [
             {[`${innerQueryAlias}.firstName`]: {'$like': `%${search.text}%`}},
             {[`${innerQueryAlias}.lastName`]: {'$like': `%${search.text}%`}},
             {[`${innerQueryAlias}.visualId`]: {'$like': `%${search.text}%`}},
-            {[`${innerQueryAlias}.locationId`]: {'$in': search.locations}}
+            {[`${innerQueryAlias}.locationId`]: {'$in': search.locations}},
+            // {$expression: `json_extract(${innerQueryAlias}.json, '$.emailAddress') like '%${search.text}%'`}
         ];
 
         if (type !== translations.personTypes.cases) {
-            mainCondition['$or'] = mainCondition['$or'].concat([
+            searchCondition['$or'] = searchCondition['$or'].concat([
                 {[`${filteredExposuresAlias}.firstName`]: {'$like': `%${search.text}%`}},
                 {[`${filteredExposuresAlias}.lastName`]: {'$like': `%${search.text}%`}},
-                {[`${filteredExposuresAlias}.visualId`]: {'$like': `%${search.text}%`}}
+                {[`${filteredExposuresAlias}.visualId`]: {'$like': `%${search.text}%`}},
             ])
         }
     }
 
+    let filterCondition = {
+        $and:[]
+    }
+
+    if (checkArrayAndLength(lodashGet(innerFilter, 'vaccines', null))) {
+        filterCondition.$and.push({
+                $expression: `json_extract(vaccinesReceived.value, '$.vaccine') in (${innerFilter.vaccines.map(vax=>`"${vax.value}"`).join(', ')})`
+            }
+        )
+    }
+    if (checkArrayAndLength(lodashGet(innerFilter, 'vaccineStatuses', null))) {
+        filterCondition.$and.push({
+                $expression: `json_extract(vaccinesReceived.value, '$.status') in (${innerFilter.vaccineStatuses.map(vax=>`"${vax.value}"`).join(', ')})`
+            }
+        )
+    }
+    if (checkArrayAndLength(lodashGet(innerFilter, 'pregnancyStatuses', null))) {
+        filterCondition.$and.push({
+            $expression: `json_extract(${innerQueryAlias}.json, '$.pregnancyStatus') in (${innerFilter.pregnancyStatuses.map(vax=>`"${vax.value}"`).join(', ')})`
+        })
+    }
+
+
+    let mainCondition = {
+        $and: [deletedCheck, searchCondition, filterCondition]
+    }
     // Take care of sorting
     let sort = {};
     if (checkArrayAndLength(lodashGet(innerFilter, 'sort', null))) {
         for (let i = 0; i < innerFilter.sort.length; i++) {
             let sortOrder = lodashGet(innerFilter, `sort[${i}].sortOrder`, null) === translations.sortTab.sortOrderAsc ? 1 : -1;
+            // Sort by name
+            if (lodashGet(innerFilter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortName) {
+                sort[`${innerQueryAlias}.firstName`] = sortOrder;
+            }
             // Sort by firstName
             if (lodashGet(innerFilter, `sort[${i}].sortCriteria`, null) === translations.sortTab.sortFirstName) {
                 sort[`${innerQueryAlias}.firstName`] = sortOrder;
@@ -176,52 +223,164 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         type: 'select',
         table: 'person',
         alias: innerQueryAlias,
-        condition: innerCondition
+        condition: innerCondition,
+        join:[],
+        group: `${innerQueryAlias}._id`
     };
+
+    if (lodashGet(innerFilter, 'selectedIndexDay', null)) {
+        const relationshipsJoinForFollowUp = {
+            type: 'left',
+            table: 'followUp',
+            alias: "FollowUp",
+            fields: [
+                {
+                    table: "FollowUp",
+                    name: 'indexDay'
+                },
+                {
+                    table: "FollowUp",
+                    name: 'deleted'
+                }
+            ],
+            on: {
+                'FollowUp.personId': `${innerQueryAlias}._id`,
+                'FollowUp.deleted' : 0,
+                'FollowUp.indexDay': {
+                    ['$gte']: get(innerFilter, 'selectedIndexDay[0]', 0),
+                    ['$lte']: get(innerFilter, 'selectedIndexDay[1]', 150)
+                },
+                'FollowUp.date': {
+                    ['$gte']: {expression: `"${createDate(new Date()).toISOString()}"`},
+                    ['$lte']: {expression: `"${createDate(new Date(), true).toISOString()}"`}
+                }
+            }
+        };
+        innerQuery.join.push(
+            relationshipsJoinForFollowUp
+        )
+        innerQuery.condition.$and.push({
+            'FollowUp.indexDay': {
+                ['$gte']: get(innerFilter, 'selectedIndexDay[0]', 0),
+                ['$lte']: get(innerFilter, 'selectedIndexDay[1]', 150)
+            }
+        })
+    }
 
     // Main query
     let source = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'sourceId' : 'targetId';
     let sourceType = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'sourceType' : 'targetType';
     let target = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'targetId' : 'sourceId';
     let targetType = type === translations.personTypes.contacts || type === translations.personTypes.contactsOfContacts ? 'targetType' : 'sourceType';
+
+    let relationshipJoin = {
+        type: 'left',
+        alias: relationshipAlias,
+        on: {[`${innerQueryAlias}._id`]: `${relationshipAlias}.${target}`}
+    };
+    let relationshipJoinForCases = {
+        table: 'relationship'
+    };
+    let relationshipsJoinForContacts = {
+        query: {
+            type: 'select',
+            table: 'relationship',
+            alias: relationshipAlias,
+            fields: [
+                {
+                    table: relationshipAlias,
+                    name: 'sourceId',
+                    alias: 'sourceId'
+                },
+                {
+                    table: relationshipAlias,
+                    name: 'targetId',
+                    alias: 'targetId'
+                },
+                {
+                    table: relationshipAlias,
+                    name: 'sourceType',
+                    alias: 'sourceType'
+                },
+                {
+                    table: relationshipAlias,
+                    name: 'targetType',
+                    alias: 'targetType'
+                },
+                {
+                    table: relationshipAlias,
+                    name: 'deleted',
+                    alias: 'deleted'
+                }
+            ],
+            // group: `${relationshipAlias}.${target}`
+        }
+    };
+    if (type === translations.personTypes.contacts) {
+        relationshipJoin = Object.assign({}, relationshipJoin, relationshipsJoinForContacts);
+    } else {
+        relationshipJoin = Object.assign({}, relationshipJoin, relationshipJoinForCases);
+    }
+
     let mainQuery = {
         type: 'select',
+        // with: {
+        //     innerQueryTable:{
+        //         query: innerQuery
+        //     }},
+        // table: 'innerQueryTable',
         query: innerQuery,
         alias: innerQueryAlias,
         join: [
-            {
-                type: 'left',
-                table: 'relationship',
-                alias: relationshipAlias,
-                on: {[`${innerQueryAlias}._id`]: `${relationshipAlias}.${target}`}
-            },
+            relationshipJoin,
             {
                 type: 'left',
                 table: 'person',
                 alias: filteredExposuresAlias,
-                on: {[`${relationshipAlias}.${source}`]: `${filteredExposuresAlias}._id`}
+                on: {
+                    [`${relationshipAlias}.${source}`]: `${filteredExposuresAlias}._id`,
+                    [`${relationshipAlias}.deleted`]: 0,
+                }
             },
             {
                 type: 'left',
                 table: 'person',
                 alias: unfilteredExposuresAlias,
                 on: {
-                    [`${relationshipAlias}.${source}`]: `${unfilteredExposuresAlias}._id`
+                    [`${relationshipAlias}.${source}`]: `${unfilteredExposuresAlias}._id`,
+                    [`${relationshipAlias}.deleted`]: 0
                 }
             },
         ],
         condition: mainCondition
     };
 
+    // TODO handle email
+    if (shouldSearchEmail || checkArrayAndLength(lodashGet(innerFilter, 'vaccines', null)) || checkArrayAndLength(lodashGet(innerFilter, 'vaccineStatuses', null))) {
+        delete mainQuery.query;
+        delete mainQuery.alias;
+        let pattern = `(${jsonSql.build(innerQuery).query.slice(0, -1)}) as ${innerQueryAlias}`;
+
+        if (checkArrayAndLength(lodashGet(innerFilter, 'vaccines', null)) ||
+            checkArrayAndLength(lodashGet(innerFilter, 'vaccineStatuses', null))
+        ) {
+            pattern = `${pattern}, json_each(${innerQueryAlias}.json, '$.vaccinesReceived') as "vaccinesReceived"`;
+        }
+        mainQuery.expression = {
+            pattern: pattern
+            // pattern: `(${jsonSql.build(innerQuery).query.slice(0, -1)}) as ${innerQueryAlias}, json_each(${innerQueryAlias}.json, '$.addresses')`
+        }
+    }
+
     if (type === translations.personTypes.contactsOfContacts) {
-        lodashSet(mainQuery, `join[1].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
-        lodashSet(mainQuery, `join[2].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
+        // lodashSet(mainQuery, `join[1].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
+        // lodashSet(mainQuery, `join[2].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
         // mainCondition[`${filteredExposuresAlias}.type`] = translations.personTypes.contacts;
         // mainCondition[`${unfilteredExposuresAlias}.type`] = translations.personTypes.contacts;
     }
     if (type === translations.personTypes.cases) {
-        lodashSet(mainQuery, `join[1].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
-        lodashSet(mainQuery, `join[2].on['${relationshipAlias}.${sourceType}']`, translations.personTypes.contacts);
+        // lodashSet(mainQuery, `join[1].on['${relationshipAlias}Contact.${sourceType}']`, translations.personTypes.contacts);
+        // lodashSet(mainQuery, `join[2].on['${relationshipAlias}Contact.${sourceType}']`, translations.personTypes.contacts);
         // mainCondition[`${unfilteredExposuresAlias}.type`] = translations.personTypes.contacts;
     }
 
@@ -240,7 +399,7 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         ]
     } else {
         mainQuery.limit = 10;
-        if (checkArrayAndLength(lodashGet(innerFilter, 'sort', null)) && lastElement && offset) {
+        if (offset) {
             mainQuery.offset = offset;
         }
         mainQuery.fields = [
@@ -263,8 +422,85 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
             }
         ];
         mainQuery.sort = sort;
-        mainQuery.group = `${innerQueryAlias}._id`
+        mainQuery.group = checkArrayAndLength(lodashGet(innerFilter, 'sort', null)) ? [`${innerQueryAlias}._id`] : [`${innerQueryAlias}.lastName`, `${innerQueryAlias}.firstName`, `${innerQueryAlias}._id`];
+
+        if (lodashGet(innerFilter, 'selectedIndexDay', null)) {
+            mainQuery.group.push(mainQuery.group = `${innerQueryAlias}._id`);
+        }
+        mainQuery = {
+            type:'select',
+            fields:[
+                {
+                    table: 'mainQuery',
+                    name: '_id',
+                    alias: '_id'
+                },
+                {
+                    table: 'mainQuery',
+                    name: 'mainData',
+                    alias: 'mainData'
+                },
+                {
+                    table: 'mainQuery',
+                    name: 'exposureData',
+                    alias: 'exposureData'
+                },
+                // {
+                //     expression: {
+                //         pattern:'{a}.*',
+                //         values: {
+                //             a: {field: 'mainQuery'}
+                //         }
+                //     }},
+                {
+                    query:{
+                        type: 'select',
+                        table: 'relationship',
+                        fields:[{
+                            func: {
+                                name: 'count',
+                                args: [{
+                                    field: 'relationship._id'
+                                }],
+                            }
+                        }],
+                        condition: [
+                            {[`mainQuery._id`]: {$eq:{field:'relationship.targetId'}}},
+                            {'relationship.deleted': 0},
+                        ]
+                    },
+                    alias: 'countExposures'
+                },
+                {
+                    query:{
+                        type: 'select',
+                        table: 'relationship',
+                        fields:[{
+                            func: {
+                                name: 'count',
+                                args: [{
+                                    field: 'relationship._id'
+                                }],
+                            }
+                        }],
+                        condition: [
+                            {[`mainQuery._id`]: {$eq:{field:'relationship.sourceId'}}},
+                            {'relationship.deleted': 0},
+                        ]
+                    },
+                    alias: 'countContacts'
+                },
+            ],
+            query: mainQuery,
+            join:[],
+            condition:{
+                $and:[]
+            },
+            alias: 'mainQuery'
+        }
     }
+
+
 
     return mainQuery;
 }

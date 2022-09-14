@@ -4,15 +4,16 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {InteractionManager, StyleSheet, View} from 'react-native';
+import {InteractionManager, StyleSheet, Text, View} from 'react-native';
 import {Icon, ListItem} from 'react-native-material-ui';
-import styles from './../styles';
 import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {calculateDimension} from './../utils/functions';
 import PermissionComponent from './../components/PermissionComponent';
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
+import {sideMenuKeys} from "../utils/config";
+import styles from './../styles';
 
 class NavigationDrawerListItem extends PureComponent {
 
@@ -31,28 +32,40 @@ class NavigationDrawerListItem extends PureComponent {
         let permissionAddButton = [];
 
         switch(this.props.itemKey) {
-            case 'followups':
+            case sideMenuKeys[0]:
                 permissionElement = [
                     constants.PERMISSIONS_FOLLOW_UP.followUpAll,
                     constants.PERMISSIONS_FOLLOW_UP.followUpList
                 ];
                 break;
-            case 'contacts':
+            case sideMenuKeys[1]:
                 permissionElement = [
                     constants.PERMISSIONS_CONTACT.contactAll,
                     constants.PERMISSIONS_CONTACT.contactList
                 ];
                 break;
-            case 'contactsOfContacts':
+            case sideMenuKeys[2]:
                 permissionElement = [
                     PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsAll,
                     PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsList
                 ];
                 break;
-            case 'cases':
+            case sideMenuKeys[3]:
                 permissionElement = [
                     constants.PERMISSIONS_CASE.caseAll,
                     constants.PERMISSIONS_CASE.caseList
+                ];
+                break;
+            case sideMenuKeys[4]:
+                permissionElement = [
+                    constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                    constants.PERMISSIONS_LAB_RESULT.labResultList
+                ];
+                break;
+            case sideMenuKeys[5]:
+                permissionElement = [
+                    constants.PERMISSIONS_EVENT.eventAll,
+                    constants.PERMISSIONS_EVENT.eventList
                 ];
                 break;
             case 'users':
@@ -65,33 +78,46 @@ class NavigationDrawerListItem extends PureComponent {
                 permissionElement = [];
         }
 
-       if (this.props.addButton && this.props.itemKey === 'cases') {
+       if (this.props.addButton && this.props.itemKey === sideMenuKeys[3]) {
             permissionAddButton = [
                 constants.PERMISSIONS_CASE.caseAll,
                 constants.PERMISSIONS_CASE.caseCreate
             ]
        }
 
+        if (this.props.addButton && this.props.itemKey === sideMenuKeys[4]) {
+            permissionAddButton = [
+                constants.PERMISSIONS_LAB_RESULT.labResultAll,
+                constants.PERMISSIONS_LAB_RESULT.labResultCreate
+            ]
+        }
+
         return (
             <PermissionComponent
                 render={() => (
                     <View style={[style.container]}>
-                        <View style={{flex: this.props.addButton ? 0.8 : 1}}>
+                        <View style={[style.containerWrapper, {borderLeftColor: this.props.isSelected ? styles.primaryColor : 'transparent'}]}>
                             <ListItem
                                 numberOfLines={1}
-                                leftElement={<Icon name={this.props.name} color={this.props.isSelected ? styles.buttonGreen : styles.navigationDrawerItemText} />}
+                                leftElement={<Icon name={this.props.name} color={this.props.isSelected ? styles.primaryColor : styles.textColor} />}
                                 centerElement={this.props.label}
                                 hideChevron={false}
                                 onPress={this.onPress}
                                 style={{
                                     container: {
-                                        backgroundColor: this.props.isSelected ? styles.backgroundGreen : 'white',
-                                        marginTop: this.props.isSelected ? 7.5 : 0,
-                                        marginLeft: this.props.isSelected ? 7.5 : 0,
-                                        marginBottom: this.props.isSelected ? 7.5 : 0,
-                                        marginRight: this.props.isSelected ? (this.props.addButton ? 0 : 7.5) : 0
+                                        backgroundColor: this.props.isSelected ? styles.primaryColorRgb : styles.backgroundColor
                                     },
-                                    primaryText: {fontFamily: 'Roboto-Medium', fontSize: 15, color: this.props.isSelected ? styles.buttonGreen : styles.navigationDrawerItemText}
+                                    leftElementContainer: {
+                                        marginLeft: 11
+                                    },
+                                    centerElementContainer: {
+                                        marginLeft: -16
+                                    },
+                                    primaryText: {
+                                        color: this.props.isSelected ? styles.primaryColor : styles.textColor,
+                                        fontFamily: 'Roboto-Medium',
+                                        fontSize: 16
+                                    }
                                 }}
                             />
                         </View>
@@ -100,29 +126,26 @@ class NavigationDrawerListItem extends PureComponent {
                                 (
                                     <PermissionComponent
                                         render={() => (
-                                            <View style={{
-                                                flex: 0.2,
-                                                justifyContent: 'center',
-                                                backgroundColor: this.props.isSelected ? styles.backgroundGreen : 'white',
-                                                marginTop: this.props.isSelected ? 7.5 : 0,
-                                                marginBottom: this.props.isSelected ? 7.5 : 0,
-                                                marginRight: this.props.isSelected ? 7.5 : 0,
-                                            }}>
+                                            <View
+                                                style={[
+                                                    style.permissionStyle,
+                                                    {
+                                                        backgroundColor: this.props.isSelected ? styles.primaryColorRgb : styles.backgroundColor
+                                                    }
+                                                ]}
+                                            >
                                                 <ElevatedView
-                                                    elevation={3}
-                                                    style={{
-                                                        backgroundColor: styles.buttonGreen,
-                                                        width: calculateDimension(33, false, this.props.screenSize),
-                                                        height: calculateDimension(25, true, this.props.screenSize),
-                                                        borderRadius: 4
-                                                    }}
+                                                    elevation={0}
+                                                    style={[
+                                                        style.permissionAddButton,
+                                                        {
+                                                            width: calculateDimension(40, false, this.props.screenSize),
+                                                            height: calculateDimension(40, true, this.props.screenSize)
+                                                        }
+                                                    ]}
                                                 >
-                                                    <Ripple style={{
-                                                        flex: 1,
-                                                        justifyContent: 'center',
-                                                        alignItems: 'center'
-                                                    }} onPress={this.props.handleOnPressAdd}>
-                                                        <Icon name="add" color={'white'} size={15}/>
+                                                    <Ripple style={style.addButton} onPress={this.props.handleOnPressAdd}>
+                                                        <Text style={style.addButtonText}>Add</Text>
                                                     </Ripple>
                                                 </ElevatedView>
                                             </View>
@@ -159,8 +182,30 @@ NavigationDrawerListItem.defaultProps = {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        width: '100%',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        paddingRight: Platform.OS === 'ios' ? 10 : 0,
+        width: '100%'
+    },
+    containerWrapper: {
+        borderLeftWidth: 5,
+        flex: 1
+    },
+    permissionStyle: {
+        flex: 0.2,
+        justifyContent: 'center'
+    },
+    permissionAddButton: {
+        backgroundColor: styles.primaryColor,
+        borderRadius: 4
+    },
+    addButton: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    addButtonText: {
+        color: styles.backgroundColor,
+        fontSize: 12
     }
 });
 

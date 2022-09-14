@@ -12,12 +12,12 @@ import {ListItem, Icon} from 'react-native-material-ui';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from 'react-redux';
-import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations'
 import {getAddress} from './../utils/functions';
 import get from 'lodash/get';
+import styles from './../styles';
 
 class CaseListItem extends Component {
 
@@ -67,7 +67,7 @@ class CaseListItem extends Component {
         }
 
         return (
-            <ElevatedView elevation={3} style={[style.container, {
+            <ElevatedView elevation={5} style={[style.container, {
                 marginHorizontal: calculateDimension(16, false, screenSize),
                 height: calculateDimension(178, true, screenSize)
             }]}>
@@ -86,7 +86,7 @@ class CaseListItem extends Component {
                         }
                         rightElement={
                             <Ripple onPress={this.onPressMapIcon}>
-                                <Image source={{uri: 'map_icon'}} style={{width: 31, height: 31}}/>
+                                <Image source={{uri: 'map_icon'}} style={style.mapIconStyle} />
                             </Ripple>
                         }
                         style={{
@@ -171,49 +171,53 @@ class CaseListItem extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
+        backgroundColor: styles.backgroundColor,
         borderRadius: 2
     },
     firstSectionContainer: {
         justifyContent: 'space-between',
     },
     addressStyle: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Light',
-        fontSize: 12,
-        color: styles.navigationDrawerItemText
+        fontSize: 14
     },
     secondSectionContainer: {
         justifyContent: 'center'
     },
     thirdSectionContainer: {
+        alignItems: 'center',
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        justifyContent: 'space-between'
     },
     rippleStyle: {
         height: '100%',
         justifyContent: 'center'
     },
     rippleTextStyle: {
+        color: styles.primaryColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 12,
-        color: styles.buttonGreen
+        fontSize: 14
     },
     centerItemContainer: {
+        alignItems: 'center',
         flexDirection: 'row',
-        height: '100%',
-        alignItems: 'center'
+        height: '100%'
+    },
+    mapIconStyle: {
+        height: 31,
+        width: 31
     },
     primaryText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 18,
-        color: 'black'
+        fontSize: 18
     },
     secondaryText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Regular',
-        fontSize: 13,
-        color: 'black'
+        fontSize: 14
     }
 });
 

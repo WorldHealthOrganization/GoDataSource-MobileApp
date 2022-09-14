@@ -1,10 +1,41 @@
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+platform :ios, '11.0'
+
 source 'https://github.com/CocoaPods/Specs.git'
 target 'who_mobile' do
-  pod 'SQLCipher'
+  config = use_native_modules!
+
+  use_react_native!(
+      :path => config[:reactNativePath],
+      # to enable hermes on iOS, change `false` to `true` and then install pods
+      :hermes_enabled => false
+    )
+
+  #pod 'SQLCipher'
   pod 'Parse'
 
   # Add new pods below this line
-  #pod 'ReactNativeDarkMode', :path => '../node_modules/react-native-dark-mode'
+  #pod 'RNSqlite2', :path => '../node_modules/react-native-sqlcipher-2'
+
+
+  #pod 'ReactNativePermissions', :path => '../node_modules/react-native-permissions'
+  #pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
+
+  permissions_path = '../node_modules/react-native-permissions/ios'
+  pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
+  pod 'Permission-FaceID', :path => "#{permissions_path}/FaceID"
+  pod 'Permission-LocationAccuracy', :path => "#{permissions_path}/LocationAccuracy"
+  pod 'Permission-LocationAlways', :path => "#{permissions_path}/LocationAlways"
+  pod 'Permission-LocationWhenInUse', :path => "#{permissions_path}/LocationWhenInUse"
+  pod 'Permission-MediaLibrary', :path => "#{permissions_path}/MediaLibrary"
+  pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary"
+
+ pod 'RNKeychain', :path => '../node_modules/react-native-keychain'
+ pod 'TouchID', :path => '../node_modules/react-native-touch-id'
+
+  #pod 'ReactNativeDarkMode', :path => '../selfnode_modules/react-native-dark-mode'
 
   #pod 'RNDateTimePicker', :path => '../node_modules/@react-native-community/datetimepicker'
 
@@ -15,8 +46,6 @@ target 'who_mobile' do
 
   #pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
 
-  pod 'React', :path => '../node_modules/react-native'
-  pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
   pod 'RNBcrypt', path: '../node_modules/react-native-bcrypt'
   #pod 'SentryReactNative', :path => '../node_modules/react-native-sentry'
 
@@ -25,14 +54,23 @@ target 'who_mobile' do
   # pod 'react-native-document-picker', :path => '../node_modules/react-native-document-picker'
   # pod 'RNFS', :path => '../node_modules/react-native-fs'
 
+  # Enables Flipper.
+    #
+    # Note that if you have use_frameworks! enabled, Flipper will not work and
+    # you should disable the next line.
+   #use_flipper!()
+
+   target 'who_mobileTests' do
+       inherit! :complete
+       # Pods for testing
+     end
+
   post_install do |installer|
+    react_native_post_install(installer)
     installer.pods_project.targets.each do |target|
-      targets_to_ignore = %w(React yoga)
-      
-      if targets_to_ignore.include? target.name
-        target.remove_from_project
-      end
-    end
+                if target.name == "RNSqlite2"
+                end
+            end
   end
 
 end

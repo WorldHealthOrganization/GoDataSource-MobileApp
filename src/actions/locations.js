@@ -10,9 +10,14 @@ import errorTypes from './../utils/errorTypes';
 import {getLocationsByOutbreakIdRequest} from './../queries/locations'
 import {mapLocations} from './../utils/functions'
 import {extractIdFromPouchId} from "../utils/functions";
+import AsyncStorage from "@react-native-community/async-storage";
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeOutbreak(outbreak) {
+    if(outbreak?._id.includes("outbreak.json_")){
+        outbreak._id = outbreak._id.substring(14, outbreak._id.length);
+    }
+    AsyncStorage.setItem('outbreakId', outbreak?._id);
     return {
         type: ACTION_TYPE_STORE_OUTBREAK,
         payload: outbreak

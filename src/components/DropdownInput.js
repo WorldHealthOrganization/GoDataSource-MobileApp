@@ -4,12 +4,13 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {View, Text} from 'react-native';
+import {View, StyleSheet, Text} from 'react-native';
 import PropTypes from 'prop-types';
 import {getTranslation, getTooltip, getDropDownInputDisplayParameters} from './../utils/functions';
 import { Dropdown } from 'react-native-material-dropdown';
 import TooltipComponent from './TooltipComponent'
 import get from 'lodash/get';
+import styles from './../styles';
 
 class DropdownInput extends PureComponent {
 
@@ -39,14 +40,15 @@ class DropdownInput extends PureComponent {
 
         return (
             <View style={[{flexDirection: 'row'}, this.props.style]}>
-                <View style = {{flex: 1}}> 
+                <View style={style.dropdownWrapper}> 
                     <Dropdown
                         label={this.props.isRequired ? getTranslation(this.props.label, this.props.translation) + ' * ' : getTranslation(this.props.label, this.props.translation)}
                         data={this.props.data}
                         value={this.props.value || ''}
-                        fontSize={15}
-                        labelFontSize={15}
-                        selectedItemColor={'rgb(255,60,56)'}
+                        fontSize={14}
+                        labelFontSize={14}
+                        textColor={styles.textColor}
+                        selectedItemColor={styles.primaryColor}
                         onChangeText={this.handleOnChangeText}
                         dropdownMargins={{min: 4, max: 8}}
                         dropdownPosition={dropDownParams.dropdownPosition}
@@ -55,9 +57,7 @@ class DropdownInput extends PureComponent {
                 </View>
                 {
                     tooltip.hasTooltip === true ? (
-                        <TooltipComponent
-                            tooltipMessage={tooltip.tooltipMessage}
-                        />
+                        <TooltipComponent tooltipMessage={tooltip.tooltipMessage} />
                     ) : null
                 }
             </View>
@@ -65,34 +65,24 @@ class DropdownInput extends PureComponent {
     }
 
     viewInput = () => {
-        let tooltip = getTooltip(this.props.label, this.props.translation)
+        let tooltip = getTooltip(this.props.label, this.props.translation);
         return (
-            <View style={[{flexDirection: 'row'}, this.props.style]}>
-                <View style={{flex: 1}}> 
-                    <Text style={{
-                        fontFamily: 'Roboto-Regular',
-                        fontSize: 15,
-                        textAlign: 'left',
-                        color: 'rgb(0,0,0)',
-                        marginBottom: 2,
-                        marginTop: 7,
-                    }}>
-                        {getTranslation(this.props.label, this.props.translation)}
-                    </Text>
-                    <Text style={{
-                        fontFamily: 'Roboto-Light',
-                        fontSize: 15,
-                        textAlign: 'left',
-                        color: 'rgb(60,60,60)',
-                    }}>
+            <View style={[{flexDirection: 'row', marginTop: 8}, this.props.style]}>
+                <View style={style.dropdownWrapper}>
+                    {
+                        this.props.skipLabel ? (null) : (
+                            <Text style={style.dropdownWrapperLabel}>
+                                {getTranslation(this.props.label, this.props.translation)}
+                            </Text>
+                        )
+                    }
+                    <Text style={style.dropdownWrapperValue}>
                         {this.props.value !== undefined ? this.props.value : ''}
                     </Text>
                 </View>
                 {
                     tooltip.hasTooltip === true ? (
-                        <TooltipComponent
-                            tooltipMessage={tooltip.tooltipMessage}
-                        />
+                        <TooltipComponent tooltipMessage={tooltip.tooltipMessage} />
                     ) : null
                 }
             </View>
@@ -114,8 +104,7 @@ class DropdownInput extends PureComponent {
                         ? this.props.data[this.props.data.map((e) => {return e.value}).indexOf(state)].type 
                         : this.props.objectType 
                             ?   (
-                                    this.props.objectType === 'Address' || 
-                                    this.props.objectType === 'LabResult' || 
+                                    this.props.objectType === 'Address' ||
                                     this.props.objectType === 'Documents' || 
                                     this.props.objectType === 'Sort' || 
                                     this.props.objectType === 'DateRanges' ||
@@ -142,8 +131,7 @@ class DropdownInput extends PureComponent {
                 returnedValue,
                 this.props.id,
                 this.props.objectType 
-                    ? (this.props.objectType === 'Address' || 
-                        this.props.objectType === 'LabResult' || 
+                    ? (this.props.objectType === 'Address' ||
                         this.props.objectType === 'Documents' || 
                         this.props.objectType === 'Sort' || 
                         this.props.objectType === 'DateRanges' ||
@@ -159,6 +147,21 @@ class DropdownInput extends PureComponent {
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
+const style = StyleSheet.create({
+    dropdownWrapper: {
+        flex: 1
+    },
+    dropdownWrapperLabel: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    },
+    dropdownWrapperValue: {
+        color: styles.textColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    }
+});
 
 DropdownInput.propTypes = {
     id: PropTypes.string.isRequired,
@@ -169,6 +172,7 @@ DropdownInput.propTypes = {
     isRequired: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
     style: PropTypes.object,
+    skipLabel: PropTypes.bool
 };
 
 export default DropdownInput;

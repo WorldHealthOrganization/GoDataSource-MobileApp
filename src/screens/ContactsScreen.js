@@ -5,12 +5,11 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import AnimatedListView from './../components/AnimatedListView';
 import {getContactsForOutbreakId} from './../actions/contacts';
@@ -19,6 +18,7 @@ import {Popup} from 'react-native-map-link';
 import translations from './../utils/translations';
 import config from './../utils/config';
 import Breadcrumb from './../components/Breadcrumb';
+import {setDisableOutbreakChange} from "../actions/outbreak";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
@@ -28,6 +28,12 @@ import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import {bindActionCreators} from "redux";
 import {setLoaderState} from "../actions/app";
 import PermissionComponent from './../components/PermissionComponent';
+import withPincode from "../components/higherOrderComponents/withPincode";
+import {getFollowUpsForOutbreakId} from "../actions/followUps";
+import {compose} from "redux";
+import {Navigation} from "react-native-navigation";
+import constants from "../utils/constants";
+import styles from './../styles';
 
 class ContactsScreen extends Component {
 
@@ -37,10 +43,10 @@ class ContactsScreen extends Component {
             loading: false,
             sortData: false,
             isVisible: false,
-            latitude: 0,
-            longitude: 0,
-            sourceLatitude: 0,
-            sourceLongitude: 0,
+            latitude: '',
+            longitude: '',
+            sourceLatitude: '',
+            sourceLongitude: '',
             error: null,
             refreshing: false,
             riskColors: {}
@@ -57,6 +63,20 @@ class ContactsScreen extends Component {
         this.setState({
             riskColors: riskColors
         })
+
+
+        const listener = {
+            componentDidAppear: () => {
+                console.log("Outbreak stuff Contact did appear")
+                this.props.setDisableOutbreakChange(false);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+    }
+
+    componentWillUnmount() {
+        this.navigationListener.remove();
     }
 
     componentDidUpdate(prevProps) {
@@ -75,15 +95,13 @@ class ContactsScreen extends Component {
 
         let filterNumbers = 0;
         if (mainFilter) {
-            if (get(mainFilter, 'gender', null) !== null) {
-                ++filterNumbers
-            }
-            if (get(mainFilter, 'age', null) !== null) {
-                ++filterNumbers
-            }
-            if (checkArrayAndLength(get(mainFilter, 'selectedLocations', null))) {
-                ++filterNumbers
-            }
+            Object.keys(mainFilter).forEach(key => {
+                if(checkArrayAndLength(mainFilter[key])){
+                    filterNumbers++;
+                } else if(mainFilter[key] !== null && !Array.isArray(mainFilter[key])){
+                    filterNumbers++;
+                }
+            })
         }
         let filterText = filterNumbers === 0 ? `${getTranslation(translations.generalLabels.filterTitle, this.props.translation)}` : `(${filterNumbers})`;
 
@@ -99,48 +117,41 @@ class ContactsScreen extends Component {
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View style={{flex: 1, flexDirection: 'row'}}>
+                        <View style={style.headerContainer}>
                             <View
                                 style={[style.breadcrumbContainer]}>
                                 <Breadcrumb
                                     key="contactKey"
                                     entities={contactTitle}
-                                    navigator={this.props.navigator}
+                                    componentId={this.props.componentId}
                                 />
                             </View>
-                            <View style={{flex: 0.15, marginRight: 10}}>
-                                <Ripple style={{
-                                    flex: 1,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }} onPress={this.handleOnPressQRCode}>
-                                    <MaterialCommunityIcons name="qrcode-scan" color={'black'} size={20}/>
+                            <View style={style.headerButtonSpacing}>
+                                <Ripple style={style.headerButtonInner} onPress={this.handleOnPressQRCode}>
+                                    <MaterialCommunityIcons name="qrcode-scan" color={styles.textColor} size={24} />
                                 </Ripple>
                             </View>
 
-                            <View style={{flex: 0.11 /*, marginRight: 10*/}}>
+                            <View>
                                 <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.buttonGreen,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
+                                    elevation={0}
+                                    style={[
+                                        style.headerButton, 
+                                        {
+                                            width: calculateDimension(30, false, this.props.screenSize),
+                                            height: calculateDimension(30, true, this.props.screenSize)
+                                        }
+                                    ]}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15}/>
+                                    <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={styles.textColor} size={18} />
                                     </Ripple>
                                 </ElevatedView>
                             </View>
 
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
@@ -156,6 +167,7 @@ class ContactsScreen extends Component {
                                 dataType={'Contact'}
                                 filterText={filterText}
                                 style={[style.listViewStyle]}
+                                goToScreen={this.goToScreen}
                                 componentContainerStyle={style.componentContainerStyle}
                                 refreshing={this.state.refreshing}
                                 onRefresh={this.handleOnRefresh}
@@ -176,16 +188,8 @@ class ContactsScreen extends Component {
                     />
                     {
                         this.props.loadMore ? (
-                            <View style={
-                                {
-                                    width: '100%',
-                                    height: 60,
-                                    backgroundColor: styles.appBackground,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <ActivityIndicator animating size={'large'} />
+                            <View style={style.loadMore}>
+                                <ActivityIndicator animating size={'small'} color={styles.backgroundColor} />
                             </View>
                         ) : (null)
                     }
@@ -228,46 +232,60 @@ class ContactsScreen extends Component {
         });
     };
 
+    goToScreen = (contactData, index) => {
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: constants.appScreens.contactSingleScreen,
+                passProps: {
+                    isNew: false,
+                    refresh: this.refresh,
+                    contact: contactData,
+                    index
+                }
+            }
+        })
+    }
+
     handleOnPressMap = (dataFromMapHandler) => {
         this.setState(prevState => ({
-            latitude: get(dataFromMapHandler, 'latitude', 0),
-            longitude: get(dataFromMapHandler, 'longitude', 0),
-            sourceLatitude: get(dataFromMapHandler, 'sourceLatitude', 0),
-            sourceLongitude: get(dataFromMapHandler, 'sourceLongitude', 0),
+            latitude: get(dataFromMapHandler, 'latitude', ''),
+            longitude: get(dataFromMapHandler, 'longitude', ''),
+            sourceLatitude: get(dataFromMapHandler, 'sourceLatitude', ''),
+            sourceLongitude: get(dataFromMapHandler, 'sourceLongitude', ''),
             isVisible: get(dataFromMapHandler, 'isVisible', false),
             error: get(dataFromMapHandler, 'error', null)
         }))
     };
 
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-                side: 'left',
-                animated: true,
-                to: 'open'
-            })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'contacts';
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
             passProps: {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     handleOnPressQRCode = () => {
         console.log('handleOnPressQRCode');
 
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
             passProps: {
                 pushNewScreen: this.pushNewEditScreenLocal
             }
-        })
+        }))
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {
@@ -276,11 +294,11 @@ class ContactsScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.navigator, get(this.props, 'user', null), get(this.props, 'translation', null), (error, itemType, record) => {
+            pushNewEditScreen(QRCodeInfo, this.props.componentId, get(this.props, 'user', null), get(this.props, 'outbreak', null), get(this.props, 'translation', null), (error, itemType, record) => {
                 this.setState({
                     loading: false
                 }, () => {
-                    handleQRSearchTransition(this.props.navigator, error, itemType, record, get(this.props, 'user', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
+                    handleQRSearchTransition(this.props.componentId, error, itemType, record, get(this.props, 'user', null), get(this.props, 'outbreak', null), get(this.props, 'translation', null), get(this.props, 'role', []), this.props.refresh);
                 });
             })
         });
@@ -293,32 +311,49 @@ class ContactsScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
+        flex: 1
+    },
+    headerContainer: {
         flex: 1,
-        backgroundColor: 'white',
-    },
-    containerContent: {
-        flex: 1,
-        backgroundColor: styles.appBackground,
-        paddingBottom: 25
-    },
-    separatorComponentStyle: {
-        height: 8
-    },
-    title: {
-        fontSize: 17,
-        fontFamily: 'Roboto-Medium',
-    },
-    mapContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF'
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingRight: 16
     },
     breadcrumbContainer: {
-        flex: 0.8,
+        alignItems: 'center',
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'flex-start'
     },
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    headerButtonSpacing: {
+        marginRight: 8
+    },
+    containerContent: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
+    },
+    loadMore: {
+        alignItems: 'center',
+        backgroundColor: styles.primaryColor,
+        height: 30,
+        justifyContent: 'center',
+        width: '100%'
+    },
+    mapContainer: {
+        alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1,
+        justifyContent: 'center'
+    }
 });
 
 function mapStateToProps(state) {
@@ -330,14 +365,21 @@ function mapStateToProps(state) {
         loaderState:    get(state, 'app.loaderState', false),
         referenceData:  get(state, 'referenceData', []),
         role:           get(state, 'role', []),
-        location:       get(state, 'locations.locationsList')
+        location:       get(state, 'locations.locationsList'),
+        outbreak:       get(state, 'outbreak')
     };
 }
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        setLoaderState
+        setLoaderState,
+        setDisableOutbreakChange
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getContactsForOutbreakId, 'ContactsScreen')(ContactsScreen));
+// export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getContactsForOutbreakId, 'ContactsScreen')(ContactsScreen));
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchProps),
+    enhanceListWithGetData(getContactsForOutbreakId, 'ContactsScreen')
+)(ContactsScreen)

@@ -3,23 +3,28 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import {Alert, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {LoaderScreen} from 'react-native-ui-lib';
 import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import styles from './../styles';
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
-import Ripple from 'react-native-material-ripple';
+import Button from './../components/Button';
 import CardComponent from './../components/CardComponent';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
+import {
+    PERMISSION_CREATE_CONTACT,
+    PERMISSION_CREATE_CONTACT_OF_CONTACT,
+    PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
+} from "../utils/constants";
+import styles from './../styles';
 
-class ContactsSingleAddress extends PureComponent {
+class ContactsSingleAddress extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -40,7 +45,7 @@ class ContactsSingleAddress extends PureComponent {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 1) {
+        if (nextProps.routeKey === 'address') {
             return true;
         }
         return false;
@@ -52,33 +57,18 @@ class ContactsSingleAddress extends PureComponent {
     render() {
         if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'} />
+                <LoaderScreen
+                    overlay={true}
+                    loaderColor={styles.primaryColor}
+                    backgroundColor={'rgba(255, 255, 255, 0.8)'} />
             )
         }
 
-        let permissionsList = [
-            constants.PERMISSIONS_CONTACT.contactAll
-        ];
+        let permissionsList = [];
         if (this.props.isNew) {
-            if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList.push(
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate
-                )
-            } else {
-                permissionsList.push(
-                    constants.PERMISSIONS_CONTACT.contactCreate
-                )
-            }
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_CREATE_CONTACT_OF_CONTACT : PERMISSION_CREATE_CONTACT;
         } else {
-            if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList.push(
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
-                )
-            } else {
-                permissionsList.push(
-                    constants.PERMISSIONS_CONTACT.contactModify
-                )
-            }
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_EDIT_CONTACT_OF_CONTACT : PERMISSION_EDIT_CONTACT;
         }
 
         return (
@@ -101,7 +91,7 @@ class ContactsSingleAddress extends PureComponent {
                     />
                     <ScrollView
                         style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 16 }]}
                     >
                     <View style={style.container}>
                         {
@@ -112,18 +102,16 @@ class ContactsSingleAddress extends PureComponent {
                     </View>
                     {
                         this.props.isEditMode !== null && this.props.isEditMode !== undefined && this.props.isEditMode === true ? (
-                            <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
-                                <Ripple
-                                    style={{
-                                        height: 25,
-                                        justifyContent: 'center'
-                                    }}
+                            <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}>
+                                <Button
+                                    title={this.props.contact.addresses && this.props.contact.addresses.length === 0 ? getTranslation(translations.contactSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.contactSingleScreen.moreAddressesText, this.props.translation)}
                                     onPress={this.props.onPressAddAdrress}
-                                >
-                                    <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
-                                        {this.props.contact.addresses && this.props.contact.addresses.length === 0 ? getTranslation(translations.contactSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.contactSingleScreen.moreAddressesText, this.props.translation)}
-                                    </Text>
-                                </Ripple>
+                                    color={styles.backgroundColor}
+                                    titleColor={styles.textColor}
+                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                    width={'100%'}
+                                    style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                />
                             </View>
                         ) : null
                     }
@@ -143,13 +131,13 @@ class ContactsSingleAddress extends PureComponent {
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView elevation={5} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4,
-                minHeight: calculateDimension(72, true, this.props.screenSize)
+                marginVertical: 6,
+                minHeight: calculateDimension(72, true, this.props.screenSize),
+                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -162,7 +150,7 @@ class ContactsSingleAddress extends PureComponent {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
+            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -175,14 +163,17 @@ class ContactsSingleAddress extends PureComponent {
         let minimumDate = undefined;
         let maximumDate = undefined;
 
+        console.log("This is rendering the items in the view", item, cardIndex);
+
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForContactsSingleScreenDropdownInput(item, cardIndex);
         } else if (item.type === 'ActionsBar') {
             item.onPressArray = [this.props.onDeletePress];
             if (this.props.isNew) {
-                item.textsArray = [item.textsArray[0], translations.addressFieldLabels.copyAddress];
-                item.textsStyleArray = [item.textsStyleArray[0], {color: styles.buttonGreen}];
+                item.textsArray = [item.textsArray[0], this.props.type === translations.personTypes.contactsOfContacts ? translations.addressFieldLabels.copyAddressContact : translations.addressFieldLabels.copyAddress];
+                item.textsStyleArray = [item.textsStyleArray[0], {color: styles.backgroundColor}];
                 item.onPressArray = [item.onPressArray[0], this.props.onPressCopyAddress];
+                item.iconArray = [item.iconArray[0], null];
             }
         }
 
@@ -213,7 +204,6 @@ class ContactsSingleAddress extends PureComponent {
                 item={item}
                 isEditMode={this.props.isEditMode}
                 isEditModeForDropDownInput={this.props.isEditMode}
-                contact={this.props.contact}
                 value={value}
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
@@ -339,33 +329,34 @@ class ContactsSingleAddress extends PureComponent {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    container: {
+        flex: 1
+    },
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        paddingBottom: 8
     },
     subcontainerCardComponent: {
         alignItems: 'center',
-        flex: 1
+        flex: 1,
+        marginVertical: 4
     },
     viewContainer: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    containerScrollView: {
+    cardStyle: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        marginVertical: 6
+    },
+    containerScrollView: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'
-    },
-    container: {
-        flex: 1,
-        marginBottom: 30
     }
 });
 

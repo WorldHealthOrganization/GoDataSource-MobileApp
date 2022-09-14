@@ -3,7 +3,7 @@
  */
 import styles from './../styles';
 import {Platform} from 'react-native';
-import translations, {contactsOfContactsScreen} from './translations';
+import translations from './translations';
 import {createDate} from './../utils/functions';
 import constants from './../utils/constants';
 
@@ -17,31 +17,36 @@ const designScreenSize = {
     height: 667
 };
 
-const sideMenuItems = [
-    {
-        key: 'followups',
+export const sideMenuKeys = ["followups", 'contacts', 'contactsOfContacts', 'cases', 'labResults', 'events', 'users', 'help'];
+
+const sideMenuItems = {
+    [sideMenuKeys[0]]: {
         name: 'update',
         label: translations.navigationDrawer.followUpsLabel,
     },
-    {
-        key: 'contacts',
+    [sideMenuKeys[1]]: {
         name: 'people',
         label: translations.navigationDrawer.contactsLabel,
+    },
+    [sideMenuKeys[2]]: {
+        name: 'groups',
+        label: translations.contactsOfContactsScreen.contactsTitle,
         // addButton: true
     },
-    {
-        key: 'contactsOfContacts',
-        name: 'people',
-        label: contactsOfContactsScreen.contactsTitle,
-        // addButton: true
-    },
-    {
-        key: 'cases',
-        name: 'create-new-folder',
+    [sideMenuKeys[3]]: {
+        name: 'person',
         label: translations.navigationDrawer.casesLabel,
         addButton: true
+    },
+    [sideMenuKeys[4]]: {
+        name: 'science',
+        label: translations.navigationDrawer.labResultsLabel
+    },
+    [sideMenuKeys[5]]: {
+        name: 'event',
+        label: translations.navigationDrawer.eventsLabel
     }
-];
+};
 
 const dropDownValues = [
     {
@@ -66,6 +71,10 @@ const tabsValuesRoutes = {
         {key: 'filters', title: translations.followUpFilter.filterTitle},
         {key: 'sort', title: translations.followUpFilter.sortTitle}
     ],
+    personFilter: [
+        {key: 'filters', title: translations.followUpFilter.filterTitle},
+        {key: 'sort', title: translations.followUpFilter.sortTitle}
+    ],
     helpFilter: [
         {key: 'filters', title: translations.followUpFilter.filterTitle},
         {key: 'sort', title: translations.followUpFilter.sortTitle}
@@ -74,9 +83,24 @@ const tabsValuesRoutes = {
         {key: 'filters', title: translations.casesFilter.filterTitle},
         {key: 'sort', title: translations.casesFilter.sortTitle}
     ],
+    eventsFilter: [
+        {key: 'filters', title: translations.eventsFilter.filterTitle},
+        {key: 'sort', title: translations.eventsFilter.sortTitle}
+    ],
     followUpsSingle: [
         {key: 'genInfo', title: translations.followUpsSingleScreen.detailsiTitle},
         {key: 'quest', title: translations.followUpsSingleScreen.questionnaireTitle}
+    ],
+    labResultsSingle: [
+        {key: 'genInfo', title: translations.followUpsSingleScreen.detailsiTitle},
+        {key: 'quest', title: translations.followUpsSingleScreen.questionnaireTitle}
+    ],
+    labResultsFilter: [
+        {key: 'filters', title: translations.casesFilter.filterTitle},
+        {key: 'sort', title: translations.casesFilter.sortTitle}
+    ],
+    labResultsFilterNoFilter: [
+        {key: 'sort', title: translations.casesFilter.sortTitle}
     ],
     helpSingle: [
         {key: 'details', title: translations.helpScreen.helpSingleScreenTab},
@@ -85,24 +109,38 @@ const tabsValuesRoutes = {
         {key: 'personal', title: translations.caseSingleScreen.personalTitle},
         {key: 'address', title: translations.caseSingleScreen.addressTitle},
         {key: 'infection', title: translations.caseSingleScreen.infectionTitle},
-        {key: 'caseInvestigation', title: translations.caseSingleScreen.investigationTitle}
+        {key: 'caseInvestigation', title: translations.followUpsSingleScreen.questionnaireTitle}
     ],
     casesSingleViewEdit: [
         {key: 'personal', title: translations.caseSingleScreen.personalTitle},
         {key: 'address', title: translations.caseSingleScreen.addressTitle},
         {key: 'infection', title: translations.caseSingleScreen.infectionTitle},
-        {key: 'exposures', title: 'Contacts'},
-        {key: 'caseInvestigation', title: translations.caseSingleScreen.investigationTitle}
+        {key: 'contacts', title: 'Contacts'},
+        {key: 'exposures', title: 'Exposures'},
+        {key: 'caseInvestigation', title: translations.followUpsSingleScreen.questionnaireTitle}
+    ],
+    eventsSingle: [
+        {key: 'details', title: translations.eventSingleScreen.detailsTitle},
+        {key: 'address', title: translations.eventSingleScreen.addressTitle},
+    ],
+    eventsSingleViewEdit: [
+        {key: 'details', title: translations.eventSingleScreen.detailsTitle},
+        {key: 'address', title: translations.eventSingleScreen.addressTitle},
+        {key: 'contacts', title: 'Contacts'},
+        {key: 'exposures', title: 'Exposures'},
     ],
     contactsSingle: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
+        {key: 'contacts', title: 'Contacts'},
         {key: 'exposures', title: translations.contactSingleScreen.exposuresTitle},
+        {key: 'investigation', title: translations.followUpsSingleScreen.questionnaireTitle},
         {key: 'calendar', title: translations.contactSingleScreen.calendarTitle}
     ],
     contactsSingleWithoutExposures: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
+        {key: 'investigation', title: translations.followUpsSingleScreen.questionnaireTitle},
         {key: 'calendar', title: translations.contactSingleScreen.calendarTitle}
     ],
     contactsOfContactsSingle: [
@@ -118,6 +156,156 @@ const tabsValuesRoutes = {
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
         {key: 'address', title: translations.contactSingleScreen.addressTitle},
         {key: 'exposures', title: translations.contactSingleScreen.exposuresTitle},
+        {key: 'investigation', title: translations.followUpsSingleScreen.questionnaireTitle},
+    ]
+};
+
+const addressFields = {
+    fields: [
+        {
+            cardNumber: 1,
+            id: 'typeId',
+            label: translations.addressFieldLabels.name,
+            labelValue: 'test',
+            type: 'DropdownInput',
+            value: '',
+            isRequired: true,
+            isEditMode: true,
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
+            id: 'date',
+            label: translations.addressFieldLabels.date,
+            labelValue: 'test',
+            value: '',
+            type: "DatePicker",
+            isRequired: false,
+            isEditMode: true,
+            format: 'MM/dd/YYYY',
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
+            id: 'emailAddress',
+            label: 'Email',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
+            id: 'phoneNumber',
+            label: translations.caseSingleScreen.phoneNumber,
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            keyboardType: 'phone-pad',
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
+            id: 'locationId',
+            label: translations.addressFieldLabels.area,
+            labelValue: 'test',
+            type: 'DropDownSectioned',
+            value: '',
+            isRequired: true,
+            isEditMode: true,
+            objectType: 'Address',
+            single: true
+        },
+        {
+            cardNumber: 1,
+            id: 'city',
+            label: translations.addressFieldLabels.city,
+            labelValue: 'test',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            multiline: true,
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
+            id: 'postalCode',
+            label: translations.addressFieldLabels.zip,
+            labelValue: 'test',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            multiline: true,
+            objectType: 'Address'
+        },
+        {
+            cardNumber: 1,
+            id: 'addressLine1',
+            label: translations.addressFieldLabels.address,
+            labelValue: 'test',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            multiline: true,
+            objectType: 'Address'
+        },
+        // Is the person next to you support
+        {
+            cardNumber: 1,
+            id: 'geoLocationAccurate',
+            label: translations.addressFieldLabels.isThePersonNextToYou,
+            labelValue: 'test',
+            type: 'SwitchInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            activeButtonColor: styles.backgroundColor,
+            activeBackgroundColor: styles.dangerColor,
+            objectType: 'Address'
+        },
+        // Add coordinates support
+        {
+            cardNumber: 1,
+            id: 'lng',
+            label: translations.addressFieldLabels.longitude,
+            labelValue: 'test',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            multiline: false,
+            objectType: 'Address',
+            keyboardType: 'numeric'
+        },
+        {
+            cardNumber: 1,
+            id: 'lat',
+            label: translations.addressFieldLabels.latitude,
+            labelValue: 'test',
+            type: 'TextInput',
+            value: '',
+            isRequired: false,
+            isEditMode: true,
+            multiline: false,
+            objectType: 'Address',
+            keyboardType: 'numeric'
+        },
+        {
+            cardNumber: 1,
+            id: 'deleteButton',
+            type: 'ActionsBar',
+            labelValue: 'test',
+            textsArray: [translations.addressFieldLabels.deleteButton],
+            textsStyleArray: [{color: styles.backgroundColor}],
+            onPressArray: [],
+            objectType: 'Address',
+            iconArray: ['delete']
+        }
     ]
 };
 
@@ -134,6 +322,18 @@ const followUpsSingleScreen = {
                     isRequired: true,
                     isEditMode: false,
                     format: 'MM/dd/YYYY',
+                    objectType: 'FollowUp'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'targeted',
+                    label: translations.followUpsSingleScreen.targeted,
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: true,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
                     objectType: 'FollowUp'
                 },
                 {
@@ -156,115 +356,362 @@ const followUpsSingleScreen = {
                     value: false,
                     isRequired: true,
                     isEditMode: true,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
                     objectType: 'FollowUp'
                 },
-                // {
-                //     cardNumber: 1,
-                //     id: 'targeted',
-                //     label: translations.followUpsSingleScreen.targeted,
-                //     type: 'SwitchInput',
-                //     value: false,
-                //     isRequired: false,
-                //     isEditMode: true,
-                //     activeButtonColor: 'green',
-                //     activeBackgroundColor: 'green',
-                //     objectType: 'FollowUp'
-                // },
+            ]
+        },
+        {
+            fields:[
+                {
+                    cardNumber: 3,
+                    id: 'teamId',
+                    label: translations.followUpsSingleScreen.team,
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    objectType: 'FollowUp',
+                    skipNone: true
+                },
             ]
         }
     ],
-    address: {
+    address: addressFields
+};
+const labResultsSingleScreen = {
+    generalInfo: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'sampleIdentifier',
+                    label: translations.labResultsSingleScreen.sampleLabId,
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateSampleTaken',
+                    label: translations.labResultsSingleScreen.sampleTaken,
+                    type: 'DatePicker',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'LabResult',
+                    skipNone: true
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateSampleDelivered',
+                    label: translations.labResultsSingleScreen.sampleDelivered,
+                    type: 'DatePicker',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateTesting',
+                    label: translations.labResultsSingleScreen.dateSampleTested,
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateOfResult',
+                    label: translations.labResultsSingleScreen.dateOfResult,
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'LabResult'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'labName',
+                    label: translations.labResultsSingleScreen.labName,
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'sampleType',
+                    label: translations.labResultsSingleScreen.sampleType,
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'testType',
+                    label: translations.labResultsSingleScreen.testType,
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'result',
+                    label: translations.labResultsSingleScreen.result,
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'testedFor',
+                    label: translations.labResultsSingleScreen.testedFor,
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'status',
+                    label: translations.labResultsSingleScreen.status,
+                    labelValue: '',
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'quantitativeResult',
+                    label: translations.labResultsSingleScreen.quantResult,
+                    labelValue: '',
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                },{
+                    cardNumber: 1,
+                    id: 'notes',
+                    label: translations.labResultsSingleScreen.notes,
+                    labelValue: '',
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult'
+                }
+            ],
+        },
+        {
+            fields:[
+                {
+                    cardNumber: 2,
+                    id: 'sequence.hasSequence',
+                    label: translations.labResultsSingleScreen.hasVariantStrain,
+                    labelValue: '',
+                    value: false,
+                    type: "SwitchInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.noSequenceReason',
+                    label: translations.labResultsSingleScreen.sequenceReason,
+                    labelValue: '',
+                    value: '',
+                    type: "TextInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: false
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.dateSampleSent',
+                    label: translations.labResultsSingleScreen.dateSampleSentSeq,
+                    labelValue: '',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: true,
+                    format: 'MM/dd/YYYY'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.labId',
+                    label: translations.labResultsSingleScreen.labNameSeq,
+                    labelValue: '',
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: true,
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.dateResult',
+                    label: translations.labResultsSingleScreen.dateResultSeq,
+                    labelValue: '',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: true,
+                    format: 'MM/dd/YYYY'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'sequence.resultId',
+                    label: translations.labResultsSingleScreen.resultSeq,
+                    labelValue: '',
+                    value: '',
+                    type: "DropdownInput",
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'LabResult',
+                    dependsOn: 'sequence.hasSequence',
+                    showWhenDependence: true,
+                }
+            ]
+        }
+    ]
+};
+const labResultsFilterScreenNoContactPermission = {
+    sort: {
         fields: [
             {
-                cardNumber: 2,
-                id: 'typeId',
-                label: translations.addressFieldLabels.name,
-                labelValue: 'test',
-                type: 'DropdownInput',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                objectType: 'Address'
+                cardNumber: 1,
+                label: translations.sortTab.SortBy,
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.separatorColor
             },
             {
                 cardNumber: 1,
-                id: 'date',
-                label: translations.addressFieldLabels.date,
-                labelValue: 'test',
-                value: '',
-                type: "DatePicker",
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortCriteria,
                 isRequired: false,
-                isEditMode: false,
-                format: 'MM/dd/YYYY',
-                objectType: 'Address'
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
             },
             {
-                cardNumber: 2,
-                id: 'locationId',
-                label: translations.addressFieldLabels.area,
-                labelValue: 'test',
-                type: 'DropDownSectioned',
-                value: '',
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortOrder,
                 isRequired: false,
-                isEditMode: false,
-                objectType: 'Address',
-                single: true
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
             },
             {
-                cardNumber: 2,
-                id: 'city',
-                label: translations.addressFieldLabels.city,
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
                 labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 2,
-                id: 'postalCode',
-                label: translations.addressFieldLabels.zip,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 2,
-                id: 'addressLine1',
-                label: translations.addressFieldLabels.address,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 2,
-                id: 'phoneNumber',
-                label: translations.contactSingleScreen.phoneNumber,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: false,
-                multiline: false,
-                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
-                objectType: 'Address'
-            },
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.backgroundColor}],
+                onPressArray: [],
+                objectType: 'Sort',
+                iconArray: ['delete']
+            }
         ]
-    },
+    }
 };
-
+const labResultsFilterScreen = {
+    filter: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    label: translations.labResultsFilter.personType,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },
+                {
+                    cardNumber: 1,
+                    id: 'type',
+                    type: 'Selector',
+                    value: '',
+                    shouldTranslate: true,
+                    data: [{value: translations.personTypes.cases, selected: true}, {value: translations.personTypes.contacts, selected: true}]
+                }
+            ]
+        }
+    ],
+    sort: {
+        fields: [
+            {
+                cardNumber: 1,
+                label: translations.sortTab.SortBy,
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.separatorColor
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortCriteria,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortOrder,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.backgroundColor}],
+                onPressArray: [],
+                objectType: 'Sort',
+                iconArray: ['delete']
+            }
+        ]
+    }
+};
 const caseSingleScreen = {
     personal: [
         {
@@ -311,6 +758,20 @@ const caseSingleScreen = {
                     activeButtonColor: 'red',
                     activeBackgroundColor: 'red',
                     objectType: 'Case'
+                },
+
+                {
+                    cardNumber: 2,
+                    id: 'pregnancyStatus',
+                    label: translations.caseSingleScreen.pregnancyStatus,
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Case',
+                    skipNone: true
                 },
                 {
                     cardNumber: 1,
@@ -370,6 +831,29 @@ const caseSingleScreen = {
                     isEditMode: false,
                     objectType: 'Case'
                 },
+                {
+                    cardNumber: 2,
+                    id: 'dateOfReporting',
+                    label: translations.caseSingleScreen.dateOfReporting,
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: true,
+                    isEditMode: false,
+                    format: 'YYYY-MM-dd',
+                    objectType: 'Case'
+                },
+                {
+                    cardNumber: 2,
+                    id: 'isDateOfReportingApproximate',
+                    label: translations.caseSingleScreen.isDateOfReportingApproximate,
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
+                    objectType: 'Case'
+                },
             ]
         },
         {
@@ -388,54 +872,6 @@ const caseSingleScreen = {
                     objectType: 'Case'
                 },
                 {
-                    cardNumber: 2,
-                    id: 'dateOfReporting',
-                    label: translations.caseSingleScreen.dateOfReporting,
-                    value: '',
-                    type: "DatePicker",
-                    isRequired: true,
-                    isEditMode: false,
-                    format: 'YYYY-MM-dd',
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 2,
-                    id: 'pregnancyStatus',
-                    label: translations.caseSingleScreen.pregnancyStatus,
-                    labelValue: 'test',
-                    type: 'DropdownInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: 'red',
-                    activeBackgroundColor: 'red',
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 2,
-                    id: 'isDateOfReportingApproximate',
-                    label: translations.caseSingleScreen.isDateOfReportingApproximate,
-                    type: 'SwitchInput',
-                    value: false,
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
-                    objectType: 'Case'
-                },
-                {
-                    cardNumber: 2,
-                    id: 'transferRefused',
-                    label: translations.caseSingleScreen.transferRefused,
-                    type: 'SwitchInput',
-                    value: false,
-                    isRequired: false,
-                    isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
-                    objectType: 'Case'
-                },
-                {
                     id: 'riskReason',
                     label: translations.caseSingleScreen.riskReason,
                     type: 'TextInput',
@@ -444,7 +880,7 @@ const caseSingleScreen = {
                     isEditMode: false,
                     multiline: true,
                     objectType: 'Case'
-                },
+                }
             ]
         },
     ],
@@ -477,9 +913,10 @@ const caseSingleScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Documents'
+                objectType: 'Documents',
+                iconArray: ['delete']
             }
         ]
     },
@@ -522,149 +959,14 @@ const caseSingleScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Vaccines'
+                objectType: 'Vaccines',
+                iconArray: ['delete']
             }
         ]
     },
-    address: {
-        fields: [
-            {
-                cardNumber: 1,
-                id: 'typeId',
-                label: translations.addressFieldLabels.name,
-                labelValue: 'test',
-                type: 'DropdownInput',
-                value: '',
-                isRequired: true,
-                isEditMode: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'date',
-                label: translations.addressFieldLabels.date,
-                labelValue: 'test',
-                value: '',
-                type: "DatePicker",
-                isRequired: false,
-                isEditMode: true,
-                format: 'MM/dd/YYYY',
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'locationId',
-                label: translations.addressFieldLabels.area,
-                labelValue: 'test',
-                type: 'DropDownSectioned',
-                value: '',
-                isRequired: true,
-                isEditMode: true,
-                objectType: 'Address',
-                single: true
-            },
-            {
-                cardNumber: 1,
-                id: 'city',
-                label: translations.addressFieldLabels.city,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'postalCode',
-                label: translations.addressFieldLabels.zip,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'addressLine1',
-                label: translations.addressFieldLabels.address,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'phoneNumber',
-                label: translations.caseSingleScreen.phoneNumber,
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
-                objectType: 'Address'
-            },
-            // Is the person next to you support
-            {
-                cardNumber: 1,
-                id: 'geoLocationAccurate',
-                label: translations.addressFieldLabels.isThePersonNextToYou,
-                labelValue: 'test',
-                type: 'SwitchInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                activeButtonColor: styles.missedRedColor,
-                activeBackgroundColor: styles.missedRedColorWithOpacity,
-                objectType: 'Address'
-            },
-            // Add coordinates support
-            {
-                cardNumber: 1,
-                id: 'lng',
-                label: translations.addressFieldLabels.longitude,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: false,
-                objectType: 'Address',
-                keyboardType: 'numeric'
-            },
-            {
-                cardNumber: 1,
-                id: 'lat',
-                label: translations.addressFieldLabels.latitude,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: false,
-                objectType: 'Address',
-                keyboardType: 'numeric'
-            },
-            {
-                cardNumber: 1,
-                id: 'deleteButton',
-                type: 'ActionsBar',
-                labelValue: 'test',
-                textsArray: [translations.addressFieldLabels.deleteButton],
-                textsStyleArray: [{color: styles.missedRedColor}],
-                onPressArray: [],
-                objectType: 'Address'
-            }
-        ]
-    },
+    address: addressFields,
     infection: [
         {
             fields: [
@@ -697,8 +999,8 @@ const caseSingleScreen = {
                     value: false,
                     isRequired: false,
                     isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
                     objectType: 'Case'
                 },
                 {
@@ -744,6 +1046,18 @@ const caseSingleScreen = {
                     format: 'YYYY-MM-dd',
                     objectType: 'Case'
                 },
+                {
+                    cardNumber: 2,
+                    id: 'transferRefused',
+                    label: translations.caseSingleScreen.transferRefused,
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
+                    objectType: 'Case'
+                },
                 // {
                 //     cardNumber: 1,
                 //     id: 'deceased',
@@ -752,8 +1066,8 @@ const caseSingleScreen = {
                 //     value: false,
                 //     isRequired: false,
                 //     isEditMode: false,
-                //     activeButtonColor: styles.missedRedColor,
-                //     activeBackgroundColor: styles.missedRedColorWithOpacity,
+                //     activeButtonColor: styles.backgroundColor,
+                //     activeBackgroundColor: styles.dangerColor,
                 //     objectType: 'Case'
                 // },
                 {
@@ -764,8 +1078,8 @@ const caseSingleScreen = {
                     value: false,
                     isRequired: false,
                     isEditMode: false,
-                    activeButtonColor: styles.missedRedColor,
-                    activeBackgroundColor: styles.missedRedColorWithOpacity,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
                     objectType: 'Case'
                 },
                 {
@@ -800,7 +1114,7 @@ const caseSingleScreen = {
                     isRequired: false,
                     isEditMode: false,
                     objectType: 'Case'
-                }
+                },
                 // {
                 //     cardNumber: 1,
                 //     id: 'dateDeceased',
@@ -888,83 +1202,27 @@ const caseSingleScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'DateRanges'
+                objectType: 'DateRanges',
+                iconArray: ['delete']
             }
         ]
     },
 };
 
-const followUpsFilterScreen = {
+const eventsFilterScreen = {
     filter: [
-        {
-            fields: [
-                {
-                    cardNumber: 1,
-                    label: translations.followUpFilter.gender,
-                    type: 'Section',
-                    hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
-                },
-                {
-                    cardNumber: 1,
-                    id: 'gender',
-                    type: 'Selector',
-                    value: '',
-                    data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
-                }
-            ]
-        },
-        {
-            fields: [
-                {
-                    cardNumber: 2,
-                    label: translations.followUpFilter.ageRange,
-                    type: 'Section',
-                    hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
-                },
-                {
-                    cardNumber: 2,
-                    id: 'age',
-                    type: 'IntervalPicker',
-                    value: '',
-                    min: 0,
-                    max: 150
-                }
-            ]
-        },
-        {
-            fields: [
-                {
-                    cardNumber: 3,
-                    label: translations.followUpFilter.area,
-                    type: 'Section',
-                    hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
-                },
-                {
-                    cardNumber: 3,
-                    id: 'selectedLocations',
-                    label: translations.followUpFilter.chooseLocationLabel,
-                    type: 'DropDownSectioned',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    single: false
-                }
-            ]
-        }
+
     ],
     sort: {
         fields: [
-            {      
+            {
                 cardNumber: 1,
                 label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
-                borderBottomColor: styles.navigationDrawerSeparatorGrey
+                borderBottomColor: styles.separatorColor
             },
             {
                 cardNumber: 1,
@@ -992,9 +1250,589 @@ const followUpsFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
+                objectType: 'Sort',
+                iconArray: ['delete']
+            }
+        ]
+    }
+}
+const eventSingleScreen = {
+    details: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'name',
+                    label: translations.eventSingleScreen.nameLabel,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: false,
+                    objectType: 'Event'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'date',
+                    label: translations.eventSingleScreen.date,
+                    labelValue: 'test',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: true,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'Event'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'dateOfReporting',
+                    label: translations.eventSingleScreen.dateOfReporting,
+                    labelValue: 'test',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: true,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'Event'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'isDateOfReportingApproximate',
+                    label: translations.eventSingleScreen.isDateOfReportingApproximate,
+                    type: 'SwitchInput',
+                    value: false,
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
+                    objectType: 'Event'
+                },
+                // {
+                //     cardNumber: 1,
+                //     id: 'responsibleUserId',
+                //     label: translations.eventSingleScreen.responsibleUser,
+                //     labelValue: 'test',
+                //     type: 'DropdownInput',
+                //     value: '',
+                //     isRequired: false,
+                //     isEditMode: false,
+                //     activeButtonColor: 'red',
+                //     activeBackgroundColor: 'red',
+                //     objectType: 'Event'
+                // },
+                {
+                    cardNumber: 1,
+                    id: 'description',
+                    label: translations.eventSingleScreen.description,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Event'
+                },
+            ]
+        }
+    ],
+    address:{
+            fields: [
+                {
+                    cardNumber: 1,
+                    id: 'typeId',
+                    label: translations.addressFieldLabels.name,
+                    labelValue: 'test',
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: true,
+                    isEditMode: true,
+                    objectType: 'Address'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'date',
+                    label: translations.addressFieldLabels.date,
+                    labelValue: 'test',
+                    value: '',
+                    type: "DatePicker",
+                    isRequired: false,
+                    isEditMode: true,
+                    format: 'MM/dd/YYYY',
+                    objectType: 'Address'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'phoneNumber',
+                    label: translations.caseSingleScreen.phoneNumber,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    keyboardType: 'phone-pad',
+                    objectType: 'Address'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'emailAddress',
+                    label: 'Email',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'Address'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'locationId',
+                    label: translations.addressFieldLabels.area,
+                    labelValue: 'test',
+                    type: 'DropDownSectioned',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    objectType: 'Address',
+                    single: true
+                },
+                {
+                    cardNumber: 1,
+                    id: 'city',
+                    label: translations.addressFieldLabels.city,
+                    labelValue: 'test',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    multiline: true,
+                    objectType: 'Address'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'postalCode',
+                    label: translations.addressFieldLabels.zip,
+                    labelValue: 'test',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    multiline: true,
+                    objectType: 'Address'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'addressLine1',
+                    label: translations.addressFieldLabels.address,
+                    labelValue: 'test',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    multiline: true,
+                    objectType: 'Address'
+                },
+                // Is the person next to you support
+                {
+                    cardNumber: 1,
+                    id: 'geoLocationAccurate',
+                    label: translations.addressFieldLabels.isThePersonNextToYou,
+                    labelValue: 'test',
+                    type: 'SwitchInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    activeButtonColor: styles.backgroundColor,
+                    activeBackgroundColor: styles.dangerColor,
+                    objectType: 'Address'
+                },
+                // Add coordinates support
+                {
+                    cardNumber: 1,
+                    id: 'lng',
+                    label: translations.addressFieldLabels.longitude,
+                    labelValue: 'test',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    multiline: false,
+                    objectType: 'Address',
+                    keyboardType: 'numeric'
+                },
+                {
+                    cardNumber: 1,
+                    id: 'lat',
+                    label: translations.addressFieldLabels.latitude,
+                    labelValue: 'test',
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    multiline: false,
+                    objectType: 'Address',
+                    keyboardType: 'numeric'
+                }
+            ]
+        },
+    document: {
+        fields: [
+            {
+                cardNumber: 3,
+                id: 'type',
+                label: translations.caseSingleScreen.documentType,
+                type: 'DropdownInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Documents'
+            },
+            {
+                cardNumber: 3,
+                id: 'number',
+                label: translations.caseSingleScreen.documentNumber,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: true,
+                isEditMode: true,
+                objectType: 'Documents'
+            },
+            {
+                cardNumber: 3,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: [translations.caseSingleScreen.deleteButton],
+                textsStyleArray: [{color: styles.backgroundColor}],
+                onPressArray: [],
+                objectType: 'Documents',
+                iconArray: ['delete']
+            }
+        ]
+    },
+}
+
+const personFilterScreen = {
+    filter: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    label: translations.followUpFilter.gender,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },
+                {
+                    cardNumber: 1,
+                    id: 'gender',
+                    type: 'Selector',
+                    shouldTranslate: true,
+                    value: '',
+                    data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 2,
+                    label: translations.followUpFilter.ageRange,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },
+                {
+                    cardNumber: 2,
+                    id: 'age',
+                    type: 'IntervalPicker',
+                    value: '',
+                    min: 0,
+                    max: 150
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 3,
+                    label: translations.followUpFilter.area,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },
+                {
+                    cardNumber: 3,
+                    id: 'selectedLocations',
+                    label: translations.followUpFilter.chooseLocationLabel,
+                    type: 'DropDownSectioned',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 4,
+                    label: translations.personFilter.vaccine,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },{
+                    cardNumber: 4,
+                    id: 'vaccines',
+                    label: translations.personFilter.vaccine,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 5,
+                    label: translations.personFilter.vaccineStatus,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },{
+                    cardNumber: 5,
+                    id: 'vaccineStatuses',
+                    label: translations.personFilter.vaccineStatus,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 6,
+                    label: translations.personFilter.pregnancyStatus,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },{
+                    cardNumber: 6,
+                    id: 'pregnancyStatuses',
+                    label: translations.personFilter.pregnancyStatus,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        }
+    ],
+    sort: {
+        fields: [
+            {
+                cardNumber: 1,
+                label: translations.sortTab.SortBy,
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.separatorColor
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortCriteria,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
                 objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortOrder,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.backgroundColor}],
+                onPressArray: [],
+                objectType: 'Sort',
+                iconArray: ['delete']
+            }
+        ]
+    }
+};
+
+const contactFilterScreen = {
+    filter:[
+        ...personFilterScreen.filter,
+        {
+            fields: [
+                {
+                    cardNumber: 7,
+                    label: translations.followUpFilter.dayOfFollowUp,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },
+                {
+                    cardNumber: 7,
+                    id: 'selectedIndexDay',
+                    label: translations.followUpFilter.dayOfFollowUp,
+                    type: 'IntervalPicker',
+                    allowOverlap: true,
+                    value: '',
+                    min: 0,
+                    max: 150,
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        }
+        ],
+    sort: {
+        ...personFilterScreen.sort
+    }
+}
+
+const followUpsFilterScreen = {
+    filter: [
+        {
+            fields: [
+                {
+                    cardNumber: 1,
+                    label: translations.followUpFilter.gender,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },
+                {
+                    cardNumber: 1,
+                    id: 'gender',
+                    type: 'Selector',
+                    shouldTranslate: true,
+                    value: '',
+                    data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 2,
+                    label: translations.followUpFilter.ageRange,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },
+                {
+                    cardNumber: 2,
+                    id: 'age',
+                    type: 'IntervalPicker',
+                    value: '',
+                    min: 0,
+                    max: 150
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 3,
+                    label: translations.followUpFilter.area,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },
+                {
+                    cardNumber: 3,
+                    id: 'selectedLocations',
+                    label: translations.followUpFilter.chooseLocationLabel,
+                    type: 'DropDownSectioned',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 4,
+                    label: translations.followUpFilter.dayOfFollowUp,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },
+                {
+                    cardNumber: 4,
+                    id: 'selectedIndexDay',
+                    label: translations.followUpFilter.dayOfFollowUp,
+                    type: 'IntervalPicker',
+                    allowOverlap: true,
+                    value: '',
+                    min: 0,
+                    max: 150,
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        }
+    ],
+    sort: {
+        fields: [
+            {
+                cardNumber: 1,
+                label: translations.sortTab.SortBy,
+                type: 'Section',
+                hasBorderBottom: true,
+                borderBottomColor: styles.separatorColor
+            },
+            {
+                cardNumber: 1,
+                id: 'sortCriteria',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortCriteria,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'sortOrder',
+                type: 'DropdownInput',
+                label: translations.sortTab.sortOrder,
+                isRequired: false,
+                isEditMode: true,
+                value: '',
+                objectType: 'Sort'
+            },
+            {
+                cardNumber: 1,
+                id: 'deleteButton',
+                type: 'ActionsBar',
+                labelValue: 'test',
+                textsArray: ['Delete'],
+                textsStyleArray: [{color: styles.backgroundColor}],
+                onPressArray: [],
+                objectType: 'Sort',
+                iconArray: ['delete']
             }
         ]
     }
@@ -1009,7 +1847,7 @@ const helpFilterScreen = {
                     label: translations.helpFilter.category,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 3,
@@ -1031,7 +1869,7 @@ const helpFilterScreen = {
                 label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
-                borderBottomColor: styles.navigationDrawerSeparatorGrey
+                borderBottomColor: styles.separatorColor
             },
             {
                 cardNumber: 1,
@@ -1059,9 +1897,10 @@ const helpFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Sort'
+                objectType: 'Sort',
+                iconArray: ['delete']
             }
         ]
     }
@@ -1076,12 +1915,13 @@ const casesFilterScreen = {
                     label: translations.casesFilter.gender,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 1,
                     id: 'gender',
                     type: 'Selector',
+                    shouldTranslate: true,
                     value: '',
                     data: [{value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE'}, {value: 'LNG_REFERENCE_DATA_CATEGORY_GENDER_FEMALE'}]
                 }
@@ -1094,7 +1934,7 @@ const casesFilterScreen = {
                     label: translations.casesFilter.ageRange,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 2,
@@ -1113,7 +1953,7 @@ const casesFilterScreen = {
                     label: translations.casesFilter.classification,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 3,
@@ -1133,13 +1973,73 @@ const casesFilterScreen = {
                     label: translations.casesFilter.area,
                     type: 'Section',
                     hasBorderBottom: true,
-                    borderBottomColor: styles.navigationDrawerSeparatorGrey
+                    borderBottomColor: styles.separatorColor
                 },
                 {
                     cardNumber: 4,
                     id: 'selectedLocations',
                     label: translations.casesFilter.chooseLocationLabel,
                     type: 'DropDownSectioned',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 5,
+                    label: translations.personFilter.vaccine,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },{
+                    cardNumber: 5,
+                    id: 'vaccines',
+                    label: translations.personFilter.vaccine,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 6,
+                    label: translations.personFilter.vaccineStatus,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },{
+                    cardNumber: 6,
+                    id: 'vaccineStatuses',
+                    label: translations.personFilter.vaccineStatus,
+                    type: 'DropDown',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: true,
+                    single: false
+                }
+            ]
+        },
+        {
+            fields: [
+                {
+                    cardNumber: 7,
+                    label: translations.personFilter.pregnancyStatus,
+                    type: 'Section',
+                    hasBorderBottom: true,
+                    borderBottomColor: styles.separatorColor
+                },{
+                    cardNumber: 7,
+                    id: 'pregnancyStatuses',
+                    label: translations.personFilter.pregnancyStatus,
+                    type: 'DropDown',
                     value: '',
                     isRequired: false,
                     isEditMode: true,
@@ -1155,7 +2055,7 @@ const casesFilterScreen = {
                 label: translations.sortTab.SortBy,
                 type: 'Section',
                 hasBorderBottom: true,
-                borderBottomColor: styles.navigationDrawerSeparatorGrey
+                borderBottomColor: styles.separatorColor
             },
             {
                 cardNumber: 1,
@@ -1183,9 +2083,10 @@ const casesFilterScreen = {
                 type: 'ActionsBar',
                 labelValue: 'test',
                 textsArray: ['Delete'],
-                textsStyleArray: [{color: styles.missedRedColor}],
+                textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
-                objectType: 'Sort'
+                objectType: 'Sort',
+                iconArray: ['delete']
             }
         ]
     }
@@ -1286,7 +2187,7 @@ const addFollowUpScreen = [
         label: translations.addFollowUpScreen.addFollowUpLabel,
         type: 'Section',
         hasBorderBottom: false,
-        borderBottomColor: styles.navigationDrawerSeparatorGrey
+        borderBottomColor: styles.separatorColor
     },
     {
         cardNumber: 1,
@@ -1312,7 +2213,7 @@ const addFollowUpScreen = [
     },
 ];
 
-const addExposureScreen = [
+const addRelationshipScreen = [
     {
         cardNumber: 1,
         id: 'exposure',
@@ -1322,6 +2223,17 @@ const addExposureScreen = [
         value: '',
         isRequired: true,
         isEditMode: true,
+        objectType: 'Contact'
+    },
+    {
+        cardNumber: 1,
+        id: 'dateOfFirstContact',
+        label: translations.exposureScreen.dateOfFirstContact,
+        value: createDate(null),
+        type: "DatePicker",
+        isRequired: false,
+        isEditMode: true,
+        format: 'MM/dd/YYYY',
         objectType: 'Contact'
     },
     {
@@ -1343,8 +2255,8 @@ const addExposureScreen = [
         value: false,
         isRequired: false,
         isEditMode: true,
-        activeButtonColor: styles.missedRedColor,
-        activeBackgroundColor: styles.missedRedColorWithOpacity
+        activeButtonColor: styles.backgroundColor,
+        activeBackgroundColor: styles.dangerColor
     },
     {
         cardNumber: 1,
@@ -1507,6 +2419,19 @@ const contactsOfContactsPersonal = [
             },
             {
                 cardNumber: 1,
+                id: 'pregnancyStatus',
+                label: translations.caseSingleScreen.pregnancyStatus,
+                type: 'DropdownInput',
+                value: '',
+                isRequired: false,
+                isEditMode: false,
+                activeButtonColor: 'red',
+                activeBackgroundColor: 'red',
+                objectType: 'Contact',
+                skipNone: true
+            },
+            {
+                cardNumber: 1,
                 id: 'occupation',
                 label: translations.contactSingleScreen.occupation,
                 labelValue: 'test',
@@ -1586,7 +2511,7 @@ const contactsOfContactsPersonal = [
                 type: 'TextInput',
                 value: '',
                 isRequired: false,
-                isEditMode: false,
+                isEditMode: true,
                 multiline: false,
                 objectType: 'Contact'
             }
@@ -1676,6 +2601,19 @@ const contactsSingleScreen = {
                 },
                 {
                     cardNumber: 1,
+                    id: 'pregnancyStatus',
+                    label: translations.caseSingleScreen.pregnancyStatus,
+                    type: 'DropdownInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    activeButtonColor: 'red',
+                    activeBackgroundColor: 'red',
+                    objectType: 'Contact',
+                    skipNone: true
+                },
+                {
+                    cardNumber: 1,
                     id: 'occupation',
                     label: translations.contactSingleScreen.occupation,
                     labelValue: 'test',
@@ -1755,7 +2693,7 @@ const contactsSingleScreen = {
                     type: 'TextInput',
                     value: '',
                     isRequired: false,
-                    isEditMode: false,
+                    isEditMode: true,
                     multiline: false,
                     objectType: 'Contact'
                 },
@@ -1815,146 +2753,7 @@ const contactsSingleScreen = {
             ]
         }
     ],
-    address: {
-        fields: [
-            {
-                cardNumber: 1,
-                id: 'typeId',
-                label: translations.addressFieldLabels.name,
-                labelValue: 'test',
-                type: 'DropdownInput',
-                value: '',
-                isRequired: true,
-                isEditMode: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'date',
-                label: translations.addressFieldLabels.date,
-                labelValue: 'test',
-                value: '',
-                type: "DatePicker",
-                isRequired: false,
-                isEditMode: true,
-                format: 'MM/dd/YYYY',
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'locationId',
-                label: translations.addressFieldLabels.area,
-                labelValue: 'test',
-                type: 'DropDownSectioned',
-                value: '',
-                isRequired: true,
-                isEditMode: true,
-                objectType: 'Address',
-                single: true
-            },
-            {
-                cardNumber: 1,
-                id: 'city',
-                label: translations.addressFieldLabels.city,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'postalCode',
-                label: translations.addressFieldLabels.zip,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'addressLine1',
-                label: translations.addressFieldLabels.address,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: true,
-                objectType: 'Address'
-            },
-            {
-                cardNumber: 1,
-                id: 'phoneNumber',
-                label: translations.contactSingleScreen.phoneNumber,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: false,
-                keyboardType: Platform.OS === 'ios' ? 'number-pad' : 'numeric',
-                objectType: 'Address'
-            },
-            // Is the person next to you support
-            {
-                cardNumber: 1,
-                id: 'geoLocationAccurate',
-                label: translations.addressFieldLabels.isThePersonNextToYou,
-                labelValue: 'test',
-                type: 'SwitchInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                activeButtonColor: styles.missedRedColor,
-                activeBackgroundColor: styles.missedRedColorWithOpacity,
-                objectType: 'Address'
-            },
-            // Add coordinates support
-            {
-                cardNumber: 1,
-                id: 'lng',
-                label: translations.addressFieldLabels.longitude,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: false,
-                objectType: 'Address',
-                keyboardType: 'numeric'
-            },
-            {
-                cardNumber: 1,
-                id: 'lat',
-                label: translations.addressFieldLabels.latitude,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: false,
-                isEditMode: true,
-                multiline: false,
-                objectType: 'Address',
-                keyboardType: 'numeric'
-            },
-
-            {
-                cardNumber: 1,
-                id: 'deleteButton',
-                type: 'ActionsBar',
-                labelValue: 'test',
-                textsArray: [translations.addressFieldLabels.deleteButton],
-                textsStyleArray: [{color: styles.missedRedColor}],
-                onPressArray: [],
-                objectType: 'Address'
-            }
-        ]
-    },
+    address: addressFields,
     relationship: {
         fields: [
             {
@@ -1966,6 +2765,17 @@ const contactsSingleScreen = {
                 value: '',
                 isRequired: true,
                 isEditMode: true,
+                objectType: 'Exposure'
+            },
+            {
+                cardNumber: 1,
+                id: 'dateOfFirstContact',
+                label: translations.exposureScreen.dateOfFirstContact,
+                value: createDate(null),
+                type: "DatePicker",
+                isRequired: false,
+                isEditMode: true,
+                format: 'MM/dd/YYYY',
                 objectType: 'Exposure'
             },
             {
@@ -1987,8 +2797,8 @@ const contactsSingleScreen = {
                 value: false,
                 isRequired: false,
                 isEditMode: true,
-                activeButtonColor: styles.missedRedColor,
-                activeBackgroundColor: styles.missedRedColorWithOpacity,
+                activeButtonColor: styles.backgroundColor,
+                activeBackgroundColor: styles.dangerColor,
                 objectType: 'Exposure'
             },
             {
@@ -2124,16 +2934,18 @@ const mongoCollections = {
     team: 'team',
     helpCategory: 'helpCategory',
     helpItem: 'helpItem',
-    user: 'user'
+    user: 'user',
+    common: 'common'
 };
 
 const changingMongoCollections = [
-    'labResult',
+    // 'labResult',
     'user'
 ];
 
 const changingSQLiteCollections = [
     'followUp',
+    'labResult',
     'person',
     'relationship'
 ];
@@ -2188,6 +3000,12 @@ const sortCriteriaDropDownItems = [
     { value: translations.sortTab.sortUpdatedAt  },
 ];
 
+const eventSortCriteriaDropDownItems = [
+    { value: translations.sortTab.sortName },
+    { value: translations.sortTab.sortCreatedAt  },
+    { value: translations.sortTab.sortUpdatedAt  },
+]
+
 const helpItemsSortCriteriaDropDownItems = [
     { value: translations.sortTab.sortCategory},
     { value: translations.sortTab.sortTitle}
@@ -2196,9 +3014,11 @@ const helpItemsSortCriteriaDropDownItems = [
 const userPermissions = {
     readContact: 'read_contact',
     readCase: 'read_case',
+    readEvent: 'read_event',
     readFollowUp: 'read_followup',
     writeContact: 'write_contact',
     writeCase: 'write_case',
+    writeEvent: 'write_event',
     writeFollowUp: 'write_followup',
 };
 
@@ -2263,10 +3083,10 @@ const caseBlueprint = {
             addressLine2: '',
             postalCode: '',
             locationId: '',
-            geoLocation: {
-                coordinates: [0, 0],
-                type: 'Point'
-            },
+            // geoLocation: {
+            //     coordinates: ['', ''],
+            //     type: 'Point'
+            // },
             date: createDate(null)
         }
     ],
@@ -2288,7 +3108,7 @@ const whocdCredentials = {
     hubUrl: 'http://whocd.clarisoft.com/api',
     clientId: 'test',
     clientSecret: 'test',
-    userEmail: 'florin.popa@clarisoft.com',
+    userEmail: 'andrei.postelnicu@clarisoft.com',
     encryptedConnection: false,
     numberOfData: 5000
 };
@@ -2300,14 +3120,19 @@ export default {
     tabsValuesRoutes,
     followUpsSingleScreen,
     followUpsFilterScreen,
+    labResultsSingleScreen,
+    labResultsFilterScreen,
     helpFilterScreen,
     casesFilterScreen,
+    contactFilterScreen,
     caseSingleScreen,
+    eventsFilterScreen,
+    eventSingleScreen,
     defaultFilterForContacts,
     defaultFilterForCases,
     baseUrls,
     addFollowUpScreen,
-    addExposureScreen,
+    addRelationshipScreen,
     contactsSingleScreen,
     personTypes,
     mongoCollections,
@@ -2321,6 +3146,7 @@ export default {
     localTranslationTokens,
     sortOrderDropDownItems,
     sortCriteriaDropDownItems,
+    eventSortCriteriaDropDownItems,
     userPermissions,
     helpSingleScreen,
     helpItemsSortCriteriaDropDownItems,
@@ -2333,5 +3159,8 @@ export default {
     rawSQLQueryString,
     rawSQLQueryWhereString,
     whocdCredentials,
-    contactsOfContactsPersonal
+    contactsOfContactsPersonal,
+    addressFields,
+    labResultsFilterScreenNoContactPermission,
+    personFilterScreen
 };

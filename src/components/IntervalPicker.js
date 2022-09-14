@@ -5,7 +5,6 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {StyleSheet, View} from 'react-native';
-import styles from './../styles';
 import {connect} from "react-redux";
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import PropTypes from 'prop-types';
@@ -13,18 +12,30 @@ import CustomMarker from './CustomMarker';
 import {getTooltip} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
 import lodashGet from 'lodash/get';
+import {Switch} from 'react-native-ui-lib';
+import styles from './../styles';
 
 class IntervalPicker extends PureComponent {
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
         super(props);
+
         this.state = {
-            interval: [this.props.min, this.props.max]
+            interval: this.props.value ? this.props.value.length === 1 ? [this.props.value[0]] : [this.props.value[0], this.props.value[1]] : [this.props.min, this.props.max],
+            active: this.props.showSwitch ? !!this.props.active : true
         }
     }
     // Please add here the react lifecycle methods that you need
 
+    componentWillReceiveProps(nextProps, nextContext) {
+        if (nextProps.value !== this.props.value){
+            this.state.interval = this.props.value ? this.props.value : [this.props.min, this.props.max];
+            // this.setState({
+            //     interval: this.props.value ? this.props.value.length === 1 ? [this.props.value[0]] : [this.props.value[0], this.props.value[1]] : [this.props.min, this.props.max],
+            // })
+        }
+    }
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -32,43 +43,66 @@ class IntervalPicker extends PureComponent {
     render() {
         let tooltip = getTooltip(this.props.label, this.props.translation, this.props.tooltipsMessage, this.props.tooltipsMessage);
         return (
-            <View
-                style={[{
-                    backgroundColor: 'white',
-                    marginVertical: 3,
-                    borderRadius: 3,
-                    alignItems: 'center'
-                }, this.props.style]}
-            >
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        width: '100%',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                    }}>
+            <View style={[{alignItems: 'center'}, this.props.style]}>
+                <View style={style.intervalPickerContainer}>
+                    {
+                        this.props.showSwitch &&
+                        <Switch
+                            value={this.state.active}
+                            onValueChange={(value)=>{
+                                if (value){
+                                    this.multiSliderValuesChange(this.state.interval);
+                                } else {
+                                    this.multiSliderValuesChange(null);
+                                }
+                                this.setState({
+                                    active: value
+                                });
+                            }}
+                            height={18}
+                            width={36}
+                            thumbSize={14}
+                            offColor={lodashGet(this.props, 'unselectedStyle', styles.secondaryColor)}
+                            onColor={lodashGet(this.props, 'selectedStyle', styles.primaryColor)}
+                        />
+                    }
+
                     <MultiSlider
-                        values={this.props.value ? this.props.value.length === 1 ? this.props.value : [this.props.value[0], this.props.value[1]] : [this.state.interval[0], this.state.interval[1]]}
+                        values={this.state.interval}
                         onValuesChange={this.multiSliderValuesChange}
+                        enabledOne={this.state.active}
+                        enabledTwo={this.state.active}
                         min={this.props.min}
                         max={this.props.max}
                         step={this.props.step ? this.props.step : 1}
                         snapped
-                        sliderLength={this.props.sliderLength}
+                        sliderLength={this.props.showSwitch ? this.props.sliderLength - 40 : this.props.sliderLength}
                         unselectedStyle={{
-                            backgroundColor: lodashGet(this.props, 'unselectedStyle', styles.navigationDrawerSeparatorGrey)
+                            backgroundColor: lodashGet(this.props, 'unselectedStyle', styles.secondaryColor)
                         }}
                         selectedStyle={{
-                            backgroundColor: lodashGet(this.props, 'selectedStyle', styles.buttonGreen)
+                            backgroundColor: this.state.active ?
+                                lodashGet(this.props, 'selectedStyle', styles.primaryColor)
+                                :
+                                lodashGet(this.props, 'unselectedStyle', styles.secondaryColor)
                         }}
                         customMarker={(props) => {
                              return (
                                 <CustomMarker
                                     currentValue={props.currentValue}
-                                    markerColor={this.props.markerColor}
+                                    markerStyle={{
+                                        backgroundColor: this.state.active ?
+                                            lodashGet(this.props, 'selectedStyle', styles.primaryColor)
+                                            :
+                                            lodashGet(this.props, 'unselectedStyle', styles.secondaryColor),
+                                        height: 14,
+                                        width: 14,
+                                        top: -2
+                                    }}
+                                    markerColor={this.state.active ? this.props.markerColor : lodashGet(this.props, 'unselectedStyle', styles.secondaryColor)}
                                 />)
                         }}
-                        allowOverlap={false}
+                        allowOverlap={this.props.allowOverlap || true}
                     />
                     {
                         tooltip.hasTooltip === true ? (
@@ -78,7 +112,7 @@ class IntervalPicker extends PureComponent {
                                     flex: 0,
                                     marginTop: 0,
                                     marginBottom: 0,
-                                    marginLeft: 5
+                                    marginLeft: 8
                                 }}
                             />
                         ) : null
@@ -90,7 +124,14 @@ class IntervalPicker extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     multiSliderValuesChange = (values) => {
-        this.props.onChange(values, this.props.id);
+        if(this.state.active){
+            if(values){
+                this.setState({
+                    interval: values
+                })
+            }
+            this.props.onChange(values, this.props.id);
+        }
     };
 }
 
@@ -100,8 +141,8 @@ IntervalPicker.defaultProps = {
     noMargin: true,
     markerColor: 'black',
     sliderLength: 280,
-    selectedStyle: styles.buttonGreen,
-    unselectedStyle: styles.navigationDrawerSeparatorGrey
+    selectedStyle: styles.primaryButton,
+    unselectedStyle: styles.separatorColor
 };
 
 IntervalPicker.propTypes = {
@@ -119,16 +160,12 @@ const style = StyleSheet.create({
     container: {
         flex: 1
     },
-    itemStyle: {
-        height: 25,
-        justifyContent: 'center',
+    intervalPickerContainer: {
         alignItems: 'center',
-        borderRadius: 12.5
-    },
-    itemTextStyle: {
-        paddingHorizontal: 18,
-        fontFamily: 'Roboto-Regular',
-        fontSize: 11
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        width: '100%'
     }
 });
 

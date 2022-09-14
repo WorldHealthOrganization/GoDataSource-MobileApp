@@ -4,15 +4,14 @@ import Modal from 'react-native-modal';
 import ElevatedView from 'react-native-elevated-view';
 import PropTypes from 'prop-types';
 import {createSelector} from 'reselect';
-import styles from "../styles";
 import LocalButton from './Button';
 import SelectMultiple from 'react-native-select-multiple';
 import {useSelector} from "react-redux";
 import {calculateDimension, getTranslation} from "../utils/functions";
 import {selectScreenSize, selectTranslations} from './../utils/selectors';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import {languageModalComponentLabels} from './../utils/translations';
 import translations from "../utils/translations";
+import styles from "../styles";
 
 const selectLanguageModalComponentReduxProps = createSelector(
     [selectTranslations, selectScreenSize],
@@ -45,22 +44,14 @@ const LanguageModalComponent = React.memo(({availableLanguages, showModal, onCan
             onBackdropPress={onCancel}
         >
             <ElevatedView
-                elevation={4}
-                style={{
-                    justifyContent: 'center',
-                    backgroundColor: 'white',
-                    alignItems: 'center',
-                    marginHorizontal: 16,
-                    padding: 8,
-                    borderRadius: 10,
-                    height: '70%',
-                }}
+                elevation={5}
+                style={style.languageModalContainer}
             >
                 <Text
                     style={style.titleText}>{getTranslation(translations.navigationDrawer.languagesLabel, translation)}</Text>
                 <ScrollView>
                     <Text
-                        style={style.subText}>{getTranslation(languageModalComponentLabels.infoMessage, translation)}</Text>
+                        style={style.subText}>{getTranslation(translations.languageModalComponentLabels.infoMessage, translation)}</Text>
                     <SelectMultiple
                         style={{width: '100%'}}
                         items={availableLanguages}
@@ -72,15 +63,15 @@ const LanguageModalComponent = React.memo(({availableLanguages, showModal, onCan
                     showError ? (
                         <Text
                             style={style.alertStyle}
-                        >{getTranslation(languageModalComponentLabels.alertNoLanguage, translation)}</Text>
+                        >{getTranslation(translations.languageModalComponentLabels.alertNoLanguage, translation)}</Text>
                     ) : (null)
                 }
 
                 <LocalButton
-                    title={getTranslation(getTranslation(languageModalComponentLabels.downloadButton, translation))}
+                    title={getTranslation(getTranslation(translations.languageModalComponentLabels.downloadButton, translation))}
                     onPress={onPressContinue}
-                    color={styles.buttonGreen}
-                    titleColor={'white'}
+                    color={styles.primaryColor}
+                    titleColor={styles.backgroundColor}
                     height={calculateDimension(35, true, screenSize)}
                     width={calculateDimension(200, false, screenSize)}
                     style={{
@@ -93,6 +84,15 @@ const LanguageModalComponent = React.memo(({availableLanguages, showModal, onCan
 });
 
 const style = StyleSheet.create({
+    languageModalContainer: {
+        alignItems: 'center',
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        height: '70%',
+        justifyContent: 'center',
+        marginHorizontal: 16,
+        padding: 8
+    },
     titleText: {
         fontFamily: 'Roboto-Medium',
         fontSize: 18,
@@ -100,15 +100,15 @@ const style = StyleSheet.create({
     },
     subText: {
         fontFamily: 'Roboto-Light',
-        fontSize: 16,
+        fontSize: 14,
         textAlign: 'center'
     },
     alertStyle: {
+        color: styles.dangerColor,
         fontFamily: 'Roboto-Light',
-        fontSize: 16,
+        fontSize: 14,
+        paddingVertical: 8,
         textAlign: 'center',
-        color: 'red',
-        paddingVertical: 8
     }
 });
 

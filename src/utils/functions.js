@@ -2,12 +2,14 @@
  * Created by florinpopa on 14/06/2018.
  */
 import errorTypes from './errorTypes';
-import config from './config';
+import config, {sideMenuKeys} from './config';
+import appConfig from './../../app.config';
+import geolocation from '@react-native-community/geolocation';
 import RNFetchBlobFS from 'rn-fetch-blob/fs';
 import {unzip, zip} from 'react-native-zip-archive';
 import {processBulkDocs, updateFileInDatabase} from './../queries/database';
 import {setSyncState} from './../actions/app';
-import {NativeModules} from 'react-native';
+import {Alert, Linking, NativeModules} from 'react-native';
 import uuid from 'react-native-uuid';
 import get from 'lodash/get';
 import sortBy from 'lodash/sortBy';
@@ -23,6 +25,32 @@ import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods'
 import translations from "./translations";
 import sqlConstants from './../queries/sqlTools/constants';
 import constants from "./constants";
+import lodashMemoize from "lodash/memoize";
+import lodashIsEqual from "lodash/isEqual";
+import lodashIntersection from "lodash/intersection";
+
+export const checkPermissions = lodashMemoize((permissionsList, outbreakPermissions, outbreak, permissions) => {
+    if (!checkArrayAndLength(permissionsList) && !checkArrayAndLength(outbreakPermissions)) {
+        return true;
+    }
+    if (checkArrayAndLength(outbreakPermissions)) {
+        for (const permissionKey of outbreakPermissions) {
+            if (!outbreak[permissionKey]) {
+                return false;
+            }
+        }
+    }
+    if (permissionsList.every((e) => checkArrayAndLength(e))) {
+        for (let elem of permissionsList) {
+            if (checkArrayAndLength(elem) && lodashIsEqual(lodashIntersection(elem, permissions), elem)) {
+                return true;
+            }
+        }
+        return false;
+    } else {
+        return checkArrayAndLength(lodashIntersection(permissionsList, permissions));
+    }
+});
 
 // This method is used for handling server responses. Please add here any custom error handling
 export function handleResponse(response) {
@@ -54,7 +82,7 @@ export function handleResponse(response) {
 
 // RN-fetch-blob does not manage status codes, so, this
 export function handleResponseFromRNFetchBlob(response) {
-    return new Promise ((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         let status = response.info().status;
 
         if (status === 200) {
@@ -67,7 +95,7 @@ export function handleResponseFromRNFetchBlob(response) {
                 })
                 .catch((errorParseError) => {
                     if (status) {
-                        reject ({message: `The mobile received the status ${status} from the API but the error could not be parsed`});
+                        reject({message: `The mobile received the status ${status} from the API but the error could not be parsed`});
                     }
                     reject({message: typeof errorParseError === 'string' ? errorParseError : JSON.stringify(errorParseError)});
                 })
@@ -81,7 +109,7 @@ export function handleResponseFromRNFetchBlob(response) {
 // First argument is the size of the component from the design
 // Second argument is the size of the screen {width, height} from the design. You can find it in the config file
 // Third argument is the screen size {width, height}
-export function calculateDimension (designResourceDimension, isHeight, screenSize) {
+export function calculateDimension(designResourceDimension, isHeight, screenSize) {
     // Check phones with different aspect ratio
     let designScreenDimension = config.designScreenSize;
     let scaledHeight = designScreenDimension.height;
@@ -111,7 +139,9 @@ export function getAddress(address, returnString, locationsList) {
     let addressArray = [];
     let locationName = null;
     if (locationsList && Array.isArray(locationsList) && locationsList.length > 0) {
-        locationName = locationsList.find((e) => {return address.locationId === extractIdFromPouchId(e._id, 'location')});
+        locationName = locationsList.find((e) => {
+            return address.locationId === extractIdFromPouchId(e._id, 'location')
+        });
         if (locationName && locationName.name) {
             locationName = locationName.name;
         }
@@ -119,10 +149,92 @@ export function getAddress(address, returnString, locationsList) {
 
     if (address) {
         addressArray = [address.addressLine1, address.addressLine2, address.city, address.country, address.postalCode, locationName];
-        addressArray = addressArray.filter((e) => {return e});
+        addressArray = addressArray.filter((e) => {
+            return e
+        });
     }
 
     return returnString ? addressArray.join(', ') : addressArray;
+}
+
+export function mapSideMenuKeysToScreenName(sideMenuKey) {
+    let screenToSwitchTo = null;
+    let addScreen = false;
+    switch (sideMenuKey) {
+        case sideMenuKeys[0]:
+            screenToSwitchTo = constants.appScreens.followUpScreen;
+            break;
+        case sideMenuKeys[1]:
+            screenToSwitchTo = constants.appScreens.contactsScreen;
+            break;
+        case `${sideMenuKeys[1]}-add`:
+            screenToSwitchTo = constants.appScreens.contactsScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[2]:
+            screenToSwitchTo = constants.appScreens.contactsOfContactsScreen;
+            break;
+        case `${sideMenuKeys[2]}-add`:
+            screenToSwitchTo = constants.appScreens.contactsOfContactsSingleScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[3]:
+            screenToSwitchTo = constants.appScreens.casesScreen;
+            break;
+        case `${sideMenuKeys[3]}-add`:
+            screenToSwitchTo = constants.appScreens.caseSingleScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[4]:
+            screenToSwitchTo = constants.appScreens.labResultsScreen;
+            break;
+        case `${sideMenuKeys[4]}-add`:
+            screenToSwitchTo = constants.appScreens.labResultsSingleScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[5]:
+            screenToSwitchTo = constants.appScreens.eventsScreen;
+            break;
+        case `${sideMenuKeys[5]}-add`:
+            screenToSwitchTo = constants.appScreens.eventSingleScreen;
+            addScreen = true;
+            break;
+        case sideMenuKeys[6]:
+            screenToSwitchTo = constants.appScreens.usersScreen;
+            break;
+        case sideMenuKeys[7]:
+            screenToSwitchTo = constants.appScreens.helpScreen;
+            break;
+        default:
+            screenToSwitchTo = constants.appScreens.followUpScreen;
+            break;
+    }
+    return {
+        screenToSwitchTo,
+        addScreen
+    }
+}
+
+export function createStackFromComponent(component) {
+    return ({
+        stack: {
+            children: [
+                {
+                    component: component
+                }
+            ],
+            options: {
+                layout: {
+                    orientation: ['portrait']
+                },
+                topBar: {
+                    visible: false,
+                },
+                modalPresentationStyle: "fullScreen"
+            }
+        }
+
+    })
 }
 
 export function navigation(event, navigator) {
@@ -134,53 +246,68 @@ export function navigation(event, navigator) {
             if (linkComponents.length > 0) {
                 let screenToSwitchTo = null;
                 let addScreen = null;
-                switch(linkComponents[1]) {
-                    case '0':
-                        screenToSwitchTo = 'FollowUpsScreen';
+                switch (linkComponents[1]) {
+                    case sideMenuKeys[0]:
+                        screenToSwitchTo = constants.appScreens.followUpScreen;
                         break;
-                    case '1':
-                        screenToSwitchTo = "ContactsScreen";
+                    case sideMenuKeys[1]:
+                        screenToSwitchTo = constants.appScreens.contactsScreen;
                         break;
-                    case '1-add':
-                        screenToSwitchTo = "ContactsScreen";
-                        addScreen = "ContactsSingleScreen";
+                    case `${sideMenuKeys[1]}-add`:
+                        screenToSwitchTo = constants.appScreens.contactsScreen;
+                        addScreen = constants.appScreens.contactSingleScreen;
                         break;
-                    case '2':
+                    case sideMenuKeys[2]:
                         screenToSwitchTo = constants.appScreens.contactsOfContactsScreen;
                         break;
-                    case '2-add':
+                    case `${sideMenuKeys[2]}-add`:
                         screenToSwitchTo = constants.appScreens.contactsOfContactsSingleScreen;
                         addScreen = constants.appScreens.contactsOfContactsSingleScreen;
                         break;
-                    case '3':
-                        screenToSwitchTo = "CasesScreen";
+                    case sideMenuKeys[3]:
+                        screenToSwitchTo = constants.appScreens.casesScreen;
                         break;
-                    case '3-add':
-                        screenToSwitchTo = "CaseSingleScreen";
-                        addScreen = "CaseSingleScreen";
+                    case `${sideMenuKeys[3]}-add`:
+                        screenToSwitchTo = constants.appScreens.caseSingleScreen;
+                        addScreen = constants.appScreens.caseSingleScreen;
                         break;
-                    case 'help':
-                        screenToSwitchTo = "HelpScreen";
-                    break;
-                    case '4':
-                        screenToSwitchTo = "UsersScreen";
-                    break;
+                    case sideMenuKeys[4]:
+                        screenToSwitchTo = constants.appScreens.labResultsScreen;
+                        break;
+                    case `${sideMenuKeys[4]}-add`:
+                        screenToSwitchTo = constants.appScreens.labResultsSingleScreen;
+                        addScreen = constants.appScreens.labResultsSingleScreen;
+                        break;
+                    case sideMenuKeys[5]:
+                        screenToSwitchTo = constants.appScreens.eventsScreen;
+                        break;
+                    case `${sideMenuKeys[5]}-add`:
+                        screenToSwitchTo = constants.appScreens.eventSingleScreen;
+                        addScreen = constants.appScreens.eventSingleScreen;
+                        break;
+                    case sideMenuKeys[6]:
+                        screenToSwitchTo = constants.appScreens.usersScreen;
+                        break;
+                    case sideMenuKeys[7]:
+                        screenToSwitchTo = constants.appScreens.helpScreen;
+                        break;
                     default:
-                        screenToSwitchTo = "FollowUpsScreen";
+                        screenToSwitchTo = constants.appScreens.followUpScreen;
                         break;
                 }
 
-                if(addScreen) {
+                if (addScreen) {
                     navigator.push({
                         screen: screenToSwitchTo,
                         passProps: {
                             isNew: true,
                             isAddFromNavigation: true,
-                            refresh: () => {console.log('Default refresh')}
+                            refresh: () => {
+                                console.log('Default refresh')
+                            }
                         }
                     });
                 } else {
-
                     navigator.resetTo({
                         screen: screenToSwitchTo,
                     });
@@ -213,30 +340,32 @@ export function computeFullName(person) {
         return '';
     }
     if (person.type === translations.personTypes.events) {
-        return person.name;
+        return person.name || person.firstName;
     }
     return (person.firstName || '') + ' ' + (person.lastName || '');
 }
 
 export function unzipFile(source, dest, password, clientCredentials) {
-    console.log('Stuff: ', source, dest, password, clientCredentials);
-    return function(dispatch) {
+    return function (dispatch) {
         return new Promise((resolve, reject) => {
             RNFetchBlobFS.exists(source)
                 .then((exists) => {
                     if (exists) {
                         unzip(source, dest, 'UTF-8')
                             .then((path) => {
-                                console.log(`unzip completed at ${path}`);
                                 // Delete the zip file after unzipping
-                                deleteFile(source, true)
-                                    .then(() => {
-                                        resolve(path);
-                                    })
-                                    .catch((errorDelete) => {
-                                        console.log('Error delete: ', errorDelete);
-                                        resolve(path);
-                                    })
+                                if (appConfig.env !== 'development') {
+                                    deleteFile(source, true)
+                                        .then(() => {
+                                            resolve(path);
+                                        })
+                                        .catch((errorDelete) => {
+                                            console.log('Error delete: ', errorDelete);
+                                            resolve(path);
+                                        })
+                                } else {
+                                    resolve(path);
+                                }
                             })
                             .catch((error) => {
                                 console.log(error);
@@ -261,7 +390,7 @@ export function unzipFile(source, dest, password, clientCredentials) {
     }
 }
 
-export function readDir (path) {
+export function readDir(path) {
     return new Promise((resolve, reject) => {
         RNFetchBlobFS.ls(path)
             .then((files) => {
@@ -273,7 +402,7 @@ export function readDir (path) {
     })
 }
 
-export function deleteFile (path, skipError) {
+export function deleteFile(path, skipError) {
     return Promise.resolve()
         .then(() => RNFetchBlobFS.exists(path))
         .then((exists) => {
@@ -311,7 +440,7 @@ export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFir
                 if (isFirstTime && forceBulk) {
                     promiseArray.push(processBulkDocs(data, type));
                 } else {
-                    for (let i=0; i<data.length; i++) {
+                    for (let i = 0; i < data.length; i++) {
                         promiseArray.push(updateFileInDatabase(data[i], type))
                     }
                 }
@@ -323,13 +452,18 @@ export function processFilePouch(path, type, totalNumberOfFiles, dispatch, isFir
             let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
             numberOfFilesProcessedAux += 1;
             setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-            dispatch(setSyncState({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles, addLanguagePacks: checkArrayAndLength(languagePacks)}));
+            dispatch(setSyncState({
+                id: 'sync',
+                name: 'Syncing',
+                status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles,
+                addLanguagePacks: checkArrayAndLength(languagePacks)
+            }));
             return Promise.resolve('Finished syncing');
         })
         .catch((errorProccessingPouch) => Promise.reject(errorProccessingPouch));
 }
 
-function processEncryptedFile (path, hubConfig) {
+function processEncryptedFile(path, hubConfig) {
     let password = getSyncEncryptPassword(null, hubConfig);
     return Promise.resolve()
         .then(() => RNFetchBlobFS.readFile(path, 'base64'))
@@ -338,7 +472,7 @@ function processEncryptedFile (path, hubConfig) {
         .catch((errorDecrypt) => Promise.reject(errorDecrypt));
 }
 
-function processUnencryptedFile (path, fileName, unzipLocation) {
+function processUnencryptedFile(path, fileName, unzipLocation) {
     return Promise.resolve()
         .then(() => unzip(`${path}`, `${unzipLocation}`))
         .then((unzipPath) => RNFetchBlobFS.readFile(getFilePath(unzipPath, fileName), 'utf8'))
@@ -348,7 +482,7 @@ function processUnencryptedFile (path, fileName, unzipLocation) {
         })
 }
 
-function getFilePath (unzipPath, fileName) {
+function getFilePath(unzipPath, fileName) {
     return `${unzipPath}/${fileName.substring(0, fileName.length - 4)}`;
 }
 
@@ -365,7 +499,12 @@ export function processFilesSql(path, table, totalNumberOfFiles, dispatch, encry
             let numberOfFilesProcessedAux = getNumberOfFilesProcessed();
             numberOfFilesProcessedAux += 1;
             setNumberOfFilesProcessed(numberOfFilesProcessedAux);
-            dispatch(setSyncState({id: 'sync', name: 'Syncing', status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles, addLanguagePacks: checkArrayAndLength(languagePacks)}));
+            dispatch(setSyncState({
+                id: 'sync',
+                name: 'Syncing',
+                status: numberOfFilesProcessedAux + "/" + totalNumberOfFiles,
+                addLanguagePacks: checkArrayAndLength(languagePacks)
+            }));
             return Promise.resolve('Finished syncing');
         })
         .catch((errorProcessingSql) => Promise.reject(errorProcessingSql));
@@ -390,7 +529,7 @@ function processFileGeneral(path, fileName, unzipLocation, hubConfig, encryptedD
         .catch((errorProcessFile) => Promise.reject(errorProcessFile));
 }
 
-export function comparePasswords (password, encryptedPassword, callback) {
+export function comparePasswords(password, encryptedPassword, callback) {
     let start = new Date().getTime();
 
     let RNBcrypt = NativeModules.RNBcrypt;
@@ -405,7 +544,7 @@ export function comparePasswords (password, encryptedPassword, callback) {
         });
 }
 
-export function getDataFromDatabaseFromFileSql (table, lastSyncDate, password) {
+export function getDataFromDatabaseFromFileSql(table, lastSyncDate, password) {
     let query = {
         type: 'select',
         table: table,
@@ -427,37 +566,36 @@ export function getDataFromDatabaseFromFileSql (table, lastSyncDate, password) {
             return handleDataForZip(response, table, password, true);
         })
         .catch((errorGetDataFromDatabaseFromFileSql) => {
-            console.log('getDataFromDatabaseFromFileSql: ', errorGetDataFromDatabaseFromFileSql);
             return Promise.reject(errorGetDataFromDatabaseFromFileSql)
         })
 }
 
-export function getDataFromDatabaseFromFile (database, fileType, lastSyncDate, password) {
-        fileType = `${fileType}.json`;
-        let start = new Date().getTime();
-        return database.find({
-            selector: {
-                // _id: {
-                //     $gte: `${fileType}_`,
-                //     $lte: `${fileType}_\uffff`
-                // },
-                // fileType: {$eq: fileType},
-                updatedAt: {$gte: lastSyncDate}
-            }
+export function getDataFromDatabaseFromFile(database, fileType, lastSyncDate, password) {
+    fileType = `${fileType}.json`;
+    let start = new Date().getTime();
+    return database.find({
+        selector: {
+            // _id: {
+            //     $gte: `${fileType}_`,
+            //     $lte: `${fileType}_\uffff`
+            // },
+            // fileType: {$eq: fileType},
+            updatedAt: {$gte: lastSyncDate}
+        }
+    })
+        .then((response) => {
+            // Now that we have some files, we should recreate the mongo collections
+            // If there are more than 1000 collections split in chunks of 1000 records
+            return handleDataForZip(response, fileType, password);
         })
-            .then((response) => {
-                // Now that we have some files, we should recreate the mongo collections
-                // If there are more than 1000 collections split in chunks of 1000 records
-                return handleDataForZip(response, fileType, password);
-            })
-            .catch((error) => {
-                database = null;
-                console.log(`An error occurred while getting data for collection: ${fileType}`);
-                return Promise.reject(error);
-            })
+        .catch((error) => {
+            database = null;
+            console.log(`An error occurred while getting data for collection: ${fileType}`);
+            return Promise.reject(error);
+        })
 }
 
-function handleDataForZip (response, fileType, password, isSqlite) {
+function handleDataForZip(response, fileType, password, isSqlite) {
     // Now that we have some files, we should recreate the mongo collections
     // If there are more than 1000 collections split in chunks of 1000 records
     // console.log('GetDataFromDatabaseFromFile query time: ', new Date().getTime() - start);
@@ -483,7 +621,7 @@ function handleDataForZip (response, fileType, password, isSqlite) {
     }
 }
 
-function writeOperations (collectionName, index, data, password, jsonPath) {
+function writeOperations(collectionName, index, data, password, jsonPath) {
     let zipPathGlobal = null;
     return Promise.resolve()
         .then(() => RNFetchBlobFS.createFile(jsonPath, JSON.stringify(data), 'utf8'))
@@ -504,7 +642,7 @@ function writeOperations (collectionName, index, data, password, jsonPath) {
 }
 
 // This method creates the json file, archives it and encrypts it
-export function createFileWithIndex (collectionName, index, data, password) {
+export function createFileWithIndex(collectionName, index, data, password) {
     let jsonPath = `${RNFetchBlobFS.dirs.DocumentDir}/who_files/${collectionName.split('.')[0]}.${index}.json`;
 
     return RNFetchBlobFS.exists(jsonPath)
@@ -519,7 +657,7 @@ export function createFileWithIndex (collectionName, index, data, password) {
         .catch((errorFileExists) => writeOperations(collectionName, index, data, password, jsonPath))
 }
 
-export async function createFilesWithName (fileName, data, password) {
+export async function createFilesWithName(fileName, data, password) {
     // First check if the directory exists
     try {
         let exists = await RNFetchBlobFS.exists(RNFetchBlobFS.dirs.DocumentDir + '/who_files');
@@ -529,7 +667,7 @@ export async function createFilesWithName (fileName, data, password) {
             let remainder = data.length % 1000;
             let arrayOfResponses = [];
 
-            for (let i=0; i<=numberOfChunks; i++) {
+            for (let i = 0; i <= numberOfChunks; i++) {
                 try {
                     let response = await createFileWithIndex(fileName, i, data.slice(i * 1000, i * 1000 + 1000), password);
                     if (response) {
@@ -540,7 +678,7 @@ export async function createFilesWithName (fileName, data, password) {
                     }
                 } catch (errorCreateFileWithIndex) {
                     console.log('An error occurred while creating directory: ', errorCreateFileWithIndex);
-                return Promise.reject(errorCreateFileWithIndex);
+                    return Promise.reject(errorCreateFileWithIndex);
                 }
             }
 
@@ -557,7 +695,7 @@ export async function createFilesWithName (fileName, data, password) {
                 let remainder = data.length % 1000;
                 let arrayOfResponses = [];
 
-                for (let i=0; i<=numberOfChunks; i++) {
+                for (let i = 0; i <= numberOfChunks; i++) {
                     try {
                         let response = await createFileWithIndex(fileName, i, data.slice(i * 1000, i * 1000 + 1000), password);
                         if (response) {
@@ -580,13 +718,13 @@ export async function createFilesWithName (fileName, data, password) {
                 return Promise.reject(errorCreateDir);
             }
         }
-    } catch(errorExists) {
+    } catch (errorExists) {
         console.log("An error occurred while getting if the root directory exists: ", errorExists);
         return Promise.reject(errorExists);
     }
 }
 
-export function createZipFileAtPath (source, target) {
+export function createZipFileAtPath(source, target) {
     return Promise.resolve()
         .then(() => RNFetchBlobFS.exists(source))
         .then((exists) => {
@@ -600,7 +738,7 @@ export function createZipFileAtPath (source, target) {
 
 // Method for extracting the mongo id from the pouch id
 // type is the name of the mongo collection: (follow)
-export function extractIdFromPouchId (pouchId, type) {
+export function extractIdFromPouchId(pouchId, type) {
     if (!pouchId) {
         return null;
     }
@@ -617,7 +755,7 @@ export function extractIdFromPouchId (pouchId, type) {
     return pouchId.split('_')[pouchId.split('_').length - 1];
 }
 
-export function computeIdForFileType (fileType, outbreakId, file, type) {
+export function computeIdForFileType(fileType, outbreakId, file, type) {
     switch (fileType) {
         case 'person.json':
             return generateId();
@@ -626,12 +764,14 @@ export function computeIdForFileType (fileType, outbreakId, file, type) {
         // return (type + '_' + file.outbreakId + '_' + file._id);
         case 'relationship.json':
             return generateId();
+        case 'labResult':
+            return generateId();
         default:
             return (fileType + '_' + generateId());
     }
 }
 
-export function generateId () {
+export function generateId() {
     return uuid.v4();
 }
 
@@ -694,7 +834,7 @@ export function updateRequiredFields(outbreakId, userId, record, action, fileTyp
             return record;
 
         default:
-            console.log ('updateRequiredFields default record', JSON.stringify(record));
+            console.log('updateRequiredFields default record', JSON.stringify(record));
             return record;
     }
 }
@@ -707,7 +847,7 @@ export function createName(type, firstName, lastName) {
     }
 }
 
-export function mapLocations (locationList) {
+export function mapLocations(locationList) {
     // let startTime = new Date().getTime();
 
     // locationList = locationList.map((e) => Object.assign({}, e, {_id: extractIdFromPouchId(e._id, 'location')}));
@@ -717,7 +857,7 @@ export function mapLocations (locationList) {
     // stores all already processed items with their ids as the keys so we can search quick
     const lookup = {};
 
-    for (let i=0; i<locationList.length; i++) {
+    for (let i = 0; i < locationList.length; i++) {
         const locationId = extractIdFromPouchId(locationList[i]._id, 'location');
         const locationParentId = locationList[i].parentLocationId;
 
@@ -757,20 +897,26 @@ export function mapLocations (locationList) {
 // 2. filter locations that don't have geographicalLevelId
 // 3. for each level starting from the second to last, add them to the children
 // the new array will be the array that will be searched next
-export function mapLocationsOld (locationList) {
+export function mapLocationsOld(locationList) {
     let startTime = new Date().getTime();
     // start with the roots
     let sortedArrays = groupBy(locationList, 'geographicalLevelId');
     // delete undefined geographicalLevelId
     delete sortedArrays['undefined'];
     // Get sorted keys
-    let allKeys = Object.keys(sortedArrays).filter((e) => {return e.includes('LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_')}).map((e) => {return e.split('_')[e.split('_').length - 1]}).sort((a, b) => {return b-a});
+    let allKeys = Object.keys(sortedArrays).filter((e) => {
+        return e.includes('LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_')
+    }).map((e) => {
+        return e.split('_')[e.split('_').length - 1]
+    }).sort((a, b) => {
+        return b - a
+    });
 
     let currentTree = sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[0]}`] || [];
-    for (let levelIndex=1; levelIndex<allKeys.length; levelIndex++) {
+    for (let levelIndex = 1; levelIndex < allKeys.length; levelIndex++) {
         currentTree = groupBy(currentTree, 'parentLocationId');
         let currentLevelTree = [];
-        for (let elementIndex=0; elementIndex<sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[levelIndex]}`].length; elementIndex ++) {
+        for (let elementIndex = 0; elementIndex < sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[levelIndex]}`].length; elementIndex++) {
             let currentElement = sortedArrays[`LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL_ADMIN_LEVEL_${allKeys[levelIndex]}`][elementIndex];
             let children = currentTree[extractIdFromPouchId(currentElement._id, 'location')] || null;
             if (children) {
@@ -788,20 +934,20 @@ export function mapLocationsOld (locationList) {
 
 //recursively functions for mapping questionCard questions (followUps and Cases )
 // item = {questionId1: [{date1, value1, subAnswers1}, {date2, value2}], questionId2: [{date: null, value1}]}
-export function extractAllQuestions (questions, item, index) {
+export function extractAllQuestions(questions, item, index) {
     let start = new Date().getTime();
     if (questions && Array.isArray(questions) && questions.length > 0) {
         // First filter for inactive questions
         questions = questions.filter((e) => !e.inactive || e.inactive === null || e.inactive === false || e.inactive === undefined);
 
-        for (let i=0; i<questions.length; i++) {
+        for (let i = 0; i < questions.length; i++) {
             if (questions[i].additionalQuestions) {
                 delete questions[i].additionalQuestions;
             }
             if (questions[i] && questions[i].answerType && (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" || questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS") && questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
                 for (let j = 0; j < questions[i].answers.length; j++) {
                     // First check for single select since it has only a value
-                    if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
+                    if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER") {
                         if (item && typeof item === 'object'
                             && Object.keys(item).length > 0
                             && item[questions[i].variable]
@@ -831,7 +977,7 @@ export function extractAllQuestions (questions, item, index) {
                                 && questions[i].answers[j].additionalQuestions) {
                                 questions[i].additionalQuestions = questions[i].additionalQuestions ?
                                     questions[i].additionalQuestions.concat(
-                                            extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']),
+                                        extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']),
                                             item[questions[i].variable][index].subAnswers)
                                     )
                                     : extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item[questions[i].variable][index].subAnswers);
@@ -847,7 +993,7 @@ export function extractAllQuestions (questions, item, index) {
 }
 
 // previousAnswer = {key}
-export function extractQuestionsRecursively (questions, item) {
+export function extractQuestionsRecursively(questions, item) {
     let returnedQuestions = [];
 
     if (questions && Array.isArray(questions) && questions.length > 0) {
@@ -861,7 +1007,7 @@ export function extractQuestionsRecursively (questions, item) {
                 // For every answer check if the user answered that question and then proceed with the showing
                 for (let j = 0; j < questions[i].answers.length; j++) {
                     // First check for single select since it has only a value
-                    if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER" ) {
+                    if (questions[i].answerType === "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER") {
                         if (item && typeof item === 'object' && Object.keys(item).length > 0 && item[questions[i].variable] && Array.isArray(item[questions[i].variable]) && item[questions[i].variable].length > 0 && typeof item[questions[i].variable][0] === "object" && Object.keys(item[questions[i].variable][0]).length > 0 && item[questions[i].variable][0].value && item[questions[i].variable][0].value === questions[i].answers[j].value && questions[i].answers[j].additionalQuestions) {
                             returnedQuestions = returnedQuestions.concat(extractQuestionsRecursively(sortBy(questions[i].answers[j].additionalQuestions, ['order', 'variable']), item))
                         }
@@ -891,16 +1037,18 @@ export function mapAnswers(questions, answers) {
     if (questionnaireAnswers) {
         for (let questionId in questionnaireAnswers) {
             // First added the main questions
-            if (sortedQuestions.findIndex((e) => {return e.variable === questionId}) > -1) {
+            if (sortedQuestions.findIndex((e) => {
+                return e.variable === questionId
+            }) > -1) {
                 mappedAnswers[questionId] = cloneDeep(questionnaireAnswers[questionId]);
             }
         }
     }
 
     // Look for the sub-questions
-    for (let i=0; i<sortedQuestions.length; i++) {
+    for (let i = 0; i < sortedQuestions.length; i++) {
         if (sortedQuestions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER' ||
-                sortedQuestions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
+            sortedQuestions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
             if (checkArrayAndLength(get(sortedQuestions, `[${i}].answers`), null)) {
                 sortedQuestions[i].additionalQuestions = [];
                 for (let j = 0; j < sortedQuestions[i].answers.length; j++) {
@@ -915,12 +1063,15 @@ export function mapAnswers(questions, answers) {
 
     if (questionnaireAnswers && mappedAnswers && Object.keys(mappedAnswers).length > 0) {
         for (let questionId in questionnaireAnswers) {
-            for (let j=0; j<sortedQuestions.length; j++) {
-                if (!mappedAnswers[questionId] && checkArrayAndLength(get(sortedQuestions, `[${j}].additionalQuestions`), null) && sortedQuestions[j].additionalQuestions.findIndex((e) => {return e.variable === questionId}) > -1) {
-                    for (let i=0; i<questionnaireAnswers[questionId].length; i++) {
-                        console.log('This point fails: ', mappedAnswers[sortedQuestions[j].variable], get(mappedAnswers, `[${get(sortedQuestions, `[${j}].variable`, null)}]`, null));
+            for (let j = 0; j < sortedQuestions.length; j++) {
+                if (!mappedAnswers[questionId] && checkArrayAndLength(get(sortedQuestions, `[${j}].additionalQuestions`), null) && sortedQuestions[j].additionalQuestions.findIndex((e) => {
+                    return e.variable === questionId
+                }) > -1) {
+                    for (let i = 0; i < questionnaireAnswers[questionId].length; i++) {
                         if (checkArrayAndLength(get(mappedAnswers, `[${get(sortedQuestions, `[${j}].variable`, null)}]`, null))) {
-                            let indexForStuff = mappedAnswers[sortedQuestions[j].variable].findIndex((e) => {return e.date === questionnaireAnswers[questionId][i].date});
+                            let indexForStuff = mappedAnswers[sortedQuestions[j].variable].findIndex((e) => {
+                                return e.date === questionnaireAnswers[questionId][i].date
+                            });
                             if (indexForStuff > -1) {
                                 if (mappedAnswers[sortedQuestions[j].variable][indexForStuff] && !mappedAnswers[sortedQuestions[j].variable][indexForStuff].subAnswers) {
                                     const a = Object.assign({}, mappedAnswers[sortedQuestions[j].variable][indexForStuff], {subAnswers: {}});
@@ -948,7 +1099,7 @@ export function mapAnswers(questions, answers) {
 function extractQuestions(questions) {
     let returnedQuestions = questions.slice();
     if (questions && Array.isArray(questions) && questions.length > 0) {
-        for (let i=0; i<questions.length; i++) {
+        for (let i = 0; i < questions.length; i++) {
             if (questions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER' || questions[i].answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
                 if (questions[i].answers && Array.isArray(questions[i].answers) && questions[i].answers.length > 0) {
                     for (let j = 0; j < questions[i].answers.length; j++) {
@@ -961,6 +1112,17 @@ function extractQuestions(questions) {
 
     // console.log('extract le questions:  ', returnedQuestions);
     return returnedQuestions;
+}
+
+export function getMaskRegExpStringForSearch(mask) {
+    mask = mask.replace('0', '[0-9]');
+    mask = mask.replace('YYYY', '\\d{4}');
+    mask = mask.replace('@', '[A-Za-z]');
+    mask = mask.replace('&', '.');
+    //Doing this for my sanity
+    mask = mask.replace('*', '(.*?)');
+
+    return new RegExp(`^${mask}$`);
 }
 
 export function reMapAnswers(answers) {
@@ -981,7 +1143,7 @@ export function reMapAnswers(answers) {
     }
 
     // Sort each returnedAnswer by date descending
-    for(let questionId in returnedAnswers) {
+    for (let questionId in returnedAnswers) {
         returnedAnswers[questionId].sort((a, b) => {
             if (a.date > b.date) {
                 return -1;
@@ -992,9 +1154,9 @@ export function reMapAnswers(answers) {
             return 0;
         });
         returnedAnswers[questionId] = returnedAnswers[questionId].map((e) => {
-            if(e.date){
-                e.date  = createDate(e.date).toISOString();
-            }else{
+            if (e.date) {
+                e.date = createDate(e.date).toISOString();
+            } else {
                 e.date = null;
             }
             return e;
@@ -1009,14 +1171,16 @@ export function checkRequiredQuestions(questions, previousAnswers) {
     for (let i = 0; i < questions.length; i++) {
         if (questions[i].required && questions[i].inactive === false) {
             if (!previousAnswers || !previousAnswers[questions[i].variable] || !Array.isArray(previousAnswers[questions[i].variable]) || previousAnswers[questions[i].variable].findIndex((e) => {
-                return !e.value || e.value === ''
+                return !e.value && e.value !== 0
             }) > -1) {
                 requiredQuestions.push(questions[i].text);
             }
         }
         if (questions[i].additionalQuestions && Array.isArray(questions[i].additionalQuestions) && questions[i].additionalQuestions.length > 0) {
             for (let j = 0; j < questions[i].additionalQuestions.length; j++) {
-                if (questions[i].additionalQuestions[j].required && previousAnswers[questions[i].variable].filter((e) => {return get(e, `subAnswers[${questions[i].additionalQuestions[j].variable}]`, 'failTest') !== 'failTest'}).findIndex((e) => {
+                if (questions[i].additionalQuestions[j].required && previousAnswers[questions[i].variable].filter((e) => {
+                    return get(e, `subAnswers[${questions[i].additionalQuestions[j].variable}]`, 'failTest') !== 'failTest'
+                }).findIndex((e) => {
                     // console.log('checkRequiredQuestions test: ', get(e, `subAnswers[${questions[i].additionalQuestions[j].variable}][0].value`, 'fail'), e);
                     return !e.subAnswers || e.subAnswers[questions[i].additionalQuestions[j].variable][0].value === null || e.subAnswers[questions[i].additionalQuestions[j].variable][0].value === ""
                 }) > -1) {
@@ -1028,7 +1192,7 @@ export function checkRequiredQuestions(questions, previousAnswers) {
     return requiredQuestions;
 }
 
-export function getTranslation (value, allTransactions) {
+export function getTranslation(value, allTransactions) {
     if (!value) {
         return '';
     }
@@ -1046,15 +1210,21 @@ export function getTranslation (value, allTransactions) {
     let valueToBeReturned = value;
     if (value && typeof value === 'string' && value.includes('LNG')) {
         let item = null;
+
+        // if(value===translations.contactsOfContactsScreen.contactsTitle){
+        //     console.log("What's this?", allTransactions);
+        // }
         if (value && allTransactions && Array.isArray(allTransactions)) {
-            item = allTransactions.find(e => {return e && e.token === value})
+            item = allTransactions.find(e => {
+                return e && e.token === value
+            })
         }
 
         // valueToBeReturned = item ? item.translation : '';
 
         if (item !== null && item !== undefined && item.translation !== null && item.translation !== undefined) {
             valueToBeReturned = item.translation
-        } else if (defaultTranslations[`${value}`] !== undefined && defaultTranslations[`${value}`] !== null){
+        } else if (defaultTranslations[`${value}`] !== undefined && defaultTranslations[`${value}`] !== null) {
             valueToBeReturned = defaultTranslations[`${value}`]
         } else {
             valueToBeReturned = value;
@@ -1064,7 +1234,7 @@ export function getTranslation (value, allTransactions) {
     return valueToBeReturned;
 }
 
-export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filterFromFilterScreen, translations) {
+export function localSortHelpItem(helpItemsCopy, propsFilter, stateFilter, filterFromFilterScreen, translations) {
     // Map helpItemsCopy to use translated title
     if (checkArrayAndLength(helpItemsCopy)) {
         helpItemsCopy = helpItemsCopy.map((e) => Object.assign({}, e, {title: getTranslation(e && e.title, translations)}));
@@ -1072,11 +1242,11 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
     // Take care of search filter
     if (stateFilter.searchText) {
         helpItemsCopy = helpItemsCopy.filter((e) => {
-            return  (e && e.title && stateFilter.searchText.toLowerCase().includes(e.title.toLowerCase())) ||
+            return (e && e.title && stateFilter.searchText.toLowerCase().includes(e.title.toLowerCase())) ||
                 e && e.title && e.title.toLowerCase().includes(stateFilter.searchText.toLowerCase())
         });
     }
-    
+
     // Take care of category filter
     if (filterFromFilterScreen && filterFromFilterScreen.categories && filterFromFilterScreen.categories.length > 0) {
         helpItemsCopy = helpItemsCopy.filter((e) => {
@@ -1091,8 +1261,8 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
     if (filterFromFilterScreen && filterFromFilterScreen.sort && filterFromFilterScreen.sort !== undefined && filterFromFilterScreen.sort.length > 0) {
         let sortCriteria = [];
         let sortOrder = [];
-        for(let i = 0; i < filterFromFilterScreen.sort.length; i++) {
-            if (filterFromFilterScreen.sort[i].sortCriteria && filterFromFilterScreen.sort[i].sortCriteria.trim().length > 0 && filterFromFilterScreen.sort[i].sortOrder && filterFromFilterScreen.sort[i].sortOrder.trim().length > 0){
+        for (let i = 0; i < filterFromFilterScreen.sort.length; i++) {
+            if (filterFromFilterScreen.sort[i].sortCriteria && filterFromFilterScreen.sort[i].sortCriteria.trim().length > 0 && filterFromFilterScreen.sort[i].sortOrder && filterFromFilterScreen.sort[i].sortOrder.trim().length > 0) {
                 sortCriteria.push(filterFromFilterScreen.sort[i].sortCriteria === 'LNG_HELP_ITEMS_FIELD_LABEL_TITLE' ? 'title' : 'categoryId')
                 sortOrder.push(filterFromFilterScreen.sort[i].sortOrder === 'LNG_SIDE_FILTERS_SORT_BY_ASC_PLACEHOLDER' ? false : true)
             }
@@ -1100,10 +1270,10 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
 
         let helpItemsCopyMapped = helpItemsCopy.map((e) => {
             if (e.title) {
-                e.title = getTranslation(e.title, translations) 
+                e.title = getTranslation(e.title, translations)
             }
             if (e.categoryId) {
-                e.categoryId = getTranslation(e.categoryId, translations) 
+                e.categoryId = getTranslation(e.categoryId, translations)
             }
             return e
         });
@@ -1122,7 +1292,7 @@ export function localSortHelpItem (helpItemsCopy, propsFilter, stateFilter, filt
     return helpItemsCopy
 }
 
-export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
+export function filterItemsForEachPage(helpItemsCopy, pageAskingHelpFrom) {
     helpItemsCopy = helpItemsCopy.filter((e) => {
         let itemPage = null;
         if (e.page && e.page !== undefined) {
@@ -1132,15 +1302,20 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             if (pageAskingHelpFrom === 'followUps') {
                 return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'labResults') {
+                return e.page.toLowerCase().includes('lab-results') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'contacts') {
                 return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'cases') {
                 return e.page.toLowerCase().includes('cases') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
-            }
-            else if (pageAskingHelpFrom === 'followUpSingleScreenAdd') {
+            } else if (pageAskingHelpFrom === 'followUpSingleScreenAdd') {
                 return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
+            } else if (pageAskingHelpFrom === 'labResultsSingleScreenAdd') {
+                return e.page.toLowerCase().includes('lab-results') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
             } else if (pageAskingHelpFrom === 'contactsSingleScreenAdd') {
                 return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
@@ -1148,9 +1323,11 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             } else if (pageAskingHelpFrom === 'casesSingleScreenAdd') {
                 return e.page.toLowerCase().includes('cases') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
-            }
-            else if (pageAskingHelpFrom === 'followUpSingleScreenEdit') {
+            } else if (pageAskingHelpFrom === 'followUpSingleScreenEdit') {
                 return e.page.toLowerCase().includes('followups') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
+                    !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'labResultsSingleScreenEdit') {
+                return e.page.toLowerCase().includes('lab-results') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'contactsSingleScreenEdit') {
                 return e.page.toLowerCase().includes('contacts') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
@@ -1158,9 +1335,11 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             } else if (pageAskingHelpFrom === 'casesSingleScreenEdit') {
                 return e.page.toLowerCase().includes('cases') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit')) &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
-            }
-            else if (pageAskingHelpFrom === 'followUpSingleScreenView') {
+            } else if (pageAskingHelpFrom === 'followUpSingleScreenView') {
                 return e.page.toLowerCase().includes('followups') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
+                    e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
+            } else if (pageAskingHelpFrom === 'labResultsSingleScreenView') {
+                return e.page.toLowerCase().includes('lab-results') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             } else if (pageAskingHelpFrom === 'contactsSingleScreenView') {
                 return e.page.toLowerCase().includes('contacts') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
@@ -1168,15 +1347,13 @@ export function filterItemsForEachPage (helpItemsCopy, pageAskingHelpFrom) {
             } else if (pageAskingHelpFrom === 'casesSingleScreenView') {
                 return e.page.toLowerCase().includes('cases') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
-            }
-            else if (pageAskingHelpFrom === 'exposureAdd') {
+            } else if (pageAskingHelpFrom === 'exposureAdd') {
                 return e.page.toLowerCase().includes('relationships') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && (e.page.toLowerCase().includes('add') || e.page.toLowerCase().includes('create'))
             } else if (pageAskingHelpFrom === 'exposureEdit') {
                 return e.page.toLowerCase().includes('relationships') && (e.page.toLowerCase().includes('modify') || e.page.toLowerCase().includes('edit') ||
                     e.page.toLowerCase().includes('view')) && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
-            }
-            else if ( pageAskingHelpFrom === 'users') {
+            } else if (pageAskingHelpFrom === 'users') {
                 return e.page.toLowerCase().includes('users') && !e.page.toLowerCase().includes('modify') && !e.page.toLowerCase().includes('edit') &&
                     !e.page.toLowerCase().includes('view') && !e.page.toLowerCase().includes('add') && !e.page.toLowerCase().includes('create')
             }
@@ -1219,7 +1396,7 @@ export function objSort() {
                 //null if wanted at the start of array
             }
 
-            if (! desc) {
+            if (!desc) {
                 if (a < b) return -1;
                 if (a > b) return 1;
             } else {
@@ -1236,7 +1413,7 @@ export function objSort() {
     // objSort(homes, 'city', ['price', true]) --> sort by city (ascending) then price (descending), case in-sensitive)
 }
 
-export function getTooltip (label, translation, forceTooltip, tooltipsMessage) {
+export function getTooltip(label, translation, forceTooltip, tooltipsMessage) {
 
     if (forceTooltip) {
         return {
@@ -1250,7 +1427,7 @@ export function getTooltip (label, translation, forceTooltip, tooltipsMessage) {
 
     let labelTooltip = label + '_DESCRIPTION';
     let tooltipTranslation = getTranslation(labelTooltip, translation);
-    if (tooltipTranslation && typeof tooltipTranslation === 'string' && !tooltipTranslation.includes('LNG') && !tooltipTranslation.includes('_DESCRIPTION') && tooltipTranslation.trim().length > 0){
+    if (tooltipTranslation && typeof tooltipTranslation === 'string' && !tooltipTranslation.includes('LNG') && !tooltipTranslation.includes('_DESCRIPTION') && tooltipTranslation.trim().length > 0) {
         hasTooltip = true;
         tooltipMessage = tooltipTranslation
     }
@@ -1259,15 +1436,15 @@ export function getTooltip (label, translation, forceTooltip, tooltipsMessage) {
         hasTooltip: hasTooltip,
         tooltipMessage: tooltipMessage
     };
-    
+
     return tooltip
 }
 
-export function getDropDownInputDisplayParameters(screenSize, dropDownDataLength ){
+export function getDropDownInputDisplayParameters(screenSize, dropDownDataLength) {
     let itemCount = 4;
     let dropdownPosition = 3;
 
-    if (dropDownDataLength < 4){
+    if (dropDownDataLength < 4) {
         itemCount = dropDownDataLength;
         dropdownPosition = dropDownDataLength - 1;
     } else {
@@ -1277,7 +1454,7 @@ export function getDropDownInputDisplayParameters(screenSize, dropDownDataLength
             dropdownPosition = 2;
         }
     }
-    
+
     return {
         itemCount: itemCount,
         dropdownPosition: dropdownPosition
@@ -1327,13 +1504,12 @@ export function calcDateDiff(startdate, enddate) {
         let days = enddateMoment.diff(startdateMoment, 'days');
 
 
-        console.log('calcDateDiff', { months: months, years: years });
+        console.log('calcDateDiff', {months: months, years: years});
         return nrOFYears = {
             months: months,
             years: years,
         };
-    }
-    else {
+    } else {
         return undefined;
     }
 }
@@ -1344,7 +1520,7 @@ export function calcDateDiff(startdate, enddate) {
 // then go recursively adding the team to the sub locations
 // - When finding the main address take the first team from the teams array or null if no team assigned
 // - Note: to be checked the performance
-export function generateTeamId (contactAddress, teams, locationsTree) {
+export function generateTeamId(contactAddress, teams, locationsTree) {
     let start = new Date().getTime();
     let currentAddress = contactAddress;
     if (!checkArrayAndLength(teams)) {
@@ -1379,10 +1555,12 @@ export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttac
         return teamId;
     }
 
-    for (let i=0; i<locationsTree.length; i++) {
+    for (let i = 0; i < locationsTree.length; i++) {
         let teamsToBeAdded = teams.filter((e) => {
             return e.locationIds.includes(extractIdFromPouchId(locationsTree[i]._id, 'location'));
-        }).map((e) => {return extractIdFromPouchId(e._id, 'team')});
+        }).map((e) => {
+            return extractIdFromPouchId(e._id, 'team')
+        });
         if (checkArrayAndLength(teamsToBeAdded)) {
             // Add the new teams at the beginning so that the first ones are the ones closer to the contact's address
             teamsToBeAttachedToAllLocations = teamsToBeAdded.concat(teamsToBeAttachedToAllLocations);
@@ -1405,28 +1583,55 @@ export function computeAllTeamsForLocations(teams, locationsTree, teamsToBeAttac
     return teamId;
 }
 
-export function extractMainAddress (addressesArray) {
+export function extractMainAddress(addressesArray) {
     if (!addressesArray || !Array.isArray(addressesArray) || addressesArray.length === 0) {
         return null;
     }
 
-    return addressesArray.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence})
+    return addressesArray.find((e) => {
+        return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+    })
 }
 
-export function extractLocationId (person) {
+export function callPhone(translation) {
+    return number => {
+        Alert.alert(
+            getTranslation(translations.alertMessages.alertLabel, translation),
+            `${getTranslation(
+                translations.alertMessages.dialNumberAlertDescription,
+                translation
+            )} (${number})`,
+            [
+                {
+                    text: getTranslation(translations.alertMessages.yesButtonLabel, translation),
+                    onPress: () => {
+                        Linking.openURL(`tel:${number}`);
+                    }
+                },
+                {
+                    text: getTranslation(translations.alertMessages.cancelButtonLabel, translation)
+                }
+            ], {cancelable: true});
+
+    }
+}
+
+export function extractLocationId(person) {
     let locationId = null;
     let addresses = get(person, 'addresses', null);
     if (addresses !== null) {
-        let currentAddress = addresses.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
+        let currentAddress = addresses.find((e) => {
+            return e.typeId === config.userResidenceAddress.userPlaceOfResidence
+        });
         locationId = get(currentAddress, 'locationId', null);
     }
     return locationId;
 }
 
 // Promise wrapper around getCurrentPosition from react-native
-export function getLocationAccurate () {
+export function getLocationAccurate() {
     return new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
+        geolocation.getCurrentPosition(
             (position) => {
                 return resolve({
                     lat: get(position, 'coords.latitude', null),
@@ -1443,20 +1648,20 @@ export function getLocationAccurate () {
     })
 }
 
-export function filterByUser(locationTree, userTeams){
+export function filterByUser(locationTree, userTeams) {
     let locationIds = [];
-    for (let i=0; i<userTeams.length; i++){
-        if (userTeams[i].hasOwnProperty('locationIds') && userTeams[i].locationIds.length > 0){
+    for (let i = 0; i < userTeams.length; i++) {
+        if (userTeams[i].hasOwnProperty('locationIds') && userTeams[i].locationIds.length > 0) {
             let teamLocations = userTeams[i].locationIds;
-            for ( let j=0; j< teamLocations.length; j++){
-                if(locationIds.indexOf(teamLocations[j]) === -1) {
+            for (let j = 0; j < teamLocations.length; j++) {
+                if (locationIds.indexOf(teamLocations[j]) === -1) {
                     locationIds.push(teamLocations[j]);
                 }
             }
         }
 
     }
-    return extractLocations(locationTree,locationIds);
+    return extractLocations(locationTree, locationIds);
 }
 
 export function generatePermissionMessage(mainPermission, dataType, translation) {

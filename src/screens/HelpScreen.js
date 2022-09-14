@@ -5,17 +5,16 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Alert, Animated, BackHandler, FlatList, StyleSheet, Text, View} from 'react-native';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import {bindActionCreators, compose} from "redux";
 import SearchFilterView from './../components/SearchFilterView';
 import HelpListItem from './../components/HelpListItem';
-import {removeErrors} from './../actions/errors';
-import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
+import {addFilterForScreen, removeFilterForScreen} from './../actions/app'
+import {setDisableOutbreakChange} from './../actions/outbreak'
 import _ from 'lodash';
 import {
-    calculateDimension,
+    calculateDimension, createStackFromComponent,
     filterItemsForEachPage,
     getTranslation,
     localSortHelpItem,
@@ -24,20 +23,20 @@ import {
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations'
 import RNExitApp from 'react-native-exit-app';
-import constants from "../utils/constants";
+import withPincode from './../components/higherOrderComponents/withPincode';
 import config from "../utils/config";
 import PermissionComponent from './../components/PermissionComponent';
+import {Navigation} from "react-native-navigation";
+import styles from './../styles';
 
 let AnimatedListView = Animated.createAnimatedComponent(FlatList);
 
-const scrollAnim = new Animated.Value(0);
-const offsetAnim = new Animated.Value(0);
 
 class HelpScreen extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
+
+    scrollAnim = new Animated.Value(0);
+    offsetAnim = new Animated.Value(0);
 
     constructor(props) {
         super(props);
@@ -56,13 +55,16 @@ class HelpScreen extends Component {
         };
 
         // Bind here methods, or at least don't declare methods in the render method
-        this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
+        // this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
         this.renderHelp = this.renderHelp.bind(this);
         this.keyExtractor = this.keyExtractor.bind(this);
         this.renderSeparatorComponent = this.renderSeparatorComponent.bind(this);
         this.listEmptyComponent = this.listEmptyComponent.bind(this);
         this.filterHelp = this.filterHelp.bind(this);
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
+
+        this.scrollAnim = new Animated.Value(0);
+        this.offsetAnim = new Animated.Value(0);
     }
 
     // Please add here the react lifecycle methods that you need
@@ -83,6 +85,14 @@ class HelpScreen extends Component {
                 console.log ('filter removed')
             })
         }
+
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setDisableOutbreakChange(false);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
     };
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -95,6 +105,7 @@ class HelpScreen extends Component {
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+        this.navigationListener.remove();
     }
 
     handleBackButtonClick() {
@@ -116,19 +127,19 @@ class HelpScreen extends Component {
 
     clampedScroll= Animated.diffClamp(
         Animated.add(
-            scrollAnim.interpolate({
+            this.scrollAnim.interpolate({
                 inputRange: [0, 1],
                 outputRange: [0, 1],
                 extrapolateLeft: 'clamp',
             }),
-            offsetAnim,
+            this.offsetAnim,
         ),
         0,
-        30,
+        40,
     );
 
     handleScroll = Animated.event(
-        [{nativeEvent: {contentOffset: {y: scrollAnim}}}],
+        [{nativeEvent: {contentOffset: {y: this.scrollAnim}}}],
         {useNativeDriver: true}
     );
 
@@ -137,12 +148,12 @@ class HelpScreen extends Component {
     // and can slow down the app
     render() {
         const navbarTranslate = this.clampedScroll.interpolate({
-            inputRange: [0, 30],
-            outputRange: [0, -30],
+            inputRange: [0, 40],
+            outputRange: [0, -40],
             extrapolate: 'clamp',
         });
         const navbarOpacity = this.clampedScroll.interpolate({
-            inputRange: [0, 30],
+            inputRange: [0, 40],
             outputRange: [1, 0],
             extrapolate: 'clamp',
         });
@@ -172,29 +183,21 @@ class HelpScreen extends Component {
                 {
                     this.state.displayModalFormat === true ? (
                         <NavBarCustom customTitle={
-                            <View
-                                style={{
-                                    flex: 1,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    height: '100%'
-                                }}
-                            >
-                                <Text style={[style.title, {marginLeft: 30}]}>
+                            <View style={style.headerContainer}>
+                                <Text style={style.title}>
                                     {`${helpTitle[1]} ${getTranslation(translations.helpScreen.itemsForMessage, this.props.translation)} ${this.state.pageAskingHelpFromNameToDisplay}`}
                                 </Text>
                             </View>
                         }
                             title={null}
-                            navigator={this.props.navigator}
+                            componentId={this.props.componentId}
                             iconName="close"
                             handlePressNavbarButton={this.handlePressNavbarButton}
                         />
                     ) : (
                     <NavBarCustom
                         title={helpTitle[1]}
-                        navigator={this.props.navigator || null}
+                        componentId={this.props.componentId || null}
                         iconName="menu"
                         handlePressNavbarButton={this.handlePressNavbarButton}
                     >
@@ -230,7 +233,7 @@ class HelpScreen extends Component {
                                 onScroll={this.handleScroll}
                                 refreshing={this.state.refreshing}
                                 onRefresh={this.handleOnRefresh}
-                                getItemLayout={this.getItemLayout}
+                                // getItemLayout={this.getItemLayout}
                             />
                         )}
                         permissionsList={[]}
@@ -243,16 +246,18 @@ class HelpScreen extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
         this.state.displayModalFormat === true ? (
-            this.props.navigator.dismissModal()
+            Navigation.dismissModal(this.props.componentId)
         ) : (
             this.setState({
                 calendarPickerOpen: false
             }, () => {
-                this.props.navigator.toggleDrawer({
-                    side: 'left',
-                    animated: true,
-                    to: 'open'
-                })
+                Navigation.mergeOptions(this.props.componentId, {
+                    sideMenu: {
+                        left: {
+                            visible: true,
+                        },
+                    },
+                });
             })
         )
     };
@@ -271,11 +276,11 @@ class HelpScreen extends Component {
         />)
     };
 
-    getItemLayout = (data, index) => ({
-        length: calculateDimension(178, true, this.props.screenSize),
-        offset: calculateDimension(178, true, this.props.screenSize) * index,
-        index
-    });
+    // getItemLayout = (data, index) => ({
+    //     length: calculateDimension(178, true, this.props.screenSize),
+    //     offset: calculateDimension(178, true, this.props.screenSize) * index,
+    //     index
+    // });
 
     keyExtractor = (item, index) => {
        return item._id;
@@ -317,13 +322,15 @@ class HelpScreen extends Component {
         console.log("### handlePressFollowUp: ", item);
 
         let itemClone = Object.assign({}, item);
-        this.props.navigator.push({
-            screen: 'HelpSingleScreen',
-            passProps: {
-                isNew: false,
-                item: itemClone,
-                filter: this.state.filter,
-                startLoadingScreen: this.startLoadingScreen
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'HelpSingleScreen',
+                passProps: {
+                    isNew: false,
+                    item: itemClone,
+                    filter: this.state.filter,
+                    startLoadingScreen: this.startLoadingScreen
+                }
             }
         })
     };
@@ -335,6 +342,9 @@ class HelpScreen extends Component {
 
         if (this.state.pageAskingHelpFrom === 'followUps') {
             pageAskingHelpFromNameToDisplay = getTranslation(translations.followUpsScreen.followUpsTitle, this.props.translation)
+        }
+        if (this.state.pageAskingHelpFrom === 'labResults') {
+            pageAskingHelpFromNameToDisplay = getTranslation(translations.labResultsScreen.labResultsTitle, this.props.translation)
         }
         else if (this.state.pageAskingHelpFrom === 'contacts') {
             pageAskingHelpFromNameToDisplay = getTranslation(translations.contactsScreen.contactsTitle, this.props.translation)
@@ -348,6 +358,9 @@ class HelpScreen extends Component {
         else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenAdd') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
         }
+        else if (this.state.pageAskingHelpFrom === 'labResultSingleScreenAdd') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.labResultsSingleScreen.title, this.props.translation)}`
+        }
         else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenAdd') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.addMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
         }
@@ -357,6 +370,9 @@ class HelpScreen extends Component {
         else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenEdit') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
         }
+        else if (this.state.pageAskingHelpFrom === 'labResultSingleScreenEdit') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.labResultsSingleScreen.title, this.props.translation)}`
+        }
         else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenEdit') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.editMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
         }
@@ -365,6 +381,9 @@ class HelpScreen extends Component {
         } 
         else if (this.state.pageAskingHelpFrom === 'followUpSingleScreenView') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.followUpsSingleScreen.title, this.props.translation)}`
+        }
+        else if(this.state.pageAskingHelpFrom === 'labResultSingleScreenView') {
+            pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.labResultsSingleScreen.title, this.props.translation)}`
         }
         else if (this.state.pageAskingHelpFrom === 'contactsSingleScreenView') {
             pageAskingHelpFromNameToDisplay = `${getTranslation(translations.helpScreen.viewMessage, this.props.translation)} ${getTranslation(translations.contactSingleScreen.title, this.props.translation)}`
@@ -424,15 +443,14 @@ class HelpScreen extends Component {
     };
 
     handlePressFilter = () => {
-        this.props.navigator.showModal({
-            screen: 'FilterScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'FilterScreen',
             passProps: {
                 activeFilters: this.state.filterFromFilterScreen || null,
                 onApplyFilters: this.handleOnApplyFilters,
                 screen: 'HelpFilterScreen'
             }
-        })
+        }))
     };
 
     handleOnChangeText = (text) => {
@@ -459,48 +477,44 @@ class HelpScreen extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
-    mapContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF'
-    },
     container: {
+        flex: 1
+    },
+    headerContainer: {
         flex: 1,
-        backgroundColor: 'white',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingRight: 16
+    },
+    breadcrumbContainer: {
+        alignItems: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
+    },
+    title: {
+        color: styles.textColor,
+        fontFamily: 'Roboto-Medium',
+        fontSize: 18,
+        marginLeft: 16
     },
     containerContent: {
-        flex: 1,
-        backgroundColor: styles.appBackground,
-        paddingBottom: 25
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     separatorComponentStyle: {
-        height: 8
+        height: 4
     },
-    listViewStyle: {
-
-    },
-    componentContainerStyle: {
-
-    },
+    listViewStyle: {},
+    componentContainerStyle: {},
     emptyComponent: {
         justifyContent: 'center',
         alignItems: 'center'
     },
     emptyComponentTextView: {
+        color: styles.secondaryColor,
         fontFamily: 'Roboto-Light',
-        fontSize: 15,
-        color: styles.textEmptyList
-    },
-    buttonEmptyListText: {
-        fontFamily: 'Roboto-Regular',
-        fontSize: 16.8,
-        color: styles.buttonTextGray
-    },
-    breadcrumbContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between'
+        fontSize: 14
     }
 });
 
@@ -519,7 +533,11 @@ function matchDispatchProps(dispatch) {
     return bindActionCreators({
         addFilterForScreen,
         removeFilterForScreen,
+        setDisableOutbreakChange
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(HelpScreen);
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchProps)
+)(HelpScreen);

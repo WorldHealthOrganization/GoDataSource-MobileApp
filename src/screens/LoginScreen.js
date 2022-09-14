@@ -7,13 +7,12 @@ import React, {Component} from 'react';
 import {Alert, Image, Platform, StyleSheet, Text, View} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
 import {TextField} from 'react-native-material-textfield';
-import styles from './../styles';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {cleanDataAfterLogout, loginUser} from './../actions/user';
 import {removeErrors} from './../actions/errors';
 import {changeAppRoot, setSyncState} from './../actions/app';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scroll-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import Ripple from 'react-native-material-ripple';
 import lodashGet from 'lodash/get';
@@ -22,26 +21,27 @@ import config from './../utils/config';
 import {getTranslation} from './../utils/functions';
 import VersionNumber from 'react-native-version-number';
 import appConfig from './../../app.config';
+import withPincode from "../components/higherOrderComponents/withPincode";
+import {compose} from "redux";
+import {Navigation} from "react-native-navigation";
+import styles from './../styles';
 
 class LoginScreen extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
+    emailRef = React.createRef();
+    passwordRef = React.createRef();
 
     constructor(props) {
         super(props);
         this.state = {
-            email: appConfig.env === 'development' ? 'florin.popa@clarisoft.com' : '',
-            password: appConfig.env === 'development' ? '112233445566' : '',
+            email: appConfig.env === 'development' ? 'andrei.postelnicu@clarisoft.com' : '',
+            password: appConfig.env === 'development' ? '123123123123' : '',
             hasAlert: false
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.handleLogin = this.handleLogin.bind(this);
         this.handleTextChange = this.handleTextChange.bind(this);
 
-        this.emailRef = this.updateRef.bind(this, 'email');
-        this.passwordRef = this.updateRef.bind(this, 'password');
     }
 
     // Please add here the react lifecycle methods that you need
@@ -77,17 +77,24 @@ class LoginScreen extends Component {
             >
                 {
                     showLoaderScreen ? (
-                        <LoaderScreen overlay={true} backgroundColor={'white'} message={this.props && this.props.loginState ? this.props.loginState : 'Loading'} />
+                        <LoaderScreen
+                            overlay={true}
+                            loaderColor={styles.primaryColor}
+                            backgroundColor={'rgba(255, 255, 255, 0.8)'}
+                            message={this.props && this.props.loginState ? this.props.loginState : 'Loading'} />
                     ) : (null)
                 }
-                <Ripple style={{flexDirection: 'row', alignItems: 'center', position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>
-                    <Icon name="arrow-back"/>
-                    <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Hub configuration</Text>
+                <Ripple style={style.goBackLink} onPress={this.handleOnPressBack}>
+                    <Icon name="arrow-back" style={style.goBackLinkIcon} />
+                    <Text style={style.goBackLinkText}>Hub configuration</Text>
                 </Ripple>
-                <View style={[style.welcomeTextContainer]}>
+                <View style={style.welcomeTextContainer}>
                     <Text style={style.welcomeText}>
                         {getTranslation(translations.loginScreen.welcomeMessage, this.props && this.props.translation ? this.props.translation : null)}
                     </Text>
+                </View>
+                <View style={style.logoContainer}>
+                    <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
                 </View>
                 <View style={style.inputsContainer}>
                     <TextField
@@ -101,9 +108,9 @@ class LoginScreen extends Component {
                         onChangeText={this.handleTextChange}
                         label={getTranslation(translations.loginScreen.emailLabel, this.props && this.props.translation ? this.props.translation : null)}
                         autoCapitalize={'none'}
-                        tintColor={styles.colorTint}
-                        baseColor={styles.colorBase}
-                        textColor={styles.colorWhite}
+                        tintColor={styles.primaryColor}
+                        baseColor={styles.secondaryColor}
+                        textColor={styles.textColor}
                     />
                     <TextField
                         ref={this.passwordRef}
@@ -116,21 +123,14 @@ class LoginScreen extends Component {
                         label={getTranslation(translations.loginScreen.passwordLabel, this.props && this.props.translation ? this.props.translation : null)}
                         secureTextEntry={true}
                         autoCapitalize={'none'}
-                        tintColor={styles.colorTint}
-                        baseColor={styles.colorBase}
-                        textColor={styles.colorWhite}
+                        tintColor={styles.primaryColor}
+                        baseColor={styles.secondaryColor}
+                        textColor={styles.textColor}
                     />
-                    <Button onPress={this.handleLogin} text={getTranslation(translations.loginScreen.loginButtonLabel, this.props && this.props.translation ? this.props.translation : null)} style={styles.buttonLogin} height={35} />
+                    <Button onPress={this.handleLogin} text={getTranslation(translations.loginScreen.loginButtonLabel, this.props && this.props.translation ? this.props.translation : null)} style={styles.primaryButton} height={35} />
                 </View>
-                <View style={style.logoContainer}>
-                    <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
-                    <Text
-                        style={{
-                            color: 'white',
-                            fontFamily: 'Roboto-Medium',
-                            fontSize: 14
-                        }}
-                    >
+                <View>
+                    <Text style={style.version}>
                         {`Version: ${VersionNumber.appVersion} - build ${VersionNumber.buildVersion}`}
                     </Text>
                 </View>
@@ -138,10 +138,6 @@ class LoginScreen extends Component {
         );
     }
 
-    // Please write here all the methods that are not react native lifecycle methods
-    updateRef(name, ref) {
-        this[name] = ref;
-    }
 
     handleLogin = () => {
         let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -171,9 +167,9 @@ class LoginScreen extends Component {
 
     handleTextChange = (text) => {
         ['email', 'password']
-            .map((name) => ({ name, ref: this[name] }))
+            .map((name) => ({ name, ref: this[`${name}Ref`] }))
             .forEach(({ name, ref }) => {
-                if (ref.isFocused()) {
+                if (ref.current && ref.current.isFocused()) {
                     this.setState({ [name]: text });
                 }
             });
@@ -181,11 +177,13 @@ class LoginScreen extends Component {
 
     handleOnPressBack = () => {
         this.props.setSyncState(null);
-        this.props.navigator.resetTo({
-            screen: this.props.activeDatabase ? 'ManualConfigScreen' : 'FirstConfigScreen',
-            passProps: {
-                allowBack: this.props.allowBack,
-                isMultipleHub: this.props.isMultipleHub
+        Navigation.setStackRoot(this.props.componentId,{
+            component:{
+                name: this.props.activeDatabase ? 'ManualConfigScreen' : 'FirstConfigScreen',
+                passProps: {
+                    allowBack: this.props.allowBack,
+                    isMultipleHub: this.props.isMultipleHub
+                }
             }
         })
     }
@@ -195,43 +193,66 @@ class LoginScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#55b5a6'
+        backgroundColor: styles.backgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
-        justifyContent: 'space-around',
         alignItems: 'center',
-        flexGrow: 1
+        flexGrow: 1,
+        justifyContent: 'space-between',
+        padding: 24
     },
-    textInput: {
-        width: '100%',
-        alignSelf: 'center'
+    goBackLink: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        left: 24,
+        position: "absolute",
+        top: 24
+    },
+    goBackLinkIcon: {
+        color: styles.secondaryColor,
+        fontSize: 18
+    },
+    goBackLinkText: {
+        color: styles.primaryAltColor,
+        fontFamily: 'Roboto-Medium',
+        fontSize: 16,
+        marginLeft: 4
     },
     welcomeTextContainer: {
-        flex: 0.35,
-        width: '75%',
-        justifyContent: 'center'
+        flex: 0.25,
+        justifyContent: 'center',
+        width: '100%'
     },
     welcomeText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Bold',
-        fontSize: 35,
-        color: 'white',
-        textAlign: 'left'
-    },
-    inputsContainer: {
-        flex: 0.15,
-        width: '75%',
-        justifyContent: 'space-around',
+        fontSize: 36,
+        textAlign: 'center'
     },
     logoContainer: {
-        flex: 0.5,
-        width: '100%',
+        alignItems: 'center',
+        flex: 0.25,
         justifyContent: 'center',
-        alignItems: 'center'
+        width: '100%'
     },
     logoStyle: {
-        width: 180,
-        height: 34
+        height: 40,
+        width: 212
+    },
+    inputsContainer: {
+        flex: 0.5,
+        width: '100%'
+    },
+    textInput: {
+        alignSelf: 'center',
+        width: '100%'
+    },
+    version: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Light',
+        fontSize: 12,
+        textAlign: 'center'
     }
 });
 
@@ -254,4 +275,8 @@ function matchDispatchToProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchToProps)(LoginScreen);
+// export default connect(mapStateToProps, matchDispatchToProps)(LoginScreen);
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchToProps),
+)(LoginScreen)

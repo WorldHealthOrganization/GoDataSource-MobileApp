@@ -3,10 +3,10 @@
  */
 /** Since this app is based around the material ui is better to use the components from
  the material ui library, since it provides design and animations out of the box */
-import React, {PureComponent} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import React, { Component} from 'react';
+import {View, Text, StyleSheet, Linking, Alert} from 'react-native';
 import {WebView} from 'react-native-webview';
-import {calculateDimension, getTranslation, createDate} from './../utils/functions';
+import {calculateDimension, getTranslation, createDate, callPhone, getMaskRegExpStringForSearch} from './../utils/functions';
 import {connect} from "react-redux";
 import DropdownInput from './DropdownInput';
 import DropDown from './DropDown';
@@ -18,6 +18,7 @@ import SwitchInput from './SwitchInput';
 import DatePicker from './DatePicker';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import Section from './Section';
 import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
@@ -25,8 +26,9 @@ import ActionsBar from './ActionsBar';
 import translations from './../utils/translations';
 import SearchableDropdown from './SearchableDropdown';
 import PermissionComponent from './PermissionComponent';
+import styles from "./../styles";
 
-class CardComponent extends PureComponent {
+class CardComponent extends Component {
 
     /** This will be a dumb component, so it's best not to put any business logic in it */
     constructor(props) {
@@ -34,6 +36,22 @@ class CardComponent extends PureComponent {
         this.state = {
             showDropdown: false
         };
+    }
+
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        let answer = false;
+        for (const [key, value] of Object.entries(nextProps)) {
+            if(!isEqual(this.props[key], value)){
+                if(!(key==='item' && this.props[key].id === value.id)) {
+                    answer = true;
+                    break;
+                }
+                if(nextProps.item.type === 'Selector' && this.props.item !== nextProps.item){
+                    return true;
+                }
+            }
+        }
+        return answer;
     }
 
     /** Please add here the react lifecycle methods that you need
@@ -53,16 +71,27 @@ class CardComponent extends PureComponent {
 
     renderElements = () => {
         let width = calculateDimension(315, false, this.props.screenSize);
-        let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
+        let marginHorizontal = calculateDimension(16, false, this.props.screenSize);
+
+        let mask = null;
+        let editMode = this.props.item.isEditMode;
+        if(this.props.item.id === 'visualId'){
+            if(this.props.mask.includes('9')){
+                editMode = false;
+            } else {
+                mask = getMaskRegExpStringForSearch(this.props.mask);
+            }
+        }
 
         switch(this.props.item.type) {
             case 'Section':
                 return (
                     <Section
                         label={get(this.props, 'item.label', null)}
+                        labelSize='medium'
                         hasBorderBottom={this.props.item.hasBorderBottom}
                         borderBottomColor={this.props.item.borderBottomColor}
-                        containerStyle={{height: calculateDimension(54, true, this.props.screenSize)}}
+                        containerStyle={this.props.item.containerStyle}
                         translation={this.props.translation}
                     />
                 );
@@ -73,16 +102,20 @@ class CardComponent extends PureComponent {
                         label={get(this.props, 'item.label', null)}
                         index={this.props.index}
                         value={this.props.value}
-                        isEditMode={this.props.item.isEditMode}
+                        isEditMode={editMode}
                         isRequired={this.props.item.isRequired}
                         multiline={this.props.item.multiline}
                         style={{width: width, marginHorizontal: marginHorizontal}}
+                        textStyle={this.props.item.id === 'phoneNumber' ? {color: styles.primaryColor} : undefined}
                         objectType={this.props.item.objectType}
                         keyboardType={this.props.item.keyboardType}
                         translation={this.props.translation}
                         onChange={this.props.onChangeText}
                         onFocus={this.props.onFocus}
                         onBlur={this.props.onBlur}
+                        mask={mask}
+                        outbreakMask={this.props.mask}
+                        onClickAction={this.props.item.id === 'phoneNumber' ? callPhone(this.props.translation) : null}
                     />
                 );
             case 'DropdownInput':
@@ -164,15 +197,8 @@ class CardComponent extends PureComponent {
                         index={this.props.index}
                         value={this.props.value}
                         showValue={true}
-                        labelStyle={{
-                            fontFamily: 'Roboto-Regular',
-                            fontSize: 15,
-                            textAlign: 'left',
-                            color: 'rgb(0,0,0)',
-                            marginBottom: 2,
-                            marginTop: 7,
-                        }}
-                        isEditMode={this.props.item.isEditMode}
+                        labelStyle={style.switchInputLabelStyle}
+                        isEditMode={this.props.isEditMode}
                         isRequired={this.props.item.isRequired}
                         onChange={this.props.onChangeSwitch}
                         activeButtonColor={this.props.item.activeButtonColor}
@@ -200,11 +226,13 @@ class CardComponent extends PureComponent {
                     />
                 );
             case 'Selector':
+                console.log("What data", this.props.item.data);
                 return (
                     <Selector
                         id={this.props.item.id}
                         key={this.props.item.id}
                         data={this.props.item.data}
+                        shouldTranslate={this.props.item.shouldTranslate}
                         selectItem={this.props.onSelectItem}
                         style={{width: width, height: '100%', marginHorizontal: marginHorizontal}}
                         objectType={this.props.item.objectType}
@@ -214,13 +242,19 @@ class CardComponent extends PureComponent {
                 return (
                     <IntervalPicker
                         id={this.props.item.id}
+                        showSwitch={true}
+                        active={this.props.item.value !== null}
                         label={get(this.props, 'item.label', null)}
                         value={this.props.item.value}
                         min={this.props.item.min}
                         max={this.props.item.max}
-                        style={{width, marginHorizontal}}
+                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        selectedStyle={styles.primaryColor}
+                        unselectedStyle={styles.secondaryColor}
+                        markerColor={styles.primaryColor}
                         onChange={this.props.onChangeInterval}
                         objectType={this.props.item.objectType}
+                        allowOverlap={this.props.item.allowOverlap}
                     />
                 );
             case 'ActionsBar':
@@ -235,6 +269,7 @@ class CardComponent extends PureComponent {
                         containerTextStyle={{width, marginHorizontal, height: calculateDimension(46, true, this.props.screenSize)}}
                         isEditMode={this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true}
                         translation={this.props.translation}
+                        iconArray={this.props.item.iconArray}
                     />
                 );
             case 'TextSwitchSelector':
@@ -275,6 +310,8 @@ class CardComponent extends PureComponent {
                 return (
                     <SearchableDropdown
                         type={this.props.type}
+                        relationshipType={this.props.relationshipType}
+                        person={this.props.person}
                         onSelectExposure={this.props.onSelectExposure}
                         isEditMode={this.props.item.isEditMode}
                         value={this.props.value}
@@ -292,8 +329,8 @@ class CardComponent extends PureComponent {
                 );
             default:
                 return (
-                    <View style={{backgroundColor: 'red'}}>
-                        <Text>{"TODO: item type: " + this.props.item.type + " is not implemented yet"}</Text>
+                    <View style={style.todoFieldWrapper}>
+                        <Text style={style.todoFieldText}>{"TODO: item type: " + this.props.item.type + " is not implemented yet"}</Text>
                     </View>
                 )
         }
@@ -306,12 +343,26 @@ class CardComponent extends PureComponent {
  */
 const style = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
     },
     containerCardComponent: {
         alignItems: 'center',
         flex: 1
+    },
+    switchInputLabelStyle: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    },
+    todoFieldWrapper: {
+        paddingHorizontal: 16,
+        paddingBottom: 16
+    },
+    todoFieldText: {
+        color: styles.warningColor,
+        fontSize: 12,
+        fontStyle: 'italic'
     }
 });
 
@@ -320,7 +371,7 @@ function mapStateToProps(state) {
         screenSize: state.app.screenSize,
         locations: get(state, `locations.locations`, []),
         userLocations: get(state, `locations.userLocations`, []),
-        translation: state.app.translation,
+        translation: state.app.translation
     };
 }
 
