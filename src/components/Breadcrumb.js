@@ -10,6 +10,8 @@ import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {calculateDimension, getTranslation} from './../utils/functions';
+import {Navigation} from "react-native-navigation";
+import styles from './../styles';
 
 const Crumb = ({isCrumbActive, index, text, numberOfEntities, crumbPress, translation}) => {
     return (
@@ -21,7 +23,7 @@ const Crumb = ({isCrumbActive, index, text, numberOfEntities, crumbPress, transl
                 {getTranslation(text, translation)}
             </Text>
             {
-                index !== (numberOfEntities - 1) ? (<Icon name="chevron-right" size={16} color={isCrumbActive ? 'black' : 'gray'} style={[style.chevronStyle]} />) : (null)
+                index !== (numberOfEntities - 1) ? (<Icon name="chevron-right" size={16} color={styles.secondaryColor} style={[style.chevronStyle]} />) : (null)
             }
         </Ripple>
     )
@@ -43,10 +45,7 @@ class Breadcrumb extends PureComponent {
     // and can slow down the app
     render() {
         return (
-            <View style={[style.crumbsContainerStyle, {
-                width: calculateDimension(250, false, this.props.screenSize),
-                marginLeft: calculateDimension(16, false, this.props.screenSize)
-            }]}>
+            <View style={style.crumbsContainerStyle}>
                 {
                     this.props.entities.length === 1 ? (
                         <Text style={[style.activeCrumbTextStyle, style.crumbStyle]}>{this.props.entities[0]}</Text>
@@ -81,7 +80,7 @@ class Breadcrumb extends PureComponent {
                 if(this.props.onPress){
                     this.props.onPress();
                 }else {
-                    this.props.navigator.pop()
+                    Navigation.pop(this.props.componentId);
                 }
             }
         });
@@ -92,25 +91,28 @@ class Breadcrumb extends PureComponent {
 // make a global style in the config directory
 const style = StyleSheet.create({
     crumbsContainerStyle: {
-        backgroundColor: 'white',
-        flexDirection: 'row'
+        backgroundColor: styles.backgroundColor,
+        flex: 1,
+        flexDirection: 'row',
+        paddingHorizontal: 16,
+        width: '100%'
     },
     crumbStyle: {
-        flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        flexDirection: 'row'
     },
     crumbTextStyle: {
+        color: styles.secondaryColor,
         fontFamily: 'Roboto-Light',
-        fontSize: 18,
-        color: 'black'
+        fontSize: 16
     },
     activeCrumbTextStyle: {
-        fontFamily: 'Roboto-Medium',
-        fontSize: 18,
-        color: 'black'
+        color: styles.textColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 16
     },
     chevronStyle: {
-        marginHorizontal: 12
+        marginHorizontal: 4
     }
 });
 

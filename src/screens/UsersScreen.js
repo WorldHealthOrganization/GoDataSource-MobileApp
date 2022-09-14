@@ -6,16 +6,16 @@
 import React, {Component} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import {bindActionCreators, compose} from "redux";
 import ElevatedView from 'react-native-elevated-view';
 import Breadcrumb from './../components/Breadcrumb';
 import {getUsersForOutbreakId} from './../actions/user';
 import {setLoaderState} from './../actions/app';
+import {setDisableOutbreakChange} from  './../actions/outbreak';
 import AnimatedListView from './../components/AnimatedListView';
 import ViewHOC from './../components/ViewHOC';
 import translations from './../utils/translations';
@@ -23,6 +23,9 @@ import config from './../utils/config';
 import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
 import call from 'react-native-phone-call';
 import get from 'lodash/get';
+import withPincode from './../components/higherOrderComponents/withPincode';
+import {Navigation} from "react-native-navigation";
+import styles from './../styles';
 
 class UsersScreen extends Component {
 
@@ -31,6 +34,19 @@ class UsersScreen extends Component {
         this.state = {
             refreshing: false
         };
+
+
+        const listener = {
+            componentDidAppear: () => {
+                this.props.setDisableOutbreakChange(false);
+            }
+        };
+        // Register the listener to all events related to our component
+        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+    }
+
+    componentWillUnmount() {
+        this.navigationListener.remove();
     }
 
     // Please add here the react lifecycle methods that you need
@@ -57,39 +73,34 @@ class UsersScreen extends Component {
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View style={{flex: 1, flexDirection: 'row'}}>
+                        <View style={style.headerContainer}>
                             <View
                                 style={[style.breadcrumbContainer]}>
                                 <Breadcrumb
                                     key="userKey"
                                     entities={usersTitle}
-                                    navigator={this.props.navigator}
+                                    componentId={this.props.componentId}
                                 />
                             </View>
-                            <View style={{ flex: 0.15 }}>
-                            </View>
-                            <View style={{ flex: 0.15 }}>
+                            <View>
                                 <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.buttonGreen,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4, marginLeft: 10
-                                    }}
+                                    elevation={0}
+                                    style={[
+                                        style.headerButton, 
+                                        {
+                                            width: calculateDimension(30, false, this.props.screenSize),
+                                            height: calculateDimension(30, true, this.props.screenSize)
+                                        }
+                                    ]}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15}/>
+                                    <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={styles.textColor} size={18} />
                                     </Ripple>
                                 </ElevatedView>
                             </View>
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 >
@@ -115,11 +126,13 @@ class UsersScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
     //Refresh list of users
@@ -133,13 +146,12 @@ class UsersScreen extends Component {
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'users';
-        this.props.navigator.showModal({
-            screen: 'HelpScreen',
-            animated: true,
+        Navigation.showModal(createStackFromComponent({
+            name: 'HelpScreen',
             passProps: {
                 pageAskingHelpFrom: pageAskingHelpFrom
             }
-        });
+        }));
     };
 
     handleCallUsers = (mainData) => {
@@ -157,29 +169,34 @@ class UsersScreen extends Component {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the confcig directory
 const style = StyleSheet.create({
-    mapContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF'
-    },
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        flex: 1
     },
-    containerContent: {
+    headerContainer: {
         flex: 1,
-        backgroundColor: styles.appBackground,
-        paddingBottom: 25
-    },
-    separatorComponentStyle: {
-        height: 8
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingRight: 16
     },
     breadcrumbContainer: {
-        flex: 0.8,
+        alignItems: 'center',
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'flex-start'
     },
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    containerContent: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
+    }
 });
 
 function mapStateToProps(state) {
@@ -190,14 +207,20 @@ function mapStateToProps(state) {
         loaderState:    get(state, 'app.loaderState', false),
         location:       get(state, 'locations.locationsList'),
         teams:          get(state, 'teams', []),
-        user:           get(state, 'user', {activeOutbreakId: null})
+        user:           get(state, 'user', {activeOutbreakId: null}),
+        outbreak:       get(state, 'outbreak', {activeOutbreakId: null})
     };
 }
 
 function matchDispatchProps(dispatch) {
     return bindActionCreators({
-        setLoaderState
+        setLoaderState,
+        setDisableOutbreakChange
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getUsersForOutbreakId, 'UsersScreen')(UsersScreen));
+export default compose(
+    connect(mapStateToProps, matchDispatchProps),
+    withPincode(),
+    enhanceListWithGetData(getUsersForOutbreakId, 'UsersScreen')
+)(UsersScreen);

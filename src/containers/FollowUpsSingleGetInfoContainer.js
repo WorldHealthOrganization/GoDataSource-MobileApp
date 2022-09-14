@@ -5,13 +5,16 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {calculateDimension, getTranslation} from '../utils/functions';
+import {calculateDimension, extractIdFromPouchId, getTranslation} from '../utils/functions';
 import config from '../utils/config';
 import {connect} from "react-redux";
-import styles from '../styles';
+import moment from "moment";
 import CardComponent from '../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
+import {getTeamsForUserRequest} from "../queries/user";
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import styles from '../styles';
 
 class FollowUpsSingleGetInfoContainer extends PureComponent {
 
@@ -19,7 +22,18 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
+            userTeams: props.userTeams || []
         };
+    }
+
+    componentDidMount() {
+        getTeamsForUserRequest((errorGetTeams, teams) => {
+            if(!errorGetTeams){
+                this.setState({
+                    userTeams: checkArrayAndLength(teams) ? teams.map((e) => Object.assign({}, e, {teamId: extractIdFromPouchId(e._id, 'team')})) : []
+                })
+            }
+        })
     }
 
     // Please add here the react lifecycle methods that you need
@@ -39,7 +53,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
         let fields = item.fields.map((field) => {
-            if (this.props.isNew === false && field.id === 'date') {
+            if  (field.id === 'date') {
                 return Object.assign({}, field, { isEditMode: false })
             } else {
                 return Object.assign({}, field, { isEditMode: this.props.isEditMode })
@@ -51,10 +65,10 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView key={cardIndex} elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView key={cardIndex} elevation={5} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4,
+                marginVertical: 6,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
@@ -104,17 +118,17 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
             value = null
         }
 
+        let isEditable = this.computeIfEditable(item);
+
         return (
             <CardComponent
                 key={cardIndex}
                 item={item}
-                isEditMode={this.props.isEditMode}
-                isEditModeForDropDownInput={this.props.isEditMode}
+                data={item.data}
+                isEditMode={isEditable}
+                isEditModeForDropDownInput={isEditable}
                 value={value}
                 index={cardIndex}
-                followUp={this.props.item}
-                contact={this.props.contact}
-
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}
                 onChangeSwitch={this.props.onChangeSwitch}
@@ -125,7 +139,31 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
         )
     };
 
+    computeIfEditable = (item) => {
+        let isEditable = this.props.isEditMode;
+        switch (item.id) {
+            case 'date':
+                isEditable = false;
+                break;
+            case 'statusId':
+            case 'fillLocation':
+            // case 'teamId':
+                if(moment().diff(this.props.item.date) < 0){
+                    isEditable = false;
+                }
+                break;
+            default:
+                break;
+        }
+        return isEditable;
+    }
+
     computeValueForFollowUpSingleScreen = (item) => {
+        if(item.id === 'teamId') {
+            const team = this.state.userTeams.find(o=>o.teamId === this.props.item[item.id]);
+            // console.log("Team help", team, this.props.item, this.props.userTeams);
+            return team ? team.name : this.props.item[item.id]
+        }
         if (item.objectType === 'Address') {
             return this.props.item && this.props.item.address && this.props.item.address[item.id] !== undefined ?
                 getTranslation(this.props.item.address[item.id], this.props.translation) : '';
@@ -135,9 +173,16 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
 
     computeDataForFollowUpSingleScreenDropdownInput = (item) => {
         if (item.id === 'statusId') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE") &&  o.value !== config.followUpStatuses.notPerformed})
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")
+                // && o.value !== config.followUpStatuses.notPerformed
+            })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        }
+        if (item.id === 'teamId') {
+            return _.filter(this.state.userTeams, (o) => { return o.deleted === false })
+                .sort((a, b) => { return a.name - b.name; })
+                .map((o) => { return { label: o.name, value: o.teamId } })
         }
     };
 }
@@ -147,32 +192,30 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
 // make a global style in the config directory
 const style = StyleSheet.create({
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
     },
     subcontainerCardComponent: {
         alignItems: 'center',
         flex: 1
     },
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    contentContainerStyle: {
-        alignItems: 'center'
-    },
+    cardStyle: {
+        flex: 1,
+        marginVertical: 6
+    }
 });
 
 function mapStateToProps(state) {
     return {
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         translation: _.get(state, 'app.translation', []),
-        referenceData: _.get(state, 'referenceData', [])
+        referenceData: _.get(state, 'referenceData', []),
+        userTeams: _.get(state, 'teams', [])
     };
 }
 

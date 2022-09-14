@@ -13,17 +13,22 @@ import FilterScreen from './FilterScreen';
 import FollowUpsSingleScreen from './FollowUpsSingleScreen';
 import CasesScreen from './CasesScreen';
 import CaseSingleScreen from './CaseSingleScreen';
+import EventsScreen from "./EventsScreen";
+import EventSingleScreen from "./EventSingleScreen";
 import ContactsScreen from './ContactsScreen';
 import ContactsSingleScreen from './ContactsSingleScreen';
 import ContactsOfContactsScreen from './ContactsOfContactsScreen';
 import ContactsOfContactsSingleScreen from './ContactsOfContactsSingleScreen';
 import InAppNotificationScreen from './InAppNotificationScreen';
-import ExposureScreen from './ExposureScreen';
+import RelationshipScreen from './RelationshipScreen';
 import HelpScreen from './HelpScreen';
 import HelpSingleScreen from './HelpSingleScreen';
 import QRScanScreen from './QRScanScreen';
 import HubConfigScreen from './HubConfigScreen';
-import UsersScreen from './UsersScreen';
+import UsersScreen  from "./UsersScreen";
+import React from "react";
+import LabResultsScreen from "./LabResultsScreen";
+import LabResultsSingleScreen from "./LabResultsSingleScreen";
 
 const screens = [
     {screen: constants.appScreens.loginScreen, component: LoginScreen},
@@ -36,12 +41,16 @@ const screens = [
     {screen: constants.appScreens.followUpSingleScreen, component: FollowUpsSingleScreen},
     {screen: constants.appScreens.casesScreen, component: CasesScreen},
     {screen: constants.appScreens.caseSingleScreen, component: CaseSingleScreen},
+    {screen: constants.appScreens.eventsScreen, component: EventsScreen},
+    {screen: constants.appScreens.eventSingleScreen, component: EventSingleScreen},
     {screen: constants.appScreens.contactsScreen, component: ContactsScreen},
     {screen: constants.appScreens.contactSingleScreen, component: ContactsSingleScreen},
     {screen: constants.appScreens.contactsOfContactsScreen, component: ContactsOfContactsScreen},
     {screen: constants.appScreens.contactsOfContactsSingleScreen, component: ContactsOfContactsSingleScreen},
+    {screen: constants.appScreens.labResultsScreen, component: LabResultsScreen},
+    {screen: constants.appScreens.labResultsSingleScreen, component: LabResultsSingleScreen},
     {screen: constants.appScreens.inAppNotificationScreen, component: InAppNotificationScreen},
-    {screen: constants.appScreens.exposureScreen, component: ExposureScreen},
+    {screen: constants.appScreens.exposureScreen, component: RelationshipScreen},
     {screen: constants.appScreens.helpScreen, component: HelpScreen},
     {screen: constants.appScreens.helpSingleScreen, component: HelpSingleScreen},
     {screen: constants.appScreens.qrScanScreen, component: QRScanScreen},
@@ -51,6 +60,19 @@ const screens = [
 
 export function registerScreens(store, Provider) {
     screens.forEach((screen) => {
-        Navigation.registerComponent(screen.screen, () => screen.component, store, Provider);
-    })
+        Navigation.registerComponent(screen.screen,
+            () => {
+                if(store && Provider){
+                    const Screen = screen.component;
+                    console.log("Judge", screen.screen, Screen);
+                    return (props)=>
+                        <Provider store={store}>
+                            <Screen {...props}/>
+                        </Provider>
+                } else {
+                    return screen.component;
+                }
+            },
+            ()=>screen.component);
+    });
 }

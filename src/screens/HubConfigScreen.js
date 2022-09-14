@@ -4,30 +4,38 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import {Alert, Platform, StyleSheet, Text, View} from 'react-native';
+import DeviceInfo from 'react-native-device-info';
+import {Alert, Platform, StyleSheet, Text, View, ScrollView} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import Modal from 'react-native-modal';
+import {Icon, Button as MaterialButton } from 'react-native-material-ui';
 import ViewHOC from './../components/ViewHOC';
 import Section from './../components/Section';
 import ElevatedView from 'react-native-elevated-view';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
 import Button from './../components/Button';
 import TextInput from './../components/TextInput';
-import styles from './../styles';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import lodashGet from 'lodash/get';
-import {logoutUser} from './../actions/user';
+import {logoutUser, cleanDataAfterLogout} from './../actions/user';
 import {removeErrors} from './../actions/errors';
-import {saveActiveDatabase} from './../actions/app';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {saveActiveDatabase, changeAppRoot, verifyChangesExist} from './../actions/app';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import IntervalPicker from './../components/IntervalPicker';
 import translations from './../utils/translations';
-import {getInternetCredentials, setInternetCredentials} from 'react-native-keychain';
-import {createDatabase} from './../queries/database';
+import {getInternetCredentials, setInternetCredentials, resetInternetCredentials} from 'react-native-keychain';
+import {createDatabase, DATABASE_VERSION} from './../queries/database';
 import SwitchInput from "../components/SwitchInput";
-
+import {modalStyle} from './../styles/views';
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import DropdownInput from "../components/DropdownInput";
+import RNFS from 'react-native-fs';
+import RNFetchBlobFS from 'rn-fetch-blob/fs';
+import RippleFeedback from 'react-native-material-ripple';
+import {Navigation} from "react-native-navigation";
+import styles from './../styles';
 
 let textFieldsStructure = [
     {
@@ -79,8 +87,8 @@ let textFieldsStructure = [
         value: true,
         isRequired: false,
         isEditMode: true,
-        activeButtonColor: 'green',
-        activeBackgroundColor: 'green',
+        activeButtonColor: styles.backgroundColor,
+        activeBackgroundColor: styles.primaryColor,
     },
     {
         id: 'chunkSize',
@@ -104,9 +112,6 @@ let textFieldsStructure = [
 
 class FirstConfigScreen extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -122,12 +127,16 @@ class FirstConfigScreen extends Component {
             chunkSize: 2500,
             allDatabases: [],
             lastSyncDate: null,
-            isModified: false
+            isModified: false,
+            isVisible: false,
+            hubReplacement: '',
+            databaseToBeDeleted: ''
         };
     }
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
+        console.log("Did mount comp")
         let activeDatabaseGlobal = null;
         let lastSyncDateGlobal = null;
         let internetCredentialsGlobal = null;
@@ -150,7 +159,7 @@ class FirstConfigScreen extends Component {
                 // lastSyncDateGlobal = lastSyncDate;
                 // internetCredentialsGlobal = internetCredentials;
                 databasesGlobal = JSON.parse(databases);
-                databasesGlobal = databasesGlobal ? databasesGlobal.filter((e) => {return e.id !== databaseId}) : [];
+                // databasesGlobal = databasesGlobal ? databasesGlobal.filter((e) => {return e.id !== databaseId}) : [];
 
                 this.setState({
                     databaseId: databaseId,
@@ -164,6 +173,8 @@ class FirstConfigScreen extends Component {
                     lastSyncDate: lastSyncDate,
                     showLoading: false,
                     allDatabases: databasesGlobal
+                }, () => {
+                    this.props.verifyChangesExist();
                 })
             })
             .catch((errorGetData) => {
@@ -175,71 +186,6 @@ class FirstConfigScreen extends Component {
             })
     }
 
-
-    // componentDidMount() {
-    //     // get active database's id
-    //     AsyncStorage.getItem('activeDatabase')
-    //         .then((activeDatabase) => {
-    //             // console.log('Active database: ', activeDatabase);
-    //             // Get last sync date
-    //             AsyncStorage.getItem(activeDatabase)
-    //                 .then((lastSyncDate) => {
-    //                     // For the active database get all credentials
-    //                     lastSyncDate = new Date(lastSyncDate).toUTCString();
-    //                     getInternetCredentials(activeDatabase)
-    //                         .then((activeDatabaseCredentials) => {
-    //                             let currentHubConfig = JSON.parse(activeDatabaseCredentials.username);
-    //                             // console.log('Active database credentials: ', JSON.parse(activeDatabaseCredentials.username));
-    //                             let databaseId = Platform.OS === 'ios' ? activeDatabaseCredentials.server : activeDatabaseCredentials.service;
-    //                             // console.log('State before: ', this.state);
-    //                             this.setState({
-    //                                 databaseId: databaseId,
-    //                                 name: currentHubConfig.name,
-    //                                 url: currentHubConfig.url,
-    //                                 clientId: currentHubConfig.clientId,
-    //                                 clientSecret: currentHubConfig.clientSecret,
-    //                                 userEmail: currentHubConfig.userEmail,
-    //                                 encryptedData: currentHubConfig.encryptedData,
-    //                                 lastSyncDate: lastSyncDate
-    //                             }, () => {
-    //                                 // console.log('State after: ', this.state);
-    //                                 AsyncStorage.getItem('databases')
-    //                                     .then((databases) => {
-    //                                         // console.log('All databases: ', databases);
-    //                                         let allDatabases = JSON.parse(databases);
-    //                                         allDatabases = allDatabases.filter((e) => {return e.id !== databaseId});
-    //                                         this.setState({
-    //                                             showLoading: false,
-    //                                             allDatabases: allDatabases
-    //                                         })
-    //                                     })
-    //                                     .catch((errorDatabases) => {
-    //                                         console.log("Error getting all databases: ", errorDatabases);
-    //                                         this.showAlert(getTranslation(translations.hubConfigScreen.getOtherHubsTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getOtherHubsMessage, this.props.translation));
-    //                                     })
-    //                             });
-    //                         })
-    //                         .catch((errorActiveDatabaseCredentials) => {
-    //                             console.log('Error active database credentials: ', errorActiveDatabaseCredentials);
-    //                             this.showAlert(getTranslation(translations.hubConfigScreen.getCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getCurrentHubMessage, this.props.translation));
-    //                         })
-    //                 })
-    //                 .catch((errorLastSyncDate) => {
-    //                     console.log('Error while getting last sync date: ', errorLastSyncDate);
-    //                     this.showAlert(getTranslation(translations.hubConfigScreen.getCurrentHubLastSyncDateTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getCurrentHubLastSyncDateMessage, this.props.translation));
-    //
-    //                 })
-    //         })
-    //         .catch((errorActiveDatabase) => {
-    //             console.log("Error while getting active database: ", errorActiveDatabase);
-    //             this.showAlert(getTranslation(translations.hubConfigScreen.getCurrentHubTitle, this.props.translation), getTranslation(translations.hubConfigScreen.getCurrentHubMessage, this.props.translation));
-    //         });
-    // }
-
-    // static getDerivedStateFromProps(props, state) {
-    //    return null;
-    // }
-
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -250,16 +196,16 @@ class FirstConfigScreen extends Component {
         let minHeight = calculateDimension(72, true, this.props.screenSize);
 
         return (
-                <ViewHOC style={{flex: 1, backgroundColor: 'white'}} showLoader={this.state.showLoading} loaderText="Loading...">
-                    <NavBarCustom style = {style.navbarContainer}
+                <ViewHOC style={{flex: 1, backgroundColor: styles.backgroundColor}} showLoader={this.state.showLoading} loaderText="Loading...">
+                    <NavBarCustom style={style.navbarContainer}
                                   title={getTranslation(translations.hubConfigScreen.label, this.props.translation)}
-                                  navigator={this.props.navigator}
+                                  componentId={this.props.componentId}
                                   iconName="close"
                                   handlePressNavbarButton={this.handlePressNavbarButton}
                     />
 
-                    <KeyboardAwareScrollView
-                        style={[style.container, {marginVertical: 10}]}
+                    <ScrollView
+                        style={[style.container]}
                         contentContainerStyle={style.contentContainerStyle}
                         keyboardShouldPersistTaps={'always'}
                     >
@@ -268,9 +214,9 @@ class FirstConfigScreen extends Component {
                             width,
                             marginVertical,
                             minHeight,
-                            backgroundColor: 'white',
-                            borderRadius: 2,
-                            paddingVertical: 5
+                            backgroundColor: styles.backgroundColor,
+                            borderRadius: 4,
+                            paddingBottom: 16
                         }}>
                             <Section label={getTranslation(translations.hubConfigScreen.currentHubConfigurationLabel, this.props.translation)}/>
                             {
@@ -283,34 +229,50 @@ class FirstConfigScreen extends Component {
                         <View style={{
                             width,
                             marginHorizontal,
-                            flexDirection: 'row',
-                            minHeight: calculateDimension(40, true, this.props.screenSize),
-                            justifyContent: 'space-around',
-                            alignItems: 'center',
-                            paddingVertical: 5
+                            alignItems: 'center'
                         }}>
-                            <Button
-                                title={getTranslation(translations.hubConfigScreen.scanQRButtonLabel, this.props.translation)}
-                                onPress={this.handleOnPressQr}
-                                color={styles.buttonGreen}
-                                titleColor={'white'}
-                                height={calculateDimension(25, true, this.props.screenSize)}
-                                width={calculateDimension(165, false, this.props.screenSize)}
+                            <View
                                 style={{
-                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize),
-
-                                }}
-                                upperCase={false}
-                            />
+                                    flexDirection: 'row',
+                                    minHeight: calculateDimension(40, true, this.props.screenSize),
+                                    justifyContent: 'space-around',
+                                    alignItems: 'center',
+                                    width: '100%'
+                                }}>
+                                <Button
+                                    title={getTranslation(translations.hubConfigScreen.scanQRButtonLabel, this.props.translation)}
+                                    onPress={this.handleOnPressQr}
+                                    color={styles.primaryColor}
+                                    titleColor={styles.backgroundColor}
+                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                    width={calculateDimension(164, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(16, true, this.props.screenSize)
+                                    }}
+                                    upperCase={false}
+                                />
+                                <Button
+                                    title={getTranslation(translations.hubConfigScreen.saveCurrentHubButtonLabel, this.props.translation)}
+                                    onPress={this.handlePressSaveHub}
+                                    color={styles.primaryColor}
+                                    titleColor={styles.backgroundColor}
+                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                    width={calculateDimension(164, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(16, true, this.props.screenSize)
+                                    }}
+                                    upperCase={false}
+                                />
+                            </View>
                             <Button
-                                title={getTranslation(translations.hubConfigScreen.saveCurrentHubButtonLabel, this.props.translation)}
-                                onPress={this.handlePressSaveHub}
-                                color={styles.buttonGreen}
-                                titleColor={'white'}
-                                height={calculateDimension(25, true, this.props.screenSize)}
-                                width={calculateDimension(165, false, this.props.screenSize)}
+                                title={getTranslation(translations.hubConfigScreen.deleteHubButton, this.props.translation)}
+                                onPress={() => {this.handlePressDeleteHub(this.state.databaseId)}}
+                                color={styles.dangerColor}
+                                titleColor={styles.backgroundColor}
+                                height={calculateDimension(35, true, this.props.screenSize)}
+                                width={calculateDimension(164, false, this.props.screenSize)}
                                 style={{
-                                    marginVertical: calculateDimension(12.5, true, this.props.screenSize)
+                                    marginVertical: calculateDimension(16, true, this.props.screenSize)
                                 }}
                                 upperCase={false}
                             />
@@ -323,9 +285,8 @@ class FirstConfigScreen extends Component {
                                 width,
                                 marginVertical,
                                 minHeight,
-                                backgroundColor: 'white',
-                                borderRadius: 2,
-                                paddingVertical: 5
+                                backgroundColor: styles.backgroundColor,
+                                borderRadius: 4
                             }}
                         >
                             <Section label={getTranslation(translations.hubConfigScreen.connectAnotherComputerLabel, this.props.translation)}/>
@@ -333,12 +294,12 @@ class FirstConfigScreen extends Component {
                                 <Button
                                     title={getTranslation(translations.hubConfigScreen.addHubButtonLabel, this.props.translation)}
                                     onPress={this.handleOnPressAddHub}
-                                    color={styles.buttonGreen}
-                                    titleColor={'white'}
-                                    height={calculateDimension(25, true, this.props.screenSize)}
-                                    width={calculateDimension(165, false, this.props.screenSize)}
+                                    color={styles.primaryColor}
+                                    titleColor={styles.backgroundColor}
+                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                    width={calculateDimension(164, false, this.props.screenSize)}
                                     style={{
-                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize)
+                                        marginVertical: calculateDimension(16, true, this.props.screenSize)
                                     }}
                                     upperCase={false}
                                 />
@@ -352,21 +313,102 @@ class FirstConfigScreen extends Component {
                                 width,
                                 marginVertical,
                                 minHeight,
-                                backgroundColor: 'white',
-                                borderRadius: 2,
-                                paddingVertical: 5
+                                backgroundColor: styles.backgroundColor,
+                                borderRadius: 4
                             }}
                         >
                             <Section label={getTranslation(translations.hubConfigScreen.otherHubConfigurationsLabel, this.props.translation)}/>
-                            <View style={{alignItems: 'center', marginVertical: 10}}>
+                            <View style={{alignItems: 'center', marginVertical: 16}}>
                                 {
-                                    this.state && this.state.allDatabases && Array.isArray(this.state.allDatabases) && this.state.allDatabases.map((database) => {
+                                    this.state && this.state.allDatabases && Array.isArray(this.state.allDatabases) && this.state.allDatabases.filter((e) => {return e.id !== this.state.databaseId}).map((database) => {
                                         return this.renderDatabase(database, width);
                                     })
                                 }
                             </View>
                         </ElevatedView>
-                    </KeyboardAwareScrollView>
+                    </ScrollView>
+
+                    <Modal animationOutTiming={150} isVisible={this.state.isVisible} onBackdropPress={this.hideModal}>
+                        <ElevatedView
+                            elevation={4}
+                            style={
+                                [
+                                    modalStyle,
+                                    {
+                                        // height: this.state.databaseId === this.state.databaseToBeDeleted && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId)) ? '45%' :'25%',
+                                        justifyContent: 'space-between',
+                                        margin: 15,
+                                        backgroundColor: styles.backgroundColor
+                                    }
+                                    ]
+                            }>
+                            <View>
+                                <Section
+                                    label={getTranslation(translations.hubConfigScreen.deleteHubButton, this.props.translation)}
+                                    // containerStyle={{height: 20}}
+                                />
+                                <Section label={getTranslation(translations.hubConfigScreen.confirmationDeleteHub, this.props.translation)} labelSize={'normal'} containerStyle={{backgroundColor: styles.backgroundColor}}
+                                         />
+                            </View>
+
+                            {
+                                this.state.databaseId === this.state.databaseToBeDeleted && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId)) ? (
+                                    <View style={{marginHorizontal, backgroundColor: styles.backgroundColor}}>
+                                        <Section
+                                            label={getTranslation(translations.hubConfigScreen.replacementHubsLabel, this.props.translation)}
+                                            labelSize={'normal'}
+                                            textStyle={{marginLeft: 0}}
+                                            containerStyle={{backgroundColor: styles.backgroundColor}}
+                                        />
+                                        <DropdownInput
+                                            id={'hubReplacement'}
+                                            label={getTranslation(translations.hubConfigScreen.replacementHubs, this.props.translation)}
+                                            value={this.state.hubReplacement}
+                                            data={this.state.allDatabases.filter((e) => e.id !== this.state.databaseId).map((e) => ({label: e.name, value: e.id}))}
+                                            isEditMode={true}
+                                            isRequired={true}
+                                            onChange={this.onChangeDropDown}
+                                            style={{width: '100%'}}
+                                        />
+                                    </View>
+                                ) : (null)
+                            }
+
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-around',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                <Button
+                                    title={"Cancel"}
+                                    onPress={this.hideModal}
+                                    color={styles.primaryColor}
+                                    titleColor={styles.backgroundColor}
+                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                    width={calculateDimension(125, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize)
+                                    }}
+                                    upperCase={false}
+                                />
+                                <Button
+                                    title={'Delete'}
+                                    disabled={(this.state.databaseToBeDeleted === this.state.databaseId && checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseId))) && !this.state.hubReplacement}
+                                    onPress={this.onConfirmDelete}
+                                    color={styles.dangerColor}
+                                    titleColor={styles.backgroundColor}
+                                    height={calculateDimension(25, true, this.props.screenSize)}
+                                    width={calculateDimension(125, false, this.props.screenSize)}
+                                    style={{
+                                        marginVertical: calculateDimension(12.5, true, this.props.screenSize)
+                                    }}
+                                    upperCase={false}
+                                />
+                            </View>
+                        </ElevatedView>
+                    </Modal>
                 </ViewHOC>
         );
     }
@@ -376,31 +418,34 @@ class FirstConfigScreen extends Component {
         if (this.state.isModified) {
             Alert.alert('', getTranslation(translations.hubConfigScreen.exitWithoutSavingMessage), [
                 {
-                    text: 'Yes', onPress: () => {this.props.navigator.dismissModal()}
+                    text: 'Yes', onPress: () => {Navigation.dismissModal(this.props.componentId)}
                 },
                 {
                     text: 'Cancel', onPress: () => {console.log('Cancel pressed')}
                 }
             ])
         } else {
-            this.props.navigator.dismissModal();
+            Navigation.dismissModal(this.props.componentId);
         }
     };
 
     renderItem = (item, index) => {
+        let width = calculateDimension(315, false, this.props.screenSize);
+        console.log("Render item", this.state[item.id], item.id);
         switch(item.type) {
             case 'TextInput':
                 return (
                     <TextInput
+                        key={item.id}
                         id={item.id}
                         label={getTranslation(item.label, this.props.translation)}
-                        index={this.props.index}
+                        index={index}
                         value={this.state[item.id]}
                         isEditMode={item.isEditMode}
                         isRequired={item.isRequired}
                         onChange={this.onChangeText}
                         multiline={item.multiline}
-                        style={{width: 315, marginHorizontal: 15}}
+                        style={{width: width, marginHorizontal: 15}}
                         objectType={item.objectType}
                         keyboardType={item.keyboardType}
                         translation={this.props.translation}
@@ -412,9 +457,10 @@ class FirstConfigScreen extends Component {
             case 'SwitchInput' :
                 return (
                     <SwitchInput
+                        key={item.id}
                         id={item.id}
                         label={getTranslation(item.label, this.props.translation)}
-                        index={this.props.index}
+                        index={index}
                         value={this.state[item.id]}
                         showValue={true}
                         isEditMode={item.isEditMode}
@@ -422,7 +468,7 @@ class FirstConfigScreen extends Component {
                         onChange={this.onChangeSwitch}
                         activeButtonColor={item.activeButtonColor}
                         activeBackgroundColor={item.activeBackgroundColor}
-                        style={{justifyContent: 'space-between', width: 315, marginHorizontal: 15}}
+                        style={{justifyContent: 'space-between', width: width, marginHorizontal: 15}}
                         objectType={item.objectType}
                         translation={this.props.translation}
                     />
@@ -430,17 +476,19 @@ class FirstConfigScreen extends Component {
             case 'IntervalPicker':
                 return (
                     <IntervalPicker
+                        key={'chunkSize'}
                         id={'chunkSize'}
                         label={'Number of records per file'}
                         value={[this.state.chunkSize]}
                         min={item.min}
                         max={item.max}
                         step={500}
-                        // style={{
-                        //     backgroundColor: styles.backgroundGreen
-                        // }}
                         onChange={this.onChangeInterval}
-                        markerColor={'black'}
+                        style={style.intervalPicker}
+                        selectedStyle={styles.primaryColor}
+                        unselectedStyle={styles.secondaryColor}
+                        sliderLength={calculateDimension(300, false, this.props.screenSize)}
+                        markerColor={styles.primaryColor}
                     />
                 );
             default:
@@ -467,11 +515,97 @@ class FirstConfigScreen extends Component {
     };
 
     onChangeInterval = (value, id) => {
-        this.setState({[id]: value[0], isModified: true}
+        this.setState({[id]: value ? value[0] : null, isModified: true}
         // , () => {
         //     console.log('onChangeSwitch: ', this.state);
         // }
         )
+    };
+
+    onChangeDropDown = (value, id) => {
+        console.log("What's the hub replacement?", this.state.hubReplacement, value, id)
+        this.setState({
+            [id]: value
+        })
+    };
+
+    onConfirmDelete = () => {
+        // 1. Delete databaseToBeDeleted
+        // 2. Remove the deleted database from AsyncStorage
+        // 3. Remove from keychain
+        // 4.
+        //      a. If deleting only hub and not having hubReplacement, changeRoot to FirstConfigScreen
+        //      b. If deleting only hub and having hubReplacement, make hubReplacement active
+        //      c. If deleting inactive hub, refresh list of hubs
+
+        let newDatabases = [];
+        this.filesDelete(this.state.databaseToBeDeleted)
+            .then((resultsRemove) => {
+                newDatabases = this.state.allDatabases.filter((e) => e.id !== this.state.databaseToBeDeleted);
+                return AsyncStorage.setItem('databases', JSON.stringify(newDatabases));
+            })
+            .then(() => getInternetCredentials(this.state.databaseToBeDeleted))
+            .then((internetCredentials) => {
+                console.log('InternetCredentials for databaseToBeDeleted: ', internetCredentials);
+                return resetInternetCredentials(this.state.databaseToBeDeleted);
+            })
+            .catch((errorResetInternetCredentials) => {
+                console.log('errorResetInternetCredentials: ', errorResetInternetCredentials);
+                return Promise.reject(errorResetInternetCredentials);
+            })
+            .then(() => {
+                // Here check for cases a., b. and c. from main point 4.
+                if (checkArrayAndLength(this.state.allDatabases.filter((e) => e.id !== this.state.databaseToBeDeleted))) {
+                    if (this.state.hubReplacement) {
+                        this.setState({
+                            isVisible: false
+                        }, () => {
+                            setTimeout(() => {
+                                this.activateHub({id: this.state.hubReplacement});
+                            }, 300);
+                        });
+                    } else {
+                        this.setState({
+                            allDatabases: newDatabases,
+                            isVisible: false,
+                            hubReplacement: ''
+                        })
+                    }
+                } else {
+                    if (this.state.databaseToBeDeleted === this.state.databaseId) {
+                        AsyncStorage.removeItem('activeDatabase')
+                            .then(() => {
+                                this.props.cleanDataAfterLogout();
+                                this.props.saveActiveDatabase(null);
+                                this.props.changeAppRoot('config');
+                            })
+                            .catch((errorRemoveItem) => {
+                                console.log('errorRemoveActiveDatabase: ', errorRemoveItem);
+                                this.props.cleanDataAfterLogout();
+                                this.props.saveActiveDatabase(null);
+                                this.props.changeAppRoot('config');
+                            })
+                    }
+                }
+            })
+            .catch((errorRemove) => {
+                console.log('ErrorRemove', errorRemove);
+                this.showAlert("Alert", `Error while deleting hub: \n${JSON.stringify(errorRemove)}`);
+            })
+    };
+
+    filesDelete = (hubId) => {
+        // hubId is database ID
+        let pathToDatabase = `${RNFetchBlobFS.dirs.DocumentDir}/`;
+
+        if (Platform.OS === 'ios') {
+            pathToDatabase = `${RNFS?.LibraryDirectoryPath}/NoCloud/`;
+        }
+
+        // Read all files from the directory and then filter only the hub's ones
+        return RNFetchBlobFS.ls(pathToDatabase)
+            .then((allFiles) => allFiles.filter((e) => e.includes(hubId)))
+            .then((filteredFiles) => Promise.all(filteredFiles.map((e) => RNFetchBlobFS.unlink(`${pathToDatabase}/${e}`))))
     };
 
     renderDatabase = (database, width) => {
@@ -479,26 +613,51 @@ class FirstConfigScreen extends Component {
         return (
             <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: width - 30}}>
                 <Text>{database.name}</Text>
-                <Button
-                    color={styles.buttonGreen}
-                    height={calculateDimension(25, true, this.props.screenSize)}
-                    width={calculateDimension(110, false, this.props.screenSize)}
-                    title={'Make active'}
-                    titleColor={'white'}
-                    onPress={() => {this.onPressMakeHubActive(database)}}
-                />
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center'
+                    }}
+                >
+                    <Button
+                        color={styles.primaryColor}
+                        height={calculateDimension(35, true, this.props.screenSize)}
+                        width={calculateDimension(164, false, this.props.screenSize)}
+                        title={'Make active'}
+                        titleColor={styles.backgroundColor}
+                        onPress={() => {
+                            this.onPressMakeHubActive(database)
+                        }}
+                    />
+                    <RippleFeedback
+                        style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginLeft: 15
+                        }}
+                        hitSlop={{
+                            left: 5,
+                            top: 10,
+                            bottom: 10,
+                            right: 10
+                        }}
+                        onPress={() => {this.handlePressDeleteHub(database.id)}}
+                    >
+                        <Icon name={'delete'}/>
+                    </RippleFeedback>
+                </View>
             </View>
         )
     };
 
     handleOnPressQr = () => {
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
+        console.log("QR code scan");
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
             passProps: {
                 pushNewScreen: this.pushNewScreen
             }
-        })
+        }))
     };
 
     pushNewScreen = (QRCodeInfo) => {
@@ -568,15 +727,22 @@ class FirstConfigScreen extends Component {
             })
     };
 
-    handleOnPressAddHub = () => {
-        this.props.navigator.push({
-            screen: 'FirstConfigScreen',
-            passProps: {
-                allowBack: true,
-                skipEdit: true,
-                isMultipleHub: true
-            }
-        })
+    handleOnPressAddHub = async () => {
+        console.log("Check", this.props.componentId, this.props.stackComponentId);
+        try {
+            await Navigation.push(this.props.componentId,{
+                component:{
+                    name: 'FirstConfigScreen',
+                    passProps: {
+                        allowBack: true,
+                        skipEdit: true,
+                        isMultipleHub: true
+                    }
+                }
+            })
+        } catch (e) {
+            console.log("Error seen here",e );
+        }
     };
 
     // database = {id, name}
@@ -586,39 +752,52 @@ class FirstConfigScreen extends Component {
                 text: 'No', onPress: () => {console.log('Cancel pressed')}
             },
             {
-                text: 'Yes', onPress: () => {
-                // change active database and logout user
-                getInternetCredentials(database.id)
-                    .then((internetCredentials) => {
-                        let server = Platform.OS === 'ios' ? internetCredentials.server : internetCredentials.service;
-                        createDatabase(server, internetCredentials.password, true)
-                            .then((newDatabase) => {
-                                AsyncStorage.setItem('activeDatabase', database.id)
-                                    .then(() => {
-                                        this.props.saveActiveDatabase(database.id);
-                                        Alert.alert("", getTranslation(translations.hubConfigScreen.successMakingHubActiveMessage, this.props.translation), [
-                                            {
-                                                text: 'Ok', onPress: () => {this.props.logoutUser();}
-                                            }
-                                        ]);
-                                    })
-                                    .catch((errorMakeActive) => {
-                                        console.log('Error make active database: ', errorMakeActive);
-                                        this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
-                                    })
-                            })
-                            .catch((errorNewDatabase) => {
-                                console.log('Error creating new Database: ', errorNewDatabase);
-                                this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
-                            })
-                    })
-                    .catch((errorGettingInternetCredentials) => {
-                        console.log('Error getting internet credentials: ', errorGettingInternetCredentials)
-                        this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
-                    })
-            }
+                text: 'Yes', onPress: () => this.activateHub(database)
             }
         ])
+    };
+
+    activateHub = (database) => {
+        getInternetCredentials(database.id)
+            .then((internetCredentials) => {
+                let server = Platform.OS === 'ios' ? internetCredentials?.server : internetCredentials?.service;
+                return createDatabase(server, internetCredentials?.password, true);
+            })
+            .then(()=> AsyncStorage.setItem('databaseVersioningToken', `${database.id}${DeviceInfo.getVersion()}${DATABASE_VERSION}`))
+            .then((newDatabase) => AsyncStorage.setItem('activeDatabase', database.id))
+            .then(() => {
+                this.props.saveActiveDatabase(database.id);
+                Alert.alert("", getTranslation(translations.hubConfigScreen.successMakingHubActiveMessage, this.props.translation), [
+                    {
+                        text: 'Ok', onPress: () => {this.props.logoutUser();}
+                    }
+                ]);
+            })
+            .catch((errorChangeActiveDatabase) => {
+                console.log('Error getting internet credentials: ', errorChangeActiveDatabase);
+                this.showAlert(getTranslation(translations.hubConfigScreen.setActiveDatabaseTitle, this.props.translation), getTranslation(translations.hubConfigScreen.setActiveDatabaseMessage, this.props.translation));
+            });
+    };
+
+    // Hub deletion methods
+    handlePressDeleteHub = (hubId) => {
+
+        if( this.props.changesExist && this.props.changesExist["status"] === 'Data'){
+            this.showAlert(getTranslation(translations.hubConfigScreen.deleteHubButton, this.props.translation), getTranslation(translations.hubConfigScreen.deleteHubSyncDataMessage, this.props.translation));
+        } else {
+            this.setState({
+                isVisible: true,
+                databaseToBeDeleted: hubId
+            });
+        }
+
+    };
+
+    hideModal = () => {
+        this.setState({
+            isVisible: false,
+            hubReplacement: ''
+        });
     };
 
     showAlert = (alertTitle, alertText) => {
@@ -634,55 +813,56 @@ class FirstConfigScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#F5FCFF'
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     navbarContainer: {
-        backgroundColor: 'white'
+        backgroundColor: styles.backgroundColor
     },
     contentContainerStyle: {
         alignItems: 'center'
     },
     textInput: {
-        width: '100%',
-        alignSelf: 'center'
+        alignSelf: 'center',
+        width: '100%'
     },
     welcomeTextContainer: {
         flex: 0.35,
-        width: '75%',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        width: '75%'
     },
     welcomeText: {
+        color: styles.backgroundColor,
         fontFamily: 'Roboto-Bold',
         fontSize: 35,
-        color: 'white',
         textAlign: 'left'
     },
     inputsContainer: {
         flex: 0.15,
-        width: '75%',
         justifyContent: 'space-around',
+        width: '75%'
     },
     logoContainer: {
+        alignItems: 'center',
         flex: 0.5,
-        width: '100%',
         justifyContent: 'center',
-        alignItems: 'center'
+        width: '100%'
     },
     logoStyle: {
-        width: 180,
-        height: 34
+        height: 34,
+        width: 180
     },
     text: {
+        color: styles.backgroundColor,
         fontFamily: 'Roboto-Light',
-        fontSize: 16,
-        color: 'white'
+        fontSize: 16
     }
 });
 
 function mapStateToProps(state) {
     return {
         screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
+        changesExist: lodashGet(state, 'app.changesExist', null),
         errors: lodashGet(state, 'errors', null),
         translation: lodashGet(state, 'app.translation', [])
     };
@@ -692,7 +872,10 @@ function matchDispatchToProps(dispatch) {
     return bindActionCreators({
         logoutUser,
         removeErrors,
-        saveActiveDatabase
+        saveActiveDatabase,
+        verifyChangesExist,
+        changeAppRoot,
+        cleanDataAfterLogout
     }, dispatch);
 }
 

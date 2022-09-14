@@ -7,7 +7,6 @@ import React, {Component} from 'react';
 import {Alert, InteractionManager, ScrollView, StyleSheet, View} from 'react-native';
 import {checkRequiredQuestions, createDate, extractAllQuestions, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
-import styles from './../styles';
 import QuestionCard from './../components/QuestionCard';
 import {LoaderScreen} from 'react-native-ui-lib';
 import _, {sortBy} from 'lodash';
@@ -18,6 +17,7 @@ import cloneDeep from "lodash/cloneDeep";
 import uniqueId from "lodash/uniqueId";
 import TopContainerButtons from './../components/TopContainerButtons';
 import PermissionComponent from './../components/PermissionComponent';
+import styles from './../styles';
 
 class FollowUpsSingleQuestionnaireContainer extends Component {
 
@@ -47,7 +47,10 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
     render() {
         if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'} />
+                <LoaderScreen
+                    overlay={true}
+                    loaderColor={styles.primaryColor}
+                    backgroundColor={'rgba(255, 255, 255, 0.8)'} />
             )
         }
 
@@ -81,26 +84,31 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.mainContainer}>
-                    <PermissionComponent
-                        render={() => (
-                            <TopContainerButtons
-                                isNew={this.props.isNew}
-                                isEditMode={this.props.isEditMode}
-                                index={this.props.activeIndex}
-                                numberOfTabs={this.props.numberOfTabs}
-                                onPressEdit={this.props.onPressEdit}
-                                onPressSaveEdit={this.props.onPressSaveEdit}
-                                onPressCancelEdit={this.props.onPressCancelEdit}
-                                onPressNextButton={this.props.handleNextButton}
-                                onPressPreviousButton={this.props.onPressPreviousButton}
+                    {
+                        this.props.noEditButton ?
+                            null
+                            :
+                            <PermissionComponent
+                                render={() => (
+                                    <TopContainerButtons
+                                        isNew={this.props.isNew}
+                                        isEditMode={this.props.isEditMode}
+                                        index={this.props.activeIndex}
+                                        numberOfTabs={this.props.numberOfTabs}
+                                        onPressEdit={this.props.onPressEdit}
+                                        onPressSaveEdit={this.props.onPressSaveEdit}
+                                        onPressCancelEdit={this.props.onPressCancelEdit}
+                                        onPressNextButton={this.props.handleNextButton}
+                                        onPressPreviousButton={this.props.onPressPreviousButton}
+                                    />
+                                )}
+                                permissionsList={[
+                                    constants.PERMISSIONS_FOLLOW_UP.followUpAll,
+                                    constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
+                                    constants.PERMISSIONS_FOLLOW_UP.followUpsModify
+                                ]}
                             />
-                        )}
-                        permissionsList={[
-                            constants.PERMISSIONS_FOLLOW_UP.followUpAll,
-                            constants.PERMISSIONS_FOLLOW_UP.followUpCreate,
-                            constants.PERMISSIONS_FOLLOW_UP.followUpsModify
-                        ]}
-                    />
+                    }
                     <ScrollView
                         style={style.containerScrollView}
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
@@ -122,7 +130,7 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
         if (item.inactive === false) {
             return (
                 <QuestionCard
-                    key={uniqueId('key_')}
+                    key={index}
                     item={item}
                     index={index + 1}
                     isCollapsed={ this.isCollapsed(item)}
@@ -249,20 +257,20 @@ class FollowUpsSingleQuestionnaireContainer extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     mainContainer: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     container: {
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
     },
     contentContainerStyle: {
         alignItems: 'center'
     },
     containerButtons: {
-        flexDirection: 'row',
         alignItems: 'center',
+        flexDirection: 'row',
         justifyContent: 'center'
     }
 });

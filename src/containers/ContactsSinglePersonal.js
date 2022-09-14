@@ -3,26 +3,26 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {PureComponent} from 'react';
-import {Alert, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {Component} from 'react';
+import {InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import styles from './../styles';
 import CardComponent from './../components/CardComponent';
 import {LoaderScreen} from 'react-native-ui-lib';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
-import Ripple from 'react-native-material-ripple';
 import _ from 'lodash';
 import lodashGet from "lodash/get";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
-import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "./../utils/constants";
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT, PERMISSION_CREATE_CONTACT, PERMISSION_CREATE_CONTACT_OF_CONTACT, PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT} from "./../utils/constants";
 import {getTeamsForUserRequest} from './../queries/user';
+import Button from './../components/Button';
+import styles from './../styles';
 
-class ContactsSinglePersonal extends PureComponent {
+class ContactsSinglePersonal extends Component {
 
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
@@ -48,7 +48,7 @@ class ContactsSinglePersonal extends PureComponent {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 0) {
+        if (nextProps.routeKey === 'personal') {
             return true;
         }
         return false;
@@ -60,37 +60,22 @@ class ContactsSinglePersonal extends PureComponent {
     render() {
         if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'} />
+                <LoaderScreen
+                    overlay={true}
+                    loaderColor={styles.primaryColor}
+                    backgroundColor={'rgba(255, 255, 255, 0.8)'} />
             )
         }
 
-        let permissionsList = [
-            constants.PERMISSIONS_CONTACT.contactAll
-        ];
+        let permissionsList = [];
         if (this.props.isNew) {
-            if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList.push(
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsCreate
-                )
-            } else {
-                permissionsList.push(
-                    constants.PERMISSIONS_CONTACT.contactCreate
-                )
-            }
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_CREATE_CONTACT_OF_CONTACT : PERMISSION_CREATE_CONTACT;
         } else {
-            if(this.props.type === translations.personTypes.contactsOfContacts) {
-                permissionsList.push(
-                    PERMISSIONS_CONTACT_OF_CONTACT.contactsOfContactsModify
-                )
-            } else {
-                permissionsList.push(
-                    constants.PERMISSIONS_CONTACT.contactModify
-                )
-            }
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_EDIT_CONTACT_OF_CONTACT : PERMISSION_EDIT_CONTACT;
         }
 
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{flex: 1}}>
                 <View style={style.viewContainer}>
                     <PermissionComponent
                         render={() => (
@@ -110,63 +95,59 @@ class ContactsSinglePersonal extends PureComponent {
 
                     <ScrollView
                         style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
+                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 16 }]}
                     >
-                    <View style={style.container}>
-                        {
-                            this.state.fields.map((item) => {
-                                return this.handleRenderItem(item)
-                            })
-                        }
-
                         <View style={style.container}>
                             {
-                                checkArrayAndLength(_.get(this.props, 'contact.vaccinesReceived', [])) && _.get(this.props, 'contact.vaccinesReceived', []).map((item, index) => {
-                                    return this.handleRenderItemForVaccinesList(item, index)
+                                this.state.fields.map((item, i) => {
+                                    return this.handleRenderItem(item, i)
                                 })
                             }
-                        </View>
-                        {
-                            this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
-                                    <Ripple
-                                        style={{
-                                            height: 25,
-                                            justifyContent: 'center'
-                                        }}
-                                        onPress={this.props.onPressAddVaccine}
-                                    >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
-                                            {!_.get(this.props, 'contact.vaccinesReceived', null) || checkArray(this.props.contact.vaccinesReceived) && this.props.contact.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
-                                        </Text>
-                                    </Ripple>
-                                </View>) : null
-                        }
 
-                        <View style={style.container}>
+                            <View style={style.container}>
+                                {
+                                    checkArrayAndLength(_.get(this.props, 'contact.vaccinesReceived', [])) && _.get(this.props, 'contact.vaccinesReceived', []).map((item, index) => {
+                                        return this.handleRenderItemForVaccinesList(item, index)
+                                    })
+                                }
+                            </View>
                             {
-                                checkArray(_.get(this.props, 'contact.documents', [])) && _.get(this.props, 'contact.documents', []).map((item, index) => {
-                                    return this.handleRenderItemForDocumentsList(item, index)
-                                })
+                                this.props.isEditMode ? (
+                                    <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}>
+                                        <Button
+                                            title={!_.get(this.props, 'contact.vaccinesReceived', null) || checkArray(this.props.contact.vaccinesReceived) && this.props.contact.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
+                                            onPress={this.props.onPressAddVaccine}
+                                            color={styles.backgroundColor}
+                                            titleColor={styles.textColor}
+                                            height={calculateDimension(35, true, this.props.screenSize)}
+                                            width={'100%'}
+                                            style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                        />
+                                    </View>) : null
+                            }
+
+                            <View style={style.container}>
+                                {
+                                    checkArray(_.get(this.props, 'contact.documents', [])) && _.get(this.props, 'contact.documents', []).map((item, index) => {
+                                        return this.handleRenderItemForDocumentsList(item, index)
+                                    })
+                                }
+                            </View>
+                            {
+                                this.props.isEditMode ? (
+                                    <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}>
+                                        <Button
+                                            title={!_.get(this.props, 'contact.documents', null) || checkArray(this.props.contact.documents) && this.props.contact.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
+                                            onPress={this.props.onPressAddDocument}
+                                            color={styles.backgroundColor}
+                                            titleColor={styles.textColor}
+                                            height={calculateDimension(35, true, this.props.screenSize)}
+                                            width={'100%'}
+                                            style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                        />
+                                    </View>) : null
                             }
                         </View>
-                        {
-                            this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
-                                    <Ripple
-                                        style={{
-                                            height: 25,
-                                            justifyContent: 'center'
-                                        }}
-                                        onPress={this.props.onPressAddDocument}
-                                    >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
-                                            {!_.get(this.props, 'contact.documents', null) || checkArray(this.props.contact.documents) && this.props.contact.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
-                                        </Text>
-                                    </Ripple>
-                                </View>) : null
-                        }
-                    </View>
                     </ScrollView>
                 </View>
             </View>
@@ -174,36 +155,36 @@ class ContactsSinglePersonal extends PureComponent {
     };
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item) => {
+    handleRenderItem = (item, i) => {
         let fields = item.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+            return Object.assign({}, field, { isEditMode:  this.props.isEditMode }, {key: i})
         });
-        return this.renderItemCardComponent(fields);
+        return this.renderItemCardComponent(fields, i);
     };
 
     handleRenderItemForDocumentsList = (item, index) => {
         let fields = config.caseSingleScreen.document.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+            return Object.assign({}, field, { isEditMode:  this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
     };
 
     handleRenderItemForVaccinesList = (item, index) => {
         let fields = config.caseSingleScreen.vaccinesReceived.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView key={cardIndex} elevation={5} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4,
-                minHeight: calculateDimension(72, true, this.props.screenSize)
+                marginVertical: 6,
+                minHeight: calculateDimension(72, true, this.props.screenSize),
+                width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
             }, style.cardStyle]}>
-                <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+                <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         fields && fields.map((item, index) => {
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
@@ -216,7 +197,7 @@ class ContactsSinglePersonal extends PureComponent {
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
         return (
-            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
+            <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
                 {
                     this.handleRenderItemByType(item, cardIndex)
                 }
@@ -229,6 +210,10 @@ class ContactsSinglePersonal extends PureComponent {
         let minimumDate = undefined;
         let maximumDate = undefined;
 
+        if(item.id === 'pregnancyStatus' && (this.props.contact?.gender === translations.localTranslationTokens.male )) {
+            return;
+        }
+
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForContactsSingleScreenDropdownInput(item);
         } else if (item.type === 'ActionsBar') {
@@ -238,6 +223,7 @@ class ContactsSinglePersonal extends PureComponent {
                 item.onPressArray = [this.props.onPressDeleteVaccines]
             }
         }
+
 
         if (item.type === 'DatePicker' && item.objectType !== 'Address' && item.objectType !== 'Documents' && item.objectType !== 'Vaccines') {
             value = this.props.contact[item.id]
@@ -268,7 +254,6 @@ class ContactsSinglePersonal extends PureComponent {
             <CardComponent
                 item={item}
                 isEditMode={this.props.isEditMode}
-                contact={this.props.contact}
                 isEditModeForDropDownInput={this.props.isEditMode}
                 selectedItemIndexForAgeUnitOfMeasureDropDown={this.props.selectedItemIndexForAgeUnitOfMeasureDropDown}
                 onChangeextInputWithDropDown={this.props.onChangeTextInputWithDropDown}
@@ -284,6 +269,7 @@ class ContactsSinglePersonal extends PureComponent {
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
                 permissionsList={item.permissionsList}
+                mask={this.props.type === translations.personTypes.contactsOfContacts ? this.props.outbreak?.contactOfContactIdMask : this.props.outbreak?.contactIdMask}
             />
         )
     };
@@ -343,6 +329,11 @@ class ContactsSinglePersonal extends PureComponent {
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
+        if (item.id === 'pregnancyStatus') {
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        }
         if (item.id === 'occupation') {
             return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION' })
                 .sort((a, b) => { return a.order - b.order; })
@@ -378,42 +369,6 @@ class ContactsSinglePersonal extends PureComponent {
         }
     };
 
-    handleNextButton = () => {
-        if (this.props.isNew) {
-            let missingFields = this.props.checkRequiredFieldsPersonalInfo();
-            if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-                if (this.props.checkAgeYearsRequirements()) {
-                    if (this.props.checkAgeMonthsRequirements()) {
-                        this.props.handleMoveToNextScreenButton()
-                    } else {
-                        Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.monthsValueError, this.props.translation), [
-                            {
-                                text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                                onPress: () => { console.log("OK pressed") }
-                            }
-                        ])
-                    }
-                } else {
-                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.yearsValueError, this.props.translation), [
-                        {
-                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                            onPress: () => { console.log("OK pressed") }
-                        }
-                    ])
-                }
-            } else {
-                Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), `${getTranslation(translations.alertMessages.requiredFieldsMissingError, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
-                    {
-                        text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                        onPress: () => { console.log("OK pressed") }
-                    }
-                ])
-            }
-        } else {
-            this.props.handleMoveToNextScreenButton()
-        }
-    };
-
     handleOnFocus = (event) => {
         // this.scrollToInput(findNodeHandle(event.target))
     };
@@ -427,33 +382,33 @@ class ContactsSinglePersonal extends PureComponent {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    container: {
+        flex: 1
+    },
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        paddingVertical: 8
     },
     subcontainerCardComponent: {
         alignItems: 'center',
         flex: 1
     },
     viewContainer: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    containerScrollView: {
+    cardStyle: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        marginVertical: 6
+    },
+    containerScrollView: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'
-    },
-    container: {
-        flex: 1,
-        marginBottom: 10
     }
 });
 
@@ -461,7 +416,8 @@ function mapStateToProps(state) {
     return {
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         translation: _.get(state, 'app.translation', []),
-        referenceData: _.get(state, 'referenceData', [])
+        referenceData: _.get(state, 'referenceData', []),
+        outbreak: _.get(state, 'outbreak', null)
     };
 }
 

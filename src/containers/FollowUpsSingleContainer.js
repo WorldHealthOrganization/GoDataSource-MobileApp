@@ -7,13 +7,13 @@ import React, {Component} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {connect} from "react-redux";
 import get from 'lodash/get';
-import styles from '../styles';
 import constants from './../utils/constants';
 import config from './../utils/config';
 import FollowUpsSingleAddressContainer from './FollowUpsSingleAddressContainer'
 import FollowUpsSingleGetInfoContainer from './FollowUpsSingleGetInfoContainer'
 import TopContainerButtons from './../components/TopContainerButtons';
 import PermissionComponent from './../components/PermissionComponent';
+import styles from '../styles';
 
 class FollowUpsSingleContainer extends Component {
 
@@ -26,7 +26,7 @@ class FollowUpsSingleContainer extends Component {
 
     // Please add here the react lifecycle methods that you need
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 0) {
+        if (nextProps.routeKey === 'genInfo') {
             return true;
         }
         return false;
@@ -91,13 +91,13 @@ class FollowUpsSingleContainer extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     containerScrollView: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'

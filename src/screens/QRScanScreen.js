@@ -6,40 +6,31 @@ import {getTranslation} from './../utils/functions';
 import translations from './../utils/translations';
 import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import lodashGet from 'lodash/get';
-
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import {Navigation} from "react-native-navigation";
+import styles from './../styles';
 
 class QRScanScreen extends Component {
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props){
         super(props)
     }
 
     render() {
+        console.log("Render inside qr scan", style.container);
         return (
             <View style = {style.container}>
                 <NavBarCustom customTitle={
-                    <View
-                        style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            height: '100%'
-                        }}
-                    >
-                        <Text style={[style.title, {marginLeft: 30}]}>
+                    <View style={style.titleBar}>
+                        <Text style={[style.title, {marginLeft: 24}]}>
                             {getTranslation(translations.qrScanScreen.title, this.props.translation)}
                         </Text>
                     </View>
                 }
-                              title={null}
-                              navigator={this.props.navigator}
-                              iconName="close"
-                              handlePressNavbarButton={this.handlePressNavbarButton}
+                    title={null}
+                    componentId={this.props.componentId}
+                    iconName="close"
+                    handlePressNavbarButton={this.handlePressNavbarButton}
                 />
                 <QRCodeScanner
                     showMarker={true}
@@ -52,69 +43,77 @@ class QRScanScreen extends Component {
     }
 
     handlePressNavbarButton = () => {
-        this.props.navigator.dismissModal()
+        Navigation.dismissModal(this.props.componentId)
     }
 
     onSuccess(e) {
         //  TO DO get data from e...
         console.log('Here we have some values for e: ', e);
         this.props.pushNewScreen(e, this.props.allowBack, this.props.skipEdit, this.props.isMultipleHub);
-        this.props.navigator.dismissModal();
+        Navigation.dismissModal(this.props.componentId);
     }
 }
 
 const style = StyleSheet.create({
     container: {
+        backgroundColor: styles.backgroundColor,
         flex: 1,
-        backgroundColor: 'white'
+        zIndex: 10000
     },
     cameraContainer: {
         height: Dimensions.get('window').height
     },
     markerContainer: {
         alignItems: "center",
-        justifyContent: "center",
-        position: "absolute",
-        top: 0,
-        right: 0,
         bottom: 0,
-        left: 0
+        justifyContent: "center",
+        left: 0,
+        position: "absolute",
+        right: 0,
+        top: 0
     },
     finder: {
         alignItems: "center",
         justifyContent: "center"
     },
     topLeftEdge: {
+        height: 20,
+        left: 0,
         position: "absolute",
         top: 0,
-        left: 0,
-        width: 40,
-        height: 20
+        width: 40
     },
     topRightEdge: {
+        height: 20,
         position: "absolute",
-        top: 0,
         right: 0,
-        width: 40,
-        height: 20
+        top: 0,
+        width: 40
     },
     bottomLeftEdge: {
-        position: "absolute",
         bottom: 0,
+        height: 20,
         left: 0,
-        width: 40,
-        height: 20
+        position: "absolute",
+        width: 40
     },
     bottomRightEdge: {
-        position: "absolute",
         bottom: 0,
+        height: 20,
+        position: "absolute",
         right: 0,
-        width: 40,
-        height: 20
+        width: 40
+    },
+    titleBar: {
+        alignItems: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        height: '100%',
+        justifyContent: 'space-between'
     },
     title: {
-        fontSize: 17,
         fontFamily: 'Roboto-Medium',
+        fontSize: 16
     }
 });
 

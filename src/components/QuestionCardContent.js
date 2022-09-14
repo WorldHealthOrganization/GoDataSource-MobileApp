@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react';
 import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
-import styles from './../styles';
 import cloneDeep from "lodash/cloneDeep";
 import translations from "../utils/translations";
 import {calculateDimension, getTranslation} from "../utils/functions";
@@ -15,6 +14,7 @@ import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
 import uniqueId from "lodash/uniqueId";
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
+import styles from './../styles';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 class QuestionCardContent extends PureComponent {
@@ -28,14 +28,13 @@ class QuestionCardContent extends PureComponent {
     render() {
         let answerDate = get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null);
         return (
-            <ScrollView key={uniqueId('key_')} scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
-
+            <ScrollView scrollEnabled={false} keyboardShouldPersistTaps={'always'}>
                 {
                     this.props.item.multiAnswer ? (
                         <View style = {{
                             flex: 1,
-                            width: this.props.viewWidth,
-                            flexDirection: this.props.isEditMode ? 'row' : 'column'
+                            flexDirection: this.props.isEditMode ? 'row' : 'column',
+                            width: this.props.viewWidth
                         }}>
                             <View style={{flexDirection: 'row', marginHorizontal: this.props.viewMarginHorizontal}}>
                                 <DatePicker
@@ -46,7 +45,7 @@ class QuestionCardContent extends PureComponent {
                                     isEditMode={!!(this.props.isEditMode && this.props.editableQuestionDate)}
                                     isRequired={true}
                                     style={{
-                                        width: this.props.isEditMode ? (this.props.viewWidth / 2) - 25 : this.props.viewWidth - 25,
+                                        width: this.props.isEditMode ? (this.props.viewWidth / 2) - 40 : this.props.viewWidth - 40,
                                     }}
                                     onChange={(value, id) => {
                                         this.onChangeAnswerDate(value, this.props.item.variable, this.props.index)
@@ -54,13 +53,13 @@ class QuestionCardContent extends PureComponent {
                                 />
                                 {   this.props.isEditMode &&
                                     <View style={{
-                                        minHeight: calculateDimension(72, true, this.props.screenSize),
+                                        minHeight: calculateDimension(60, true, this.props.screenSize),
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        width: 25,
+                                        width: 16
                                     }}>
                                         {
-                                            answerDate !== null && <Ripple onPress={() => this.handleCopyAnswerDate(answerDate)}><Icon name="content-copy"/></Ripple>
+                                            answerDate !== null && <Ripple onPress={() => this.handleCopyAnswerDate(answerDate)}><Icon name="content-copy" color={styles.primaryColor} size={18} /></Ripple>
                                         }
                                     </View>
                                 }
@@ -69,18 +68,20 @@ class QuestionCardContent extends PureComponent {
                                 flexDirection: 'row',
                                 width: this.props.isEditMode ? (this.props.viewWidth / 2) : this.props.viewWidth,
                             }}>
-                                <View style={{maxWidth:  this.props.isEditMode ? ( this.props.index === 0 ? (this.props.viewWidth / 2 ) - 25 : (this.props.viewWidth / 2 )) : this.props.viewWidth }}>
+                                <View style={{width:  this.props.isEditMode ? ( this.props.index === 0 ? (this.props.viewWidth / 2 ) - 16 : (this.props.viewWidth / 2 )) : this.props.viewWidth }}>
                                     { this.handleRenderItem(this.props.item) }
                                 </View>
                                 {   this.props.isEditMode && !this.props.isCollapsed && this.props.index === 0 &&  Array.isArray(this.props.source[this.props.item.variable]) && this.props.source[this.props.item.variable].length > 1 &&
                                     <View style={{
-                                        minHeight: calculateDimension(72, true, this.props.screenSize),
+                                        minHeight: calculateDimension(60, true, this.props.screenSize),
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        width: 25,
+                                        width: 16,
+                                        position: 'absolute',
+                                        right: 0
                                     }}>
                                         <Ripple onPress={() => { this.handleDeletePrevAnswer(0)}}>
-                                            <Icon name="delete"/>
+                                            <Icon name="delete" color={styles.dangerColor} size={18} />
                                         </Ripple>
                                     </View>
                                 }
@@ -91,10 +92,10 @@ class QuestionCardContent extends PureComponent {
                 {
                     checkArrayAndLength(this.props.item.additionalQuestions) ? (
                         <View>
-                            <Section label={'Additional Questions'}/>
+                            <Section label={translations.questionCardLabels.additionalQuestions} containerStyle={{marginBottom: 8}} />
                             {
-                                this.props.item.additionalQuestions.map((additionalQuestion) => {
-                                    return this.handleRenderAdditionalQuestions(additionalQuestion, this.props.item.variable);
+                                this.props.item.additionalQuestions.map((additionalQuestion, i) => {
+                                    return this.handleRenderAdditionalQuestions(additionalQuestion, this.props.item.variable, i);
                                 })
                             }
                         </View>
@@ -108,10 +109,7 @@ class QuestionCardContent extends PureComponent {
     handleRenderItem = (item) => {
         // console.log('handleRenderItem: ', item);
         return (
-            <View style={[style.containerCardComponent, {
-                minHeight: calculateDimension(72, true, this.props.screenSize),
-                maxWidth: this.props.viewWidth
-            }]}>
+            <View style={customStyles.containerCardComponent}>
                 {
                     this.handleRenderItemByType(item)
                 }
@@ -121,10 +119,12 @@ class QuestionCardContent extends PureComponent {
 
     handleRenderItemByType = (item, parentId) => {
         let answerDate = get(this.props, `source[${get(this.props, 'item.variable', null)}][${this.props.index}].date`, null);
-        let calculateWidth = this.props.isEditMode ? ( this.props.item.multiAnswer && !parentId ? (this.props.viewWidth / 2 ) - (this.props.isCollapsed ? 0 : 25) : 300) : 300;
-        let width = calculateDimension(300, false, this.props.screenSize);
+        let calculateWidth = this.props.isEditMode ? ( this.props.item.multiAnswer && !parentId ? (this.props.viewWidth / 2 ) - (this.props.isCollapsed ? 0 : 16) : 300) : 300;
+        let width = calculateDimension(140, false, this.props.screenSize);
         let alternateWidth = calculateDimension(calculateWidth, false, this.props.screenSize);
-        let marginHorizontal = calculateDimension(14, false, this.props.screenSize);
+        let style = {
+            width: item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_DATE_TIME' ? alternateWidth : alternateWidth
+        };
         let source = cloneDeep(this.props.source);
         if (!source) {
             source = {};
@@ -178,47 +178,23 @@ class QuestionCardContent extends PureComponent {
             }
         }
 
-        let questionAnswers = null;
 
-        questionAnswers = parentId ?
-            (source
-            && source[parentId]
-            && Array.isArray(source[parentId])
-            && source[parentId].length > 0
-            && source[parentId][this.props.index]
-            && typeof source[parentId][this.props.index] === 'object'
-            && Object.keys(source[parentId][this.props.index]).length > 0
-            && source[parentId][this.props.index].hasOwnProperty('subAnswers')
-            && typeof source[parentId][this.props.index].subAnswers === "object"
-            && Object.keys(source[parentId][this.props.index].subAnswers).length > 0
-            && source[parentId][this.props.index].subAnswers[item.variable]
-            && Array.isArray(source[parentId][this.props.index].subAnswers[item.variable])
-            && source[parentId][this.props.index].subAnswers[item.variable].length > 0
-            && source[parentId][this.props.index].subAnswers[item.variable][0]
-            && source[parentId][this.props.index].subAnswers[item.variable][0].value ?
-                source[parentId][this.props.index].subAnswers[item.variable][0].value
-                : ''
-            ) :
-            (
-                source[item.variable]
-                && Array.isArray(source[item.variable])
-                && source[item.variable].length > 0
-                && source[item.variable][this.props.index]
-                && source[item.variable][this.props.index].value ?
-                    source[item.variable][this.props.index].value : ''
-            );
+        let questionAnswers = parentId ? get(source, `[${parentId}][${this.props.index}].subAnswers[${item.variable}][0].value`, '') : get(source, `[${item.variable}][${this.props.index}].value`, '');
+
         if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_SINGLE_ANSWER') {
             // console.log('QuestionCard: ', item);
-            questionAnswers = questionAnswers !== null &&
-            questionAnswers !== undefined &&
-            item.answers.map((e) => {return e && e.value ? e.value : null}).indexOf(questionAnswers) > -1 &&
-            item.answers[item.answers.map((e) => {return e.value ? e.value : null}).indexOf(questionAnswers)] ?
+            questionAnswers = (
+                questionAnswers !== null &&
+                questionAnswers !== undefined &&
+                item.answers.map((e) => {return e && e.value ? e.value : null}).indexOf(questionAnswers) > -1 &&
+                item.answers[item.answers.map((e) => {return e.value ? e.value : null}).indexOf(questionAnswers)]
+            ) ?
                 getTranslation(item.answers[item.answers.map((e) => {return e.value}).indexOf(questionAnswers)].label, this.props.translation) : ' ';
         }
         else {
             if (item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS') {
                 // console.log('QuestionCard: ', item);
-                questionAnswers = questionAnswers !== null && questionAnswers !== undefined && Array.isArray(questionAnswers) && questionAnswers.length > 0 ?
+                questionAnswers = (questionAnswers !== null && questionAnswers !== undefined && Array.isArray(questionAnswers) && questionAnswers.length > 0) ?
                     item.answers.filter((e) => {
                         // console.log('Inside filter: ', e);
                         return e && e.value && questionAnswers.indexOf(e.value) > -1;
@@ -234,6 +210,7 @@ class QuestionCardContent extends PureComponent {
                     <TextInput
                         id={item.variable}
                         label={translations.questionCardLabels.textInputLabel}
+                        skipLabel={true}
                         labelValue={item.text}
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
@@ -246,7 +223,7 @@ class QuestionCardContent extends PureComponent {
                         }}
 
                         multiline={true}
-                        style={{width: alternateWidth, marginHorizontal: marginHorizontal}}
+                        style={style}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
                         onFocus={this.props.onFocus}
@@ -256,22 +233,23 @@ class QuestionCardContent extends PureComponent {
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_NUMERIC':
                 return (
                     <TextInput
-                        key={item.variable}
                         id={item.variable}
                         label={translations.questionCardLabels.textInputLabel}
+                        skipLabel={true}
                         labelValue={item.text}
                         value={questionAnswers}
                         isEditMode={this.props.isEditMode}
                         isRequired={item.required}
                         onChange={(text, id) => {
+                            let parsedText = parseFloat(text);
                             let valueToSend = {
-                                date: answerDate, value: parseFloat(text)
+                                date: answerDate, value: Number.isNaN(parsedText) ? undefined : parsedText
                             };
                             this.props.onChangeTextAnswer(valueToSend, id, parentId, this.props.index);
                         }}
                         multiline={true}
                         keyboardType={'numeric'}
-                        style={{width: alternateWidth, marginHorizontal: marginHorizontal}}
+                        style={style}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
                         onFocus={this.props.onFocus}
@@ -284,6 +262,7 @@ class QuestionCardContent extends PureComponent {
                         key={item.variable}
                         id={item.variable}
                         label={translations.questionCardLabels.datePickerLabel}
+                        skipLabel={true}
                         value={questionAnswers}
                         isEditMode={get(this.props, 'isEditMode', true)}
                         isRequired={item.required}
@@ -293,7 +272,7 @@ class QuestionCardContent extends PureComponent {
                             };
                             this.props.onChangeDateAnswer(valueToSend, id, parentId, this.props.index);
                         }}
-                        style={{width: width, marginHorizontal: marginHorizontal}}
+                        style={style}
                         translation={this.props.translation}
                     />
                 );
@@ -319,6 +298,7 @@ class QuestionCardContent extends PureComponent {
                         key={item.variable}
                         id={item.variable}
                         label={translations.questionCardLabels.dropDownInputLabel}
+                        skipLabel={true}
                         labelValue={item.text}
                         value={questionAnswers}
                         data={dataWithNoneOption}
@@ -337,7 +317,7 @@ class QuestionCardContent extends PureComponent {
                             }
                             this.props.onChangeSingleSelection(valueToSend, id, parentId, this.props.index);
                         }}
-                        style={{width: alternateWidth, marginHorizontal: marginHorizontal}}
+                        style={style}
                         translation={this.props.translation}
                         screenSize={this.props.screenSize}
                     />
@@ -345,9 +325,10 @@ class QuestionCardContent extends PureComponent {
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MULTIPLE_ANSWERS':
                 return (
                     <DropDown
-                        key={uniqueId('key_')}
+                        // key={uniqueId('key_')}
                         id={item.variable}
                         label={translations.questionCardLabels.dropDownLabel}
+                        skipLabel={true}
                         labelValue={item.text}
                         value={questionAnswers}
                         data={item.answers.map((e) => {return {label: getTranslation(e.label, this.props.translation), value: e.value}})}
@@ -371,20 +352,20 @@ class QuestionCardContent extends PureComponent {
                             }
                             this.props.onChangeMultipleSelection(valueToSend, id, parentId, this.props.index);
                         }}
-                        style={{width: alternateWidth, marginHorizontal: marginHorizontal}}
-                        dropDownStyle={{width: width, alignSelf: 'center'}}
+                        style={style}
+                        dropDownStyle={{width: 300, alignSelf: 'center'}}
                         showDropdown={this.state.showDropdown}
                     />
                 );
             case 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP':
                 return (
-                    <Section key={item.variable} label={getTranslation(item.text, this.props.translation)}/>
+                    <Section key={item.variable} label={getTranslation(item.text, this.props.translation)} containerStyle={customStyles.questionMarkupHeader} textStyle={customStyles.questionMarkupHeaderText} />
                 );
             default:
                 return(
                     item.answerType !== undefined ? (
                         <View>
-                            <Text>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
+                            <Text style={customStyles.questionTodoFieldText}>{"TODO: item type: " + item.answerType + " is not implemented yet"}</Text>
                         </View>
                     ) : null
                 )
@@ -392,17 +373,21 @@ class QuestionCardContent extends PureComponent {
 
     };
 
-    handleRenderAdditionalQuestions = (additionalQuestion, parentId) => {
+    handleRenderAdditionalQuestions = (additionalQuestion, parentId, i) => {
         return (
-            <View key={uniqueId('key_')}>
+            <View
+                key={i}
+            >
                 {
                     additionalQuestion.answerType !== 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP' ? (
-                        <Section key={uniqueId('key_')} label={getTranslation(additionalQuestion.text, this.props.translation)} />
+                        <Section label={getTranslation(additionalQuestion.text, this.props.translation)} labelSize={'normal'} style={{margin: 0}} containerStyle={customStyles.additionalQuestionContainer} textStyle={customStyles.additionalQuestionText} />
                     ) : (null)
                 }
+                <View style={customStyles.additionalQuestionContent}>
                 {
                     this.handleRenderItemByType(additionalQuestion, parentId)
                 }
+                </View>
             </View>
         )
     };
@@ -450,24 +435,54 @@ class QuestionCardContent extends PureComponent {
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
-const style = StyleSheet.create({
+const customStyles = StyleSheet.create({
+    containerCardComponent: {
+        justifyContent: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 8
+    },
     containerQuestion: {
-        flexDirection: 'row',
-        backgroundColor: styles.colorBackgroundQuestions,
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: styles.backgroundColorRgb,
+        flexDirection: 'row'
     },
     containerQuestionNumber: {
-        width: 28,
+        alignItems: 'center',
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 25,
         height: 28,
-        borderRadius: 14,
-        backgroundColor: 'white',
         justifyContent: 'center',
-        alignItems: 'center'
+        width: 28
     },
     questionText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Regular',
-        fontSize: 13,
-        color: 'black'
+        fontSize: 14
+    },
+    questionTodoFieldText: {
+        color: styles.warningColor,
+        fontSize: 12,
+        fontStyle: 'italic'
+    },
+    questionMarkupHeader: {
+        backgroundColor: styles.warningColorRgb,
+        borderRadius: 4,
+        marginHorizontal: -16,
+        marginVertical: -8,
+        width: 400
+    },
+    questionMarkupHeaderText: {
+        color: styles.primaryAltColor
+    },
+    additionalQuestionContainer: {
+        backgroundColor: styles.backgroundColorRgb
+    },
+    additionalQuestionText: {
+        color: styles.overlayColor
+    },
+    additionalQuestionContent: {
+        paddingHorizontal: 16,
+        paddingVertical: 8,
     }
 });
 

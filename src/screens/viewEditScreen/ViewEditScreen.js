@@ -24,7 +24,6 @@ import {
     getTranslation,
     updateRequiredFields
 } from "../../utils/functions";
-import styles from "../../styles";
 import translations from "../../utils/translations";
 import config from "../../utils/config";
 import constants from './../../utils/constants';
@@ -32,6 +31,11 @@ import lodashGet from "lodash/get";
 import _ from "lodash";
 import {checkArrayAndLength} from "../../utils/typeCheckingFunctions";
 import FollowUpsSingleContainer from './../../containers/FollowUpsSingleContainer';
+import {Navigation} from "react-native-navigation";
+import {fadeInAnimation, fadeOutAnimation} from "../../utils/animations";
+import ContactsSingleRelationship from "../../containers/ContactsSingleRelationship";
+import styles from "../../styles";
+import colors from "../../styles/colors";
 
 class ViewEditScreen extends Component {
     constructor(props) {
@@ -73,56 +77,59 @@ class ViewEditScreen extends Component {
     render() {
         if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'} />
+                <LoaderScreen
+                    overlay={true}
+                    loaderColor={styles.primaryColor}
+                    backgroundColor={'rgba(255, 255, 255, 0.8)'} />
             )
         }
 
         return (
             <ViewHOC
-                style={{flex: 1}}
-                     showLoader={this && this.state && this.state.loading}
-                     loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
+                style={style.container}
+                showLoader={this && this.state && this.state.loading}
+                loaderText={this.props && this.props.syncState ? 'Loading' : getTranslation(translations.loadingScreenMessages.loadingMsg, this.props.translation)}
             >
                 <NavBarCustom
                     title={null}
                     customTitle={
-                        <View
-                            style={[style.breadcrumbContainer]}>
-                            <Breadcrumb
-                                entities={
-                                    [
-                                        getTranslation(lodashGet(this.props, 'previousScreen', translations.followUpsSingleScreen.title), this.props.translation),
-                                        computeFullName(this.props.elementType === 'followUp' ? this.props.additionalData : this.props.element)
-                                    ]
-                                }
-                                navigator={this.props.navigator}
-                                onPress={this.handlePressBreadcrumb}
-                            />
-                            <View style={{ flexDirection: 'row', marginRight: calculateDimension(16, false, this.props.screenSize) }}>
+                        <View style={style.headerContainer}>
+                            <View style={[style.breadcrumbContainer]}>
+                                <Breadcrumb
+                                    entities={
+                                        [
+                                            getTranslation(lodashGet(this.props, 'previousScreen', translations.followUpsSingleScreen.title), this.props.translation),
+                                            computeFullName(this.props.elementType === 'followUp' ? this.props.additionalData : this.props.element)
+                                        ]
+                                    }
+                                    componentId={this.props.componentId}
+                                    onPress={this.handlePressBreadcrumb}
+                                />
+                            </View>
+                            <View style={style.headerButtonSpacing}>
                                 <ElevatedView
-                                    elevation={3}
-                                    style={{
-                                        backgroundColor: styles.buttonGreen,
-                                        width: calculateDimension(33, false, this.props.screenSize),
-                                        height: calculateDimension(25, true, this.props.screenSize),
-                                        borderRadius: 4
-                                    }}
+                                    elevation={0}
+                                    style={[
+                                        style.headerButton, 
+                                        {
+                                            width: calculateDimension(30, false, this.props.screenSize),
+                                            height: calculateDimension(30, true, this.props.screenSize)
+                                        }
+                                    ]}
                                 >
-                                    <Ripple style={{
-                                        flex: 1,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={'white'} size={15} />
+                                    <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
+                                        <Icon name="help" color={styles.textColor} size={18} />
                                     </Ripple>
                                 </ElevatedView>
+                            </View>
+                            <View>
                                 {
                                     this.renderNavBarContent()
                                 }
                             </View>
                         </View>
                     }
-                    navigator={this.props.navigator}
+                    componentId={this.props.componentId}
                     iconName="menu"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
@@ -231,28 +238,24 @@ class ViewEditScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'open'
-        })
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: true,
+                },
+            },
+        });
     };
 
     //Index change for TabBar
-    handleOnIndexChange = (index) => {
-        if (this.props.isNew) {
-            if (this.state.canChangeScreen) {
-                this.setState({
-                    canChangeScreen: false,
-                    index
-                });
-            }
-        } else {
-            this.setState({
-                index
-            });
-        }
-    };
+    handleOnIndexChange = _.throttle( (index) => {
+        // if (this.state.canChangeScreen) {
+        this.setState({
+            canChangeScreen: false,
+            index
+        });
+        // }
+    },300);
     handleMoveToNextScreenButton = () => {
         let nextIndex = this.state.index + 1;
 
@@ -277,13 +280,21 @@ class ViewEditScreen extends Component {
             <TabBar
                 {...props}
                 indicatorStyle={{
-                    backgroundColor: styles.buttonGreen,
+                    backgroundColor: styles.primaryColor,
                     height: 2
                 }}
                 style={{
-                    height: 41,
-                    backgroundColor: 'Red'
+                    height: 36,
+                    backgroundColor: styles.backgroundColor
                 }}
+                tabStyle={{
+                    width: 'auto',
+                    paddingHorizontal: 16,
+                    marginHorizontal: 0,
+                    textAlign: 'center'
+                }}
+                activeColor={styles.primaryColor}
+                inactiveColor={styles.secondaryColor}
                 renderLabel={this.handleRenderLabel(props)}
                 scrollEnabled={this.props.elementType !== 'followUp'}
                 bounces={this.props.elementType !== 'followUp'}
@@ -292,24 +303,15 @@ class ViewEditScreen extends Component {
     };
 
     //Render label for TabBar
-    handleRenderLabel = (props) => ({ route, index }) => {
-        const inputRange = props.navigationState.routes.map((x, i) => i);
-
-        const outputRange = inputRange.map(
-            inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
-        );
-        const color = props.position.interpolate({
-            inputRange,
-            outputRange: outputRange,
-        });
+    handleRenderLabel = (props) => ({ route, focused }) => {
 
         return (
             <Animated.Text style={{
                 fontFamily: 'Roboto-Medium',
                 fontSize: 12,
-                color: color,
                 flex: 1,
-                alignSelf: 'center'
+                alignSelf: 'center',
+                color: focused ? colors.primaryColor : this.props.isNew ? colors.secondaryColor : colors.textColor
             }}>
                 {getTranslation(route.title, this.props.translation).toUpperCase()}
             </Animated.Text>
@@ -439,9 +441,9 @@ class ViewEditScreen extends Component {
                             />
                         );
                     case 'exposures':
-                    let ContactsSingleExposures = require('./../../containers/ContactsSingleExposures').default;
+                    let ContactsSingleRelationship = require('./../../containers/ContactsSingleRelationship').default;
                         return (
-                            <ContactsSingleExposures
+                            <ContactsSingleRelationship
                                 isNew={this.props.isNew}
                                 isEditMode={this.props.isEditMode}
                                 contact={this.props.element}
@@ -460,7 +462,7 @@ class ViewEditScreen extends Component {
                                 onPressEditExposure={this.handleOnPressEditExposure}
                                 onPressDeleteExposure={this.handleOnPressDeleteExposure}
                                 addContactFromCasesScreen={this.props.addContactFromCasesScreen}
-                                navigator={this.props.navigator}
+                                componentId={this.props.componentId}
                                 saveExposure={this.handleSaveExposure}
                                 handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
                                 handleOnPressSave={this.handleOnPressSave}
@@ -607,9 +609,9 @@ class ViewEditScreen extends Component {
                             />
                         );
                     case 'exposures':
-                    let CaseSingleExposureContainer = require("../../containers/CaseSingleExposureContainer").default;
+                    let CaseSingleRelationshipContainer = require("../../containers/CaseSingleRelationshipContainer").default;
                         return (
-                            <CaseSingleExposureContainer
+                            <CaseSingleRelationshipContainer
                                 isNew={this.props.isNew}
                                 isEditMode={this.props.isEditMode}
                                 case={this.props.element}
@@ -636,7 +638,7 @@ class ViewEditScreen extends Component {
                                 onPressSaveEdit={this.onPressSaveEdit}
                                 onPressEditExposure={this.handleOnPressEditExposure}
                                 onPressDeleteExposure={this.handleOnPressDeleteExposure}
-                                navigator={this.props.navigator}
+                                componentId={this.props.componentId}
                                 saveExposure={this.handleSaveExposure}
                                 handleOnPressSave={this.handleOnPressSave}
                                 selectedExposure={this.props.singleCase}
@@ -743,7 +745,7 @@ class ViewEditScreen extends Component {
             date: date,
             fileType: 'followUp.json',
             outbreakId: this.props.outbreakId,
-            index: daysSince(_.get(this.props, 'element.followUp.startDate', null), now) + 1,
+            index: daysSince(_.get(this.props, 'element.followUp.startDate', null), date) + 1,
             teamId: generateTeamId(this.props.element.addresses.slice(), this.props.teams, this.props.locations.slice()),
             personId: extractIdFromPouchId(this.props.element._id, 'person.json')
         };
@@ -754,20 +756,25 @@ class ViewEditScreen extends Component {
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen
         }, () => {
             this.hideMenu();
-            this.props.navigator.push({
-                screen: constants.appScreens.viewEditScreen,
-                // screen: constants.appScreens.followUpSingleScreen,
-                animated: true,
-                animationType: 'fade',
-                passProps: {
-                    isNew: true,
-                    isEditMode: true,
-                    element: followUp,
-                    elementType: 'followUp',
-                    additionalId: this.props.element._id,
-                    previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
-                    // contact: this.props.element,
-                    // item: followUp
+            Navigation.push(this.props.componentId, {
+                component:{
+                    name: constants.appScreens.viewEditScreen,
+                    options:{
+                        animations: {
+                            push: fadeInAnimation,
+                            pop: fadeOutAnimation
+                        }
+                    },
+                    passProps: {
+                        isNew: true,
+                        isEditMode: true,
+                        element: followUp,
+                        elementType: 'followUp',
+                        additionalId: this.props.element._id,
+                        previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
+                        // contact: this.props.element,
+                        // item: followUp
+                    }
                 }
             });
         });
@@ -847,20 +854,44 @@ ViewEditScreen.defaultProps = {
 
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        flex: 1
     },
-    breadcrumbContainer: {
+    headerContainer: {
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
+        paddingRight: 16
+    },
+    breadcrumbContainer: {
+        alignItems: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start'
+    },
+    headerButtonSpacing: {
+        marginRight: 8
+    },
+    headerButton: {
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4
+    },
+    headerButtonInner: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center'
+    },
+    moreMenuButton: {
+        alignItems: 'center',
+        backgroundColor: styles.disabledColor,
+        borderRadius: 4,
+        justifyContent: 'center'
     }
 });
 
 function mapStateToProps(state) {
     return {
         user: lodashGet(state, 'user', {}),
-        outbreakId: lodashGet(state, 'user.activeOutbreakId', null),
+        outbreakId: lodashGet(state, 'outbreak._id', null),
         screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
         caseInvestigationTemplate: lodashGet(state, 'outbreak.caseInvestigationTemplate', null),
         contactFollowUpTemplate: lodashGet(state, 'outbreak.contactFollowUpTemplate', null),

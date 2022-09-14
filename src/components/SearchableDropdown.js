@@ -2,7 +2,7 @@
  * Created by florinpopa on 22/10/2018.
  */
 import React, {useState, useRef} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, Text, View, ScrollView} from 'react-native';
 import PropTypes from 'prop-types';
 import TextInput from './TextInput';
 import {useSelector} from "react-redux";
@@ -15,13 +15,14 @@ import lodashGet from "lodash/get";
 import {createSelector} from "reselect/lib/index";
 
 const selectOutbreakId = createSelector(
-    state => lodashGet(state, 'user.activeOutbreakId', null),
+    state => lodashGet(state, 'outbreak._id', null),
     (outbreakId) => {
         return {outbreakId}
     }
 );
 
 SearchableDropDown = React.memo(({
+                                     person,
                                      containerStyle,
                                      isEditMode,
                                      placeholder,
@@ -32,7 +33,8 @@ SearchableDropDown = React.memo(({
                                      itemTextStyle,
                                      onSelectExposure,
                                      type,
-                                     value
+                                     relationshipType,
+                                     value,
                                  }) => {
     const {outbreakId} = useSelector(selectOutbreakId);
     const delayedSearch = useRef(debounce((tex) => searchedItems(tex), 500)).current;
@@ -73,10 +75,13 @@ SearchableDropDown = React.memo(({
         if (tex === '') {
             setListItems([]);
         } else {
-            getPersonsByName(outbreakId, tex, type)
+            getPersonsByName(outbreakId, tex, type, relationshipType)
                 .then((cases) => {
-                    // console.log('Cases: ', cases);
-                    setListItems(cases)
+                    let filteredCases = cases;
+                    if (person){
+                        filteredCases = cases.filter(e=>e._id !== person._id);
+                    }
+                    setListItems(filteredCases);
                 })
                 .catch((errorSearchCases) => {
                     console.log('ErrorSearchCases: ', errorSearchCases);
@@ -85,7 +90,10 @@ SearchableDropDown = React.memo(({
     };
 
     return (
-        <View keyboardShouldpersist='always' style={{...containerStyle}}>
+        <View keyboardShouldpersist='always' style={{
+            flex:1,
+            ...containerStyle
+        }}>
             <TextInput
                 id={'SearchableDropDownId'}
                 onChange={updateText}
@@ -98,7 +106,12 @@ SearchableDropDown = React.memo(({
                 isRequired={false}
             />
             <FlatList
-                style={{...itemsContainerStyle}}
+                nestedScrollEnabled={true}
+                style={{
+                    flex: 1,
+                    maxHeight: 120,
+                    ...itemsContainerStyle,
+                }}
                 enableEmptySections={true}
                 keyboardShouldPersistTaps="always"
                 data={listItems || []}

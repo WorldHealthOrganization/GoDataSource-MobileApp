@@ -9,29 +9,34 @@
 import React, {Component} from 'react';
 import {Alert, Image, Platform, StyleSheet, Text, View} from 'react-native';
 import {Button, Icon} from 'react-native-material-ui';
-import styles from './../styles';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {loginUser} from './../actions/user';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { setSyncState } from './../actions/app';
+import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scroll-view';
 import Ripple from 'react-native-material-ripple';
 import lodashGet from 'lodash/get';
 import translations from './../utils/translations';
 import config from './../utils/config';
-import {getTranslation} from './../utils/functions';
+import {createStackFromComponent, getTranslation} from './../utils/functions';
 import VersionNumber from 'react-native-version-number';
+import withPincode from "../components/higherOrderComponents/withPincode";
+import {compose} from "redux";
+import {Navigation} from "react-native-navigation";
+import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
+import styles from './../styles';
 
 class FirstConfigScreen extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
-
     constructor(props) {
+        console.log("Constructor");
         super(props);
         this.state = {
         };
         // Bind here methods, or at least don't declare methods in the render method
+    }
+    componentDidMount() {
+        console.log("Comp did mount")
     }
 
     // Please add here the react lifecycle methods that you need
@@ -40,6 +45,7 @@ class FirstConfigScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        console.log("Rendering first config screen");
         return (
             <KeyboardAwareScrollView
                 style={[style.container, {paddingTop: Platform.OS === 'ios' ? this.props.screenSize.height === 812 ? 44 : 20 : 0}]}
@@ -48,42 +54,38 @@ class FirstConfigScreen extends Component {
             >
                 {
                     this.props && this.props.allowBack ? (
-                        <Ripple style={{flexDirection: 'row', position: "absolute", top: 20, left: 20}} onPress={this.handleOnPressBack}>
-                            <Icon name="arrow-back"/>
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Hub config</Text>
+                        <Ripple style={[style.topNavLinks, {left: 24}]} onPress={this.handleOnPressBack}>
+                            <Icon name="arrow-back" style={style.topNavLinksIcon} />
+                            <Text style={[style.topNavLinksText, {marginLeft: 4}]}>Hub config</Text>
                         </Ripple>
                     ) : (<View/>)
                 }
                 {
                     this.props && this.props.activeDatabase && !this.props.skipEdit ? (
-                        <Ripple style={{flexDirection: 'row', alignItems: 'center', position: "absolute", top: 20, right: 20}} onPress={this.handleOnPressForward}>
-                            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white'}}>Current Hub config</Text>
-                            <Icon name="arrow-forward"/>
+                        <Ripple style={[style.topNavLinks, {right: 24}]} onPress={this.handleOnPressForward}>
+                            <Text style={[style.topNavLinksText, {marginRight: 4}]}>Current Hub config</Text>
+                            <Icon name="arrow-forward" style={style.topNavLinksIcon} />
                         </Ripple>
                     ) : (<View/>)
                 }
-                <View style={[style.welcomeTextContainer]}>
+                <View style={style.welcomeTextContainer}>
                     <Text style={style.welcomeText}>
                         {getTranslation(translations.firstConfigScreen.welcomeMessage, null)}
                     </Text>
+                </View>
+                <View style={style.logoContainer}>
+                    <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
                 </View>
                 <View style={style.inputsContainer}>
                     <Text style={style.text}>
                         {getTranslation(translations.firstConfigScreen.infoMessage, null)}
                     </Text>
-                    <Button onPress={this.handlePressScanQR} upperCase={false} icon="photo-camera" raised text={getTranslation(translations.firstConfigScreen.qrScanButton, null)} style={styles.buttonLogin} />
-                    {/*<Button onPress={this.handlePressImport} upperCase={false} icon={<MaterialCommunityIcons size={24} name="download" />} raised text="Import config file" style={styles.buttonLogin} />*/}
-                    <Button onPress={this.handlePressManual} upperCase={false} icon="short-text" raised text={getTranslation(translations.firstConfigScreen.manualConfigButton, null)} style={styles.buttonLogin} />
+                    <Button onPress={this.handlePressScanQR} upperCase={false} icon="photo-camera" flat text={getTranslation(translations.firstConfigScreen.qrScanButton, null)} style={styles.primaryButton} />
+                    {/*<Button onPress={this.handlePressImport} upperCase={false} icon={<MaterialCommunityIcons size={24} name="download" />} flat text="Import config file" style={styles.secondaryButton} />*/}
+                    <Button onPress={this.handlePressManual} upperCase={false} icon="short-text" flat text={getTranslation(translations.firstConfigScreen.manualConfigButton, null)} style={styles.primaryButton} />
                 </View>
-                <View style={style.logoContainer}>
-                    <Image source={{uri: 'logo_app'}} style={style.logoStyle} />
-                    <Text
-                        style={{
-                            color: 'white',
-                            fontFamily: 'Roboto-Medium',
-                            fontSize: 14
-                        }}
-                    >
+                <View>
+                    <Text style={style.version}>
                         {`Version: ${VersionNumber.appVersion} - build ${VersionNumber.buildVersion}`}
                     </Text>
                 </View>
@@ -93,31 +95,34 @@ class FirstConfigScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleOnPressBack = () => {
-        this.props.navigator.pop();
+        Navigation.pop(this.props.componentId)
+            .catch(reason => {
+
+            })
     };
 
     handleOnPressForward = () => {
-        this.props.navigator.push({
-            screen: 'ManualConfigScreen',
-            passProps: {
-                allowBack: this.props.allowBack,
-                isMultipleHub: this.props.isMultipleHub
+        Navigation.push(this.props.componentId,{
+            component:{
+                name: 'ManualConfigScreen',
+                passProps: {
+                    allowBack: this.props.allowBack,
+                    isMultipleHub: this.props.isMultipleHub
+                }
             }
-            // animationType: 'fade',
-            // animated: true
         })
     };
 
     handlePressScanQR = () => {
-        this.props.navigator.showModal({
-            screen: 'QRScanScreen',
-            animated: true,
+        console.log("Press scan QR", this.props.allowBack, this.props.isMultipleHub);
+        Navigation.showModal(createStackFromComponent({
+            name: 'QRScanScreen',
             passProps: {
                 pushNewScreen: this.pushNewScreen,
                 allowBack: this.props.allowBack,
                 isMultipleHub: this.props.isMultipleHub
             }
-        })
+        }))
     };
 
     handlePressImport = () => {
@@ -129,17 +134,20 @@ class FirstConfigScreen extends Component {
     };
 
     handlePressManual = () => {
-        console.log("Here change screen");
-        this.props.navigator.push({
-            screen: 'ManualConfigScreen',
-            // animated: true,
-            // animationType: 'fade',
-            passProps: {
-                isNewHub: true,
-                allowBack: this.props.allowBack,
-                isMultipleHub: this.props.isMultipleHub
+        console.log("Here change screen", this.props.componentId, this.props.navigator);
+        Navigation.push(this.props.componentId, {
+            component:{
+                name: 'ManualConfigScreen',
+                // animated: true,
+                // animationType: 'fade',
+                passProps: {
+                    isNewHub: true,
+                    allowBack: this.props.allowBack,
+                    isMultipleHub: this.props.isMultipleHub
+                }
             }
-        })
+        }).then((res)=>{console.log("navpush res", res)})
+            .catch((err)=>{console.log("catch error", err)});
     };
 
     pushNewScreen = (QRCodeInfo, allowBack, skipEdit, isMultipleHub) => {
@@ -149,18 +157,26 @@ class FirstConfigScreen extends Component {
                 let QRCodeInfoData = JSON.parse(QRCodeInfo.data);
                 if (QRCodeInfoData && QRCodeInfoData.url && QRCodeInfoData.clientId && QRCodeInfoData.clientSecret) {
                     // this.props.navigator.dismissAllModals();
+                    this.props.setSyncState(null);
                     setTimeout(() => {
-                        this.props.navigator.push({
-                            screen: 'ManualConfigScreen',
-                            animated: true,
-                            animationType: 'fade',
-                            passProps: {
-                                QRCodeInfo: QRCodeInfo,
-                                allowBack: allowBack,
-                                isNewHub: true,
-                                skipEdit: skipEdit,
-                                isMultipleHub: isMultipleHub
+                        Navigation.push(this.props.componentId,{
+                            component:{
+                                name: 'ManualConfigScreen',
+                                options:{
+                                    animations:{
+                                        push:fadeInAnimation,
+                                        pop:fadeOutAnimation
+                                    }
+                                },
+                                passProps: {
+                                    QRCodeInfo: QRCodeInfo,
+                                    allowBack: allowBack,
+                                    isNewHub: true,
+                                    skipEdit: skipEdit,
+                                    isMultipleHub: isMultipleHub
+                                }
                             }
+
                         })
                     }, 250);
                 } else {
@@ -191,48 +207,68 @@ class FirstConfigScreen extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#55b5a6'
+        backgroundColor: styles.backgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
-        justifyContent: 'space-around',
         alignItems: 'center',
-        flexGrow: 1
+        flexGrow: 1,
+        justifyContent: 'space-between',
+        padding: 24
     },
-    textInput: {
-        width: '100%',
-        alignSelf: 'center'
+    topNavLinks: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        position: "absolute",
+        top: 24,
+        zIndex: 10
+    },
+    topNavLinksIcon: {
+        color: styles.secondaryColor,
+        fontSize: 18
+    },
+    topNavLinksText: {
+        color: styles.primaryAltColor,
+        fontFamily: 'Roboto-Medium',
+        fontSize: 16
     },
     welcomeTextContainer: {
-        flex: 0.35,
-        width: '75%',
-        justifyContent: 'center'
+        flex: 0.25,
+        justifyContent: 'center',
+        width: '100%'
     },
     welcomeText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Bold',
-        fontSize: 35,
-        color: 'white',
-        textAlign: 'left'
-    },
-    inputsContainer: {
-        flex: 0.15,
-        width: '75%',
-        justifyContent: 'space-around',
+        fontSize: 36,
+        textAlign: 'center'
     },
     logoContainer: {
-        flex: 0.5,
-        width: '100%',
+        alignItems: 'center',
+        flex: 0.25,
         justifyContent: 'center',
-        alignItems: 'center'
+        width: '100%'
     },
     logoStyle: {
-        width: 180,
-        height: 34
+        height: 40,
+        width: 212
     },
     text: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Light',
         fontSize: 16,
-        color: 'white'
+        marginBottom: 16,
+        textAlign: 'center'
+    },
+    inputsContainer: {
+        flex: 0.5,
+        width: '100%'
+    },
+    version: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Light',
+        fontSize: 12,
+        textAlign: 'center'
     }
 });
 
@@ -245,8 +281,13 @@ function mapStateToProps(state) {
 
 function matchDispatchToProps(dispatch) {
     return bindActionCreators({
-        loginUser
+        loginUser,
+        setSyncState
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchToProps)(FirstConfigScreen);
+// export default connect(mapStateToProps, matchDispatchToProps)(FirstConfigScreen);
+export default compose(
+    withPincode(),
+    connect(mapStateToProps, matchDispatchToProps),
+)(FirstConfigScreen)

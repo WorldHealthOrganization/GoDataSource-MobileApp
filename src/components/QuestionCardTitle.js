@@ -43,22 +43,22 @@ class QuestionCardTitle extends PureComponent {
 // make a global style in the config directory
 const style = StyleSheet.create({
     containerQuestion: {
-        flexDirection: 'row',
-        backgroundColor: styles.colorBackgroundQuestions,
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: styles.backgroundColorRgb,
+        flexDirection: 'row'
     },
     containerQuestionNumber: {
-        width: 28,
+        alignItems: 'center',
+        backgroundColor: styles.disabledColor,
+        borderRadius: 25,
         height: 28,
-        borderRadius: 14,
-        backgroundColor: 'white',
         justifyContent: 'center',
-        alignItems: 'center'
+        width: 28
     },
     questionText: {
-        fontFamily: 'Roboto-Regular',
-        fontSize: 13,
-        color: 'black'
+        color: styles.textColor,
+        fontFamily: 'Roboto-Medium',
+        fontSize: 14
     }
 });
 

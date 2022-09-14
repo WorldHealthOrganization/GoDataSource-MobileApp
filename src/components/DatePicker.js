@@ -3,105 +3,102 @@
  */
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
-import React, {useState} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import React, {useState, useRef} from 'react';
+import {View, Text, StyleSheet, TouchableWithoutFeedback} from 'react-native';
 import PropTypes from 'prop-types';
-import { TextField } from 'react-native-material-textfield';
+import {TextField} from 'react-native-material-textfield';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import Ripple from 'react-native-material-ripple';
 import moment from 'moment/min/moment.min';
 import {getTranslation, getTooltip, createDate} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
 import {useDarkMode} from 'react-native-dark-mode';
+import stylesGlobal from './../styles';
 
 const DatePicker = React.memo(({
-            id,
-            isEditMode,
-            label,
-            value,
-            isRequired,
-            onChange,
-            style,
-            objectType,
-            translation,
-            minimumDate,
-            maximumDate,
-            date,
-            index
+                                   id,
+                                   isEditMode,
+                                   label,
+                                   value,
+                                   isRequired,
+                                   onChange,
+                                   style,
+                                   objectType,
+                                   translation,
+                                   minimumDate,
+                                   maximumDate,
+                                   index,
+                                   skipLabel
                                }) => {
+    const fieldRef = useRef(null);
     const [isDateTimePickerVisible, setIsDateTimePickerVisible] = useState(false);
+    let newDate = value;
+    if (newDate && typeof newDate === 'string' && newDate !== '') {
+        newDate = new Date(value);
+    }
+    const [date, setDate] = useState(newDate);
+
+    React.useEffect(() => {
+        if (date !== value) {
+            let newDate = value;
+            if (newDate && typeof newDate === 'string' && newDate !== '') {
+                newDate = new Date(value);
+            }
+            if (fieldRef.current) {
+                fieldRef.current.setValue(newDate ? moment.utc(newDate).format('MM/DD/YYYY') : '');
+            }
+            setDate(newDate);
+        }
+    }, [value])
+
+
     const isDarkMode = useDarkMode();
 
     const editInput = () => {
-        // console.log('This.props.value: ', this.props.value);
         let tooltip = getTooltip(label, translation);
-        let customStyle = value !== undefined && value !== null ? styles.hasDateTooltipStyle : style.emptyDateTooltipStyle;
-        if (value && typeof value === 'string' && value !== '') {
-            value = new Date(value);
-        }
-        return (
-            <View style={[{marginVertical: 10, flexDirection: 'row'}, style]}>
-                <View style = {{flex: 1}}>
-                    {
-                        value !== null && value !== undefined && date !== '' ? (
-                            <View>
-                                <Text style={{
-                                    fontFamily: 'Roboto',
-                                    fontSize: 15,
-                                    textAlign: 'left',
-                                    color: 'rgba(0, 0, 0, .38)',
-                                }}>
-                                    {isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)}
-                                </Text>
+        let customStyle = date !== undefined && date !== null ? customStyles.hasDateTooltipStyle : customStyles.emptyDateTooltipStyle;
 
-                                <Ripple onPress={handleShowDatePicker}>
-                                    <Text
-                                        style={{
-                                            fontFamily: 'Roboto-Regular',
-                                            fontSize: 15,
-                                            textAlign: 'left',
-                                            lineHeight: 30,
-                                            color: 'rgb(60,60,60)',
-                                            marginBottom: 7.5
-                                        }}>
-                                        {value !== null && value !== undefined && value !== '' ? moment.utc(value).format('MM/DD/YYYY') : ''}
-                                    </Text>
-                                </Ripple>
-                            </View>
-                        ) : (
-                            <Ripple onPress={handleShowDatePicker}>
-                                <TextField
-                                    label={isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)} textColor='rgb(0,0,0)'
-                                    labelFontSize={15}
-                                    // labelHeight={30}
-                                    labelTextStyle={{
-                                        fontFamily: 'Roboto',
-                                        textAlign: 'left',
-                                        marginBottom: 2,
-                                        marginTop: 2,
-                                    }}
-                                    tintColor='rgb(77,176,160)'
-                                >
-                                </TextField>
-                            </Ripple>
-                        )
-                    }
-                    <DateTimePicker
-                        minimumDate={minimumDate || null}
-                        maximumDate={maximumDate || null}
-                        timeZoneOffsetInMinutes={0}
-                        isVisible={isDateTimePickerVisible}
-                        onConfirm={handleDatePicked}
-                        onCancel={handleDateCancelled}
-                        isDarkModeEnabled={isDarkMode}
-                        date={value || new Date()}
-                    />
-                </View>
+        return (
+            <View style={[{flexDirection: 'row'}, style]}>
+                <TouchableWithoutFeedback
+                    onPress={handleDateCancelled}
+                >
+                    <View style={{flex: 1}}>
+                        <Ripple onPress={handleShowDatePicker}>
+                            <TextField
+                                label={isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)}
+                                textColor={stylesGlobal.textColor}
+                                fontSize={14}
+                                value={date ? moment.utc(newDate).format('MM/DD/YYYY') : ''}
+                                ref={fieldRef}
+                                labelTextStyle={{fontFamily: 'Roboto-Regular'}}
+                                tintColor={stylesGlobal.primaryColor}
+                            >
+                            </TextField>
+                        </Ripple>
+                        <DateTimePicker
+                            minimumDate={minimumDate || null}
+                            maximumDate={maximumDate || null}
+                            timeZoneOffsetInMinutes={0}
+                            isVisible={isDateTimePickerVisible}
+                            onConfirm={handleDatePicked}
+                            onCancel={handleDateCancelled}
+                            isDarkModeEnabled={isDarkMode}
+                            date={value ? new Date(
+                                Date.parse(
+                                    moment(new Date(value), 'DD/MM/YYYY').format(
+                                        'ddd MMM DD YYYY HH:mm:ss ZZ',
+                                    ),
+                                ),
+                            ) : new Date()}
+                        />
+                    </View>
+                </TouchableWithoutFeedback>
                 {
                     tooltip.hasTooltip === true ? (
                         <TooltipComponent
                             tooltipMessage={tooltip.tooltipMessage}
-                            style = {customStyle}
+                            style={customStyle}
                         />
                     ) : null
                 }
@@ -113,25 +110,16 @@ const DatePicker = React.memo(({
     const viewInput = () => {
         let tooltip = getTooltip(label, translation);
         return (
-            <View style={[{flexDirection: 'row'}, style]}>
+            <View style={[{flexDirection: 'row', marginVertical: 8}, style]}>
                 <View style={{flex: 1}}>
-                    <Text style={{
-                        fontFamily: 'Roboto-Regular',
-                        fontSize: 15,
-                        textAlign: 'left',
-                        color: 'rgb(0,0,0)',
-                        marginBottom: 2,
-                        marginTop: 7,
-                    }}>
-                        {getTranslation(label, translation)}
-                    </Text>
-                    <Text
-                        style={{
-                            fontFamily: 'Roboto-Light',
-                            fontSize: 15,
-                            textAlign: 'left',
-                            color: 'rgb(60,60,60)',
-                        }}>
+                    {
+                        skipLabel ? (null) : (
+                            <Text style={customStyles.datePickerLabel}>
+                                {getTranslation(label, translation)}
+                            </Text>
+                        )
+                    }
+                    <Text style={customStyles.datePickerValue}>
                         {value !== null && value !== undefined && value !== '' ? moment.utc(value).format('MM/DD/YYYY') : ''}
                     </Text>
                 </View>
@@ -147,6 +135,15 @@ const DatePicker = React.memo(({
     };
 
     const handleShowDatePicker = () => {
+        console.log("Show date picker", isDateTimePickerVisible);
+        console.log("Show date picker 2", `"${value}"`);
+        console.log("Show date picker 3", value ? new Date(
+            Date.parse(
+                moment(new Date(value), 'DD/MM/YYYY').format(
+                    'ddd MMM DD YYYY HH:mm:ss ZZ',
+                ),
+            ),
+        ) : new Date())
         setIsDateTimePickerVisible(true);
     };
 
@@ -159,10 +156,11 @@ const DatePicker = React.memo(({
     const handleDatePicked = (date) => {
         // console.log("### date picked: ", date, moment.utc(date).format());
         handleDateCancelled();
+        setDate(createDate(date));
         onChange(
             createDate(date),
             id,
-            objectType ? (objectType === 'Address' || objectType === 'LabResult' || objectType === 'DateRanges' || objectType === 'Vaccines' ? index : objectType) : null,
+            objectType ? (objectType === 'Address' || objectType === 'DateRanges' || objectType === 'Vaccines' ? index : objectType) : null,
             objectType
         );
     };
@@ -173,19 +171,28 @@ const DatePicker = React.memo(({
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
-const styles = StyleSheet.create({
+const customStyles = StyleSheet.create({
+    datePickerLabel: {
+        color: stylesGlobal.secondaryColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    },
+    datePickerValue: {
+        color: stylesGlobal.textColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    },
     hasDateTooltipStyle: {
         flex: 0,
-        marginTop: 15,
-        marginBottom: 15
+        marginTop: 16,
+        marginBottom: 16
     },
     emptyDateTooltipStyle: {
         flex: 0,
-        marginTop: 30,
+        marginTop: 32,
         marginBottom: 8
     }
 });
-
 
 DatePicker.propTypes = {
     id: PropTypes.string.isRequired,
@@ -194,7 +201,8 @@ DatePicker.propTypes = {
     isEditMode: PropTypes.bool.isRequired,
     isRequired: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
-    style: PropTypes.object
+    style: PropTypes.object,
+    skipLabel: PropTypes.bool
 };
 
 DatePicker.defaultTypes = {
@@ -203,8 +211,11 @@ DatePicker.defaultTypes = {
     value: new Date(),
     isEditMode: true,
     isRequired: false,
-    onChange: () => {console.log('Default DatePicker onChange')},
-    style: {}
+    onChange: () => {
+        console.log('Default DatePicker onChange')
+    },
+    style: {},
+    skipLabel: false
 };
 
 export default DatePicker;

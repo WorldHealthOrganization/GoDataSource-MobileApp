@@ -9,7 +9,6 @@
 import React, {PureComponent} from 'react';
 import {StyleSheet, View} from 'react-native';
 import Button from './../components/Button';
-import styles from './../styles';
 import {connect} from "react-redux";
 import get from 'lodash/get';
 import ElevatedView from 'react-native-elevated-view';
@@ -19,6 +18,7 @@ import DatePicker from './../components/DatePicker';
 import {Dialog} from 'react-native-ui-lib';
 import translations from './../utils/translations';
 import config from './../utils/config';
+import styles from './../styles';
 
 class AddFollowUpScreen extends PureComponent{
 
@@ -48,7 +48,7 @@ class AddFollowUpScreen extends PureComponent{
                     elevation={3}
                     style={{
                         flex: 1,
-                        backgroundColor: 'white',
+                        backgroundColor: styles.backgroundColor,
                         borderRadius: 4,
                         marginVertical: 10,
                     }}>
@@ -64,30 +64,29 @@ class AddFollowUpScreen extends PureComponent{
                         <DatePicker
                             id='followUpDate'
                             label={getTranslation(translations.addFollowUpScreen.followUpDateLabel, this.props.translation)}
-                            value={this.state.date.toISOString()}
+                            value={this.state.date}
                             isEditMode={true}
                             isRequired={false}
                             onChange={this.onDateChanged}
-                            style={{width: contentWidth, marginHorizontal, flex: 0.33}}
+                            style={{width: contentWidth, flex: 0.33}}
                             translation={this.props.translation}
                         />
                     </View>
                     <View style={{flex: 0.2, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>
                         <Button
                             title={getTranslation(translations.generalButtons.cancelButtonLabel, this.props.translation)}
-                            color="white"
-                            titleColor={"black"}
+                            style={styles.secondaryButton}
                             onPress={this.onCancelPressed}
-                            height={25}
-                            width="40%"
+                            height={35}
+                            width={165}
                         />
                         <Button
                             title={getTranslation(translations.generalButtons.saveButtonLabel, this.props.translation)}
-                            color={styles.buttonGreen}
-                            titleColor={'white'}
+                            color={styles.primaryColor}
+                            titleColor={styles.backgroundColor}
                             onPress={this.onSavePressed}
-                            height={25}
-                            width="40%"
+                            height={35}
+                            width={165}
                         />
                     </View>
                 </ElevatedView>
@@ -126,8 +125,8 @@ class AddFollowUpScreen extends PureComponent{
 const style = StyleSheet.create({
     container: {
         backgroundColor: 'transparent',
-        width: 200,
-        height: 200
+        height: 200,
+        width: 200
     }
 });
 

@@ -3,16 +3,21 @@
  */
 import React, {Component} from 'react';
 import {Platform, ScrollView, StyleSheet, Text, View, Linking} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
-import config from './../utils/config';
+import config, {sideMenuKeys} from './../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {logoutUser, updateUser} from './../actions/user';
+import {computeOutbreakSwitch, logoutUser, updateUser} from './../actions/user';
 import {changeAppRoot, getTranslationsAsync, saveSelectedScreen, sendDatabaseToServer} from './../actions/app';
-import styles from './../styles';
 import {Icon, ListItem} from 'react-native-material-ui';
 import DropdownInput from './../components/DropdownInput';
-import {getTranslation, updateRequiredFields} from './../utils/functions';
+import {
+    createStackFromComponent,
+    getTranslation,
+    mapSideMenuKeysToScreenName,
+    updateRequiredFields
+} from './../utils/functions';
 import translations from './../utils/translations';
 import VersionNumber from 'react-native-version-number';
 import PermissionComponent from './../components/PermissionComponent';
@@ -20,6 +25,11 @@ import constants from "../utils/constants";
 import lodashGet from 'lodash/get';
 import isNumber from 'lodash/isNumber';
 import LanguageComponent from "../components/LanguageComponent";
+import {Navigation} from "react-native-navigation";
+import {Dropdown} from "react-native-material-dropdown";
+import {getAllOutbreaks} from "../queries/outbreak";
+import {storeOutbreak} from "../actions/outbreak";
+import styles from './../styles';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -29,17 +39,33 @@ class NavigationDrawer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedScreen: this.props.selectedScreen
+            selectedScreen: this.props.selectedScreen,
+            outbreaks: []
         };
         // Bind here methods, or at least don't declare methods in the render method
         this.handlePressOnListItem = this.handlePressOnListItem.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
     }
 
+    componentWillMount() {
+        console.log("Get all outbreaks");
+        getAllOutbreaks((error, result)=>{
+            if(!error){
+                result.map(outbreak => {
+                    if(outbreak._id.includes("outbreak.json_")){
+                    outbreak._id = outbreak._id.substring(14, outbreak._id.length);
+                    return outbreak;
+                }})
+                this.setState({
+                    outbreaks: result
+                })
+            }
+        });
+    }
+
     // Please add here the react lifecycle methods that you need
     componentDidUpdate(prevProps) {
-        let thisPropsSelectedScreen = lodashGet(this.props, 'selectedScreen', 0);
-        if (isNumber(thisPropsSelectedScreen) && thisPropsSelectedScreen >= 0 && prevProps.selectedScreen !== this.props.selectedScreen) {
+        if (prevProps.selectedScreen !== this.props.selectedScreen) {
             this.setState({
                 selectedScreen: this.props.selectedScreen
             })
@@ -52,53 +78,94 @@ class NavigationDrawer extends Component {
         return (
             <View style={style.container}>
                 <View
-                    style={{
-                        flex: 0.2,
-                        marginTop: Platform.OS === 'ios' ? (this.props.screenSize.height === 812 ? 44 : 20) : 0,
-                        justifyContent: 'space-around'
-                    }}>
+                    style={[
+                        style.topNavContainer,
+                        {
+                            marginTop: Platform.OS === 'ios' ? (this.props.screenSize.height === 812 ? 44 : 20) : 0
+                        }
+                    ]}>
                         <ListItem
                             numberOfLines={2}
-                            leftElement={<Icon name="account-circle" size={38} color={styles.buttonGreen}/>}
+                            leftElement={<Icon name="account-circle" size={36} color={styles.primaryColor} />}
                             centerElement={{
                                 primaryText: (this.props.user && this.props.user.firstName ? (this.props.user.firstName + ' ') : ' ') + (this.props.user && this.props.user.lastName ? this.props.user.lastName : ' '),
                                 secondaryText: this.props.user && this.props.user.email ? this.props.user.email : ' '
                             }}
                             style={{
-                                primaryText: {fontFamily: 'Roboto-Medium', fontSize: 18},
-                                secondaryText: {fontFamily: 'Roboto-Regular', fontSize: 12},
-                                centerElementContainer: {height: '100%', justifyContent: 'center'}
+                                primaryText: {
+                                    color: styles.textColor, fontFamily: 'Roboto-Medium', fontSize: 18
+                                },
+                                secondaryText: {
+                                    color: styles.secondaryColor, fontFamily: 'Roboto-Regular', fontSize: 12
+                                },
+                                centerElementContainer: {
+                                    height: '100%', justifyContent: 'center'
+                                },
+                                container: {
+                                    borderBottomWidth: 1, borderBottomColor: styles.separatorColor
+                                }
                             }}
                         />
                     {
                         this.props && this.props.outbreak && this.props.outbreak.name ? (
-                            <View style={{marginHorizontal: 16}}>
-                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText}} numberOfLines={1}>{getTranslation(translations.navigationDrawer.activeOutbreak, this.props.translation)}</Text>
-                                <Text style={{fontFamily: 'Roboto-Medium', fontSize: 15, color: styles.navigationDrawerItemText}} numberOfLines={1}>{this.props.outbreak.name}</Text>
+                            <View style={style.activeOutbreakContainer}>
+                                <Dropdown
+                                    useNativeDriver={true}
+                                    label={getTranslation(translations.navigationDrawer.activeOutbreak, this.props.translation)}
+                                    value={this.props.outbreak?._id}
+                                    labelExtractor={element => element.name}
+                                    valueExtractor={element => element._id}
+                                    containerStyle={{
+                                        marginBottom: 0
+                                    }}
+                                    inputContainerStyle={{
+                                        borderBottomColor: 'transparent',
+                                        paddingHorizontal: 16
+                                    }}
+                                    labelTextStyle={{
+                                        marginLeft: 16
+                                    }}
+                                    pickerStyle={{
+                                        marginLeft: 0,
+                                        width: '80%'
+                                    }}
+                                    selectedItemColor={styles.primaryColor}
+                                    disabled={!!this.props.outbreak?.disableOutbreakChange}
+                                    data={this.state.outbreaks}
+                                    onChangeText={(value,index,data)=>{
+                                        // computeCommonData()
+                                        // this.props.storeOutbreak(data[index]);
+                                        AsyncStorage.setItem("outbreakId",value);
+                                        this.props.computeOutbreakSwitch(this.props.user, value);
+                                    }}
+                                />
                             </View>
                         ) : (null)
                     }
-                    <View style={styles.lineStyle} />
                 </View>
-
+                
                 <ScrollView scrollEnabled={true} style={{flex: 0.9}} contentContainerStyle={{flexGrow: 1}}>
                     {
-                        config.sideMenuItems.map((item, index) => {
+                        Object.keys(config.sideMenuItems).map((item, index) => {
                             let addButton = false;
 
-                            if (item.key === 'cases') {
+                            if (item === sideMenuKeys[3]) {
                                 addButton = true;
+                            }
+
+                            if(item === 'contactsOfContacts' && !(this.props.outbreak && this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC])) {
+                                return (<></>);
                             }
 
                             return (
                                 <NavigationDrawerListItem
                                     key={index}
-                                    itemKey={item.key}
-                                    label={getTranslation(item.label, this.props.translation)}
-                                    name={item.name}
-                                    onPress={() => this.handlePressOnListItem(index)}
-                                    handleOnPressAdd={() => this.handleOnPressAdd(item.key, index)}
-                                    isSelected={index === this.state.selectedScreen}
+                                    itemKey={item}
+                                    label={getTranslation(config.sideMenuItems[item].label, this.props.translation)}
+                                    name={config.sideMenuItems[item].name}
+                                    onPress={() => this.handlePressOnListItem(item)}
+                                    handleOnPressAdd={() => this.handleOnPressAdd(item, index)}
+                                    isSelected={item === this.state.selectedScreen}
                                     addButton={addButton}
                                 />
                             )
@@ -108,12 +175,12 @@ class NavigationDrawer extends Component {
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.syncHubManually, this.props.translation)} name={'cached'} onPress={this.handleOnPressSync} />
                     <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.changeHubConfig, this.props.translation)} name={'settings'} onPress={this.handleOnPressChangeHubConfig} />
                     <View style={styles.lineStyle} />
-                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <View style={style.languageContainer}>
                         <PermissionComponent
                             render={() => (
                                 <LanguageComponent
                                     style={{width: '90%'}}
-                                    navigator={this.props.navigator}
+                                    componentId={this.props.componentId}
                                 />
 
                                 //<DropdownInput
@@ -135,22 +202,23 @@ class NavigationDrawer extends Component {
                             ]}
                         />
                     </View>
+                    <View style={styles.lineStyle} />
                     <NavigationDrawerListItem
                         label={getTranslation(translations.navigationDrawer.usersLabel, this.props.translation)}
                         name={'contact-phone'}
-                        key={4}
-                        onPress={() => this.handlePressOnListItem(4)}
-                        isSelected={4 === this.state.selectedScreen}
+                        key={sideMenuKeys[6]}
+                        onPress={() => this.handlePressOnListItem(sideMenuKeys[6])}
+                        isSelected={sideMenuKeys[6] === this.state.selectedScreen}
                         addButton={false}
-                        itemKey={'users'}
+                        itemKey={sideMenuKeys[6]}
                     />
 
                     <NavigationDrawerListItem
-                        key={'help'}
+                        key={sideMenuKeys[7]}
                         label={getTranslation(translations.navigationDrawer.helpLabel, this.props.translation)}
-                        name="help"
-                        onPress={() => this.handlePressOnListItem('help')}
-                        isSelected={'help' === this.state.selectedScreen}
+                        name={sideMenuKeys[7]}
+                        onPress={() => this.handlePressOnListItem(sideMenuKeys[7])}
+                        isSelected={sideMenuKeys[7] === this.state.selectedScreen}
                     />
                     <NavigationDrawerListItem
                         key={'community'}
@@ -158,16 +226,28 @@ class NavigationDrawer extends Component {
                         name="open-in-browser"
                         onPress={this.handleCommunity}
                     />
-                    <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)} name="power-settings-new" onPress={this.handleLogout} />
-                    <Text
-                        style={{
-                            color: styles.navigationDrawerItemText,
-                            fontFamily: 'Roboto-Medium',
-                            fontSize: 14,
-                            // marginTop: 10,
-                            marginHorizontal: 16
+                    <ListItem
+                        onPress={this.handleLogout}
+                        numberOfLines={1}
+                        leftElement={<Icon name="power-settings-new" color={styles.dangerColor} />}
+                        centerElement={{
+                            primaryText: getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)
                         }}
-                    >
+                        style={{
+                            leftElementContainer: {
+                                marginLeft: 16
+                            },
+                            centerElementContainer: {
+                                marginLeft: -16
+                            },
+                            primaryText: {
+                                color: styles.dangerColor,
+                                fontFamily: 'Roboto-Medium',
+                                fontSize: 16
+                            }
+                        }}
+                    />
+                    <Text style={style.version}>
                         {`Version: ${VersionNumber.appVersion} - build ${VersionNumber.buildVersion}`}
                     </Text>
                 </ScrollView>
@@ -181,14 +261,18 @@ class NavigationDrawer extends Component {
         this.setState({
             selectedScreen: index
             }, () => {
-                this.props.navigator.toggleDrawer({
-                    side: 'left',
-                    animated: true,
-                    to: 'missing'
-                });
-                this.props.navigator.handleDeepLink({
-                    link: 'Navigate/' + index
-                })
+            Navigation.setStackRoot('CenterStack', {
+                component: {
+                    name: mapSideMenuKeysToScreenName(index).screenToSwitchTo,
+                    options: {
+                        sideMenu: {
+                            left: {
+                                visible: false
+                            }
+                        }
+                    }
+                }
+            });
             });
        
     };
@@ -199,24 +283,30 @@ class NavigationDrawer extends Component {
 
     handleOnPressAdd = (key, index) => {
         console.log('handleOnPressAdd', key, index);
-        this.props.saveSelectedScreen(index);
+        this.props.saveSelectedScreen(key);
         this.setState({
-            selectedScreen: index
+            selectedScreen: key
         }, () => {
-            this.props.navigator.toggleDrawer({
-                side: 'left',
-                animated: true,
-                to: 'missing'
-            });
             switch(key) {
                 case 'contacts':
-                    this.props.navigator.handleDeepLink({
-                        link: 'Navigate/' + index + '-add'
-                    });
-                    break;
                 case 'cases':
-                    this.props.navigator.handleDeepLink({
-                        link: 'Navigate/' + index + '-add'
+                    console.log("Here");
+                    Navigation.push('CenterStack', {
+                        component: {
+                            name: mapSideMenuKeysToScreenName(`${key}-add`).screenToSwitchTo,
+                            options: {
+                                sideMenu: {
+                                    left: {
+                                        visible: false
+                                    }
+                                }
+                            },
+                            passProps: {
+                                isNew: true,
+                                isAddFromNavigation: true,
+                                refresh: () => {console.log('Default refresh')}
+                            }
+                        }
                     });
                     break;
                 default:
@@ -228,32 +318,39 @@ class NavigationDrawer extends Component {
     };
 
     handleOnPressSync = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'missing'
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: false,
+                },
+            },
         });
         this.props.sendDatabaseToServer();
     };
 
     handleOnPressChangeHubConfig = () => {
-        this.props.navigator.toggleDrawer({
-            side: 'left',
-            animated: true,
-            to: 'missing'
+        console.log("Pressed it");
+        Navigation.mergeOptions(this.props.componentId, {
+            sideMenu: {
+                left: {
+                    visible: false,
+                },
+            },
         });
-        this.props.navigator.showModal({
-            screen: 'HubConfigScreen',
-            animated: true
-        })
+        Navigation.showModal(createStackFromComponent({
+            name: 'HubConfigScreen',
+            passProps: {
+                stackComponentId: this.props.componentId
+            }
+        }))
     };
 
     handleOnChangeLanguage = (value, label) => {
         let user = Object.assign({}, this.props.user);
         user.languageId = value;
-        this.props.getTranslationsAsync(value);
+        this.props.getTranslationsAsync(value, user?.activeOutbreakId);
 
-        user = updateRequiredFields(user.activeOutbreakId, user._id, user, 'update');
+        user = updateRequiredFields(this.props.outbreak._id, user._id, user, 'update');
 
         this.props.updateUser(user);
     };
@@ -267,15 +364,28 @@ class NavigationDrawer extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
+        backgroundColor: styles.backgroundColor,
         flex: 1,
-        width: '100%',
-        backgroundColor: 'white'
+        width: '100%'
     },
-    textInput: {
-        borderColor: 'red',
-        borderWidth: 1,
-        borderRadius: 20,
-        flex: 1
+    topNavContainer: {
+        borderBottomWidth: 1,
+        borderBottomColor: styles.separatorColor
+    },
+    activeOutbreakContainer: {
+        backgroundColor: styles.backgroundColorRgb
+    },
+    languageContainer: {
+        alignItems: 'center',
+        backgroundColor: styles.backgroundColorRgb,
+        justifyContent: 'center'
+    },
+    version: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Light',
+        fontSize: 12,
+        marginBottom: 8,
+        paddingLeft: 18
     }
 });
 
@@ -286,7 +396,7 @@ function mapStateToProps(state) {
         screenSize: lodashGet(state, 'app.screenSize', config.designScreenSize),
         selectedScreen: lodashGet(state, 'app.selectedScreen', 0),
         availableLanguages: lodashGet(state, 'app.availableLanguages', []),
-        outbreak: lodashGet(state, 'outbreak', {name: ''}),
+        outbreak: lodashGet(state, 'outbreak', {name: 'No outbreak', disableOutbreakChange: false}),
         translation: lodashGet(state, 'app.translation', [])
     };
 }
@@ -298,7 +408,9 @@ function matchDispatchProps(dispatch) {
         updateUser,
         getTranslationsAsync,
         changeAppRoot,
-        saveSelectedScreen
+        saveSelectedScreen,
+        storeOutbreak,
+        computeOutbreakSwitch,
     }, dispatch);
 }
 

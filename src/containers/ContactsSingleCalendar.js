@@ -6,7 +6,6 @@
 import React, {Component} from 'react';
 import {InteractionManager, StyleSheet, View} from 'react-native';
 import {connect} from "react-redux";
-import styles from './../styles';
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import FollowUpAgenda from './../components/FollowUpAgenda';
@@ -16,6 +15,13 @@ import TopContainerButtons from "./../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
 import config from "./../utils/config";
+import {
+    PERMISSION_CREATE_CONTACT,
+    PERMISSION_CREATE_CONTACT_OF_CONTACT,
+    PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
+} from "../utils/constants";
+import translations from "../utils/translations";
+import styles from './../styles';
 
 class ContactsSingleCalendar extends Component {
 
@@ -37,7 +43,7 @@ class ContactsSingleCalendar extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.activeIndex === 3) {
+        if (nextProps.routeKey === 'calendar') {
             return true;
         }
         return false;
@@ -49,7 +55,10 @@ class ContactsSingleCalendar extends Component {
     render() {
         if(!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'}/>
+                <LoaderScreen
+                    overlay={true}
+                    loaderColor={styles.primaryColor}
+                    backgroundColor={'rgba(255, 255, 255, 0.8)'} />
             )
         }
 
@@ -58,39 +67,15 @@ class ContactsSingleCalendar extends Component {
         let followUps = this.computeFollowUps();
         // console.log("### ContactsSingleCalendar: ", followUps);
 
-        let permissionsList = [
-            constants.PERMISSIONS_CONTACT.contactAll
-        ];
+        let permissionsList = [];
         if (this.props.isNew) {
-            permissionsList.push(
-                constants.PERMISSIONS_CONTACT.contactCreate
-            )
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_CREATE_CONTACT_OF_CONTACT : PERMISSION_CREATE_CONTACT;
         } else {
-            permissionsList.push(
-                constants.PERMISSIONS_CONTACT.contactModify
-            )
+            permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_EDIT_CONTACT_OF_CONTACT : PERMISSION_EDIT_CONTACT;
         }
 
         return (
-            <ElevatedView elevation={3} style={[style.container]}>
-                <View style = {{alignItems: 'center'}}>
-                    <PermissionComponent
-                        render={() => (
-                            <TopContainerButtons
-                                isNew={this.props.isNew}
-                                isEditMode={this.props.isEditMode}
-                                index={this.props.activeIndex}
-                                numberOfTabs={this.props.numberOfTabs}
-                                onPressEdit={this.props.onPressEdit}
-                                onPressSaveEdit={this.props.onPressSaveEdit}
-                                onPressCancelEdit={this.props.onPressCancelEdit}
-                                onPressNextButton={this.props.onPressNextButton}
-                                onPressPreviousButton={this.props.onPressPreviousButton}
-                            />
-                        )}
-                        permissionsList={permissionsList}
-                    />
-                </View>
+            <ElevatedView elevation={5} style={[style.container]}>
                 <FollowUpAgenda
                     contact={this.props.contact}
                     followUps={followUps}
@@ -122,9 +107,9 @@ class ContactsSingleCalendar extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
-        borderRadius: 2
+        backgroundColor: styles.screenBackgroundColor,
+        borderRadius: 4,
+        flex: 1
     }
 });
 

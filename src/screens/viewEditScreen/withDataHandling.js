@@ -13,14 +13,12 @@ import lodashCloneDeep from "lodash/cloneDeep";
 import {checkArray, checkArrayAndLength, checkInteger, checkObject} from './../../utils/typeCheckingFunctions';
 import {extractAllQuestions, extractIdFromPouchId} from "../../utils/functions";
 import _, {sortBy} from "lodash";
+import {Navigation} from "react-native-navigation";
+import cloneDeep from "lodash/cloneDeep";
 
 export function enhanceTabsWithDataHandling() {
     return function withEditHandling(WrappedComponent) {
         class ViewEditScreenContainer extends Component {
-
-            static navigatorStyle = {
-                navBarHidden: true
-            };
 
             constructor(props) {
                 super(props);
@@ -273,7 +271,7 @@ export function enhanceTabsWithDataHandling() {
                                 if (value) {
                                     getLocationAccurate()
                                         .then((position) => {
-                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.lng : 0, value ? position.lat : 0];
+                                            addressesClone[objectTypeOrIndex].geoLocation.coordinates = [value ? position.lng : '', value ? position.lat : ''];
                                             this.generalUpdate({addresses: addressesClone});
                                         })
                                         .catch((errorGetLocation) => {
@@ -382,10 +380,10 @@ export function enhanceTabsWithDataHandling() {
                     addressLine2: '',
                     postalCode: '',
                     locationId: '',
-                    geoLocation: {
-                        coordinates: [0, 0],
-                        type: 'Point'
-                    },
+                    // geoLocation: {
+                    //     coordinates: ['', ''],
+                    //     type: 'Point'
+                    // },
                     date: createDate(null)
                 });
 
@@ -423,7 +421,7 @@ export function enhanceTabsWithDataHandling() {
                     let addresses = lodashGet(this.state, 'editableElement.addresses', []);
                     lodashSet(addresses, `[${index}].locationId`, extractIdFromPouchId(selectedItems['0']._id, 'location'));
                     if (checkArray(lodashGet(selectedItems, `[0].geoLocation.coordinates`, null))) {
-                        if (lodashGet(selectedItems, `[0].geoLocation.coordinates[0]`) !== 0 || lodashGet(selectedItems, `[0].geoLocation.coordinates[1]`) !== 0) {
+                        if (lodashGet(selectedItems, `[0].geoLocation.coordinates[0]`) !== '' || lodashGet(selectedItems, `[0].geoLocation.coordinates[1]`) !== '') {
                             setTimeout(() => {
                                 Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
                                     {
@@ -628,102 +626,14 @@ export function enhanceTabsWithDataHandling() {
             onChangeSingleSelection = (value, id, parentId, index) => {
 
                 this.onChangeAnswerGeneral(value, id, parentId, index);
-                // let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
-                //
-                // if (parentId) {
-                //     if (!questionnaireAnswers[parentId]) {
-                //         questionnaireAnswers[parentId] = [];
-                //     }
-                //     if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
-                //         if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
-                //             questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
-                //         }
-                //         if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
-                //             questionnaireAnswers[parentId][0].subAnswers = {};
-                //         }
-                //         if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
-                //             questionnaireAnswers[parentId][0].subAnswers[id] = [];
-                //         }
-                //         questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                //     }
-                // } else {
-                //     if (!questionnaireAnswers[id]) {
-                //         questionnaireAnswers[id] = [];
-                //     }
-                //     questionnaireAnswers[id][0] = value;
-                // }
-                // this.setState(prevState => ({
-                //         previousAnswers: questionnaireAnswers,
-                //         isModified: true
-                //     })
-                // )
             };
             onChangeMultipleSelection = (value, id, parentId, index) => {
                 this.onChangeAnswerGeneral(value, id, parentId, index);
 
-                // let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
-                //
-                // if (parentId) {
-                //     if (!questionnaireAnswers[parentId]) {
-                //         questionnaireAnswers[parentId] = [];
-                //     }
-                //     if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
-                //         if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
-                //             questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
-                //         }
-                //         if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
-                //             questionnaireAnswers[parentId][0].subAnswers = {};
-                //         }
-                //         if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
-                //             questionnaireAnswers[parentId][0].subAnswers[id] = [];
-                //         }
-                //         questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                //     }
-                // } else {
-                //     if (!questionnaireAnswers[id]) {
-                //         questionnaireAnswers[id] = [];
-                //     }
-                //     questionnaireAnswers[id][0] = value;
-                // }
-                // this.setState(prevState => ({
-                //         previousAnswers: questionnaireAnswers,
-                //         isModified: true
-                //     })
-                // )
             };
             onChangeDateAnswer = (value, id, parentId, index) => {
                 this.onChangeAnswerGeneral(value, id, parentId, index);
 
-                // let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
-                //
-                // if (parentId) {
-                //     if (!questionnaireAnswers[parentId]) {
-                //         questionnaireAnswers[parentId] = [];
-                //     }
-                //     if (questionnaireAnswers[parentId] && Array.isArray(questionnaireAnswers[parentId]) && questionnaireAnswers[parentId].length > 0 && questionnaireAnswers[parentId][0]) {
-                //         if(!questionnaireAnswers[parentId][0].hasOwnProperty("subAnswers")){
-                //             questionnaireAnswers[parentId][0] = Object.assign({}, questionnaireAnswers[parentId][0],{ subAnswers: {}});
-                //         }
-                //         if (typeof questionnaireAnswers[parentId][0].subAnswers === "object" && Object.keys(questionnaireAnswers[parentId][0].subAnswers).length === 0) {
-                //             questionnaireAnswers[parentId][0].subAnswers = {};
-                //         }
-                //         if (!questionnaireAnswers[parentId][0].subAnswers[id]) {
-                //             questionnaireAnswers[parentId][0].subAnswers[id] = [];
-                //         }
-                //         questionnaireAnswers[parentId][0].subAnswers[id][0] = value;
-                //     }
-                // } else {
-                //     if (!questionnaireAnswers[id]) {
-                //         questionnaireAnswers[id] = [];
-                //     }
-                //     questionnaireAnswers[id][index] = value;
-                // }
-                // this.setState({
-                //     previousAnswers: questionnaireAnswers,
-                //     isModified: true
-                // }, () => {
-                //     // console.log ('onChangeDateAnswer after setState', this.state.previousAnswers);
-                // })
             };
             onChangeAnswerDate = (value, questionId, index) => {
                 let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
@@ -801,16 +711,26 @@ export function enhanceTabsWithDataHandling() {
                     previousAnswers: Object.assign({}, prevState.previousAnswers, { [previousAnswersId]: previousAnswers }),
                     isModified: true
                 }), () => {
-                    this.props.navigator.dismissAllModals();
+                    Navigation.dismissAllModals();
                 })
             };
             copyAnswerDate = (value) => {
                 let previousAnswersClone = _.cloneDeep(this.state.previousAnswers);
-                for(let questionId in previousAnswersClone) {
-                    if(previousAnswersClone.hasOwnProperty(questionId)) {
-                        previousAnswersClone[questionId] = previousAnswersClone[questionId].map((e) => {
-                            return {date: e.date === null ? createDate(value).toISOString() : e.date, value: e.value};
-                        });
+                let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
+                sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswersClone, 0);
+
+                for (let question of sortedQuestions){
+                    if (question.variable && question.answerType !== "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP"){
+                        if (previousAnswersClone[question.variable]){
+                            previousAnswersClone[question.variable] = previousAnswersClone[question.variable].map((e) => {
+                                return Object.assign(e, {date: e.date || createDate(value).toISOString()})
+                            })
+                        } else {
+                            previousAnswersClone[question.variable] = [{
+                                date: createDate(value).toISOString(),
+                                value: null
+                            }]
+                        }
                     }
                 }
                 this.setState({

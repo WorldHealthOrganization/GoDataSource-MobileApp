@@ -5,7 +5,6 @@ import {bindActionCreators} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
-import styles from './../styles';
 import NavBarCustom from './../components/NavBarCustom';
 import {extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
@@ -13,11 +12,11 @@ import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
 import FiltersContainer from './../containers/FiltersContainer';
 import SortContainer from './../containers/SortContainer';
 import translations from './../utils/translations';
+import {Navigation} from "react-native-navigation";
+import throttle from 'lodash/throttle';
+import styles from './../styles';
 
 class FilterScreen extends Component {
-    static navigatorStyle = {
-        navBarHidden: true
-    };
 
     constructor(props) {
         super(props);
@@ -25,13 +24,21 @@ class FilterScreen extends Component {
             filter: {
                 filter: {
                     gender: {
-                        Male: false,
-                        Female: false
+                        [translations.localTranslationTokens.male]: false,
+                        [translations.localTranslationTokens.female]: false
                     },
-                    age: [0, 150],
+                    age: null,
                     selectedLocations: [],
+                    selectedIndexDay: null,
                     classification: [],
-                    categories: []
+                    categories: [],
+                    vaccines: [],
+                    vaccineStatuses: [],
+                    pregnancyStatuses: [],
+                    type: {
+                        [translations.personTypes.cases]: false,
+                        [translations.personTypes.contacts]: false
+                    }
                 },
                 sort: []
             },
@@ -51,8 +58,8 @@ class FilterScreen extends Component {
         const { activeFilters, translation, screen } = this.props;
 
         const { tabsValuesRoutes, localTranslationTokens } = config;
-        const { sortOrderDropDownItems, sortCriteriaDropDownItems, helpItemsSortCriteriaDropDownItems } = config;
-        const { followUpsFilterScreen, casesFilterScreen, helpFilterScreen } = config;
+        const { sortOrderDropDownItems, sortCriteriaDropDownItems, eventSortCriteriaDropDownItems, helpItemsSortCriteriaDropDownItems } = config;
+        const { followUpsFilterScreen,personFilterScreen, contactFilterScreen, casesFilterScreen, helpFilterScreen, labResultsFilterScreen, eventsFilterScreen, labResultsFilterScreenNoContactPermission } = config;
 
         let filterClone = cloneDeep(filter.filter);
         let sortClone = cloneDeep(filter.sort);
@@ -64,18 +71,34 @@ class FilterScreen extends Component {
 
         if (activeFilters !== undefined && activeFilters !== null) {
             if (activeFilters.gender) {
-                if (activeFilters.gender === localTranslationTokens.male && filterClone.gender.Male === false) {
-                    filterClone.gender.Male = true
-                    filterClone.gender.Female = false
-                } else if (activeFilters.gender === localTranslationTokens.female && filterClone.gender.Female === false) {
-                    filterClone.gender.Female = true
-                    filterClone.gender.Male = false
+                if (activeFilters.gender === localTranslationTokens.male && filterClone.gender[localTranslationTokens.male] === false) {
+                    filterClone.gender[localTranslationTokens.male] = true
+                    filterClone.gender[localTranslationTokens.female] = false
+                } else if (activeFilters.gender === localTranslationTokens.female && filterClone.gender[localTranslationTokens.female] === false) {
+                    filterClone.gender[localTranslationTokens.female] = true
+                    filterClone.gender[localTranslationTokens.male] = false
+                } else if(activeFilters.gender.$in) {
+                    filterClone.gender[localTranslationTokens.female] = true
+                    filterClone.gender[localTranslationTokens.male] = true
                 }
             }
 
+            if (activeFilters.type){
+                Object.keys(filterClone.type).forEach(key=>{
+                    if(!activeFilters.type.includes(key)){
+                        filterClone.type[key] = false;
+                    } else {
+                        filterClone.type[key] = true;
+                    }
+                })
+            }
+
             if (activeFilters.age && Array.isArray(activeFilters.age) && activeFilters.age.length === 2) {
-                filterClone.age[0] = activeFilters.age[0];
-                filterClone.age[1] = activeFilters.age[1];
+                filterClone.age = [activeFilters.age[0], activeFilters.age[1]]
+            }
+
+            if (activeFilters.selectedIndexDay && activeFilters.selectedIndexDay !== '') {
+                filterClone.selectedIndexDay = [activeFilters.selectedIndexDay[0], activeFilters.selectedIndexDay[1]]
             }
 
             if (activeFilters.selectedLocations && Array.isArray(activeFilters.selectedLocations) && activeFilters.selectedLocations.length > 0) {
@@ -89,6 +112,15 @@ class FilterScreen extends Component {
             if (activeFilters.categories && Array.isArray(activeFilters.categories)) {
                 filterClone.categories = activeFilters.categories;
             }
+            if (activeFilters.vaccines && Array.isArray(activeFilters.vaccines)) {
+                filterClone.vaccines = activeFilters.vaccines;
+            }
+            if (activeFilters.vaccineStatuses && Array.isArray(activeFilters.vaccineStatuses)) {
+                filterClone.vaccineStatuses = activeFilters.vaccineStatuses;
+            }
+            if (activeFilters.pregnancyStatuses && Array.isArray(activeFilters.pregnancyStatuses)) {
+                filterClone.pregnancyStatuses = activeFilters.pregnancyStatuses;
+            }
 
             if (activeFilters.sort && activeFilters.sort !== undefined && Array.isArray(activeFilters.sort) && activeFilters.sort.length > 0) {
                 sortClone = activeFilters.sort
@@ -98,8 +130,14 @@ class FilterScreen extends Component {
         switch (screen) {
             case 'ContactsScreen':
                 screenTitle = getTranslation(translations.followUpFilter.contactFilterTitle, translation);
-                routes = tabsValuesRoutes.followUpsFilter;
-                configFilterScreen = followUpsFilterScreen;
+                routes = tabsValuesRoutes.personFilter;
+                configFilterScreen = contactFilterScreen;
+                mySortCriteriaDropDownItems = sortCriteriaDropDownItems;
+                break;
+            case 'ContactsOfContactsScreen':
+                screenTitle = getTranslation(translations.followUpFilter.contactFilterTitle, translation);
+                routes = tabsValuesRoutes.personFilter;
+                configFilterScreen = personFilterScreen;
                 mySortCriteriaDropDownItems = sortCriteriaDropDownItems;
                 break;
             case 'FollowUpsScreen':
@@ -114,11 +152,23 @@ class FilterScreen extends Component {
                 configFilterScreen = casesFilterScreen;
                 mySortCriteriaDropDownItems = sortCriteriaDropDownItems;
                 break;
+            case 'EventsScreen':
+                screenTitle = getTranslation(translations.eventsFilter.eventsFilterTitle, translation);
+                routes = tabsValuesRoutes.eventsFilter;
+                configFilterScreen = eventsFilterScreen;
+                mySortCriteriaDropDownItems = eventSortCriteriaDropDownItems;
+                break;
             case 'HelpFilterScreen':
                 screenTitle = getTranslation(translations.helpFilter.helpFilterTitle, translation);
                 routes = tabsValuesRoutes.helpFilter;
                 configFilterScreen = helpFilterScreen;
                 mySortCriteriaDropDownItems = helpItemsSortCriteriaDropDownItems;
+                break;
+            case 'LabResultsScreen':
+                screenTitle = getTranslation(translations.labResultsFilter.filterTitle, translation);
+                routes = this.props.outbreak?.isContactLabResultsActive ? tabsValuesRoutes.labResultsFilter : tabsValuesRoutes.labResultsFilterNoFilter;
+                configFilterScreen = this.props.outbreak?.isContactLabResultsActive ? labResultsFilterScreen : labResultsFilterScreenNoContactPermission;
+                mySortCriteriaDropDownItems = sortCriteriaDropDownItems;
                 break;
             default:
                 screenTitle = getTranslation(translations.followUpFilter.contactFilterTitle, translation);
@@ -145,13 +195,13 @@ class FilterScreen extends Component {
 
     render() {
         const { screenTitle } = this.state;
-        const { navigator } = this.props;
+        const { componentId } = this.props;
 
         return (
             <View style={style.container}>
                 <NavBarCustom
                     title={screenTitle}
-                    navigator={navigator}
+                    componentId={componentId}
                     iconName="close"
                     handlePressNavbarButton={this.handlePressNavbarButton}
                 />
@@ -194,6 +244,7 @@ class FilterScreen extends Component {
                             onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
                             onChangeInterval={this.handleOnChangeInterval}
                             onChangeMultipleSelection={this.handleOnChangeMultipleSelection}
+                            onChangeText={this.handleOnChangeText}
 
                         />
                     );
@@ -228,37 +279,35 @@ class FilterScreen extends Component {
             <TabBar
                 {...props}
                 indicatorStyle={{
-                    backgroundColor: styles.buttonGreen,
+                    backgroundColor: styles.primaryColor,
                     height: 2
                 }}
                 style={{
-                    height: 41,
-                    backgroundColor: 'white'
+                    height: 36,
+                    backgroundColor: styles.backgroundColor
                 }}
+                tabStyle={{
+                    paddingHorizontal: 16,
+                    marginHorizontal: 0,
+                    textAlign: 'center'
+                }}
+                activeColor={styles.primaryColor}
+                inactiveColor={styles.secondaryColor}
                 renderLabel={this.handleRenderLabel(props)}
             />
         )
     };
 
-    handleRenderLabel = (props) => ({ route, index }) => {
+    handleRenderLabel = (props) => ({ route, focused }) => {
         const { translation } = this.props;
 
         if (props.navigationState.routes !== null) {
-            const inputRange = props.navigationState.routes.map((x, i) => i);
-
-            const outputRange = inputRange.map(
-                inputIndex => (inputIndex === index ? styles.colorLabelActiveTab : styles.colorLabelInactiveTab)
-            );
-            const color = props.position.interpolate({
-                inputRange,
-                outputRange: outputRange,
-            });
 
             return (
                 <Animated.Text style={{
                     fontFamily: 'Roboto-Medium',
                     fontSize: 12,
-                    color: color,
+                    color: styles.textColor,
                     flex: 1,
                     alignSelf: 'center'
                 }}>
@@ -273,20 +322,20 @@ class FilterScreen extends Component {
 
     // Buttons action
     handlePressNavbarButton = () => {
-        const { navigator } = this.props;
-        navigator.dismissModal();
+        Navigation.dismissModal(this.props.componentId);
     };
 
-    handleResetFilters = () => {
-        const { navigator, screen, onApplyFilters, removeFilterForScreen } = this.props;
+    handleResetFilters = async () => {
+        const { componentId, screen, onApplyFilters, removeFilterForScreen } = this.props;
 
         removeFilterForScreen(screen);
-        navigator.dismissModal(onApplyFilters(null));
+        await Navigation.dismissModal(componentId);
+        onApplyFilters(null);
     };
 
-    handleOnIndexChange = (index) => {
+    handleOnIndexChange = throttle((index) => {
         this.setState({ index });
-    };
+    }, 300);
 
     handleMoveToNextScreenButton = () => {
         const { index } = this.state;
@@ -300,41 +349,65 @@ class FilterScreen extends Component {
         this.handleOnIndexChange(nextIndex)
     };
 
-    handleOnPressApplyFilters = () => {
+    handleOnPressApplyFilters = async () => {
         const { filter } = this.state;
         const { localTranslationTokens } = config;
-        const { addFilterForScreen, screen, navigator, onApplyFilters } = this.props;
+        const { addFilterForScreen, screen, componentId, onApplyFilters } = this.props;
 
         let filterStateClone = Object.assign({}, filter.filter);
         let filterSortClone = filter.sort.slice()
         let filterClone = {};
 
-        if (filterStateClone.gender.Male && !filterStateClone.gender.Female) {
+        console.log("Important cases filter state clone", filterStateClone);
+        if (filterStateClone.gender[localTranslationTokens.male] && !filterStateClone.gender[localTranslationTokens.female]) {
             filterClone.gender = localTranslationTokens.male
         }
-        if (filterStateClone.gender.Female && !filterStateClone.gender.Male) {
+        if (filterStateClone.gender[localTranslationTokens.female] && !filterStateClone.gender[localTranslationTokens.male]) {
             filterClone.gender = localTranslationTokens.female
         }
+        if (filterStateClone.gender[localTranslationTokens.female] && filterStateClone.gender[localTranslationTokens.male]){
+            filterClone.gender = {
+                $in: [localTranslationTokens.male, localTranslationTokens.female]
+            };
+        }
+        filterClone.type = []
+        Object.keys(filterStateClone.type).forEach(k=>{
+            if(filterStateClone.type[k]){
+                filterClone.type.push(k);
+            }
+        });
         if (filterStateClone.age) {
             filterClone.age = filterStateClone.age;
         }
         if (filterStateClone.selectedLocations) {
             filterClone.selectedLocations = filterStateClone.selectedLocations;
         }
+        if (filterStateClone.selectedIndexDay) {
+            filterClone.selectedIndexDay = filterStateClone.selectedIndexDay;
+        }
         if (filterStateClone.classification) {
-            if (filterStateClone.classification.length > 0) {
-                filterClone.classification = filterStateClone.classification.map((e) => get(e, 'value', null));
-            }
+            filterClone.classification = filterStateClone.classification;
         }
         if (filterStateClone.categories) {
             filterClone.categories = filterStateClone.categories;
         }
+        if (filterStateClone.vaccines) {
+            filterClone.vaccines = filterStateClone.vaccines;
+        }
+        if (filterStateClone.vaccineStatuses) {
+            filterClone.vaccineStatuses = filterStateClone.vaccineStatuses;
+        }
+        if (filterStateClone.pregnancyStatuses) {
+            filterClone.pregnancyStatuses = filterStateClone.pregnancyStatuses;
+        }
+
         if (filterSortClone && filterSortClone.length > 0) {
             filterClone.sort = filterSortClone;
         }
 
         addFilterForScreen(screen, filterClone);
-        navigator.dismissModal(onApplyFilters(filterClone));
+        await Navigation.dismissModal(componentId);
+        onApplyFilters(filterClone)
     };
 
 
@@ -390,7 +463,9 @@ class FilterScreen extends Component {
     handleOnSelectItem = (item, index, id) => {
         console.log("### handleOnSelectItem: ", item, index, id);
         let filter = Object.assign({}, this.state.filter.filter);
-        filter[id][item.value] = !filter[id][item.value];
+        console.log("HUUUH?", filter);
+        filter[id][item.value] = !item.selected;
+        console.log("Filter?", filter);
         this.setState(prevState => ({
             filter: Object.assign({}, prevState.filter, Object.assign({}, prevState.filter.filter, { [id]: filter[id] }))
         }))
@@ -407,6 +482,12 @@ class FilterScreen extends Component {
             console.log("Filters: ", this.state.filter.filter);
         })
     };
+
+    handleOnChangeText = (text, id) => {
+        this.setState(prevState => ({
+            filter: Object.assign({}, prevState.filter, { filter: Object.assign({}, prevState.filter.filter, { [id]: text }) })
+        }))
+    }
 
     handleOnChangeInterval = (values, id) => {
         this.setState(prevState => ({
@@ -425,15 +506,16 @@ class FilterScreen extends Component {
 
 const style = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: styles.backgroundColor,
+        flex: 1
     }
 });
 
 function mapStateToProps(state) {
     return {
         screenSize: get(state, 'app.screenSize', config.designScreenSize),
-        translation: get(state, 'app.translation', [])
+        translation: get(state, 'app.translation', []),
+        outbreak: get(state, 'outbreak', null)
     };
 }
 

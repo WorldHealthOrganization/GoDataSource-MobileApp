@@ -8,15 +8,16 @@ import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {calculateDimension, createDate, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import styles from './../styles';
 import CardComponent from './../components/CardComponent';
-import Ripple from 'react-native-material-ripple';
+import Button from './../components/Button';
 import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations'
 import _ from 'lodash';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
+import {checkArray} from "../utils/typeCheckingFunctions";
+import styles from './../styles';
 
 class CaseSinglePersonalContainer extends Component {
 
@@ -29,10 +30,11 @@ class CaseSinglePersonalContainer extends Component {
 
     // Please add here the react lifecycle methods that you need
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 0) {
-            return true;
+        let should = false;
+        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.routeKey === 'personal') {
+            should = true;
         }
-        return false;
+        return should;
     }
 
     // The render method should have at least business logic as possible,
@@ -79,18 +81,16 @@ class CaseSinglePersonalContainer extends Component {
                         </View>
                         {
                             this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize), marginVertical: 20 }}>
-                                    <Ripple
-                                        style={{
-                                            height: 25,
-                                            justifyContent: 'center'
-                                        }}
+                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize) }}>
+                                    <Button
+                                        title={!_.get(this.props, 'case.documents', null) || checkArray(this.props.case.documents) && this.props.case.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
                                         onPress={this.props.onPressAddDocument}
-                                    >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
-                                            {this.props.case.documents && this.props.case.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
-                                        </Text>
-                                    </Ripple>
+                                        color={styles.backgroundColor}
+                                        titleColor={styles.textColor}
+                                        height={calculateDimension(35, true, this.props.screenSize)}
+                                        width={'100%'}
+                                        style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                    />
                                 </View>) : null
                         }
                     </ScrollView>
@@ -102,24 +102,26 @@ class CaseSinglePersonalContainer extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
         let fields = item.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+            field.isEditMode = this.props.isEditMode;
+            return field;
         });
         return this.renderItemCardComponent(fields, index)
     };
 
     handleRenderItemForDocumentsList = (item, index) => {
         let fields = config.caseSingleScreen.document.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
+            field.isEditMode = this.props.isEditMode;
+            return field;
         });
         return this.renderItemCardComponent(fields, index)
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} key={cardIndex} style={[style.containerCardComponent, {
+            <ElevatedView elevation={5} key={cardIndex} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4,
+                marginVertical: 6,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
@@ -149,6 +151,11 @@ class CaseSinglePersonalContainer extends Component {
         let minimumDate = undefined;
         let maximumDate = undefined;
 
+
+        if(item.id === 'pregnancyStatus' && (this.props.case?.gender === translations.localTranslationTokens.male )) {
+            return;
+        }
+
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForCasesSingleScreenDropdownInput(item);
         } else if (item.type === 'ActionsBar') {
@@ -160,6 +167,9 @@ class CaseSinglePersonalContainer extends Component {
         } else {
             value = this.computeValueForCasesSingleScreen(item, cardIndex);
         }
+        if (item.type === 'DatePicker' && value === '') {
+            value = null
+        }
 
         if (this.props.selectedItemIndexForTextSwitchSelectorForAge !== null && this.props.selectedItemIndexForTextSwitchSelectorForAge !== undefined && item.objectType === 'Case' && item.dependsOn !== undefined && item.dependsOn !== null) {
             let itemIndexInConfigTextSwitchSelectorValues = config[item.dependsOn].map((e) => { return e.value }).indexOf(item.id);
@@ -168,9 +178,6 @@ class CaseSinglePersonalContainer extends Component {
                     return
                 }
             }
-        }
-        if (item.type === 'DatePicker' && value === '') {
-            value = null
         }
 
         let dateValidation = this.setDateValidations(item);
@@ -182,7 +189,6 @@ class CaseSinglePersonalContainer extends Component {
                 item={item}
                 isEditMode={this.props.isEditMode}
                 isEditModeForDropDownInput={this.props.isEditMode}
-                case={this.props.case}
                 selectedItemIndexForAgeUnitOfMeasureDropDown={this.props.selectedItemIndexForAgeUnitOfMeasureDropDown}
                 onChangeextInputWithDropDown={this.props.onChangeextInputWithDropDown}
                 value={value}
@@ -199,6 +205,7 @@ class CaseSinglePersonalContainer extends Component {
                 onFocus={this.handleOnFocus}
                 onBlur={this.handleOnBlur}
                 permissionsList={item.permissionsList}
+                mask={this.props.outbreak?.caseIdMask}
             />
         )
     };
@@ -228,6 +235,11 @@ class CaseSinglePersonalContainer extends Component {
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
+        if (item.id === 'pregnancyStatus') {
+            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS' })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
+        }
         if (item.id === 'occupation') {
             return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION' })
                 .sort((a, b) => { return a.order - b.order; })
@@ -237,11 +249,6 @@ class CaseSinglePersonalContainer extends Component {
             return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE' })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if (item.id === 'pregnancyStatus') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS") })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
     };
 
@@ -312,25 +319,26 @@ class CaseSinglePersonalContainer extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        paddingTop: 8
     },
     subcontainerCardComponent: {
         alignItems: 'center',
         flex: 1
     },
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    containerScrollView: {
+    cardStyle: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        marginVertical: 6
+    },
+    containerScrollView: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'
@@ -342,7 +350,8 @@ function mapStateToProps(state) {
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         role: _.get(state, 'role', []),
         referenceData: _.get(state, 'referenceData', []),
-        translation: _.get(state, 'app.translation')
+        translation: _.get(state, 'app.translation'),
+        outbreak: _.get(state, 'outbreak', null)
     };
 }
 

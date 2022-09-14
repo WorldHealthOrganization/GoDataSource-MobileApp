@@ -8,10 +8,10 @@ import {ScrollView, StyleSheet, View} from 'react-native';
 import {calculateDimension, extractIdFromPouchId, getTranslation} from '../utils/functions';
 import config from '../utils/config';
 import {connect} from "react-redux";
-import styles from '../styles';
 import CardComponent from '../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
+import styles from '../styles';
 
 class FollowUpsSingleAddressContainer extends PureComponent {
 
@@ -47,10 +47,10 @@ class FollowUpsSingleAddressContainer extends PureComponent {
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} style={[style.containerCardComponent, {
+            <ElevatedView elevation={5} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4,
+                marginVertical: 6,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
@@ -102,13 +102,11 @@ class FollowUpsSingleAddressContainer extends PureComponent {
         }
         return (
             <CardComponent
-                item={item}
+                item={Object.assign(item, {isEditMode: false})}
                 isEditMode={false}
                 isEditModeForDropDownInput={false}
                 value={value}
                 index={cardIndex}
-                followUp={this.props.item}
-                contact={this.props.contact}
                 onChangeDropDown={() => {}}
                 onChangeDate={() => {}}
                 onChangeText={() => {}}
@@ -119,6 +117,15 @@ class FollowUpsSingleAddressContainer extends PureComponent {
 
     computeValueForFollowUpSingleScreen = (item) => {
         if (item.objectType === 'Address') {
+            const coordinates = this.props.item.address?.geoLocation?.coordinates;
+            if(coordinates && Array.isArray(coordinates)){
+                if (item.id === 'lat'){
+                    return coordinates[0];
+                }
+                if(item.id === 'lng'){
+                    return coordinates[1];
+                }
+            }
             return this.props.item && this.props.item.address && this.props.item.address[item.id] !== undefined ?
                 getTranslation(this.props.item.address[item.id], this.props.translation) : '';
         }
@@ -156,25 +163,24 @@ class FollowUpsSingleAddressContainer extends PureComponent {
 // make a global style in the config directory
 const style = StyleSheet.create({
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        paddingBottom: 8
     },
     subcontainerCardComponent: {
         alignItems: 'center',
-        flex: 1
+        flex: 1,
+        marginVertical: 4
     },
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    contentContainerStyle: {
-        alignItems: 'center'
-    },
+    cardStyle: {
+        marginVertical: 6,
+        flex: 1
+    }
 });
 
 function mapStateToProps(state) {

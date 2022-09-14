@@ -17,7 +17,7 @@ import {createDate, handleResponseFromRNFetchBlob} from './../utils/functions';
 import {checkArrayAndLength, retriablePromise} from "../utils/typeCheckingFunctions";
 import constants from './constants';
 
-export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch, languagePacks) {
+export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch, languagePacks, noDateFilter) {
     // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
     let hubConfiguration = JSON.parse(hubConfig.clientId);
 
@@ -26,7 +26,7 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
 
     let filter = {};
 
-    if (lastSyncDate) {
+    if (lastSyncDate && !noDateFilter) {
         filter.where = {
             fromDate: createDate(lastSyncDate)
         }
@@ -89,6 +89,11 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                 }
             }
             syncParams = JSON.stringify(syncParams);
+            console.log("Just the sync params", syncParams);
+
+            console.log(`####ZIP location ${dirs}/database.zip`);
+
+            console.log("SYNC 1 request data",  encodeURI(requestUrl), deviceInfo, 'Basic ' + base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`), syncParams);
 
             return retriablePromise(RNFetchBlob.config({
                     timeout: (30 * 60 * 10 * 1000),
@@ -104,15 +109,16 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                         },
                         syncParams
                     )
-                    .progress({count: 500}, (received, total) => {
+                    .progress({count:500},(received, total) => {
                         dispatch(setSyncState({
                             id: 'downloadDatabase',
-                            name: `Downloading database\nReceived ${received} bytes`,
+                            name: `Downloading database`,
                             addLanguagePacks: checkArrayAndLength(languagePacks)
                         }));
-                        console.log(received, total)
+                        console.log("Received", received, total)
                     })
                     .then((res) => {
+                        //console.log("RNFetchBlob response", res);
                         return handleResponseFromRNFetchBlob(res)
                     }), 3)
                     .then((response) => Promise.resolve(databaseLocation))
@@ -149,13 +155,16 @@ export function postDatabaseSnapshotRequest(internetCredentials, path) {
                 {name: 'generatePersonVisualId', data: `${true}`}
             ], '0', '6000000')
             .then((res) => {
-                // console.log('Finished sending the data to the server: ', res);
                 let status = res.info().status;
                 if(status === 200) {
                     //     console.log("Got database");
                     return Promise.resolve('Finished sending data to the server');
                 } else {
-                    return Promise.resolve(res);
+                    let data = res.data;
+                    if(typeof data === 'string'){
+                        data = JSON.parse(data);
+                    }
+                    return Promise.resolve(data?.error?.message || res);
                 }
             })
         )
@@ -183,11 +192,14 @@ async function computeHelpItemsAndCategories(hubConfiguration, lastSyncDate) {
         let translations = [];
         let generalRequestUrl = hubConfiguration.url;
         let authorization = `Basic ${base64.encode(`${hubConfiguration.clientId}:${hubConfiguration.clientSecret}`)}`;
-        let filterItems = {
-            updatedAt: {
-                gt: lastSyncDate
-            }
-        };
+        let filterItems;
+        if (lastSyncDate){
+            filterItems = {
+                updatedAt: {
+                    gt: lastSyncDate
+                }
+            };
+        }
         getHelpItemsRequest(`${generalRequestUrl}${constants.helpItems}`, authorization, filterItems, (errorGetItems, resultItems) => {
             if (errorGetItems) {
                 console.log('Error while getting items: ', errorGetItems);

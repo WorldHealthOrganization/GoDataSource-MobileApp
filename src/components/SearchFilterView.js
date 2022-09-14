@@ -11,8 +11,10 @@ import {connect} from "react-redux";
 import PropTypes from 'prop-types';
 import IconButton from './ButtonWithIcons';
 import TextInputWithIcon from './TextInputWithIcon';
+import styles from './../styles';
 
 class SearchFilterView extends Component {
+    searchRef = React.createRef();
 
     // This will be a dumb component, so it's best not to put any business logic in it
     constructor(props) {
@@ -23,7 +25,6 @@ class SearchFilterView extends Component {
 
         this.handleTextChange = this.handleTextChange.bind(this);
 
-        this.searchRef = this.updateRef.bind(this, 'search');
     }
 
     // Please add here the react lifecycle methods that you need
@@ -34,13 +35,16 @@ class SearchFilterView extends Component {
 
         return (
             <Animated.View style={[this.props.style, {
-                height: calculateDimension(50, true, this.props.screenSize),
-                backgroundColor: '#eeeeee'
+                height: calculateDimension(42, true, this.props.screenSize),
+                backgroundColor: styles.backgroundColor,
+                marginBottom: 0,
+                borderBottomColor: styles.separatorColor,
+                borderBottomWidth: 1
             }]}>
                 <View style={[style.container, {
                     width: calculateDimension(375 - 32, false, this.props.screenSize),
                     marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                    marginVertical: calculateDimension(12.5, true, this.props.screenSize)
+                    marginVertical: calculateDimension(4, true, this.props.screenSize)
                 }]}>
                     <TextInputWithIcon
                         onSubmitEditing={this.props.onSubmitEditing}
@@ -49,10 +53,10 @@ class SearchFilterView extends Component {
                         value={this.props.value}
                     />
                     { this.props.hasFilter &&
-                        <ElevatedView elevation={4}>
+                        <ElevatedView elevation={4} style={{backgroundColor: 'transparent'}}>
                             <IconButton
                                 label={this.props.filterText}
-                                containerButton={{backgroundColor: 'white'}}
+                                containerButton={{backgroundColor: styles.backgroundColor}}
                                 onPress={this.props.onPress}
                                 firstIcon={null}
                                 isFirstIconPureMaterial={null}
@@ -66,16 +70,12 @@ class SearchFilterView extends Component {
         );
     }
 
-    // Please write here all the methods that are not react native lifecycle methods
-    updateRef(name, ref) {
-        this[name] = ref;
-    }
 
     handleTextChange = (text) => {
         ['search']
-            .map((name) => ({ name, ref: this[name] }))
+            .map((name) => ({ name, ref: this[`${name}Ref`] }))
             .forEach(({ name, ref }) => {
-                if (ref.isFocused()) {
+                if (ref.current && ref.current.isFocused()) {
                     this.setState({ [name]: text });
                 }
             });
@@ -111,11 +111,11 @@ const style = StyleSheet.create({
         flexDirection: 'row'
     },
     textInput: {
-        width: '50%',
         alignSelf: 'center',
         borderBottomWidth: 1,
-        borderBottomColor: 'red',
-        paddingVertical: 5
+        borderBottomColor: styles.dangerColor,
+        paddingVertical: 5,
+        width: '50%',
     }
 });
 

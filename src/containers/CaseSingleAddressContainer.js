@@ -9,15 +9,17 @@ import {LoaderScreen} from 'react-native-ui-lib';
 import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
 import config from './../utils/config';
 import {connect} from "react-redux";
-import styles from './../styles';
 import constants from './../utils/constants';
 import CardComponent from './../components/CardComponent';
-import Ripple from 'react-native-material-ripple';
+import Button from './../components/Button';
 import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
+import {validateRequiredFields, checkValidEmails} from './../utils/formValidators';
+import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import styles from './../styles';
 
 class CaseSingleAddressContainer extends React.Component {
 
@@ -39,7 +41,7 @@ class CaseSingleAddressContainer extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.index === 1) {
+        if (nextProps.isEditMode !== this.props.isEditMode || nextProps.routeKey === 'address') {
             return true;
         }
         return false;
@@ -51,7 +53,10 @@ class CaseSingleAddressContainer extends React.Component {
     render() {
         if (!this.state.interactionComplete) {
             return (
-                <LoaderScreen overlay={true} backgroundColor={'white'} />
+                <LoaderScreen
+                    overlay={true}
+                    loaderColor={styles.primaryColor}
+                    backgroundColor={'rgba(255, 255, 255, 0.8)'} />
             )
         }
         return (
@@ -93,19 +98,16 @@ class CaseSingleAddressContainer extends React.Component {
                         {
                             this.props.isEditMode ? (
                                 <View style={{ alignSelf: 'flex-start', 
-                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize), 
-                                    marginVertical: 20 }}>
-                                    <Ripple
-                                        style={{
-                                            height: 25,
-                                            justifyContent: 'center'
-                                        }}
+                                    marginHorizontal: calculateDimension(16, false, this.props.screenSize) }}>
+                                    <Button
+                                        title={this.props.case.addresses && this.props.case.addresses.length === 0 ? getTranslation(translations.caseSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreAddressesText, this.props.translation)}
                                         onPress={this.props.onPressAddAddress}
-                                    >
-                                        <Text style={{ fontFamily: 'Roboto-Medium', fontSize: 12, color: styles.buttonGreen }}>
-                                            {this.props.case.addresses && this.props.case.addresses.length === 0 ? getTranslation(translations.caseSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreAddressesText, this.props.translation)}
-                                        </Text>
-                                    </Ripple>
+                                        color={styles.backgroundColor}
+                                        titleColor={styles.textColor}
+                                        height={calculateDimension(35, true, this.props.screenSize)}
+                                        width={'100%'}
+                                        style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                    />
                                 </View>
                             ) : null
                         }
@@ -125,10 +127,10 @@ class CaseSingleAddressContainer extends React.Component {
 
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
-            <ElevatedView elevation={3} key={cardIndex} style={[style.containerCardComponent, {
+            <ElevatedView elevation={5} key={cardIndex} style={[style.containerCardComponent, {
                 marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                 width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize),
-                marginVertical: 4,
+                marginVertical: 6,
                 minHeight: calculateDimension(72, true, this.props.screenSize)
             }, style.cardStyle]}>
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
@@ -196,7 +198,6 @@ class CaseSingleAddressContainer extends React.Component {
                 item={item}
                 isEditMode={this.props.isEditMode}
                 isEditModeForDropDownInput={this.props.isEditMode}
-                case={this.props.case}
                 value={value}
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
@@ -273,25 +274,51 @@ class CaseSingleAddressContainer extends React.Component {
     };
 
     handleNextButton = () => {
+        let invalidEmails = validateRequiredFields(
+            _.get(this.props, 'case.addresses', []),
+            config?.addressFields?.fields,
+            (dataToBeValidated, fields, defaultFunction) => {
+                if (fields.id === 'emailAddress') {
+                    return checkValidEmails(dataToBeValidated, fields?.id);
+                }
+                return null;
+            }
+        );
         let missingFields = this.props.checkRequiredFieldsAddresses();
-        if (missingFields && Array.isArray(missingFields) && missingFields.length === 0) {
-            if (this.props.case.addresses.length === 0 || (this.props.case.addresses.length > 0 && this.props.hasPlaceOfResidence)) {
-                this.props.onPressNextButton(true)
-            } else {
-                Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.addressOfResidenceError, this.props.translation), [
+        let checkPlaceOfResidence = validateRequiredFields(
+            this.props?.case?.addresses,
+            config.addressFields?.fields,
+            (dataToBeValidated, fields, defaultFunction) => {
+                if (fields.id === 'typeId') {
+                    return (checkArray(dataToBeValidated) && dataToBeValidated.length === 0) ||
+                        (checkArrayAndLength(dataToBeValidated) && dataToBeValidated.find((e) => {
+                            return e.typeId === translations.userResidenceAddress.userPlaceOfResidence
+                        }));
+                }
+                return null;
+            },
+            true);
+        let message = null;
+        if (checkArrayAndLength(missingFields)) {
+            message = `${getTranslation(translations.alertMessages.addressRequiredFieldsMissing, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`;
+        } else if (checkArrayAndLength(invalidEmails)) {
+            message = `${getTranslation(translations.alertMessages.invalidEmails, this.props.translation)}: ${invalidEmails}`;
+        } else if (!checkArrayAndLength(checkPlaceOfResidence)) {
+            message = getTranslation(translations.alertMessages.addressOfResidenceError, this.props.translation);
+        }
+
+        if (message) {
+            Alert.alert(
+                getTranslation(translations.alertMessages.alertLabel, this.props.translation),
+                message,
+                [
                     {
                         text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                         onPress: () => { console.log("OK pressed") }
                     }
                 ])
-            }
         } else {
-            Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), `${getTranslation(translations.alertMessages.addressRequiredFieldsMissing, this.props.translation)}.\n${getTranslation(translations.alertMessages.missingFields, this.props.translation)}: ${missingFields}`, [
-                {
-                    text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
-                    onPress: () => { console.log("OK pressed") }
-                }
-            ])
+            this.props.onPressNextButton(true);
         }
     };
 
@@ -318,25 +345,27 @@ class CaseSingleAddressContainer extends React.Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     containerCardComponent: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        paddingBottom: 8
     },
     subcontainerCardComponent: {
         alignItems: 'center',
-        flex: 1
+        flex: 1,
+        marginVertical: 4
     },
     container: {
-        flex: 1,
-        backgroundColor: styles.screenBackgroundGrey,
         alignItems: 'center',
-    },
-    cardStyle: {
-        marginVertical: 4,
+        backgroundColor: styles.screenBackgroundColor,
         flex: 1
     },
-    containerScrollView: {
+    cardStyle: {
         flex: 1,
-        backgroundColor: styles.screenBackgroundGrey
+        marginVertical: 6
+    },
+    containerScrollView: {
+        backgroundColor: styles.screenBackgroundColor,
+        flex: 1
     },
     contentContainerStyle: {
         alignItems: 'center'

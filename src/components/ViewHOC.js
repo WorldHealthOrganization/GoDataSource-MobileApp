@@ -13,6 +13,7 @@ import KeyboardManager from 'react-native-keyboard-manager';
 import ModalSyncStatus from './ModalSyncStatus';
 import {setLoaderState, setSyncState} from "../actions/app";
 import isFunction from 'lodash/isFunction';
+import styles from "../styles";
 
 if (Platform.OS === 'ios') {
     KeyboardManager.setEnable(true);
@@ -32,10 +33,6 @@ if (Platform.OS === 'ios') {
 
 class ViewHOC extends Component {
 
-    static navigatorStyle = {
-        navBarHidden: true
-    };
-
     constructor(props) {
         super(props);
         this.state = {
@@ -43,7 +40,6 @@ class ViewHOC extends Component {
     }
 
     render() {
-
         return (
             <View style={[this.props.style]}>
                 {
@@ -53,6 +49,7 @@ class ViewHOC extends Component {
                     this.props.showLoader || this.props.showLoading ? (
                         <LoaderScreen
                             overlay={true}
+                            loaderColor={styles.primaryColor}
                             backgroundColor={'rgba(255, 255, 255, 0.8)'}
                             // message={loaderText}
                             message={'Loading'}
@@ -106,7 +103,7 @@ function mapStateToProps(state) {
 
 let syncStateGlobal = cloneDeep(config.manualSyncStages);
 
-handleChangingSyncState = (syncState) => {
+let handleChangingSyncState = (syncState) => {
     let returnedValue = {
         showModal: !!(syncState && syncState.id && (syncState.status || syncState.name)),
         syncState: syncStateGlobal,

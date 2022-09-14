@@ -8,10 +8,10 @@ import {InteractionManager, StyleSheet, Text, View} from 'react-native';
 import {ListItem} from 'react-native-material-ui';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
-import styles from './../styles';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
-import translations from './../utils/translations'
+import translations from './../utils/translations';
+import styles from './../styles';
 
 class HelpListItem extends PureComponent {
 
@@ -30,50 +30,58 @@ class HelpListItem extends PureComponent {
     // and can slow down the app
     render() {
         let help = this.props && this.props.item ? this.props.item : null;
-
         let primaryText = help ? (help.title ? getTranslation(help.title, this.props.translation) : ' ') : '';
-        let primaryColor = 'black';
         let categoryText = help ? (help.categoryId ? `${getTranslation(translations.helpScreen.helpCategoryLabel, this.props.translation)}: ${getTranslation(help.categoryId, this.props.translation)}` : ' ') : '';
 
         return (
-            <ElevatedView elevation={3} style={[style.container, {
-                marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                height: calculateDimension(178, true, this.props.screenSize)
-            }]}>
-                <View style={[style.firstSectionContainer, {
-                    height: calculateDimension(53, true, this.props.screenSize),
-                    paddingBottom: calculateDimension(18, true, this.props.screenSize)
-                }]}>
-                    <ListItem
-                        numberOfLines={1}
-                        centerElement={
-                            <View style={style.centerItemContainer}>
-                                <Text style={[style.primaryText, {flex: 3, color: primaryColor}]} numberOfLines={1}>{primaryText}</Text>
-                            </View>
-                        }
-                        style={{
-                            container: {marginRight: calculateDimension(13, false, this.props.screenSize)},
-                            rightElementContainer: {justifyContent: 'center', alignItems: 'center'}
-                        }}
-                    />
-                </View>
-                <View style={styles.lineStyle}/>
-                <View style={[style.secondSectionContainer, {height: calculateDimension(78.5, true, this.props.screenSize)}]}>
-                    <Text
-                        style={[style.addressStyle, {
-                            marginHorizontal: calculateDimension(14, false, this.props.screenSize),
-                            marginVertical: 7.5
-                        }]}
-                        numberOfLines={2}
-                    >{categoryText}</Text>
-                </View>
-                <View style={styles.lineStyle}/>
-                <View style={[style.thirdSectionContainer, {marginHorizontal: calculateDimension(14, false, this.props.screenSize)}]}>
-                    <Ripple style={[style.rippleStyle]} onPress={this.onPressHelpItem}>
-                        <Text style={[style.rippleTextStyle]}>{this.props.firstActionText || getTranslation(translations.helpScreen.viewHelpLabel, this.props.translation).toUpperCase()}</Text>
-                    </Ripple>
-                </View>
-            </ElevatedView>
+            <View style={[style.containerWrapper, {marginHorizontal: calculateDimension(16, false, this.props.screenSize)}]}>
+                <ElevatedView elevation={5} style={style.container}>
+                    {/* Help Header */}
+                    <View style={[style.firstSectionContainer]}>
+                        <ListItem
+                            numberOfLines={1}
+                            centerElement={
+                                /* Help Title */
+                                <View style={style.centerItemContainer}>
+                                    <Text style={[style.primaryText]} numberOfLines={1}>
+                                        {primaryText}
+                                    </Text>
+                                </View>
+                            }
+                            style={{
+                                container: {
+                                    backgroundColor: styles.backgroundColorRgb,
+                                    borderTopLeftRadius: 4,
+                                    borderTopRightRadius: 4,
+                                    height: 'auto',
+                                    paddingVertical: 8
+                                },
+                                rightElementContainer: {
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }
+                            }}
+                        />
+                    </View>
+                    {/* Help Content */}
+                    <View style={[style.secondSectionContainer]}>
+                        <Text
+                            style={[style.addressStyle]}
+                            numberOfLines={2}
+                        >
+                            {categoryText}
+                        </Text>
+                    </View>
+                    {/* Help Button */}
+                    <View style={[style.thirdSectionContainer]}>
+                        <Ripple onPress={this.onPressHelpItem}>
+                            <Text style={[style.rippleTextStyle]}>
+                                {this.props.firstActionText || getTranslation(translations.helpScreen.viewHelpLabel, this.props.translation).toUpperCase()}
+                            </Text>
+                        </Ripple>
+                    </View>
+                </ElevatedView>
+            </View>
         );
     }
 
@@ -89,50 +97,55 @@ class HelpListItem extends PureComponent {
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    containerWrapper: {
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        marginVertical: 4
+    },
     container: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
     },
     firstSectionContainer: {
-        justifyContent: 'space-between',
-    },
-    addressStyle: {
-        fontFamily: 'Roboto-Light',
-        fontSize: 12,
-        color: styles.navigationDrawerItemText
-    },
-    secondSectionContainer: {
-        justifyContent: 'center'
-    },
-    thirdSectionContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-    },
-    rippleStyle: {
-        height: '100%',
-        justifyContent: 'center'
-    },
-    rippleTextStyle: {
-        fontFamily: 'Roboto-Medium',
-        fontSize: 12,
-        color: styles.buttonGreen
+        borderTopLeftRadius: 4,
+        borderTopRightRadius: 4,
+        justifyContent: 'space-between'
     },
     centerItemContainer: {
-        flexDirection: 'row',
-        height: '100%',
-        alignItems: 'center'
+        marginLeft: -8
     },
     primaryText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 18,
-        color: 'black'
+        fontSize: 16,
+        lineHeight: 20
     },
-    secondaryText: {
+    secondSectionContainer: {
+        color: styles.secondaryColor,
         fontFamily: 'Roboto-Regular',
-        fontSize: 13,
-        color: 'black'
+        fontSize: 14,
+        padding: 16
+    },
+    addressStyle: {
+        color: styles.secondaryColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14,
+    },
+    thirdSectionContainer: {
+        display: 'flex',
+        flex: 1,
+        justifyContent: 'center',
+        padding: 4
+    },
+    rippleTextStyle: {
+        backgroundColor: styles.primaryColorRgb,
+        borderRadius: 4,
+        color: styles.primaryColor,
+        display: 'flex',
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14,
+        lineHeight: 26,
+        textAlign: 'center'
     }
 });
 

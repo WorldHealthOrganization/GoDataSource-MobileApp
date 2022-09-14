@@ -2,19 +2,21 @@ const navigationDrawer = {
     activeOutbreak: 'LNG_NAVIGATION_DRAWER_ACTIVE_OUTBREAK',
     followUpsLabel: 'LNG_NAVIGATION_DRAWER_FOLLOW_UPS',
     contactsLabel: 'LNG_NAVIGATION_DRAWER_CONTACTS',
-    //TODO add to backend translations
     contactsOfContactsLabel: 'LNG_NAVIGATION_DRAWER_CONTACTS_OF_CONTACTS',
 
     casesLabel: 'LNG_NAVIGATION_DRAWER_CASES',
+    eventsLabel: 'LNG_PAGE_LIST_EVENTS_TITLE',
+    labResultsLabel: 'LNG_LAYOUT_MENU_ITEM_LAB_RESULTS_LABEL',
     syncHubManually: 'LNG_NAVIGATION_DRAWER_SYNC_HUB_MANUAL',
     changeHubConfig: 'LNG_NAVIGATION_DRAWER_CHANGE_HUB_CONFIG',
     usersLabel: 'LNG_NAVIGATION_DRAWER_USERS',
     languagesLabel: 'LNG_NAVIGATION_DRAWER_LANGUAGES',
     logoutLabel: 'LNG_NAVIGATION_DRAWER_LOGOUT',
     helpLabel: 'LNG_LAYOUT_MENU_ITEM_HELP_LABEL',
-    //TODO add to backend translations
     addLanguagePacks: 'LNG_NAVIGATION_DRAWER_ADD_LANGUAGE_PACKS',
-    community: 'LNG_MOBILE_NAVIGATION_DRAWER_COMMUNITY_LINK'
+    community: 'LNG_MOBILE_NAVIGATION_DRAWER_COMMUNITY_LINK',
+
+
 };
 
 const addFollowUpScreen = {
@@ -47,7 +49,15 @@ const followUpFilter = {
     ageRange: 'LNG_FILTER_SCREEN_AGE_RANGE_LABEL',
     area: 'LNG_FILTER_SCREEN_AREA_LABEL',
     chooseLocationLabel: 'LNG_FILTER_SCREEN_CHOOSE_LOCATIONS_MESSAGE',
+
+    dayOfFollowUp: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP'
 };
+
+const personFilter = {
+    vaccine: 'LNG_ENTITY_FIELD_LABEL_VACCINE',
+    vaccineStatus: 'LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS',
+    pregnancyStatus: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS'
+}
 
 const helpFilter = {
     filterTitle: 'LNG_SIDE_FILTERS_TITLE',
@@ -81,6 +91,7 @@ const sortTab = {
     sortCriteria: 'LNG_SORT_SCREEN_CRITERIA_LABEL',
     sortOrder: 'LNG_SORT_SCREEN_ORDER_LABEL',
 
+    sortName: 'LNG_EVENT_FIELD_LABEL_NAME',
     sortFirstName: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
     sortLastName: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
     sortCreatedAt: 'LNG_SORT_CRITERIA_CREATED_AT',
@@ -147,8 +158,8 @@ const caseSingleScreen = {
     safeBurial: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
     dateDeceased: 'LNG_CASE_FIELD_LABEL_DATE_OF_DECEASE',
     dateOfBurial: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
-    burialLocationId: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION',
-    burialPlaceName: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION',
+    burialLocationId: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
+    burialPlaceName: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
 
 
     dateRangeType: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE',
@@ -156,22 +167,24 @@ const caseSingleScreen = {
     dateRangeEndDate: 'LNG_DATE_FIELD_LABEL_TO',
     dateRangeLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     dateRangeComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
-    dateRangeCenterName: 'LNG_DATE_FIELD_LABEL_CENTER_NAME',
+    dateRangeCenterName: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
     dateRangeHospitalName: 'LNG_DATE_FIELD_LABEL_HOSPITAL_NAME',
 
 
     hospitalisationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     hospitalisationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
-    hospitalisationCenterName: 'LNG_DATE_FIELD_LABEL_HOSPITAL_NAME',
+    hospitalisationCenterName: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
     hospitalisationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     hospitalisationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
 
 
     isolationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
     isolationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
-    isolationCenterName: 'LNG_DATE_FIELD_LABEL_CENTER_NAME',
+    isolationCenterName: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
     isolationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
     isolationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
+
+    deleteCase: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE'
 
 };
 
@@ -205,23 +218,27 @@ const contactSingleScreen = {
 
     contactId: 'LNG_CONTACT_FIELD_LABEL_CONTACT_ID',
     followUpFinalStatus: 'LNG_MOBILE_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
+    followUpTeamId: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
 
-    // TODO check with backend for common translation label between web and mobile
-    followUpTeamId: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID'
+    contactIdMaskError: 'LNG_API_ERROR_CODE_INVALID_VISUAL_ID_MASK',
 };
 
 const exposureScreen = {
     editExposureLabel: 'LNG_RELATIONSHIP_SCREEN_EDIT_EXPOSURE_TITLE',
     addExposureLabel: 'LNG_RELATIONSHIP_SCREEN_ADD_EXPOSURE_TITLE',
 
+    editContactLabel: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT',
+    addContactLabel: 'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON',
+
     chooseCaseOrEvent: 'LNG_RELATIONSHIP_LABEL_CHOOSE_CASE_OR_EVENT',
     contactDate: 'LNG_RELATIONSHIP_LABEL_DATE_OF_LAST_CONTACT',
+    dateOfFirstContact: 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
     contactDateEstimated: 'LNG_RELATIONSHIP_LABEL_IS_CONTACT_DATE_ESTIMATED',
     certaintyLevelId: 'LNG_RELATIONSHIP_LABEL_CERTAINTY_LEVEL',
     exposureTypeId: 'LNG_RELATIONSHIP_LABEL_EXPOSURE_TYPE',
     exposureFrequencyId: 'LNG_RELATIONSHIP_LABEL_EXPOSURE_FREQUENCY',
     exposureDurationId: 'LNG_RELATIONSHIP_LABEL_EXPOSURE_DURATION',
-    socialRelationshipTypeId: 'LNG_RELATIONSHIP_LABEL_RELATION',
+    socialRelationshipTypeId: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
     socialRelationshipDetail: 'LNG_RELATIONSHIP_LABEL_RELATIONSHIPS',
     clusterId: 'LNG_RELATIONSHIP_LABEL_CLUSTER',
     comment: 'LNG_RELATIONSHIP_LABEL_COMMENT',
@@ -234,23 +251,71 @@ const followUpsSingleScreen = {
 
     missingButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_MISSING',
     deceasedButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DECEASE',
-    deleteButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_DELETE',
-    editContactButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_EDIT_CONTACT',
+    deleteButton: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_FOLLOW_UP',
+    editContactButton: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CONTACT',
 
     deleteFollowUpAlertError: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_FOLLOW_UP',
 
     date: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
     status: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
     targeted: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
+    team: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
 };
 
 const casesScreen = {
     casesTitle: 'LNG_CASE_LIST_SCREEN_TITLE',
     viewButtonLabel: 'LNG_CASE_LIST_SCREEN_VIEW_BUTTON',
     addContactButtonLabel: 'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON',
+    addContactOfContact: 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT',
     noCases: 'LNG_CASE_LIST_SCREEN_NO_CASES',
-    contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS'
+    contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS',
+    exposures: 'LNG_CONTACT_SINGLE_SCREEN_EXPOSURE_TAB'
 };
+
+const labResultsScreen = {
+    labResultsTitle: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+    noLabResults: 'LNG_LAB_RESULTS_NO_RESULTS_FOUND_LABEL',
+    labName: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+    dateOfResult: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+    status: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+    result: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
+    sampleTaken: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
+}
+
+const labResultsSingleScreen = {
+    title: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+    sampleLabId: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
+    sampleTaken: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
+    sampleDelivered: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
+    dateOfResult: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+    labName: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+    result: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
+    status: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+    notes: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+    variantStrain: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE',
+    hasVariantStrain: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+    sequenceReason: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+    dateSampleSentSeq: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+    labNameSeq: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+    dateResultSeq: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+    resultSeq: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+    dateSampleSent: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+    dateSampleTested: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+    sampleType: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
+    testType: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
+    testedFor: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+    quantResult: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT',
+    modifyLabResult: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
+    viewLabResult: 'LNG_MENU_ITEM_VIEW_LAB_RESULTS',
+    deleteAlertMessage: 'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT',
+    deleteLabResult: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_LAB_RESULT',
+    createLabResult: 'LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON',
+}
+
+const labResultsFilter = {
+    filterTitle: 'LNG_LAB_RESULTS_FILTER_TITLE',
+    personType: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_TYPE'
+}
 
 const usersScreen = {
     usersTitle: 'LNG_USER_LIST_SCREEN_TITLE',
@@ -264,14 +329,15 @@ const contactsScreen = {
     contactsTitle: 'LNG_CONTACT_LIST_SCREEN_TITLE',
     addFollowupsButton: 'LNG_CONTACT_LIST_SCREEN_ADD_FOLLOW_UP_BUTTON',
     editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
-    noContacts: 'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS'
+    noContacts: 'LNG_CONTACT_LIST_SCREEN_NO_CONTACTS',
+    delete: 'LNG_CONTACT_SINGLE_SCREEN_DELETE_CONTACT_ACTION'
 };
 
-// TODO add to backend
-export const contactsOfContactsScreen = {
+const contactsOfContactsScreen = {
     contactsTitle: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_TITLE',
     // editButton: 'LNG_CONTACT_LIST_SCREEN_EDIT_BUTTON',
-    noContacts: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_NO_CONTACTS'
+    noContacts: 'LNG_CONTACT_OF_CONTACT_LIST_SCREEN_NO_CONTACTS',
+    deleteCoC: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT_OF_CONTACT'
 };
 
 const followUpsScreen = {
@@ -311,6 +377,9 @@ const alertMessages = {
     validationErrorLabel: 'LNG_DIALOG_VALIDATION_ERROR_TITLE_LABEL',
     warningLabel: 'LNG_DIALOG_WARNING_TITLE_LABEL',
     saveAnywayLabel: 'LNG_DIALOG_SAVE_ANYWAY_LABEL',
+    areYouSureDelete: 'LNG_DIALOG_CONFIRM_DELETE_ITEM',
+
+    invalidMaskAlert: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
 
     //not used with translation
     invalidCredentials: 'Invalid credentials',
@@ -327,6 +396,10 @@ const alertMessages = {
     // cases
     caseDeleteConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_CASE',
     caseDiscardAllChangesConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DISCARD_ALL_CHANGES',
+
+    //events
+    eventDeleteConfirmation: 'LNG_DIALOG_CONFIRM_DELETE_EVENT',
+    eventDiscardAllChangesConfirmation: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DISCARD_ALL_CHANGES',
 
     // contacts
     contactDeleteLastExposureError: 'LNG_DIALOG_ALERT_MESSAGE_CANNOT_DELETE_CONTACT_LAST_EXPOSURE',
@@ -346,6 +419,8 @@ const alertMessages = {
     getLocationError: 'LNG_DIALOG_ALERT_MESSAGE_THERE_WAS_AN_ISSUE_GETTING_YOUR_LOCATION',
     credentialsValidationError: 'LNG_DIALOG_ALERT_MESSAGE_MAKE_SURE_YOU_COMPLETE_ALL_FIELDS',
     dropDownSearchableContactsError: 'LNG_DIALOG_ALERT_MESSAGE_ERROR_OCCURED_WHILE_GETTING_CONTACTS',
+    // TODO add to backend
+    invalidEmails: 'LNG_MOBILE_DIALOG_ALERT_MESSAGE_INVALID_EMAIL_ADDRESSES',
 
     // mapsPopup
     mapsPopupMessage: 'LNG_DIALOG_ALERT_MESSAGE_SELECT_MAPS_APP_THAT_YOU_WOULD_LIKE_TO_USER',
@@ -355,6 +430,7 @@ const alertMessages = {
     addressRequiredFieldsMissing: 'LNG_DIALOG_ALERT_MESSAGE_ADD_AT_LEAST_ONE_ADDRESS_WITH_ALL_REQUERED_FIELDS_COMPLETED',
 
     // Delete alert messages
+    deleteVaccine: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE',
     deleteDocument: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DOCUMENT',
     deleteAddress: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_ADDRESS',
     deleteDateRange: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_DATE_RANGE',
@@ -366,7 +442,9 @@ const alertMessages = {
     copyAddress: 'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_COPY_THE_ADDRESS_FROM_THE_PARENT_ENTITY',
 
     // Permissions alert messages
-    permission: 'LNG_MOBILE_DIALOG_ALERT_MESSAGE_PERMISSION'
+    permission: 'LNG_MOBILE_DIALOG_ALERT_MESSAGE_PERMISSION',
+
+    dialNumberAlertDescription: 'LNG_DIAL_NUMBER_DESCRIPTION'
 };
 
 const loadingScreenMessages = {
@@ -405,7 +483,8 @@ const questionCardLabels = {
     dropDownInputLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER',
     dropDownLabel: 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS',
     addAnswer: 'LNG_QUESTIONNAIRE_LABEL_ADD_ANSWER',
-    previousAnswers: 'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS'
+    previousAnswers: 'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS',
+    additionalQuestions: 'LNG_QUESTIONNAIRE_LABEL_ADDITIONAL_QUESTIONS'
 };
 
 const inAppNotificationScreen = {
@@ -424,7 +503,7 @@ const qrScanScreen = {
 };
 
 const manualConfigScreen = {
-    title: 'HUB configuration',
+    title: 'Hub configuration',
     nameLabel: 'HUB Name',
     hubUrlLabel: 'HUB URL',
     clientIdLabel: 'Client ID',
@@ -452,6 +531,7 @@ const addressFieldLabels = {
     latitude: 'LNG_ADDRESS_FIELD_LABEL_LATITUDE',
     deleteButton: 'LNG_COMMON_BUTTON_DELETE',
     copyAddress: 'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS',
+    copyAddressContact: 'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS_CONTACT',
     isThePersonNextToYou: 'LNG_ADDRESS_FIELD_LABEL_IS_THE_PERSON_NEXT_TO_YOU'
 };
 
@@ -529,6 +609,12 @@ const hubConfigScreen = {
     otherHubConfigurationsLabel: 'LNG_HUB_CONFIGURATION_SCREEN_OTHER_HUB_CONFIGURATIONS_LABEL',
     makeActiveLabel: 'LNG_HUB_CONFIGURATION_SCREEN_MAKE_ACTIVE_ACTION',
 
+    deleteHubButton: 'LNG_HUB_CONFIGURATION_SCREEN_DELETE_HUB',
+    deleteHubSyncDataMessage: 'LNG_HUB_CONFIGURATION_SCREEN_DELETE_HUB_SYNC_DATA',
+    confirmationDeleteHub: 'LNG_HUB_CONFIGURATION_SCREEN_CONFIRM_DELETE_HUB',
+    replacementHubs: "LNG_HUB_CONFIGURATION_SCREEN_REPLACEMENT_HUBS",
+    replacementHubsLabel: "LNG_HUB_CONFIGURATION_SCREEN_REPLACEMENT_HUBS_LABEL",
+
     // Errors
     setActiveDatabaseTitle: 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_SET_ACTIVE_HUB',
     setActiveDatabaseMessage: 'LNG_HUB_CONFIGURATION_SCREEN_ERROR_OCCURED_WHILE_SETTING_ACTIVE_HUB',
@@ -566,12 +652,109 @@ const personListItem = {
     dayOfFollowUp: 'LNG_PERSON_LIST_ITEM_DAY_OF_FOLLOW_UP'
 };
 
-//TODO add translation to backend
-export const languageModalComponentLabels = {
+const languageModalComponentLabels = {
     infoMessage: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_INFO_MESSAGE',
     downloadButton: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_DOWNLOAD_BUTTON',
     alertNoLanguage: 'LNG_MOBILE_LANGUAGE_MODAL_COMPONENT_ALERT_NO_LANGUAGE'
 };
+
+
+const eventsFilter = {
+    eventsFilterTitle: 'LNG_EVENT_FILTER_SCREEN_TITLE',
+    filterTitle: 'LNG_FILTER_SCREEN_FILTER_TAB',
+    sortTitle: 'LNG_FILTER_SCREEN_SORT_TAB',
+
+    gender: 'LNG_FILTER_SCREEN_GENDER_LABEL',
+    ageRange: 'LNG_FILTER_SCREEN_AGE_RANGE_LABEL',
+    area: 'LNG_FILTER_SCREEN_AREA_LABEL',
+    chooseLocationLabel: 'LNG_FILTER_SCREEN_CHOOSE_LOCATIONS_MESSAGE',
+    classification: 'LNG_FILTER_SCREEN_CLASSIFICATION_LABEL',
+    chooseClassificationLabel: 'LNG_FILTER_SCREEN_CHOOSE_CLASSIFICATIONS_MESSAGE',
+}
+const eventSingleScreen = {
+    eventsTitle: 'LNG_PAGE_LIST_EVENTS_TITLE',
+    title: 'LNG_PAGE_LIST_EVENTS_TITLE',
+    nameLabel: 'LNG_LOCATION_FIELD_LABEL_NAME',
+    date: 'LNG_EVENT_FIELD_LABEL_DATE',
+    dateOfReporting: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+    dateOfReportingApproximate: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+    description: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+    responsibleUser: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+    detailsTitle: 'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
+    addressTitle: 'LNG_PAGE_MODIFY_EVENT_TAB_ADDRESS_TITLE',
+
+    personalTitle: 'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
+
+    addEventTitle: 'LNG_EVENT_SINGLE_SCREEN_ADD_NEW_EVENT_TITLE_LABEL',
+    deleteEventLabel: 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT',
+
+    oneAddressText: 'LNG_ADDRESS_ADD_NEW_ADDRESS_MESSAGE',
+    moreAddressesText: 'LNG_ADDRESS_ADD_ANOTHER_ADDRESS_MESSAGE',
+
+    oneDateRangeText: 'LNG_DATE_RANGE_ADD_NEW_DATE_MESSAGE',
+    moreDateRangeText: 'LNG_DATE_RANGE_ADD_ANOTHER_DATE_MESSAGE',
+
+    oneIsolationDateText: 'LNG_ISOLATION_ADD_NEW_ISOLATION_MESSAGE',
+    moreIsolationDatesText: 'LNG_ISOLATION_ADD_ANOTHER_ISOLATION_MESSAGE',
+    oneDocumentText: 'LNG_DOCUMENT_ADD_NEW_DOCUMENT_MESSAGE',
+    moreDocumentsText: 'LNG_DOCUMENT_ADD_ANOTHER_DOCUMENT_MESSAGE',
+
+    firstNameLabel: 'LNG_LOCATION_FIELD_LABEL_NAME',
+
+    isDateOfReportingApproximate: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_REPORTING_APPROXIMATE',
+
+
+    documentType: 'LNG_CASE_FIELD_LABEL_DOCUMENT_TYPE',
+    documentNumber: 'LNG_CASE_FIELD_LABEL_DOCUMENT_NUMBER',
+    deleteButton: 'LNG_COMMON_BUTTON_DELETE',
+
+    classification: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+    dateOfOnset: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+    isDateOfOnsetApproximate: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+    dateBecomeCase: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+    dateOfInfection: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+    outcomeId: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+    dateOfOutcome: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+    deceased: 'LNG_CASE_FIELD_LABEL_DECEASED',
+    safeBurial: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
+    dateDeceased: 'LNG_CASE_FIELD_LABEL_DATE_OF_DECEASE',
+    dateOfBurial: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
+    burialLocationId: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
+    burialPlaceName: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
+
+
+    dateRangeType: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE',
+    dateRangeStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
+    dateRangeEndDate: 'LNG_DATE_FIELD_LABEL_TO',
+    dateRangeLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
+    dateRangeComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
+    dateRangeCenterName: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
+    dateRangeHospitalName: 'LNG_DATE_FIELD_LABEL_HOSPITAL_NAME',
+
+
+    hospitalisationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
+    hospitalisationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
+    hospitalisationCenterName: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
+    hospitalisationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
+    hospitalisationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
+
+
+    isolationStartDate: 'LNG_DATE_FIELD_LABEL_FROM',
+    isolationEndDate: 'LNG_DATE_FIELD_LABEL_TO',
+    isolationCenterName: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
+    isolationLocation: 'LNG_DATE_FIELD_LABEL_LOCATION',
+    isolationComments: 'LNG_DATE_FIELD_LABEL_COMMENTS',
+
+    deleteEvent: 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT'
+}
+const eventsScreen = {
+    eventsTitle: 'LNG_PAGE_LIST_EVENTS_TITLE',
+    viewButtonLabel: 'LNG_CASE_LIST_SCREEN_VIEW_BUTTON',
+    addContactButtonLabel: 'LNG_CASE_LIST_SCREEN_ADD_CONTACT_BUTTON',
+    noEvents: 'LNG_CASE_LIST_SCREEN_NO_EVENTS',
+    contactExposures: 'LNG_CASE_LIST_SCREEN_SEE_CONTACTS',
+    exposures: 'LNG_CONTACT_SINGLE_SCREEN_EXPOSURE_TAB'
+}
 
 export default {
     navigationDrawer,
@@ -579,6 +762,9 @@ export default {
     casesFilter,
     caseSingleScreen,
     casesScreen,
+    eventsFilter,
+    eventSingleScreen,
+    eventsScreen,
     usersScreen,
     contactsScreen,
     generalLabels,
@@ -613,5 +799,11 @@ export default {
     hubConfigScreen,
     sortTab,
     followUpAgenda,
-    personListItem
+    personListItem,
+    contactsOfContactsScreen,
+    languageModalComponentLabels,
+    labResultsScreen,
+    labResultsSingleScreen,
+    labResultsFilter,
+    personFilter
 };

@@ -1,9 +1,8 @@
 import React, {PureComponent} from 'react';
-import {FlatList, Modal, Text, TextInput, View} from 'react-native';
+import {FlatList, Modal, Text, TextInput, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import config from './../utils/config';
 import Ripple from 'react-native-material-ripple';
-import stylesGlobal from './../styles';
 import {connect} from "react-redux";
 import {calculateDimension} from './../utils/functions';
 import ElevatedView from 'react-native-elevated-view';
@@ -11,6 +10,7 @@ import Button from './Button';
 import SectionedMultiSelectListItem from './SectionedMultiSelectListItem';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
+import styles from './../styles';
 
 class SectionedMultiSelect extends PureComponent {
 
@@ -56,17 +56,15 @@ class SectionedMultiSelect extends PureComponent {
                 {/**Component container*/}
                 <Ripple onPress={this.handleOnPress}>
                     {/**Text and dropdown icon container*/}
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                        <Text>{this.props.selectText}</Text>
+                    <View style={style.sectionedMultiSelectDropdown}>
+                        <Text style={style.sectionedMultiSelectDropdownLabel}>
+                            {this.props.selectText}
+                        </Text>
                         <Icon name={'arrow-drop-down'} />
                     </View>
                     {
                         this.props.showUnderline ? (
-                            <View style={{
-                                width: '100%',
-                                height: 0.5,
-                                backgroundColor: this.props.underlineColor
-                            }}/>
+                            <View style={{ backgroundColor: this.props.underlineColor, height: 0.5, width: '100%'}} />
                         ) : (null)
                     }
                 </Ripple>
@@ -75,115 +73,65 @@ class SectionedMultiSelect extends PureComponent {
                     animationType={'slide'}
                     transparent={true}
                 >
-                    <View style={{
-                        flex: 1,
-                        backgroundColor: 'transparent',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }}>
+                    <View style={style.sectionedMultiSelectModalContainer}>
                         <ElevatedView
-                            style={{
-                                width: calculateDimension(config.designScreenSize.width - 28, false, this.props.screenSize),
-                                height: '80%',
-                                backgroundColor: 'white',
-                                alignSelf: 'center',
-                                marginHorizontal: calculateDimension(6.5, false, this.props.screenSize)
-                            }}
+                            style={[
+                                style.sectionedMultiSelectModal,
+                                {
+                                    marginHorizontal: calculateDimension(8, false, this.props.screenSize),
+                                    width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
+                                }
+                            ]}
                             elevation={5}
                         >
                             {/**Search header*/}
-                            <View
-                                style={{
-                                    flex: 0.1,
-                                    flexDirection: 'row',
-                                    backgroundColor: stylesGlobal.screenBackgroundGrey,
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <View
-                                    style={{
-                                        flex: 0.15,
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }}
-                                >
+                            <View style={style.sectionedMultiSelectModalSearch}>
+                                <View style={style.sectionedMultiSelectModalSearchLabel}>
                                     <Icon name={'search'}/>
                                 </View>
                                 <TextInput
-                                    style={{
-                                        flex: 0.9,
-                                        marginRight: 13
-                                    }}
+                                    style={style.sectionedMultiSelectModalSearchInput}
                                     value={this.state.searchText}
                                     onChangeText={this.handleOnChangeText}
                                     // onSubmitEditing={this.handleOnChangeTextSearch}
                                     placeholder={this.props.searchPlaceholderText}
+                                    placeholderTextColor={styles.secondaryColor}
                                 />
                             </View>
                             {/** Toggle list button */}
-                            <View  style={{
-                                flex: 0.1,
-                                flexDirection: 'row',
-                                alignSelf: 'center',
-                                backgroundColor: 'white',
-                                alignItems: 'center'
-                            }}>
+                            <View  style={style.sectionedMultiSelectModalToggleButton}>
                                 <Button
                                     title={this.state.showAll ? 'SHOW LESS' : 'SHOW ALL'}
-                                    height={calculateDimension(32, true, this.props.screenSize)}
-                                    width={calculateDimension(32, true, this.props.screenSize)}
-                                    style={{
-                                        alignSelf:'center',
-                                        marginHorizontal: 6.5,
-                                        flex: 0.75
-                                    }}
-                                    color={stylesGlobal.buttonGreen}
-                                    titleColor={'white'}
+                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                    width={calculateDimension(360, true, this.props.screenSize)}
+                                    style={{alignSelf:'center'}}
+                                    color={styles.primaryColor}
+                                    titleColor={styles.backgroundColor}
                                     titleStyle={{fontFamily: 'Roboto-Medium', fontSize: 14}}
                                     onPress={this.handleOnPressShowAll}
                                 />
                             </View>
                             {/**List container*/}
-                            <View
-                                style={{
-                                    flex: 0.8,
-                                    marginHorizontal: calculateDimension(14, false, this.props.screenSize),
-                                    marginTop: calculateDimension(6.5, true, this.props.screenSize)
-                                }}
-                            >
-                                {
-                                    this.handleRenderList(this.state.showAll ? this.state.allItems : this.state.items)
-                                }
+                            <View style={style.sectionedMultiSelectModalContent}>
+                                {this.handleRenderList(this.state.showAll ? this.state.allItems : this.state.items)}
                             </View>
                             {/**Action buttons container*/}
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    flex: 0.1
-                                }}
-                            >
+                            <View style={style.sectionedMultiSelectModalButtons}>
                                 <Button
                                     title={'Ok'}
-                                    height={calculateDimension(32, true, this.props.screenSize)}
-                                    style={{
-                                        marginHorizontal: 6.5,
-                                        flex: 0.75
-                                    }}
-                                    color={stylesGlobal.buttonGreen}
-                                    titleColor={'white'}
+                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                    style={style.sectionedMultiSelectModalButtonOk}
+                                    color={styles.primaryColor}
+                                    titleColor={styles.backgroundColor}
                                     titleStyle={{fontFamily: 'Roboto-Medium', fontSize: 14}}
                                     onPress={this.handleOnPressOk}
                                 />
                                 <Button
                                     title={'Cancel'}
-                                    height={calculateDimension(32, true, this.props.screenSize)}
-                                    style={{
-                                        marginHorizontal: 6.5,
-                                        flex: 0.25
-                                    }}
-                                    color={'white'}
-                                    titleColor={'black'}
+                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                    style={style.sectionedMultiSelectModalButtonCancel}
+                                    color={styles.backgroundColor}
+                                    titleColor={styles.textColor}
                                     titleStyle={{fontFamily: 'Roboto-Medium', fontSize: 14}}
                                     onPress={this.handleOnPress}
                                 />
@@ -218,6 +166,7 @@ class SectionedMultiSelect extends PureComponent {
                 extraData={this.state.reRenderProps}
                 renderItem={this.handleRenderItem}
                 keyExtractor={this.keyExtractor}
+                style={{paddingHorizontal: 16}}
             />
         )
     };
@@ -231,7 +180,7 @@ class SectionedMultiSelect extends PureComponent {
                 handleOnSelectItem={this.handleOnSelectItem}
                 handleOnPressExpand={this.handleOnPressExpand}
                 handleRenderList={this.handleRenderList}
-                iconWidth={calculateDimension(30, false, this.props.screenSize)}
+                iconWidth={calculateDimension(16, false, this.props.screenSize)}
                 selectedItems={this.state.reRenderProps.selectedItems}
                 selectToggleIconComponent={this.props.selectToggleIconComponent}
                 expandedItems={this.state.reRenderProps.expandedItems}
@@ -292,17 +241,13 @@ class SectionedMultiSelect extends PureComponent {
     handleOnChangeTextSearch = () => {
         let text = this.state.searchText;
         if (text !== '' && text !== null && text !== undefined) {
-            // this.setState({
-            //     searchText: text
-            // }, () => {
-                let filteredData = this.filterData(cloneDeep(this.props.items), text);
-                let filteredAllData = this.filterData(cloneDeep(this.props.allItems), text);
-                this.setState(prevState => ({
-                    allItems: filteredAllData.filteredData,
-                    items: filteredData.filteredData,
-                    reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: this.state.showAll ? filteredAllData.expandedItems : filteredData.expandedItems})
-                }))
-            // })
+            let filteredData = this.filterData(cloneDeep(this.props.items), text);
+            let filteredAllData = this.filterData(cloneDeep(this.props.allItems), text);
+            this.setState(prevState => ({
+                allItems: filteredAllData.filteredData,
+                items: filteredData.filteredData,
+                reRenderProps: Object.assign({}, prevState.reRenderProps, {expandedItems: this.state.showAll ? filteredAllData.expandedItems : filteredData.expandedItems})
+            }))
         } else {
             this.setState(prevState => ({
                 allItems: cloneDeep(this.props.allItems),
@@ -342,8 +287,8 @@ class SectionedMultiSelect extends PureComponent {
                         dataToReturn.expandedItems.push( items[i][this.props.uniqueKey]);
                     }
                 } else {
+                    dataToReturn.filteredData.push(Object.assign({}, items[i], {children: items[i][this.props.subKey]}));
                     delete items[i][this.props.subKey];
-                    dataToReturn.filteredData.push(items[i]);
                 }
             } else {
                 if (keepData && Array.isArray(keepData) && keepData.length > 0) {
@@ -386,6 +331,75 @@ class SectionedMultiSelect extends PureComponent {
         return selectedItems;
     };
 }
+
+const style = StyleSheet.create({
+    sectionedMultiSelectDropdown: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    sectionedMultiSelectDropdownLabel: {
+        color: styles.textColor,
+        fontFamily: 'Roboto-Regular',
+        fontSize: 14
+    },
+    sectionedMultiSelectModalContainer: {
+        alignItems: 'center',
+        backgroundColor: styles.overlayColor,
+        flex: 1,
+        justifyContent: 'center'
+    },
+    sectionedMultiSelectModal: {
+        alignSelf: 'center',
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4,
+        height: '80%'
+    },
+    sectionedMultiSelectModalSearch: {
+        alignItems: 'center',
+        backgroundColor: styles.screenBackgroundColor,
+        borderTopLeftRadius: 4,
+        borderTopRightRadius: 4,
+        flexDirection: 'row'
+    },
+    sectionedMultiSelectModalSearchLabel: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingLeft: 16
+    },
+    sectionedMultiSelectModalSearchInput: {
+        color: styles.textColor,
+        paddingHorizontal: 16,
+        paddingVertical: 8
+    },
+    sectionedMultiSelectModalToggleButton: {
+        alignItems: 'center',
+        alignSelf: 'center',
+        backgroundColor: styles.backgroundColor,
+        borderBottomWidth: 1,
+        borderBottomColor: styles.separatorColor,
+        flexDirection: 'row',
+        padding: 8
+    },
+    sectionedMultiSelectModalContent: {
+        flex: 1
+    },
+    sectionedMultiSelectModalButtons: {
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderTopColor: styles.separatorColor,
+        flexDirection: 'row',
+        padding: 8
+    },
+    sectionedMultiSelectModalButtonOk: {
+        flex: 0.75,
+        marginRight: 4
+    },
+    sectionedMultiSelectModalButtonCancel: {
+        flex: 0.25,
+        marginLeft: 4
+    }
+});
 
 function mapStateToProps(state) {
     return {

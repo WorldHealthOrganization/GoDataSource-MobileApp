@@ -7,9 +7,9 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
+import moment from 'moment/min/moment.min';
 import {InteractionManager, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
-import styles from './../styles';
 import {calculateDimension, getTranslation} from './../utils/functions';
 import {connect} from "react-redux";
 import GeneralListItem from './GeneralListItem';
@@ -22,6 +22,8 @@ import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import constants from './../utils/constants';
 import translations from "../utils/translations";
+import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
+import styles from './../styles';
 
 class PersonListItem extends Component {
     constructor(props) {
@@ -53,11 +55,11 @@ class PersonListItem extends Component {
                         type={this.props.type}
                         titleColor={this.props.titleColor}
                         firstComponentRenderData={firstComponentData}
-                        onPressMapIcon={this.onPressMapIcon}
+                        onPressMapIcon={this.props.onPressMapIconProp ? this.onPressMapIcon : null}
                         onPressName={this.props.onPressNameProp}
                     />
                 }
-                secondComponent={this.props.type !== 'Case' && this.props.type !== 'User' ? (
+                secondComponent={this.props.type !== 'Case' && this.props.type !== 'Event' && this.props.type !== 'User' && this.props.type !== 'LabResult' ? (
                     <PermissionComponent
                         render={() => (
                             <PersonListItemExposuresComponent
@@ -77,6 +79,14 @@ class PersonListItem extends Component {
                 textsStyleArray={this.props.textsStyleArray}
                 onPressArray={this.props.onPressTextsArray}
                 arrayPermissions={this.props.arrayPermissions}
+                onPermissionDisable={this.props.onPermissionDisable}
+                outbreakPermissions={this.props.outbreakPermissions}
+                secondaryOutbreakPermissions={this.props.secondaryOutbreakPermissions}
+                hasSecondaryActionsBar={this.props.secondaryTextsArray?.length}
+                secondaryTextsArray={this.props.secondaryTextsArray}
+                secondaryTextsStyleArray={this.props.secondaryTextsStyleArray}
+                secondaryOnPressArray={this.props.secondaryOnPressTextsArray}
+                secondaryArrayPermissions={this.props.secondaryArrayPermissions}
             />
         )
     }
@@ -90,10 +100,22 @@ class PersonListItem extends Component {
             age: '',
             visualId: '',
             addressString: '',
-            primaryColor: 'black',
+            primaryColor: styles.textColor,
             status: null,
             institutionName: '',
             telephoneNumbers: '',
+            emails: '',
+            //Lab Result
+            classification: '',
+            dateSampleTaken: '',
+            dateOfResult: '',
+            labName: '',
+            result: '',
+            labResultStatus: '',
+            //Event
+            name: '',
+            date: '',
+            description: ''
         };
         // the new implementation
         let person = get(itemToRender, 'mainData', null);
@@ -118,11 +140,31 @@ class PersonListItem extends Component {
             }
         }
         // Address
-        if (person && person.addresses && Array.isArray(person.addresses) && person.addresses.length > 0) {
+        if (type !== 'LabResult' && person && person.addresses && Array.isArray(person.addresses) && person.addresses.length > 0) {
             let personPlaceOfResidence = person.addresses.find((e) => {return e.typeId === config.userResidenceAddress.userPlaceOfResidence});
             if (personPlaceOfResidence) {
                 returnValues.addressString = getAddress(personPlaceOfResidence, true, this.props.locations);
+                if(personPlaceOfResidence.phoneNumber){
+                    // !IMPORTANT - this gets replaced if there's a person telephone number to show!
+                    returnValues.telephoneNumbers = personPlaceOfResidence.phoneNumber;
+                }
             }
+        }
+        if(person?.address){
+            let personPlaceOfResidence = person.address.typeId === config.userResidenceAddress.userPlaceOfResidence ? person.address : null;
+            if (personPlaceOfResidence) {
+                returnValues.addressString = getAddress(personPlaceOfResidence, true, this.props.locations);
+                if(personPlaceOfResidence.phoneNumber){
+                    // !IMPORTANT - this gets replaced if there's a person telephone number to show!
+                    returnValues.telephoneNumbers = personPlaceOfResidence.phoneNumber;
+                }
+            }
+        }
+        // Emails
+        if (checkArrayAndLength(person?.addresses) && type !== 'LabResult') {
+            returnValues.emails = person?.addresses.filter((e) => e.emailAddress).map((e) => e?.emailAddress).join(', ')
+        } else if (person?.address) {
+            returnValues.emails = person.address.emailAddress
         }
         // Visual Id
         if (person && person.visualId) {
@@ -133,15 +175,35 @@ class PersonListItem extends Component {
             returnValues.id = person._id;
         }
         // Followup final status
-        if (type !== 'Case' && person && person.followUp){
+        if (type !== 'Case' && type !== 'LabResult' && person && person.followUp){
             returnValues.status = person.followUp.status ? getTranslation(person.followUp.status, this.props.translation) : null;
         }
         // User institution and phone number
         if (person &&  person.hasOwnProperty('institutionName')){
             returnValues.institutionName =  getTranslation(person.institutionName, this.props.translation);
         }
+        // Replaces address telephone number
         if (person &&  person.hasOwnProperty('telephoneNumbers')){
             returnValues.telephoneNumbers = person.telephoneNumbers[translations.usersScreen.primaryPhone];
+        }
+        //Classification
+        if (type === 'LabResult' && person && person.classification){
+            returnValues.classification = person.classification ? getTranslation(person.classification, this.props.translation) : null;
+        }
+        if (type === 'LabResult'){
+            const labResultData =  get(itemToRender, 'labResultData', null);
+            returnValues.result = labResultData.result ? getTranslation(labResultData.result, this.props.translation) : null;
+            returnValues.dateSampleTaken = labResultData.dateSampleTaken ? moment(labResultData.dateSampleTaken).format('YYYY-MM-DD') : undefined;
+            returnValues.dateOfResult = labResultData.dateOfResult ? moment(labResultData.dateOfResult).format('YYYY-MM-DD') : undefined;
+            returnValues.labName = labResultData.labName;
+            returnValues.labResultStatus = labResultData.status ? getTranslation(labResultData.status, this.props.translation) : null;
+        }
+        if (type === 'Event') {
+            const eventData =  get(itemToRender, 'mainData', null);
+            returnValues.name = eventData.name;
+            returnValues.fullName = eventData.name;
+            returnValues.description = eventData.description;
+            returnValues.date = eventData.date ? moment(eventData.date).format('YYYY-MM-DD') : undefined
         }
         return returnValues;
     };
@@ -156,13 +218,16 @@ class PersonListItem extends Component {
                 returnedValues.followUpDay = get(itemToRender, 'followUpData.index', null);
             }
         }
+        if(type === 'LabResult') {
+
+        }
 
         return returnedValues;
     };
 
     onPressMapIcon = () => {
         InteractionManager.runAfterInteractions(() => {
-            if (this.props.onPressMapIconProp !== undefined) {
+            if (this.props.onPressMapIconProp) {
                 this.props.onPressMapIconProp()
             }
         })
@@ -173,53 +238,53 @@ class PersonListItem extends Component {
 // make a global style in the config directory
 const style = StyleSheet.create({
     container: {
-        backgroundColor: 'white',
-        borderRadius: 2
+        backgroundColor: styles.backgroundColor,
+        borderRadius: 4
     },
     firstSectionContainer: {
         justifyContent: 'space-between',
     },
     addressStyle: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Light',
-        fontSize: 12,
-        color: styles.navigationDrawerItemText
+        fontSize: 14
     },
     secondSectionContainer: {
         justifyContent: 'center'
     },
     thirdSectionContainer: {
+        alignItems: 'center',
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        justifyContent: 'space-between'
     },
     rippleStyle: {
         height: '100%',
         justifyContent: 'center'
     },
     rippleTextStyle: {
+        color: styles.primaryColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 12,
-        color: styles.buttonGreen
+        fontSize: 14
     },
     centerItemContainer: {
         height: '100%',
         justifyContent: 'center'
     },
     primaryText: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 18,
-        color: 'black'
+        fontSize: 16
     },
     secondaryText: {
+        color: styles.secondaryColor,
         fontFamily: 'Roboto-Regular',
-        fontSize: 15,
-        color: styles.buttonTextGray
+        fontSize: 14
     },
     exposedToTextStyle: {
+        color: styles.textColor,
         fontFamily: 'Roboto-Medium',
-        fontSize: 15,
-        color: 'black'
+        fontSize: 14
     }
 });
 
