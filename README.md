@@ -15,7 +15,7 @@ The IMT focal point is CRAMPTON, Kevin <cramptonk@who.int> of IMT/PMO
 Copyright The GoDataSource-MobileApp Contributors.
 
 ## Terms of Use and License Agreement
-GoDataSource-MobileApp is available under the GNU General Public License Version 3.
+GoDataSource-MobileApp is available under the [GNU General Public License Version 3](LICENSE).
 
 GoDataSource-MobileApp also includes external libraries that are available under a variety of licenses.
 
