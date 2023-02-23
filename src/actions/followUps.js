@@ -264,19 +264,19 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
         sort[`${aliasForContacts}.firstName`] = 1;
         sort[`${aliasForContacts}._id`] = 1;
         sort[`${aliasFollowUps}._id`] = 1;
-        if (lastElement) {
-            condition = Object.assign({}, condition, {
-                $expression: {
-                    pattern: `(${aliasForContacts}.lastName, ${aliasForContacts}.firstName, ${aliasForContacts}._id, ${aliasFollowUps}._id)>({lastName}, {firstName}, {id}, {followUpId})`,
-                    values: {
-                        lastName: get(lastElement, 'lastName', ''),
-                        firstName: get(lastElement, 'firstName', ''),
-                        id: get(lastElement, '_id', ''),
-                        followUpId: get(lastElement, 'followUpId', '')
-                    }
-                }
-            })
-        }
+        // if (lastElement) {
+        //     condition = Object.assign({}, condition, {
+        //         $expression: {
+        //             pattern: `(${aliasForContacts}.lastName, ${aliasForContacts}.firstName, ${aliasForContacts}._id, ${aliasFollowUps}._id)>({lastName}, {firstName}, {id}, {followUpId})`,
+        //             values: {
+        //                 lastName: get(lastElement, 'lastName', ''),
+        //                 firstName: get(lastElement, 'firstName', ''),
+        //                 id: get(lastElement, '_id', ''),
+        //                 followUpId: get(lastElement, 'followUpId', '')
+        //             }
+        //         }
+        //     })
+        // }
     }
 
     return {condition, sort};

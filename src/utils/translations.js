@@ -246,7 +246,7 @@ const exposureScreen = {
 
 const followUpsSingleScreen = {
     title: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_TITLE',
-    detailsiTitle: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_DETAILS_TAB',
+    detailsiTitle: 'LNG_FOLLOW_U  nPS_SINGLE_SCREEN_DETAILS_TAB',
     questionnaireTitle: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_QUESTIONNAIRE_TAB',
 
     missingButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_MISSING',
@@ -531,6 +531,7 @@ const addressFieldLabels = {
     latitude: 'LNG_ADDRESS_FIELD_LABEL_LATITUDE',
     deleteButton: 'LNG_COMMON_BUTTON_DELETE',
     copyAddress: 'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS',
+    copyAddressEvent: 'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS_EVENT',
     copyAddressContact: 'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS_CONTACT',
     isThePersonNextToYou: 'LNG_ADDRESS_FIELD_LABEL_IS_THE_PERSON_NEXT_TO_YOU'
 };

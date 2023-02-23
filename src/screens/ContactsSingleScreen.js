@@ -744,6 +744,7 @@ class ContactsSingleScreen extends Component {
             case 'address':
                 return (
                     <ContactsSingleAddress
+                        type={this.props.type}
                         routeKey={this.state.routes[this.state.index].key}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
