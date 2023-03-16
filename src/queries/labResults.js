@@ -105,9 +105,11 @@ function createQueryLabResults(outbreakId, labResultsFilter, searchText, lastEle
         query.group = `${aliasForLabResults}._id`;
     }
 
-    if (get(labResultsFilter, 'sort', null) !== null && lastElement && offset) {
+    if (offset) {
         query.offset = offset;
     }
+
+    console.log("Nasty", query.offset, offset, query.limit);
 
     return query;
 }
