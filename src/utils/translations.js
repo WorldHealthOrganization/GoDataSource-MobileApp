@@ -246,7 +246,7 @@ const exposureScreen = {
 
 const followUpsSingleScreen = {
     title: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_TITLE',
-    detailsiTitle: 'LNG_FOLLOW_U  nPS_SINGLE_SCREEN_DETAILS_TAB',
+    detailsiTitle: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_DETAILS_TAB',
     questionnaireTitle: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_QUESTIONNAIRE_TAB',
 
     missingButton: 'LNG_FOLLOW_UPS_SINGLE_SCREEN_ACTION_MISSING',
