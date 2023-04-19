@@ -7,10 +7,6 @@ import PropTypes from 'prop-types';
 import translations from './../utils/translations'
 import {getTooltip, getTranslation} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
-// Since this app is based around the material ui is better to use the components from
-// the material ui library, since it provides design and animations out of the box
-// var Switch = require('react-native-material-switch');
-// import Switch from 'react-native-material-switch';
 import {Switch} from 'react-native-ui-lib';
 import {isFunction} from './../utils/typeCheckingFunctions';
 import styles from './../styles';

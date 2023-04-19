@@ -10,7 +10,6 @@ jsonSql.configure({separatedValues: false});
 
 export function getPersonWithRelationsForOutbreakId({outbreakId, filter, search, lastElement, offset, personType}, computeCount) {
 
-    console.log("Important cases inside", filter);
     let countPromise = null;
     let mainPromise = executeQuery(createGeneralQuery({
         outbreakId: outbreakId,
@@ -203,18 +202,19 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
         sort[`${innerQueryAlias}.lastName`] = 1;
         sort[`${innerQueryAlias}.firstName`] = 1;
         sort[`${innerQueryAlias}._id`] = 1;
-        if (lastElement) {
-            mainCondition = Object.assign({}, mainCondition, {
-                $expression: {
-                    pattern: `(${innerQueryAlias}.lastName, ${innerQueryAlias}.firstName, ${innerQueryAlias}._id)>({lastName}, {firstName}, {id})`,
-                    values: {
-                        lastName: lodashGet(lastElement, 'lastName', ''),
-                        firstName: lodashGet(lastElement, 'firstName', ''),
-                        id: lodashGet(lastElement, '_id', '')
-                    }
-                }
-            })
-        }
+        //TODO: This was placed here for faster performance.This only works for sorted lists. After last name, first name, id. Otherwise this leads to problems displaying the items correctly when there's an offset.The sort does not sort the entire database.
+        // if (lastElement) {
+        //     mainCondition = Object.assign({}, mainCondition, {
+        //         $expression: {
+        //             pattern: `(${innerQueryAlias}.lastName, ${innerQueryAlias}.firstName, ${innerQueryAlias}._id)>({lastName}, {firstName}, {id})`,
+        //             values: {
+        //                 lastName: lodashGet(lastElement, 'lastName', ''),
+        //                 firstName: lodashGet(lastElement, 'firstName', ''),
+        //                 id: lodashGet(lastElement, '_id', '')
+        //             }
+        //         }
+        //     })
+        // }
     }
 
     // Create queries

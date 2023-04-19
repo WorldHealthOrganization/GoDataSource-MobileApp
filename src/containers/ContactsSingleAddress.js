@@ -170,7 +170,19 @@ class ContactsSingleAddress extends Component {
         } else if (item.type === 'ActionsBar') {
             item.onPressArray = [this.props.onDeletePress];
             if (this.props.isNew) {
-                item.textsArray = [item.textsArray[0], this.props.type === translations.personTypes.contactsOfContacts ? translations.addressFieldLabels.copyAddressContact : translations.addressFieldLabels.copyAddress];
+                let translation = 'NO CASE';
+                switch (this.props.type){
+                    case translations.personTypes.contactsOfContacts:
+                        translation = translations.addressFieldLabels.copyAddressContact;
+                        break;
+                    case translations.personTypes.events:
+                        translation = translations.addressFieldLabels.copyAddressEvent;
+                        break;
+                    default:
+                        translation = translations.addressFieldLabels.copyAddress;
+                        break;
+                }
+                item.textsArray = [item.textsArray[0], translation];
                 item.textsStyleArray = [item.textsStyleArray[0], {color: styles.backgroundColor}];
                 item.onPressArray = [item.onPressArray[0], this.props.onPressCopyAddress];
                 item.iconArray = [item.iconArray[0], null];
