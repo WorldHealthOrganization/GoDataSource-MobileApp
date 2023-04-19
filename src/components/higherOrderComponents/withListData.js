@@ -253,7 +253,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                     }
                                     this.setState((prevState) => {
                                         return {
-                                            data: !isRefresh && (prevState.lastElement !== null ||  (prevState.data.length + result.data.length) === prevState.dataCount) ? union(prevState.data,result.data) : result.data,
+                                            data: !isRefresh && (prevState.lastElement !== null || (prevState.data.length + result.data.length) === prevState.dataCount) ? union(prevState.data,result.data) : result.data,
                                             // exposureData: !isRefresh && (prevState.lastElement !== null ||  (prevState.exposureData.length + exposureResult.dataExposures.length) === prevState.dataCount) ? union(prevState.exposureData,exposureResult.dataExposures) : exposureResult.dataExposures,
                                             lastElement: lastElement,
                                             isAddFromNavigation: false,
@@ -400,16 +400,33 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             onPressAddExposure = (dataToForward) => {
                 let forwardScreen = this.computeForwardScreen('onPressAddExposure');
-                if (screenType === 'CasesScreen' || screenType === 'EventsScreen') {
+                if (screenType === 'CasesScreen') {
                     Navigation.push(this.props.componentId,{
                         component: {
                             //contactSingleScreen
                             name: forwardScreen,
                             passProps: {
                                 isNew: true,
+                                type: translations.personTypes.cases,
                                 addContactFromCasesScreen: true,
                                 caseIdFromCasesScreen: dataToForward._id,
                                 caseAddress: extractMainAddress(get(dataToForward, 'addresses', [])),
+                                singleCase: dataToForward,
+                                refresh: this.refresh
+                            }
+                        }
+                    })
+                } else if (screenType === 'EventsScreen'){
+                    Navigation.push(this.props.componentId,{
+                        component: {
+                            //contactSingleScreen
+                            name: forwardScreen,
+                            passProps: {
+                                isNew: true,
+                                type: translations.personTypes.events,
+                                addContactFromCasesScreen: true,
+                                caseIdFromCasesScreen: dataToForward._id,
+                                caseAddress: dataToForward?.address,
                                 singleCase: dataToForward,
                                 refresh: this.refresh
                             }

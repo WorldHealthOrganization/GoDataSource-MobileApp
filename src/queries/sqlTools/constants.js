@@ -449,18 +449,18 @@ function createMainQuery(dataType, outbreakId, filter, search, lastElement, offs
         } else {
             sort[`${mainQueryStrings.outerFilter}.lastName`] = 1;
             sort[`${mainQueryStrings.outerFilter}.firstName`] = 1;
-            if (lastElement) {
-                outerFilterCondition = Object.assign({}, outerFilterCondition, {
-                    $expression: {
-                        pattern: `(${mainQueryStrings.outerFilter}.lastName, ${mainQueryStrings.outerFilter}.firstName, ${mainQueryStrings.outerFilter}._id)>({lastName}, {firstName}, {id})`,
-                        values: {
-                            lastName: get(lastElement, 'lastName', ''),
-                            firstName: get(lastElement, 'firstName', ''),
-                            id: get(lastElement, '_id', '')
-                        }
-                    }
-                })
-            }
+            // if (lastElement) {
+            //     outerFilterCondition = Object.assign({}, outerFilterCondition, {
+            //         $expression: {
+            //             pattern: `(${mainQueryStrings.outerFilter}.lastName, ${mainQueryStrings.outerFilter}.firstName, ${mainQueryStrings.outerFilter}._id)>({lastName}, {firstName}, {id})`,
+            //             values: {
+            //                 lastName: get(lastElement, 'lastName', ''),
+            //                 firstName: get(lastElement, 'firstName', ''),
+            //                 id: get(lastElement, '_id', '')
+            //             }
+            //         }
+            //     })
+            // }
         }
     }
     let query = {

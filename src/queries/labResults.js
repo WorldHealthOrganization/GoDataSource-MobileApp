@@ -105,9 +105,11 @@ function createQueryLabResults(outbreakId, labResultsFilter, searchText, lastEle
         query.group = `${aliasForLabResults}._id`;
     }
 
-    if (get(labResultsFilter, 'sort', null) !== null && lastElement && offset) {
+    if (offset) {
         query.offset = offset;
     }
+
+    console.log("Nasty", query.offset, offset, query.limit);
 
     return query;
 }
@@ -261,19 +263,19 @@ function createConditionLabResults (outbreakId, labResultFilter, dataType, searc
         sort[`${aliasForContacts}.firstName`] = 1;
         sort[`${aliasForContacts}._id`] = 1;
         sort[`${aliasLabResults}._id`] = 1;
-        if (lastElement) {
-            condition = Object.assign({}, condition, {
-                $expression: {
-                    pattern: `(${aliasForContacts}.lastName, ${aliasForContacts}.firstName, ${aliasForContacts}._id, ${aliasLabResults}._id)>({lastName}, {firstName}, {id}, {labResultId})`,
-                    values: {
-                        lastName: get(lastElement, 'lastName', ''),
-                        firstName: get(lastElement, 'firstName', ''),
-                        id: get(lastElement, '_id', ''),
-                        labResultId: get(lastElement, 'labResultId', '')
-                    }
-                }
-            })
-        }
+        // if (lastElement) {
+        //     condition = Object.assign({}, condition, {
+        //         $expression: {
+        //             pattern: `(${aliasForContacts}.lastName, ${aliasForContacts}.firstName, ${aliasForContacts}._id, ${aliasLabResults}._id)>({lastName}, {firstName}, {id}, {labResultId})`,
+        //             values: {
+        //                 lastName: get(lastElement, 'lastName', ''),
+        //                 firstName: get(lastElement, 'firstName', ''),
+        //                 id: get(lastElement, '_id', ''),
+        //                 labResultId: get(lastElement, 'labResultId', '')
+        //             }
+        //         }
+        //     })
+        // }
     }
 
     return {condition, sort};

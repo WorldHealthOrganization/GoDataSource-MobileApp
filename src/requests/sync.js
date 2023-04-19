@@ -22,7 +22,7 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
     let hubConfiguration = JSON.parse(hubConfig.clientId);
 
     let arrayOfTokens = getAllLanguageTokens();
-    // console.log("Array of Tokens: ", JSON.stringify(arrayOfTokens));
+    console.log("TEMPO Array of Tokens: ", JSON.stringify(arrayOfTokens));
 
     let filter = {};
 
