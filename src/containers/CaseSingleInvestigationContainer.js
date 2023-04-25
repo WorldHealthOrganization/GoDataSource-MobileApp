@@ -5,18 +5,20 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {createDate, extractAllQuestions} from '../utils/functions';
+import {calculateDimension, createDate, extractAllQuestions, getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
 import QuestionCard from '../components/QuestionCard';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import uniqueId from 'lodash/uniqueId';
+import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
 import config from "./../utils/config";
 import styles from '../styles';
+import Section from "../components/Section";
 
 class CaseSingleInvestigationContainer extends Component {
 
@@ -65,7 +67,7 @@ class CaseSingleInvestigationContainer extends Component {
             }
         }
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
-        sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswers, 0);
+        let {categories, questions} = extractAllQuestions(sortedQuestions, previousAnswers, 0);
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.container}>
@@ -94,14 +96,41 @@ class CaseSingleInvestigationContainer extends Component {
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
-                            sortedQuestions.map((item, index) => {
-                                return this.handleRenderItem(previousAnswers, item, index, sortedQuestions)
+                            Object.keys(categories).map(key => {
+                                return this.handleRenderCategory(key, categories[key], previousAnswers, questions);
                             })
                         }
                     </ScrollView>
                 </View>
             </View >
         );
+    }
+
+    handleRenderCategory = (key, category, previousAnswers, questions) => {
+        return (
+            <View style={{borderRadius: 4}}>
+                <ElevatedView
+                    elevation={5}
+                    style={{
+                        overflow: 'hidden',
+                        borderRadius: 4,
+                        marginVertical: 6,
+                        justifyContent: 'center',
+                        paddingHorizontal: 16,
+                        paddingVertical: 8,
+                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                        width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
+                    }}
+                >
+                    <Section key={key} label={getTranslation(key, this.props.translation)} containerStyle={style.questionMarkupHeader} textStyle={style.questionMarkupHeaderText} />
+                </ElevatedView>
+                {
+                    category.map((item, index) => {
+                        return this.handleRenderItem(previousAnswers, item, index, questions);
+                    })
+                }
+            </View>
+        )
     }
 
     // Please write here all the methods that are not react native lifecycle methods
@@ -202,6 +231,16 @@ const style = StyleSheet.create({
     },
     contentContainerStyle: {
         alignItems: 'center'
+    },
+    questionMarkupHeader: {
+        backgroundColor: styles.warningColorRgb,
+        borderRadius: 4,
+        marginHorizontal: -16,
+        marginVertical: -8,
+        width: 400
+    },
+    questionMarkupHeaderText: {
+        color: styles.primaryAltColor
     },
 });
 

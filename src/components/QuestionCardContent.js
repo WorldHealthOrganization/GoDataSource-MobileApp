@@ -465,14 +465,15 @@ const customStyles = StyleSheet.create({
         fontStyle: 'italic'
     },
     questionMarkupHeader: {
-        backgroundColor: styles.warningColorRgb,
+        backgroundColor: styles.markupColorRgb,
         borderRadius: 4,
         marginHorizontal: -16,
         marginVertical: -8,
         width: 400
     },
     questionMarkupHeaderText: {
-        color: styles.primaryAltColor
+        color: styles.primaryAltColor,
+        fontSize: 16,
     },
     additionalQuestionContainer: {
         backgroundColor: styles.backgroundColorRgb

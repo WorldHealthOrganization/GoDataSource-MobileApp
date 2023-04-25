@@ -5,7 +5,13 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Alert, InteractionManager, ScrollView, StyleSheet, View} from 'react-native';
-import {checkRequiredQuestions, createDate, extractAllQuestions, getTranslation} from './../utils/functions';
+import {
+    calculateDimension,
+    checkRequiredQuestions,
+    createDate,
+    extractAllQuestions,
+    getTranslation
+} from './../utils/functions';
 import {connect} from "react-redux";
 import QuestionCard from './../components/QuestionCard';
 import {LoaderScreen} from 'react-native-ui-lib';
@@ -18,6 +24,8 @@ import uniqueId from "lodash/uniqueId";
 import TopContainerButtons from './../components/TopContainerButtons';
 import PermissionComponent from './../components/PermissionComponent';
 import styles from './../styles';
+import ElevatedView from "react-native-elevated-view";
+import Section from "../components/Section";
 
 class LabResultsSingleQuestionnaireContainer extends Component {
 
@@ -79,7 +87,7 @@ class LabResultsSingleQuestionnaireContainer extends Component {
         }
 
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
-        let questions = extractAllQuestions(sortedQuestions, previousAnswers, 0);
+        let {categories, questions} = extractAllQuestions(sortedQuestions, previousAnswers, 0);
 
         return (
             <View style={{ flex: 1 }}>
@@ -109,14 +117,41 @@ class LabResultsSingleQuestionnaireContainer extends Component {
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
-                            questions && Array.isArray(questions) && questions.length > 0 && questions.map((item, index) => {
-                                return this.handleRenderItem(previousAnswers, item, index, questions);
+                            Object.keys(categories).map(key => {
+                                return this.handleRenderCategory(key, categories[key], previousAnswers, questions);
                             })
                         }
                     </ScrollView>
                 </View>
             </View>
         );
+    }
+
+    handleRenderCategory = (key, category, previousAnswers, questions) => {
+        return (
+            <View style={{borderRadius: 4}}>
+                <ElevatedView
+                    elevation={5}
+                    style={{
+                        overflow: 'hidden',
+                        borderRadius: 4,
+                        marginVertical: 6,
+                        justifyContent: 'center',
+                        paddingHorizontal: 16,
+                        paddingVertical: 8,
+                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                        width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
+                    }}
+                >
+                    <Section key={key} label={getTranslation(key, this.props.translation)} containerStyle={style.questionMarkupHeader} textStyle={style.questionMarkupHeaderText} />
+                </ElevatedView>
+                {
+                    category.map((item, index) => {
+                        return this.handleRenderItem(previousAnswers, item, index, questions);
+                    })
+                }
+            </View>
+        )
     }
 
     // Please write here all the methods that are not react native lifecycle methods
@@ -267,7 +302,17 @@ const style = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'center'
-    }
+    },
+    questionMarkupHeader: {
+        backgroundColor: styles.warningColorRgb,
+        borderRadius: 4,
+        marginHorizontal: -16,
+        marginVertical: -8,
+        width: 400
+    },
+    questionMarkupHeaderText: {
+        color: styles.primaryAltColor
+    },
 });
 
 function mapStateToProps(state){
