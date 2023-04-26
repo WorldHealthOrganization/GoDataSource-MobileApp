@@ -218,7 +218,6 @@ dependencies {
 
     implementation project(':react-native-keychain')
     implementation project(':react-native-touch-id')
-    implementation project(':react-native-dark-mode')
     implementation project(':react-native-webview')
     implementation project(':react-native-version-number')
     implementation project(':react-native-randombytes')

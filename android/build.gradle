@@ -14,10 +14,16 @@ buildscript {
     repositories {
         google()
         jcenter()
-
-        //react-native-navigation
         mavenLocal()
-        mavenCentral()
+        //react-native-navigation
+        mavenCentral {
+            // We don't want to fetch react-native from Maven Central as there are
+            // older versions over there.
+            content {
+                excludeGroup "com.facebook.react"
+            }
+        }
+        maven { url 'https://www.jitpack.io' }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
