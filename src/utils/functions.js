@@ -989,16 +989,7 @@ export function extractAllQuestions(questions, item, index) {
         }
     }
     // console.log('Processing questions took: ', new Date().getTime() - start);
-    let categories = {};
-    questions.forEach(q => {
-        if(q.category){
-            if(!categories[q.category]){
-                categories[q.category] = [];
-            }
-            categories[q.category].push(q);
-        }
-    });
-    return {questions,categories};
+    return questions;
 }
 
 // previousAnswer = {key}

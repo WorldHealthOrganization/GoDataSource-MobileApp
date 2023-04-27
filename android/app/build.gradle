@@ -141,7 +141,7 @@ def getPassword(String currentUser, String keyChain) {
 android {
     ndkVersion rootProject.ext.ndkVersion
 
-    compileSdkVersion 31
+    compileSdkVersion 33
     buildToolsVersion '29.0.3'
 
     compileOptions {
@@ -152,9 +152,9 @@ android {
     defaultConfig {
         applicationId "com.who_mobile2020"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 33
         multiDexEnabled true
-        versionCode 46
+        versionCode 47
         versionName "2.46.0"
         ndk {
             abiFilters "armeabi-v7a", "x86", 'arm64-v8a', 'x86_64'

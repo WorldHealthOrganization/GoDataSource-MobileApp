@@ -34,6 +34,7 @@ class ContactsSingleQuestionnaire extends Component {
             previousAnswers: this.props.previousAnswers,
             collapsedQuestions: [],
         };
+        this.currentCategory = null;
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -47,6 +48,7 @@ class ContactsSingleQuestionnaire extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        this.currentCategory = null;
         let permissionsList = [];
         if (this.props.isNew) {
             permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_CREATE_CONTACT_OF_CONTACT : PERMISSION_CREATE_CONTACT;
@@ -77,7 +79,7 @@ class ContactsSingleQuestionnaire extends Component {
             }
         }
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
-        let {categories, questions} = extractAllQuestions(sortedQuestions, previousAnswers, 0);
+        let questions = extractAllQuestions(sortedQuestions, previousAnswers, 0);
         return (
             <View style={{flex: 1}}>
                 <View style={style.container}>
@@ -102,8 +104,8 @@ class ContactsSingleQuestionnaire extends Component {
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 16 }]}
                     >
                         {
-                            Object.keys(categories).map(key => {
-                                return this.handleRenderCategory(key, categories[key], previousAnswers, questions);
+                            questions.map((item, index) => {
+                                return this.handleRenderItem(previousAnswers, item, index, questions);
                             })
                         }
                     </ScrollView>
@@ -112,38 +114,36 @@ class ContactsSingleQuestionnaire extends Component {
         );
     }
 
-    handleRenderCategory = (key, category, previousAnswers, questions) => {
+    renderCategory = (category) => {
         return (
-            <View style={{borderRadius: 4}}>
-                <ElevatedView
-                    elevation={5}
-                    style={{
-                        overflow: 'hidden',
-                        borderRadius: 4,
-                        marginVertical: 6,
-                        justifyContent: 'center',
-                        paddingHorizontal: 16,
-                        paddingVertical: 8,
-                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
-                        width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
-                    }}
-                >
-                    <Section key={key} label={getTranslation(key, this.props.translation)} containerStyle={style.questionMarkupHeader} textStyle={style.questionMarkupHeaderText} />
-                </ElevatedView>
-                {
-                    category.map((item, index) => {
-                        return this.handleRenderItem(previousAnswers, item, index, questions);
-                    })
-                }
-            </View>
-        )
+            <ElevatedView
+                elevation={5}
+                style={{
+                    overflow: 'hidden',
+                    borderRadius: 4,
+                    marginVertical: 6,
+                    justifyContent: 'center',
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                    width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
+                }}
+            >
+                <Section key={category} label={getTranslation(category, this.props.translation)} containerStyle={style.questionMarkupHeader} textStyle={style.questionMarkupHeaderText} />
+            </ElevatedView>
+        );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (previousAnswers, item, index, totalQuestions) => {
         let totalNumberOfQuestions = totalQuestions.length;
+        let cardsToRender = [];
+        if (item.category && this.currentCategory !== item.category) {
+            this.currentCategory = item.category;
+            cardsToRender.push(this.renderCategory(item.category));
+        }
         if (item.inactive === false) {
-            return (
+            cardsToRender.push(
                 <QuestionCard
                     key={index}
                     item={item}
@@ -169,6 +169,7 @@ class ContactsSingleQuestionnaire extends Component {
                 />
             )
         }
+        return cardsToRender;
     };
 
     handleBackButton = () => {
