@@ -109,8 +109,6 @@ function createQueryLabResults(outbreakId, labResultsFilter, searchText, lastEle
         query.offset = offset;
     }
 
-    console.log("Nasty", query.offset, offset, query.limit);
-
     return query;
 }
 

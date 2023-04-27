@@ -119,7 +119,6 @@ class QuestionCard extends PureComponent {
                     marginHorizontal: calculateDimension(16, false, this.props.screenSize),
                     width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
                 }]}
-                onPress={() => {this.setState({showDropdown: false})}}
             >
                 {
                     this.props.item.answerType === 'LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP' ? null :
@@ -132,8 +131,7 @@ class QuestionCard extends PureComponent {
                             marginRight={calculateDimension(34, false, this.props.screenSize)}
                             questionNumber={getTranslation(translations.generalLabels.questionInitial, this.props.translation).charAt(0).toUpperCase() + index}
                             questionText={getTranslation(this.props.item.text, this.props.translation)}
-                            questionCategory={this.props.item && this.props.item.category ?
-                                ' - ' + getTranslation(this.props.item.category, this.props.translation) : ''}
+                            questionCategory={''}
                         />
                 }
                 <View>
