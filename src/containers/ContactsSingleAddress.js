@@ -182,10 +182,10 @@ class ContactsSingleAddress extends Component {
                         translation = translations.addressFieldLabels.copyAddress;
                         break;
                 }
-                item.textsArray = [item.textsArray[0], translation];
-                item.textsStyleArray = [item.textsStyleArray[0], {color: styles.backgroundColor}];
-                item.onPressArray = [item.onPressArray[0], this.props.onPressCopyAddress];
-                item.iconArray = [item.iconArray[0], null];
+                item.textsArray = this.props.canCopyAddress ? [item.textsArray[0],translation] : [item.textsArray[0]];
+                item.textsStyleArray = this.props.canCopyAddress ?  [item.textsStyleArray[0], {color: styles.backgroundColor}] : [item.textsStyleArray[0]];
+                item.onPressArray = this.props.canCopyAddress ? [item.onPressArray[0],  this.props.onPressCopyAddress] : [item.onPressArray[0]];
+                item.iconArray = this.props.canCopyAddress ? [item.iconArray[0], null] : [item.iconArray[0]];
             }
         }
 
