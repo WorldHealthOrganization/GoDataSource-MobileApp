@@ -207,7 +207,8 @@ const style = StyleSheet.create({
         flexDirection: 'row',
         left: 24,
         position: "absolute",
-        top: 24
+        top: 24,
+        zIndex: 99
     },
     goBackLinkIcon: {
         color: styles.secondaryColor,
