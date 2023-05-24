@@ -12,6 +12,7 @@ import CardComponent from '../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import styles from '../styles';
+import get from "lodash/get";
 
 class LabResultsSingleGetInfoContainer extends PureComponent {
 
@@ -148,38 +149,15 @@ class LabResultsSingleGetInfoContainer extends PureComponent {
     };
 
     computeDataForLabResultSingleScreenDropdownInput = (item) => {
-        if (item.id === 'status') {
-            return  _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS")})
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if (item.id === 'labName') {
-            return  _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CATEGORY_LAB_NAME")})
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if (item.id === 'sampleType') {
-            return  _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE")})
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if (item.id === 'testType') {
-            return  _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST")})
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if (item.id === 'result') {
-            return  _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT")})
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if(item.id === 'sequence.labId') {
-            return  _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_LABORATORY")})
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if(item.id === 'sequence.resultId') {
-            return  _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_RESULT")})
+        if (item.categoryId) {
+            return  _.filter(this.props.referenceData, (o) => {
+                return (o.active === true && o.categoryId === item.categoryId) && (
+                    o.isSystemWide ||
+                    !this.props.outbreak?.allowedRefDataItems ||
+                    !this.props.outbreak.allowedRefDataItems[o.categoryId] ||
+                    this.props.outbreak.allowedRefDataItems[o.categoryId][o.value]
+                );
+            })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
@@ -217,7 +195,8 @@ function mapStateToProps(state) {
     return {
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         translation: _.get(state, 'app.translation', []),
-        referenceData: _.get(state, 'referenceData', [])
+        referenceData: _.get(state, 'referenceData', []),
+        outbreak: _.get(state, 'outbreak', null)
     };
 }
 

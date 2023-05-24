@@ -15,6 +15,7 @@ import _ from 'lodash';
 import {getTeamsForUserRequest} from "../queries/user";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import styles from '../styles';
+import get from "lodash/get";
 
 class FollowUpsSingleGetInfoContainer extends PureComponent {
 
@@ -172,17 +173,22 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     };
 
     computeDataForFollowUpSingleScreenDropdownInput = (item) => {
-        if (item.id === 'statusId') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE")
-                // && o.value !== config.followUpStatuses.notPerformed
-            })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
         if (item.id === 'teamId') {
             return _.filter(this.state.userTeams, (o) => { return o.deleted === false })
                 .sort((a, b) => { return a.name - b.name; })
                 .map((o) => { return { label: o.name, value: o.teamId } })
+        }
+        if (item.categoryId) {
+            return _.filter(this.props.referenceData, (o) => {
+                return (o.active === true && o.categoryId === item.categoryId) && (
+                    o.isSystemWide ||
+                    !this.props.outbreak?.allowedRefDataItems ||
+                    !this.props.outbreak.allowedRefDataItems[o.categoryId] ||
+                    this.props.outbreak.allowedRefDataItems[o.categoryId][o.value]
+                );
+            })
+                .sort((a, b) => { return a.order - b.order; })
+                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
     };
 }
@@ -215,7 +221,8 @@ function mapStateToProps(state) {
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         translation: _.get(state, 'app.translation', []),
         referenceData: _.get(state, 'referenceData', []),
-        userTeams: _.get(state, 'teams', [])
+        userTeams: _.get(state, 'teams', []),
+        outbreak: _.get(state, 'outbreak', null)
     };
 }
 

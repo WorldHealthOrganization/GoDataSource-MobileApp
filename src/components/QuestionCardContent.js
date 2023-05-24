@@ -283,6 +283,7 @@ class QuestionCardContent extends PureComponent {
                     const dataFormatKeys = Object.keys(dataWithNoneOption[0]);
                     if (dataFormatKeys.length === 2) {
                         const noneLabel = getTranslation(translations.generalLabels.noneLabel, this.props.translation);
+                        let noneData = null;
                         if (dataFormatKeys[0] === 'label' && dataFormatKeys[1] === 'value'){
                             noneData = { label: noneLabel, value: null };
                             dataWithNoneOption.unshift(noneData);

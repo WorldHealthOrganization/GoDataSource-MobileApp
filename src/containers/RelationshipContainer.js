@@ -187,16 +187,22 @@ class RelationshipContainer extends PureComponent {
 
     computeDataForExposure = (item) => {
         let data = [];
+        if (item.id === 'clusterId') {
+            data = this.props.clusters.map((e) => {
+                return {value: e.name, id: extractIdFromPouchId(e._id, 'cluster')}
+            })
+        }
         if (item.categoryId) {
-            data = this.props.referenceData.filter((e) => { return e.active === true && e.categoryId === item.categoryId })
+            data = this.props.referenceData.filter((o) => {
+                return (o.active === true && o.categoryId === item.categoryId) && (
+                    o.isSystemWide ||
+                    !this.props.outbreak?.allowedRefDataItems ||
+                    !this.props.outbreak.allowedRefDataItems[o.categoryId] ||
+                    this.props.outbreak.allowedRefDataItems[o.categoryId][o.value]
+                );
+            })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((e) => { return { value: getTranslation(e.value, this.props.translation), id: extractIdFromPouchId(e._id, 'referenceData') } });
-        } else {
-            if (item.id === 'clusterId') {
-                data = this.props.clusters.map((e) => {
-                    return {value: e.name, id: extractIdFromPouchId(e._id, 'cluster')}
-                })
-            }
         }
         return data;
     };
@@ -241,6 +247,7 @@ function mapStateToProps(state) {
         translation: get(state, 'app.translation', []),
         referenceData: get(state, 'referenceData', []),
         clusters: get(state, 'clusters', []),
+        outbreak: get(state, 'outbreak', null)
     };
 }
 

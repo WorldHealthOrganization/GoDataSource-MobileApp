@@ -23,6 +23,7 @@ import {
     PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
 } from "../utils/constants";
 import styles from './../styles';
+import get from "lodash/get";
 
 class ContactsSingleAddress extends Component {
 
@@ -282,9 +283,16 @@ class ContactsSingleAddress extends Component {
         return dateValidation
     };
 
-    computeDataForContactsSingleScreenDropdownInput = (item, index) => {
-        if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE' })
+    computeDataForContactsSingleScreenDropdownInput = (item) => {
+        if (item.categoryId) {
+            return _.filter(this.props.referenceData, (o) => {
+                return (o.active === true && o.categoryId === item.categoryId) && (
+                    o.isSystemWide ||
+                    !this.props.outbreak?.allowedRefDataItems ||
+                    !this.props.outbreak.allowedRefDataItems[o.categoryId] ||
+                    this.props.outbreak.allowedRefDataItems[o.categoryId][o.value]
+                );
+            })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
@@ -379,6 +387,7 @@ function mapStateToProps(state) {
         cases: state.cases,
         translation: state.app.translation,
         referenceData: state.referenceData,
+        outbreak: _.get(state, 'outbreak', null),
         locations: _.get(state, `locations.locations`, [])
     };
 }

@@ -20,6 +20,7 @@ import PermissionComponent from './../components/PermissionComponent';
 import {validateRequiredFields, checkValidEmails} from './../utils/formValidators';
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import styles from './../styles';
+import get from "lodash/get";
 
 class EventSingleAddressContainer extends React.Component {
 
@@ -231,8 +232,15 @@ class EventSingleAddressContainer extends React.Component {
     };
 
     computeDataForEventsSingleScreenDropdownInput = (item) => {
-        if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE' })
+        if (item.categoryId) {
+            return _.filter(this.props.referenceData, (o) => {
+                return (o.active === true && o.categoryId === item.categoryId) && (
+                    o.isSystemWide ||
+                    !this.props.outbreak?.allowedRefDataItems ||
+                    !this.props.outbreak.allowedRefDataItems[o.categoryId] ||
+                    this.props.outbreak.allowedRefDataItems[o.categoryId][o.value]
+                );
+            })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
@@ -359,6 +367,7 @@ function mapStateToProps(state) {
         role: state.role,
         translation: state.app.translation,
         referenceData: state.referenceData,
+        outbreak: _.get(state, 'outbreak', null),
         locations: _.get(state, `locations.locations`, []),
     };
 

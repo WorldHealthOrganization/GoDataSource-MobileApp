@@ -319,49 +319,17 @@ class ContactsSinglePersonal extends Component {
     };
 
     computeDataForContactsSingleScreenDropdownInput = (item) => {
-        if (item.id === 'riskLevel') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId.includes("RISK_LEVEL") })
+        if (item.categoryId) {
+            return _.filter(this.props.referenceData, (o) => {
+                return (o.active === true && o.categoryId === item.categoryId) && (
+                    o.isSystemWide ||
+                    !this.props.outbreak?.allowedRefDataItems ||
+                    !this.props.outbreak.allowedRefDataItems[o.categoryId] ||
+                    this.props.outbreak.allowedRefDataItems[o.categoryId][o.value]
+                );
+            })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-        if (item.id === 'gender') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_GENDER' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-        if (item.id === 'pregnancyStatus') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if (item.id === 'occupation') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-        if (item.id === 'followUp.status') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CONTACT_FINAL_FOLLOW_UP_STATUS_TYPE' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
-        }
-
-        // Documents data
-        if (item.id === 'type') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-
-        // Vaccines data
-        if (item.id === 'vaccine') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_VACCINE' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
-        }
-        if (item.id === 'status') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS' })
-                .sort((a, b) => { return a.order - b.order; })
-                .map((o) => { return { label: getTranslation(o.value, this.props.translation), value: o.value } })
         }
 
         if (item.id === 'followUpTeamId') {
