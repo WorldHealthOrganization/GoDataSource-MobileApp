@@ -457,7 +457,7 @@ const labResultsSingleScreen = {
                     label: translations.labResultsSingleScreen.sampleType,
                     value: '',
                     type: "DropdownInput",
-                    categoryId: "LNG_REFERENCE_DATA_CATEGORY_LAB_NAME",
+                    categoryId: "LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE",
                     isRequired: false,
                     isEditMode: true,
                     objectType: 'LabResult'
@@ -467,7 +467,7 @@ const labResultsSingleScreen = {
                     label: translations.labResultsSingleScreen.testType,
                     value: '',
                     type: "DropdownInput",
-                    categoryId: "LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_SAMPLE",
+                    categoryId: "LNG_REFERENCE_DATA_CATEGORY_TYPE_OF_LAB_TEST",
                     isRequired: false,
                     isEditMode: true,
                     objectType: 'LabResult'
@@ -1349,7 +1349,7 @@ const eventSingleScreen = {
                     label: translations.addressFieldLabels.name,
                     labelValue: 'test',
                     type: 'DropdownInput',
-                    categoryId: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE',
+                    categoryId: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE',
                     value: '',
                     isRequired: true,
                     isEditMode: true,
