@@ -207,6 +207,7 @@ class FilterScreen extends Component {
                 />
                 <TabView
                     swipeEnabled={false}
+                    animationEnabled={Platform.OS === 'ios'}
                     navigationState={this.state}
                     renderScene={this.handleRenderScene}
                     renderPager={this.handleRenderPager}

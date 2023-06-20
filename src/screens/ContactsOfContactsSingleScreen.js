@@ -336,6 +336,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 />
                 <TabView
                     navigationState={this.state}
+                    animationEnabled={Platform.OS === 'ios'}
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.renderScene}
                     renderTabBar={this.handleRenderTabBar}

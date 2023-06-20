@@ -145,7 +145,6 @@ class CaseSingleScreen extends Component {
             isEditMode: this.props.isNew ? true : this.props.forceNew ? true : false,
             isDateTimePickerVisible: false,
             isModified: false,
-            canChangeScreen: false,
             caseBeforeEdit: {},
             anotherPlaceOfResidenceWasChosen: false,
             hasPlaceOfResidence: true,
@@ -304,7 +303,7 @@ class CaseSingleScreen extends Component {
                                 <ElevatedView
                                     elevation={0}
                                     style={[
-                                        style.headerButton, 
+                                        style.headerButton,
                                         {
                                             width: calculateDimension(30, false, this.props.screenSize),
                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -333,7 +332,7 @@ class CaseSingleScreen extends Component {
                                             button={
                                                 <Ripple
                                                     style={[
-                                                        style.moreMenuButton, 
+                                                        style.moreMenuButton,
                                                         {
                                                             width: calculateDimension(30, false, this.props.screenSize),
                                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -394,6 +393,7 @@ class CaseSingleScreen extends Component {
                         index: this.state.index,
                         routes: this.state.routes
                     }}
+                    animationEnabled={Platform.OS === 'ios'}
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}
@@ -450,47 +450,25 @@ class CaseSingleScreen extends Component {
 
     //Index change for TabBar
     handleOnIndexChange = _.throttle((index) => {
-        console.log("Can state change", index, this.state.canChangeScreen);
-        // if (this.state.canChangeScreen) {
         this.setState({
-            canChangeScreen: false,
             index
         });
-        // }
     }, 800);
     handleMoveToScreen = (nextIndex) => {
-        this.setState({
-            canChangeScreen: true,
-        }, () => {
-            console.log("On index change 1");
-            this.handleOnIndexChange(nextIndex)
-        });
+        this.handleOnIndexChange(nextIndex)
     }
 
     handleMoveToNextScreenButton = () => {
         let nextIndex = this.state.index + 1;
-
-        this.setState({
-            canChangeScreen: true,
-        }, () => {
-            console.log("On index change 2");
-            this.handleOnIndexChange(nextIndex)
-        });
+        this.handleOnIndexChange(nextIndex)
     };
     handleMoveToPrevieousScreenButton = () => {
         let nextIndex = this.state.index - 1;
-
-        this.setState({
-            canChangeScreen: true,
-        });
-
-        console.log("On index change 3");
         this.handleOnIndexChange(nextIndex)
     };
 
     //Generate TabBar
     handleRenderTabBar = (props) => {
-        console.log("Render tab bar");
         return (
             <TabBar
                 {...props}
@@ -572,7 +550,6 @@ class CaseSingleScreen extends Component {
             </Animated.Text>
         );
     };
-
     //Render scene
     handleRenderScene = ({route}) => {
         switch (route.key) {
@@ -656,7 +633,6 @@ class CaseSingleScreen extends Component {
                         onPressAddDateRange={this.onPressAddDateRange}
                         handleOnPressDeleteDateRange={this.handleOnPressDeleteDateRange}
                         //onPressAddIsolationDates={this.onPressAddIsolationDates}
-
                         checkIsolationOnsetDates={this.checkIsolationOnsetDates}
                         onChangeSectionedDropDownDateRange={this.onChangeSectionedDropDownDateRange}
                         onChangeSectionedDropDownIsolation={this.onChangeSectionedDropDownIsolation}

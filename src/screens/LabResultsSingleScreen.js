@@ -226,6 +226,7 @@ class LabResultsSingleScreen extends Component {
                 <TabView
                     navigationState={{index: this.state.index, routes:this.state.routes}}
                     onIndexChange={this.handleOnIndexChange}
+                    animationEnabled={Platform.OS === 'ios'}
                     renderScene={this.handleRenderScene}
                     renderPager={this.handleRenderPager}
                     renderTabBar={this.handleRenderTabBar}

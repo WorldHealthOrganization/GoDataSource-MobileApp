@@ -426,6 +426,7 @@ class ContactsSingleScreen extends Component {
                 <TabView
                     navigationState={{index: this.state.index, routes: this.state.routes}}
                     onIndexChange={this.handleOnIndexChange}
+                    animationEnabled={Platform.OS === 'ios'}
                     renderScene={this.renderScene}
                     renderTabBar={this.handleRenderTabBar}
                     useNativeDriver

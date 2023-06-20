@@ -91,7 +91,7 @@ class EventSingleAddressContainer extends React.Component {
                     >
                         <View style={style.container}>
                             {
-                                this.props.event && this.props.event.address && this.handleRenderItem(this.props.event.address, 0)
+                                this.handleRenderItem(0)
                             }
                         </View>
                     </ScrollView>
@@ -101,7 +101,7 @@ class EventSingleAddressContainer extends React.Component {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item, index) => {
+    handleRenderItem = (index) => {
         let fields = config.eventSingleScreen.address.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
