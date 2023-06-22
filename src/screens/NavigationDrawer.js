@@ -47,20 +47,10 @@ class NavigationDrawer extends Component {
         this.handleLogout = this.handleLogout.bind(this);
     }
 
+
+
     componentWillMount() {
-        console.log("Get all outbreaks");
-        getAllOutbreaks((error, result)=>{
-            if(!error){
-                result.map(outbreak => {
-                    if(outbreak._id.includes("outbreak.json_")){
-                    outbreak._id = outbreak._id.substring(14, outbreak._id.length);
-                    return outbreak;
-                }})
-                this.setState({
-                    outbreaks: result
-                })
-            }
-        });
+        this.populateOutbreakDropdown();
     }
 
     // Please add here the react lifecycle methods that you need
@@ -69,6 +59,9 @@ class NavigationDrawer extends Component {
             this.setState({
                 selectedScreen: this.props.selectedScreen
             })
+        }
+        if (prevProps.syncState !== this.props.syncState && this.props.syncState === 'Finished'){
+            this.populateOutbreakDropdown();
         }
     }
     // The render method should have at least business logic as possible,
@@ -317,6 +310,21 @@ class NavigationDrawer extends Component {
 
     };
 
+    populateOutbreakDropdown = () =>{
+        getAllOutbreaks((error, result)=>{
+            if(!error){
+                result.map(outbreak => {
+                    if(outbreak._id.includes("outbreak.json_")){
+                        outbreak._id = outbreak._id.substring(14, outbreak._id.length);
+                        return outbreak;
+                    }})
+                this.setState({
+                    outbreaks: result
+                })
+            }
+        });
+    }
+
     handleOnPressSync = () => {
         Navigation.mergeOptions(this.props.componentId, {
             sideMenu: {
@@ -397,7 +405,8 @@ function mapStateToProps(state) {
         selectedScreen: lodashGet(state, 'app.selectedScreen', 0),
         availableLanguages: lodashGet(state, 'app.availableLanguages', []),
         outbreak: lodashGet(state, 'outbreak', {name: 'No outbreak', disableOutbreakChange: false}),
-        translation: lodashGet(state, 'app.translation', [])
+        translation: lodashGet(state, 'app.translation', []),
+        syncState: lodashGet(state, 'app.syncState', null),
     };
 }
 

@@ -17,6 +17,7 @@ import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
 import styles from './../styles';
+import get from "lodash/get";
 
 class CaseSingleInfectionContainer extends Component {
 
@@ -363,53 +364,15 @@ class CaseSingleInfectionContainer extends Component {
     };
 
     computeDataForCasesSingleScreenDropdownInput = (item) => {
-        let categoryId = null;
-        switch(item.id) {
-            case 'typeId':
-                if (item.objectType === 'DateRanges') {
-                    categoryId = 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE';
-                } else {
-                    categoryId = 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE';
-                }
-                break;
-            case 'centerName':
-                if (item.objectType === 'DateRanges') {
-                    categoryId = 'LNG_REFERENCE_DATA_CATEGORY_CENTRE_NAME';
-                }
-                break;
-            case 'riskLevel':
-                categoryId = "LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL";
-                break;
-            case 'pregnancyStatus':
-                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS';
-                break;
-            case 'gender':
-                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_GENDER';
-                break;
-            case 'classification':
-                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION';
-                break;
-            case 'outcomeId':
-                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME';
-                break;
-            case 'type':
-                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE';
-                break;
-            case 'occupation':
-                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION';
-                break;
-            case 'vaccine':
-                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_VACCINE';
-                break;
-            case 'status':
-                categoryId = 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS';
-                break;
-            default:
-                categoryId = null;
-        }
-
-        if (categoryId) {
-            let returnedValue = _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === categoryId })
+        if (item.categoryId) {
+            let returnedValue = _.filter(this.props.referenceData, (o) => {
+                return (o.active === true && o.categoryId === item.categoryId) && (
+                    o.isSystemWide ||
+                    !this.props.outbreak?.allowedRefDataItems ||
+                    !this.props.outbreak.allowedRefDataItems[o.categoryId] ||
+                    this.props.outbreak.allowedRefDataItems[o.categoryId][o.value]
+                );
+            })
                 .sort((a, b) => { return a.order - b.order; });
             returnedValue = _.map(returnedValue, (o) => {
                 return { value: getTranslation(o.value, this.props.translation), id: o.value }
@@ -518,6 +481,7 @@ function mapStateToProps(state) {
         translation: _.get(state, 'app.translation', []),
         referenceData: _.get(state, 'referenceData', []),
         locations: _.get(state, `locations.locations`, []),
+        outbreak: _.get(state, 'outbreak', null),
         isDateOfOnsetRequired: _.get(state, 'outbreak.isDateOfOnsetRequired', null)
     };
 }

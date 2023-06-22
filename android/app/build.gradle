@@ -141,7 +141,7 @@ def getPassword(String currentUser, String keyChain) {
 android {
     ndkVersion rootProject.ext.ndkVersion
 
-    compileSdkVersion 30
+    compileSdkVersion 33
     buildToolsVersion '29.0.3'
 
     compileOptions {
@@ -152,10 +152,10 @@ android {
     defaultConfig {
         applicationId "com.who_mobile2020"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 33
         multiDexEnabled true
-        versionCode 44
-        versionName "2.43.1"
+        versionCode 49
+        versionName "2.47.0"
         ndk {
             abiFilters "armeabi-v7a", "x86", 'arm64-v8a', 'x86_64'
         }
@@ -218,7 +218,6 @@ dependencies {
 
     implementation project(':react-native-keychain')
     implementation project(':react-native-touch-id')
-    implementation project(':react-native-dark-mode')
     implementation project(':react-native-webview')
     implementation project(':react-native-version-number')
     implementation project(':react-native-randombytes')
@@ -226,7 +225,6 @@ dependencies {
     implementation project(':react-native-sentry')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-exit-app')
-    implementation project(':react-native-reanimated')
 //    implementation(project(':react-native-camera')) {
 //        // exclude group: "com.google.android.gms"
 //        exclude group: "com.android.support"

@@ -339,6 +339,7 @@ class EventSingleScreen extends Component {
                         index: this.state.index,
                         routes: this.state.routes
                     }}
+                    animationEnabled={Platform.OS === 'ios'}
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.handleRenderScene}
                     renderTabBar={this.handleRenderTabBar}

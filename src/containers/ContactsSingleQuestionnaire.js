@@ -5,7 +5,7 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {createDate, extractAllQuestions} from '../utils/functions';
+import {calculateDimension, createDate, extractAllQuestions, getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
 import QuestionCard from '../components/QuestionCard';
 import sortBy from 'lodash/sortBy';
@@ -22,6 +22,8 @@ import constants, {
 import config from "./../utils/config";
 import translations from "../utils/translations";
 import styles from './../styles';
+import ElevatedView from "react-native-elevated-view";
+import Section from "../components/Section";
 
 class ContactsSingleQuestionnaire extends Component {
 
@@ -32,6 +34,7 @@ class ContactsSingleQuestionnaire extends Component {
             previousAnswers: this.props.previousAnswers,
             collapsedQuestions: [],
         };
+        this.currentCategory = null;
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -45,6 +48,7 @@ class ContactsSingleQuestionnaire extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        this.currentCategory = null;
         let permissionsList = [];
         if (this.props.isNew) {
             permissionsList = this.props.type === translations.personTypes.contactsOfContacts ? PERMISSION_CREATE_CONTACT_OF_CONTACT : PERMISSION_CREATE_CONTACT;
@@ -75,7 +79,7 @@ class ContactsSingleQuestionnaire extends Component {
             }
         }
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
-        sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswers, 0);
+        let questions = extractAllQuestions(sortedQuestions, previousAnswers, 0);
         return (
             <View style={{flex: 1}}>
                 <View style={style.container}>
@@ -100,8 +104,8 @@ class ContactsSingleQuestionnaire extends Component {
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 16 }]}
                     >
                         {
-                            sortedQuestions.map((item, index) => {
-                                return this.handleRenderItem(previousAnswers, item, index, sortedQuestions)
+                            questions.map((item, index) => {
+                                return this.handleRenderItem(previousAnswers, item, index, questions);
                             })
                         }
                     </ScrollView>
@@ -110,11 +114,36 @@ class ContactsSingleQuestionnaire extends Component {
         );
     }
 
+    renderCategory = (category) => {
+        return (
+            <ElevatedView
+                elevation={5}
+                style={{
+                    overflow: 'hidden',
+                    borderRadius: 4,
+                    marginVertical: 6,
+                    justifyContent: 'center',
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                    width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
+                }}
+            >
+                <Section key={category} label={getTranslation(category, this.props.translation)} containerStyle={style.questionMarkupHeader} textStyle={style.questionMarkupHeaderText} />
+            </ElevatedView>
+        );
+    }
+
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (previousAnswers, item, index, totalQuestions) => {
         let totalNumberOfQuestions = totalQuestions.length;
+        let cardsToRender = [];
+        if (item.category && this.currentCategory !== item.category) {
+            this.currentCategory = item.category;
+            cardsToRender.push(this.renderCategory(item.category));
+        }
         if (item.inactive === false) {
-            return (
+            cardsToRender.push(
                 <QuestionCard
                     key={index}
                     item={item}
@@ -140,6 +169,7 @@ class ContactsSingleQuestionnaire extends Component {
                 />
             )
         }
+        return cardsToRender;
     };
 
     handleBackButton = () => {
@@ -209,6 +239,16 @@ const style = StyleSheet.create({
     },
     contentContainerStyle: {
         alignItems: 'center'
+    },
+    questionMarkupHeader: {
+        backgroundColor: styles.warningColorRgb,
+        borderRadius: 4,
+        marginHorizontal: -16,
+        marginVertical: -8,
+        width: 400
+    },
+    questionMarkupHeaderText: {
+        color: styles.primaryAltColor
     },
 });
 

@@ -5,18 +5,20 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {createDate, extractAllQuestions} from '../utils/functions';
+import {calculateDimension, createDate, extractAllQuestions, getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
 import QuestionCard from '../components/QuestionCard';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import uniqueId from 'lodash/uniqueId';
+import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
 import config from "./../utils/config";
 import styles from '../styles';
+import Section from "../components/Section";
 
 class CaseSingleInvestigationContainer extends Component {
 
@@ -27,6 +29,7 @@ class CaseSingleInvestigationContainer extends Component {
             previousAnswers: this.props.previousAnswers,
             collapsedQuestions: [],
         };
+        this.currentCategory = null;
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -43,6 +46,7 @@ class CaseSingleInvestigationContainer extends Component {
         // Get all additional questions recursively
 
         // Logic moved from the getDerivedStateFromProps
+        this.currentCategory = null;
         let previousAnswers = {};
         if (this.props.previousAnswers) {
             previousAnswers = Object.assign({}, this.props.previousAnswers);
@@ -65,7 +69,7 @@ class CaseSingleInvestigationContainer extends Component {
             }
         }
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
-        sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswers, 0);
+        let questions = extractAllQuestions(sortedQuestions, previousAnswers, 0);
         return (
             <View style={{ flex: 1 }}>
                 <View style={style.container}>
@@ -94,8 +98,8 @@ class CaseSingleInvestigationContainer extends Component {
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
-                            sortedQuestions.map((item, index) => {
-                                return this.handleRenderItem(previousAnswers, item, index, sortedQuestions)
+                            questions.map((item, index) => {
+                                return this.handleRenderItem(previousAnswers, item, index, questions);
                             })
                         }
                     </ScrollView>
@@ -104,35 +108,59 @@ class CaseSingleInvestigationContainer extends Component {
         );
     }
 
+    renderCategory = (category) => {
+        return (
+                <ElevatedView
+                    elevation={5}
+                    style={{
+                        overflow: 'hidden',
+                        borderRadius: 4,
+                        marginVertical: 6,
+                        justifyContent: 'center',
+                        paddingHorizontal: 16,
+                        paddingVertical: 8,
+                        marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                        width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
+                    }}
+                >
+                    <Section key={category} label={getTranslation(category, this.props.translation)} containerStyle={style.questionMarkupHeader} textStyle={style.questionMarkupHeaderText} />
+                </ElevatedView>
+        );
+    }
+
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (previousAnswers, item, index, totalQuestions) => {
         let totalNumberOfQuestions = totalQuestions.length;
-        if (item.inactive === false) {
-            return (
-                <QuestionCard
-                    key={index}
-                    item={item}
-                    isEditMode={this.props.isEditMode}
-                    index={index + 1}
-                    isCollapsed={ this.isCollapsed(item)}
-                    totalQuestions={totalQuestions}
-                    totalNumberOfQuestions={totalNumberOfQuestions}
-                    source={previousAnswers}
-                    onCollapse={ this.collapseQuestion}
-                    onChangeTextAnswer={this.props.onChangeTextAnswer}
-                    onChangeSingleSelection={this.props.onChangeSingleSelection}
-                    onChangeMultipleSelection={this.props.onChangeMultipleSelection}
-                    onChangeDateAnswer={this.props.onChangeDateAnswer}
-                    onFocus={this.handleOnFocus}
-                    onClickAddNewMultiFrequencyAnswer={this.props.onClickAddNewMultiFrequencyAnswer}
-                    onBlur={this.handleOnBlur}
-                    onChangeAnswerDate={this.props.onChangeAnswerDate}
-                    savePreviousAnswers={this.props.savePreviousAnswers}
-                    copyAnswerDate={this.props.copyAnswerDate}
-                    editableQuestionDate={true}
-                />
-            )
+        let cardsToRender = [];
+        if (item.category && this.currentCategory !== item.category) {
+            this.currentCategory = item.category;
+            cardsToRender.push(this.renderCategory(item.category));
         }
+        if (item.inactive === false) {
+            cardsToRender.push(<QuestionCard
+                key={index}
+                item={item}
+                isEditMode={this.props.isEditMode}
+                index={index + 1}
+                isCollapsed={ this.isCollapsed(item)}
+                totalQuestions={totalQuestions}
+                totalNumberOfQuestions={totalNumberOfQuestions}
+                source={previousAnswers}
+                onCollapse={ this.collapseQuestion}
+                onChangeTextAnswer={this.props.onChangeTextAnswer}
+                onChangeSingleSelection={this.props.onChangeSingleSelection}
+                onChangeMultipleSelection={this.props.onChangeMultipleSelection}
+                onChangeDateAnswer={this.props.onChangeDateAnswer}
+                onFocus={this.handleOnFocus}
+                onClickAddNewMultiFrequencyAnswer={this.props.onClickAddNewMultiFrequencyAnswer}
+                onBlur={this.handleOnBlur}
+                onChangeAnswerDate={this.props.onChangeAnswerDate}
+                savePreviousAnswers={this.props.savePreviousAnswers}
+                copyAnswerDate={this.props.copyAnswerDate}
+                editableQuestionDate={true}
+            />)
+        }
+        return cardsToRender;
     };
 
     handleBackButton = () => {
@@ -202,6 +230,16 @@ const style = StyleSheet.create({
     },
     contentContainerStyle: {
         alignItems: 'center'
+    },
+    questionMarkupHeader: {
+        backgroundColor: styles.warningColorRgb,
+        borderRadius: 4,
+        marginHorizontal: -16,
+        marginVertical: -8,
+        width: 400
+    },
+    questionMarkupHeaderText: {
+        color: styles.primaryAltColor
     },
 });
 

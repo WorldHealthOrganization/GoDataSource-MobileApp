@@ -5,7 +5,13 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Alert, InteractionManager, ScrollView, StyleSheet, View} from 'react-native';
-import {checkRequiredQuestions, createDate, extractAllQuestions, getTranslation} from './../utils/functions';
+import {
+    calculateDimension,
+    checkRequiredQuestions,
+    createDate,
+    extractAllQuestions,
+    getTranslation
+} from './../utils/functions';
 import {connect} from "react-redux";
 import QuestionCard from './../components/QuestionCard';
 import {LoaderScreen} from 'react-native-ui-lib';
@@ -18,6 +24,8 @@ import uniqueId from "lodash/uniqueId";
 import TopContainerButtons from './../components/TopContainerButtons';
 import PermissionComponent from './../components/PermissionComponent';
 import styles from './../styles';
+import ElevatedView from "react-native-elevated-view";
+import Section from "../components/Section";
 
 class LabResultsSingleQuestionnaireContainer extends Component {
 
@@ -30,6 +38,7 @@ class LabResultsSingleQuestionnaireContainer extends Component {
             previousAnswers: this.props.previousAnswers,
             collapsedQuestions: [],
         };
+        this.currentCategory = null;
     }
 
     // Please add here the react lifecycle methods that you need
@@ -45,6 +54,7 @@ class LabResultsSingleQuestionnaireContainer extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        this.currentCategory = null;
         if (!this.state.interactionComplete) {
             return (
                 <LoaderScreen
@@ -109,7 +119,7 @@ class LabResultsSingleQuestionnaireContainer extends Component {
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
-                            questions && Array.isArray(questions) && questions.length > 0 && questions.map((item, index) => {
+                            questions.map((item, index) => {
                                 return this.handleRenderItem(previousAnswers, item, index, questions);
                             })
                         }
@@ -119,11 +129,36 @@ class LabResultsSingleQuestionnaireContainer extends Component {
         );
     }
 
+    renderCategory = (category) => {
+        return (
+            <ElevatedView
+                elevation={5}
+                style={{
+                    overflow: 'hidden',
+                    borderRadius: 4,
+                    marginVertical: 6,
+                    justifyContent: 'center',
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    marginHorizontal: calculateDimension(16, false, this.props.screenSize),
+                    width: calculateDimension(config.designScreenSize.width - 32, false, this.props.screenSize)
+                }}
+            >
+                <Section key={category} label={getTranslation(category, this.props.translation)} containerStyle={style.questionMarkupHeader} textStyle={style.questionMarkupHeaderText} />
+            </ElevatedView>
+        );
+    }
+
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (previousAnswers, item, index, totalQuestions) => {
         const totalNumberOfQuestions = totalQuestions.length;
+        let cardsToRender = [];
+        if (item.category && this.currentCategory !== item.category) {
+            this.currentCategory = item.category;
+            cardsToRender.push(this.renderCategory(item.category));
+        }
         if (item.inactive === false) {
-            return (
+            cardsToRender.push (
                 <QuestionCard
                     key={index}
                     item={item}
@@ -148,6 +183,7 @@ class LabResultsSingleQuestionnaireContainer extends Component {
                 />
             )
         }
+        return cardsToRender;
     };
 
     onPressSave = (questions) => {
@@ -267,7 +303,17 @@ const style = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'center'
-    }
+    },
+    questionMarkupHeader: {
+        backgroundColor: styles.warningColorRgb,
+        borderRadius: 4,
+        marginHorizontal: -16,
+        marginVertical: -8,
+        width: 400
+    },
+    questionMarkupHeaderText: {
+        color: styles.primaryAltColor
+    },
 });
 
 function mapStateToProps(state){

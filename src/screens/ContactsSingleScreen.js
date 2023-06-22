@@ -426,6 +426,7 @@ class ContactsSingleScreen extends Component {
                 <TabView
                     navigationState={{index: this.state.index, routes: this.state.routes}}
                     onIndexChange={this.handleOnIndexChange}
+                    animationEnabled={Platform.OS === 'ios'}
                     renderScene={this.renderScene}
                     renderTabBar={this.handleRenderTabBar}
                     useNativeDriver
@@ -744,6 +745,7 @@ class ContactsSingleScreen extends Component {
             case 'address':
                 return (
                     <ContactsSingleAddress
+                        type={this.props.type}
                         routeKey={this.state.routes[this.state.index].key}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
@@ -754,6 +756,7 @@ class ContactsSingleScreen extends Component {
                         onChangeSectionedDropDown={this.handleOnChangeSectionedDropDown}
                         onDeletePress={this.handleOnDeletePress}
                         onPressCopyAddress={this.handleOnPressCopyAddress}
+                        canCopyAddress={!!this.props.caseAddress}
                         onPressAddAdrress={this.handleOnPressAddAdrress}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         onPressPreviousButton={this.handleMoveToPrevieousScreenButton}
@@ -1985,24 +1988,28 @@ class ContactsSingleScreen extends Component {
     };
 
     handleOnPressCopyAddress = (index) => {
-        Alert.alert(
-            getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.copyAddress, this.props.translation), [
-                {
-                    text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
-                        console.log('Cancel pressed')
+        if (this.props.caseAddress) {
+            Alert.alert(
+                getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.copyAddress, this.props.translation), [
+                    {
+                        text: getTranslation(translations.generalLabels.noAnswer, this.props.translation),
+                        onPress: () => {
+                            console.log('Cancel pressed')
+                        }
+                    },
+                    {
+                        text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation),
+                        onPress: () => {
+                            let contactsCopy = _.cloneDeep(this.state.contact);
+                            _.set(contactsCopy, `addresses[${index}]`, this.props.caseAddress);
+                            this.setState({
+                                contact: contactsCopy
+                            })
+                        }
                     }
-                },
-                {
-                    text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
-                        let contactsCopy = _.cloneDeep(this.state.contact);
-                        _.set(contactsCopy, `addresses[${index}]`, this.props.caseAddress);
-                        this.setState({
-                            contact: contactsCopy
-                        })
-                    }
-                }
-            ]
-        );
+                ]
+            );
+        }
     };
 
     handleOnPressAddAdrress = () => {

@@ -10,15 +10,26 @@ export function getOutbreakByIdRequest(outbreakId, token, callback) {
     getDatabase(config.mongoCollections.outbreak)
         .then((database) => {
             console.log("This is the PK", 'outbreak.json_' + outbreakId);
+            let request = database.get('outbreak.json_' + outbreakId);
+            if (!outbreakId) {
+                request = database.find({
+                    selector: {deleted: false},
+                    limit: 1
+                })
+            }
             // For searching by ID it is recommended to use the PouchDB allDocs method with the ID as a key, since primary indexes are much faster than secondary ones
-            database.get('outbreak.json_' + outbreakId)
+            request
                 .then((result) => {
-                    console.log("Result for find time for getting outbreak: ", new Date().getTime() - start);
-                    callback(null, result);
+                    console.log("Result for find time for getting outbreak: ", new Date().getTime() - start, result);
+                    callback(null, result.docs ? result.docs[0] : result);
                 })
                 .catch((errorGetOutbreak) => {
                     console.log("Error from getting outbreak: ", errorGetOutbreak);
-                    callback(errorGetOutbreak);
+                    if (outbreakId) {
+                        getOutbreakByIdRequest(null, token, callback);
+                    } else {
+                        callback(errorGetOutbreak);
+                    }
                 })
         })
         .catch((errorGetDatabase) => {
@@ -37,7 +48,7 @@ export function getAllOutbreaks(callback) {
                 // fields: ["name", "_id"]
             })
                 .then((result) => {
-                    console.log("Result for find time for getting outbreak: ", new Date().getTime() - start);
+                    console.log("Result for find time for getting all outbreaks: ", new Date().getTime() - start);
                     if(result?.docs){
                         callback(null, result.docs);
                     } else {

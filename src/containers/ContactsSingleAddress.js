@@ -23,6 +23,7 @@ import {
     PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
 } from "../utils/constants";
 import styles from './../styles';
+import get from "lodash/get";
 
 class ContactsSingleAddress extends Component {
 
@@ -170,10 +171,22 @@ class ContactsSingleAddress extends Component {
         } else if (item.type === 'ActionsBar') {
             item.onPressArray = [this.props.onDeletePress];
             if (this.props.isNew) {
-                item.textsArray = [item.textsArray[0], this.props.type === translations.personTypes.contactsOfContacts ? translations.addressFieldLabels.copyAddressContact : translations.addressFieldLabels.copyAddress];
-                item.textsStyleArray = [item.textsStyleArray[0], {color: styles.backgroundColor}];
-                item.onPressArray = [item.onPressArray[0], this.props.onPressCopyAddress];
-                item.iconArray = [item.iconArray[0], null];
+                let translation = 'NO CASE';
+                switch (this.props.type){
+                    case translations.personTypes.contactsOfContacts:
+                        translation = translations.addressFieldLabels.copyAddressContact;
+                        break;
+                    case translations.personTypes.events:
+                        translation = translations.addressFieldLabels.copyAddressEvent;
+                        break;
+                    default:
+                        translation = translations.addressFieldLabels.copyAddress;
+                        break;
+                }
+                item.textsArray = this.props.canCopyAddress ? [item.textsArray[0],translation] : [item.textsArray[0]];
+                item.textsStyleArray = this.props.canCopyAddress ?  [item.textsStyleArray[0], {color: styles.backgroundColor}] : [item.textsStyleArray[0]];
+                item.onPressArray = this.props.canCopyAddress ? [item.onPressArray[0],  this.props.onPressCopyAddress] : [item.onPressArray[0]];
+                item.iconArray = this.props.canCopyAddress ? [item.iconArray[0], null] : [item.iconArray[0]];
             }
         }
 
@@ -270,9 +283,16 @@ class ContactsSingleAddress extends Component {
         return dateValidation
     };
 
-    computeDataForContactsSingleScreenDropdownInput = (item, index) => {
-        if (item.id === 'typeId') {
-            return _.filter(this.props.referenceData, (o) => { return o.active === true && o.categoryId === 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE' })
+    computeDataForContactsSingleScreenDropdownInput = (item) => {
+        if (item.categoryId) {
+            return _.filter(this.props.referenceData, (o) => {
+                return (o.active === true && o.categoryId === item.categoryId) && (
+                    o.isSystemWide ||
+                    !this.props.outbreak?.allowedRefDataItems ||
+                    !this.props.outbreak.allowedRefDataItems[o.categoryId] ||
+                    this.props.outbreak.allowedRefDataItems[o.categoryId][o.value]
+                );
+            })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })
         }
@@ -367,6 +387,7 @@ function mapStateToProps(state) {
         cases: state.cases,
         translation: state.app.translation,
         referenceData: state.referenceData,
+        outbreak: _.get(state, 'outbreak', null),
         locations: _.get(state, `locations.locations`, [])
     };
 }

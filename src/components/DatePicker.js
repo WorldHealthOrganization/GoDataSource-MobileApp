@@ -12,7 +12,6 @@ import Ripple from 'react-native-material-ripple';
 import moment from 'moment/min/moment.min';
 import {getTranslation, getTooltip, createDate} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
-import {useDarkMode} from 'react-native-dark-mode';
 import stylesGlobal from './../styles';
 
 const DatePicker = React.memo(({
@@ -51,9 +50,6 @@ const DatePicker = React.memo(({
         }
     }, [value])
 
-
-    const isDarkMode = useDarkMode();
-
     const editInput = () => {
         let tooltip = getTooltip(label, translation);
         let customStyle = date !== undefined && date !== null ? customStyles.hasDateTooltipStyle : customStyles.emptyDateTooltipStyle;
@@ -83,7 +79,7 @@ const DatePicker = React.memo(({
                             isVisible={isDateTimePickerVisible}
                             onConfirm={handleDatePicked}
                             onCancel={handleDateCancelled}
-                            isDarkModeEnabled={isDarkMode}
+                            isDarkModeEnabled={false}
                             date={value ? new Date(
                                 Date.parse(
                                     moment(new Date(value), 'DD/MM/YYYY').format(

@@ -357,7 +357,6 @@ export default {
     'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DISCARD_ALL_CHANGES': 'Are you sure you want to discard all changes?',
 
     //events
-    'LNG_DIALOG_ALERT_MESSAGE_ARE_YOU_SURE_YOU_WANT_TO_DELETE_THIS_EVENT': 'Are you sure you want to delete this event?',
     'LNG_DIALOG_CONFIRM_DELETE_EVENT': 'Are you sure you want to delete this event?',
 
     // contacts
@@ -484,6 +483,7 @@ export default {
     'LNG_ADDRESS_FIELD_LABEL_LATITUDE': 'Latitude',
     'LNG_COMMON_BUTTON_DELETE': 'Delete',
     'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS': 'Copy case address',
+    'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS_EVENT': 'Copy event address',
     'LNG_ADDRESS_FIELD_LABEL_COPY_ADDRESS_CONTACT': 'Copy contact address',
     'LNG_ADDRESS_FIELD_LABEL_IS_THE_PERSON_NEXT_TO_YOU': 'Capture coordinates',
 
@@ -585,12 +585,7 @@ export default {
     'LNG_DROP_DOWN_SECTIONED_SELECTED': 'Items',
 
 
-    // Add single answer modal screen
-    'LNG_ADD_SINGLE_ANSWER_MODAL_SCREEN_ADD_NEW_ANSWER': 'Add new answer',
-
     // Previous answers screen
-    'LNG_PREVIOUS_ANSWERS_SCREEN_PREVIOUS_ANSWERS_TITLE': 'Previous Answers',
-    'LNG_PREVIOUS_ANSWERS_SCREEN_NO_PREVIOUS_ANSWERS_TO_SHOW': 'No previous answers to show',
     'LNG_QUESTIONNAIRE_LABEL_ADD_ANSWER': 'Add Answer',
     'LNG_QUESTIONNAIRE_LABEL_PREVIOUS_ANSWERS': 'Prev Answers',
 

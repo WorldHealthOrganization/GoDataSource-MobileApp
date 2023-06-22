@@ -241,6 +241,7 @@ class FollowUpsSingleScreen extends Component {
                 />
                 <TabView
                     navigationState={this.state}
+                    animationEnabled={Platform.OS === 'ios'}
                     onIndexChange={this.handleOnIndexChange}
                     renderScene={this.handleRenderScene}
                     renderPager={this.handleRenderPager}

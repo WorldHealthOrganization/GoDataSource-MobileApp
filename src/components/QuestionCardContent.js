@@ -283,6 +283,7 @@ class QuestionCardContent extends PureComponent {
                     const dataFormatKeys = Object.keys(dataWithNoneOption[0]);
                     if (dataFormatKeys.length === 2) {
                         const noneLabel = getTranslation(translations.generalLabels.noneLabel, this.props.translation);
+                        let noneData = null;
                         if (dataFormatKeys[0] === 'label' && dataFormatKeys[1] === 'value'){
                             noneData = { label: noneLabel, value: null };
                             dataWithNoneOption.unshift(noneData);
@@ -465,14 +466,15 @@ const customStyles = StyleSheet.create({
         fontStyle: 'italic'
     },
     questionMarkupHeader: {
-        backgroundColor: styles.warningColorRgb,
+        backgroundColor: styles.markupColorRgb,
         borderRadius: 4,
         marginHorizontal: -16,
         marginVertical: -8,
         width: 400
     },
     questionMarkupHeaderText: {
-        color: styles.primaryAltColor
+        color: styles.primaryAltColor,
+        fontSize: 16,
     },
     additionalQuestionContainer: {
         backgroundColor: styles.backgroundColorRgb

@@ -136,6 +136,7 @@ class ViewEditScreen extends Component {
                 <TabView
                     navigationState={this.state}
                     onIndexChange={this.handleOnIndexChange}
+                    animationEnabled={Platform.OS === 'ios'}
                     renderScene={this.handleRenderScene}
                     renderPager={this.handleRenderPager}
                     renderTabBar={this.handleRenderTabBar}
