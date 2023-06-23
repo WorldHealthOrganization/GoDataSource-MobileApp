@@ -155,6 +155,9 @@ class EventSingleScreen extends Component {
                     let relationsExposure = _.get(eventAndRelations, 'relationshipExposureData', []);
 
                     if (eventData !== null) {
+                        if(!eventData.address && eventData.addresses) {
+                            eventData.address = eventData.addresses[0];
+                        }
                         let mappedAnswers = mapAnswers(this.props.eventInvestigationQuestions, eventData.questionnaireAnswers);
                         let ageClone = {years: 0, months: 0};
                         let updateAge = false;
@@ -271,7 +274,7 @@ class EventSingleScreen extends Component {
                                 <ElevatedView
                                     elevation={0}
                                     style={[
-                                        style.headerButton, 
+                                        style.headerButton,
                                         {
                                             width: calculateDimension(30, false, this.props.screenSize),
                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -1193,9 +1196,9 @@ class EventSingleScreen extends Component {
             if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
                 if (objectType && objectType === 'Address') {
                     let addressClone = _.cloneDeep(this.state.event.address);
+                    if(!addressClone) addressClone = {};
                     // Check if the lat/lng have changed
                     if (id === 'lng') {
-                        console.log("Wnna know lng", value);
                         if (value === '' || value.value === '') {
                             delete addressClone.geoLocation;
                         } else {
@@ -1314,6 +1317,7 @@ class EventSingleScreen extends Component {
                         })
                     } else if (objectType && objectType === 'Address') {
                         let addressClone = _.cloneDeep(this.state.event.address);
+                        if(!addressClone) addressClone = {};
                         addressClone[id] = value && value.value ? value.value : value;
                         this.setState(prevState => ({
                             event: Object.assign({}, prevState.event, {address: addressClone}),
@@ -1341,6 +1345,7 @@ class EventSingleScreen extends Component {
                 {
                     text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
                         let addressClone = _.cloneDeep(this.state.event.address);
+                        if(!addressClone) addressClone = {};
                         addressClone.geoLocationAccurate = value;
                         this.setState(
                             (prevState) => ({
@@ -1356,6 +1361,7 @@ class EventSingleScreen extends Component {
                     text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
                         if (value) {
                             let addressClone = _.cloneDeep(this.state.event.address);
+                            if(!addressClone) addressClone = {};
                             addressClone.geoLocationAccurate = value;
                             this.setState(
                                 (prevState) => ({
@@ -1364,6 +1370,7 @@ class EventSingleScreen extends Component {
                                 }), () => {
                                     geolocation.getCurrentPosition((position) => {
                                             let addressClone = _.cloneDeep(this.state.event.address);
+                                            if(!addressClone) addressClone = {};
                                             if (!addressClone.geoLocation) {
                                                 addressClone.geoLocation = {};
                                                 addressClone.geoLocation.type = 'Point';
@@ -1390,6 +1397,7 @@ class EventSingleScreen extends Component {
                                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                                                     onPress: () => {
                                                         let addressClone = _.cloneDeep(this.state.event.address);
+                                                        if(!addressClone) addressClone = {};
                                                         if (!addressClone.geoLocation) {
                                                             addressClone.geoLocation = {};
                                                             addressClone.geoLocation.type = 'Point';
@@ -1421,6 +1429,7 @@ class EventSingleScreen extends Component {
                             )
                         } else {
                             let addressClone = _.cloneDeep(this.state.event.address);
+                            if(!addressClone) addressClone = {};
                             if (!addressClone.geoLocation) {
                                 addressClone.geoLocation = {};
                                 addressClone.geoLocation.type = 'Point';
@@ -1469,6 +1478,7 @@ class EventSingleScreen extends Component {
             if (typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
                 if (objectType === 'Address') {
                     let addressClone = _.cloneDeep(this.state.event.address);
+                    if(!addressClone) addressClone = {};
 
                     let anotherPlaceOfResidenceWasChosen = false;
                     if (value && value.value !== undefined) {
