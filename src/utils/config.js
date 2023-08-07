@@ -1330,6 +1330,16 @@ const eventSingleScreen = {
                 },
                 {
                     cardNumber: 1,
+                    id: 'visualId',
+                    label: translations.eventSingleScreen.eventId,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Event'
+                },
+                {
+                    cardNumber: 1,
                     id: 'description',
                     label: translations.eventSingleScreen.description,
                     type: 'TextInput',
