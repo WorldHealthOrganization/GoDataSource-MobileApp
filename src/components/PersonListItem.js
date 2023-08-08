@@ -151,7 +151,7 @@ class PersonListItem extends Component {
             }
         }
         if(person?.address){
-            let personPlaceOfResidence = person.address.typeId === config.userResidenceAddress.userPlaceOfResidence ? person.address : null;
+            let personPlaceOfResidence = person.address;
             if (personPlaceOfResidence) {
                 returnValues.addressString = getAddress(personPlaceOfResidence, true, this.props.locations);
                 if(personPlaceOfResidence.phoneNumber){
