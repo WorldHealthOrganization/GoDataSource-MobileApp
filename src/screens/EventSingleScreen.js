@@ -55,6 +55,7 @@ import {setDisableOutbreakChange} from "../actions/outbreak";
 import EventSingleRelationshipContainer from "../containers/EventSingleRelationshipContainer";
 import styles from './../styles';
 import colors from "../styles/colors";
+import CaseSingleInvestigationContainer from "../containers/CaseSingleInvestigationContainer";
 
 const initialLayout = {
     height: 0,
@@ -303,7 +304,7 @@ class EventSingleScreen extends Component {
                                             button={
                                                 <Ripple
                                                     style={[
-                                                        style.moreMenuButton, 
+                                                        style.moreMenuButton,
                                                         {
                                                             width: calculateDimension(30, false, this.props.screenSize),
                                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -628,6 +629,32 @@ class EventSingleScreen extends Component {
                     />
                 );
                 break;
+            case 'eventInvestigation':
+                return (
+                  <EventSingleInvestigationContainer
+                    routeKey={this.state.routes[this.state.index].key}
+                    item={this.state.case}
+                    currentAnswers={this.state.currentAnswers}
+                    previousAnswers={this.state.previousAnswers}
+                    isEditMode={this.state.isEditMode}
+                    index={this.state.index}
+                    numberOfTabs={this.state.routes.length}
+                    onPressEdit={this.onPressEdit}
+                    onPressSave={this.handleOnPressSave}
+                    onPressSaveEdit={this.onPressSaveEdit}
+                    onPressCancelEdit={this.onPressCancelEdit}
+                    onChangeTextAnswer={this.onChangeTextAnswer}
+                    onChangeSingleSelection={this.onChangeSingleSelection}
+                    onChangeMultipleSelection={this.onChangeMultipleSelection}
+                    onChangeDateAnswer={this.onChangeDateAnswer}
+                    handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                    isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
+                    onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
+                    onChangeAnswerDate={this.onChangeAnswerDate}
+                    savePreviousAnswers={this.savePreviousAnswers}
+                    copyAnswerDate={this.handleCopyAnswerDate}
+                  />
+                );
             default:
                 return null;
         }

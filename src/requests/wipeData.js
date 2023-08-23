@@ -9,9 +9,9 @@ export function wipeCompleteRequest(url, installationId, clientId, clientSecret,
         let deviceInfoStringify = JSON.stringify({
             id: installationId,
             os: Platform.OS,
-            manufacturer: DeviceInfo.getManufacturer().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
+            manufacturer: DeviceInfo.getManufacturerSync().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
             model: DeviceInfo.getModel().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
-            name: DeviceInfo.getDeviceName().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
+            name: DeviceInfo.getDeviceNameSync().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
         });
 
         fetch( encodeURI(requestUrl), {

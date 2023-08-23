@@ -122,12 +122,14 @@ const tabsValuesRoutes = {
     eventsSingle: [
         {key: 'details', title: translations.eventSingleScreen.detailsTitle},
         {key: 'address', title: translations.eventSingleScreen.addressTitle},
+        {key: 'eventInvestigation', title: translations.followUpsSingleScreen.questionnaireTitle}
     ],
     eventsSingleViewEdit: [
         {key: 'details', title: translations.eventSingleScreen.detailsTitle},
         {key: 'address', title: translations.eventSingleScreen.addressTitle},
         {key: 'contacts', title: 'Contacts'},
         {key: 'exposures', title: 'Exposures'},
+        {key: 'eventInvestigation', title: translations.followUpsSingleScreen.questionnaireTitle}
     ],
     contactsSingle: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
