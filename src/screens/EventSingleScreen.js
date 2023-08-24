@@ -55,7 +55,7 @@ import {setDisableOutbreakChange} from "../actions/outbreak";
 import EventSingleRelationshipContainer from "../containers/EventSingleRelationshipContainer";
 import styles from './../styles';
 import colors from "../styles/colors";
-import CaseSingleInvestigationContainer from "../containers/CaseSingleInvestigationContainer";
+import EventSingleInvestigationContainer from "../containers/EventSingleInvestigationContainer";
 
 const initialLayout = {
     height: 0,
@@ -109,6 +109,7 @@ class EventSingleScreen extends Component {
                         // },
                         date: createDate(null)
                     },
+                questionnaireAnswers: {},
 
             } : Object.assign({}, this.props.event),
             isEditMode: this.props.isNew ? true : this.props.forceNew ? true : false,
@@ -440,7 +441,6 @@ class EventSingleScreen extends Component {
 
     //Generate TabBar
     handleRenderTabBar = (props) => {
-        console.log("Render tab bar");
         return (
             <TabBar
                 {...props}
@@ -473,6 +473,8 @@ class EventSingleScreen extends Component {
                 activeColor={styles.primaryColor}
                 inactiveColor={styles.secondaryColor}
                 renderLabel={this.handleRenderLabel(props)}
+                scrollEnabled={true}
+                bounces={true}
             />
         )
     };
@@ -633,7 +635,7 @@ class EventSingleScreen extends Component {
                 return (
                   <EventSingleInvestigationContainer
                     routeKey={this.state.routes[this.state.index].key}
-                    item={this.state.case}
+                    item={this.state.event}
                     currentAnswers={this.state.currentAnswers}
                     previousAnswers={this.state.previousAnswers}
                     isEditMode={this.state.isEditMode}
@@ -701,7 +703,20 @@ class EventSingleScreen extends Component {
                                     }
                                 ])
                         } else {
-                            this.saveEventAction()
+                            if (this.checkAnswerDatesQuestionnaire()) {
+                                this.saveEventAction()
+                            } else {
+                                this.setState({loading: false}, () => {
+                                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
+                                        {
+                                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                            onPress: () => {
+                                                this.hideMenu()
+                                            }
+                                        }
+                                    ])
+                                })
+                            }
                         }
                     } else {
                         this.setState({loading: false}, () => {
@@ -735,6 +750,8 @@ class EventSingleScreen extends Component {
         // Remap the previous answers
         // let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
         // questionnaireAnswers = this.filterUnasweredQuestions();
+        eventClone.questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
+        eventClone.questionnaireAnswers = this.filterUnasweredQuestions(eventClone.questionnaireAnswers);
         this.setState(prevState => ({
             event: Object.assign({}, prevState.event, eventClone),
         }), () => {
@@ -1201,12 +1218,20 @@ class EventSingleScreen extends Component {
         return requiredFields;
         // return true;
     };
+    checkRequiredFieldsEventInvestigationQuestionnaire = () => {
+        let sortedQuestions = sortBy(cloneDeep(this.props.eventInvestigationQuestions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
+
+        let unAnsweredQuestions = checkRequiredQuestions(sortedQuestions, this.state.previousAnswers);
+
+        return unAnsweredQuestions;
+    };
     checkRequiredFields = () => {
         let requiredFields = [];
         if (this.state.event?.deleted) {
             return [];
         }
-        return requiredFields.concat(this.checkRequiredFieldsPersonalInfo(), this.checkRequiredFieldsAddress());
+        return requiredFields.concat(this.checkRequiredFieldsPersonalInfo(), this.checkRequiredFieldsAddress(), this.checkRequiredFieldsEventInvestigationQuestionnaire());
         // return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddress() && this.checkRequiredFieldsInfection() && this.checkRequiredFieldsEventInvestigationQuestionnaire()
     };
 
