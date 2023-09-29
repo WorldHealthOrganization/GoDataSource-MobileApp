@@ -102,7 +102,10 @@ class EventSingleAddressContainer extends React.Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (index) => {
-        let fields = config.eventSingleScreen.address.fields.map((field) => {
+        if(!this.props.preparedFields.address.visible){
+            return null;
+        }
+        let fields = this.props.preparedFields.address.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
@@ -119,6 +122,9 @@ class EventSingleAddressContainer extends React.Component {
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
+                            if(!item.visible){
+                                return null;
+                            }
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
                         })
                     }
@@ -274,12 +280,15 @@ class EventSingleAddressContainer extends React.Component {
                 return null;
             }
         );
-        let missingFields = this.props.checkRequiredFieldsAddresses();
+        let missingFields = this.props.checkRequiredFieldsAddress();
         let checkPlaceOfResidence = validateRequiredFields(
             this.props?.event?.address,
-            config.addressFields?.fields,
+            this.props.preparedFields.address.fields,
             (dataToBeValidated, fields, defaultFunction) => {
                 if (fields.id === 'typeId') {
+                    if (!Array.isArray(dataToBeValidated)){
+                        return dataToBeValidated.typeId === translations.userResidenceAddress.userPlaceOfResidence;
+                    }
                     return (checkArray(dataToBeValidated) && dataToBeValidated.length === 0) ||
                         (checkArrayAndLength(dataToBeValidated) && dataToBeValidated.find((e) => {
                             return e.typeId === translations.userResidenceAddress.userPlaceOfResidence

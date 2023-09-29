@@ -69,7 +69,10 @@ class CaseSingleInfectionContainer extends Component {
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
-                            config.caseSingleScreen.infection.map((item, index) => {
+                            this.props.preparedFields.infection.map((item, index) => {
+                                if (!item.visible){
+                                    return null;
+                                }
                                 return this.handleRenderItem(item, index)
                             })
                         }
@@ -138,7 +141,10 @@ class CaseSingleInfectionContainer extends Component {
     };
 
     handleRenderItemForDateRangesList = (item, index) => {
-        let fields = config.caseSingleScreen.dateRanges.fields.map((field) => {
+        if(!this.props.preparedFields.dateRanges.visible){
+            return null;
+        }
+        let fields = this.props.preparedFields.dateRanges.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
         // if (this.props && this.props.case && this.props.case.dateRanges && Array.isArray(this.props.case.dateRanges) && this.props.case.dateRanges[index] && this.props.case.dateRanges[index].typeId === config.dateRangeTypes.hospitalization) {
@@ -155,7 +161,7 @@ class CaseSingleInfectionContainer extends Component {
     };
 
     handleRenderItemForVaccinesList = (item, index) => {
-        let fields = config.caseSingleScreen.vaccinesReceived.fields.map((field) => {
+        let fields = this.props.preparedFields.vaccinesReceived.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: field.id === 'visualId' ? false : this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
@@ -172,7 +178,10 @@ class CaseSingleInfectionContainer extends Component {
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
-                            return this.handleRenderItemCardComponent(item, index, cardIndex);
+                            if(item.visible){
+                                return this.handleRenderItemCardComponent(item, index, cardIndex);
+                            }
+                            return null;
                         })
                     }
                 </ScrollView>

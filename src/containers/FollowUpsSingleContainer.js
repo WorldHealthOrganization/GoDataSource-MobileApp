@@ -67,6 +67,7 @@ class FollowUpsSingleContainer extends Component {
                 >
                     <FollowUpsSingleGetInfoContainer
                         isNew={this.props.isNew}
+                        preparedFields={this.props.preparedFields}
                         isEditMode={this.props.isEditMode}
                         item={this.props.item}
                         contact={this.props.contact}
@@ -78,6 +79,7 @@ class FollowUpsSingleContainer extends Component {
 
                     <FollowUpsSingleAddressContainer
                         item={this.props.item}
+                        preparedFields={this.props.preparedFields}
                         contact={this.props.contact}
                     />
                 </ScrollView>

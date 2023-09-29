@@ -120,10 +120,13 @@ class CaseSingleAddressContainer extends React.Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
-        let fields = config.caseSingleScreen.address.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
-        });
-        return this.renderItemCardComponent(fields, index)
+        if(this.props.preparedFields.address.visible){
+            let fields = this.props.preparedFields.address.fields.map((field) => {
+                return Object.assign({}, field, { isEditMode: this.props.isEditMode })
+            });
+            return this.renderItemCardComponent(fields, index)
+        }
+        return null;
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
@@ -137,7 +140,10 @@ class CaseSingleAddressContainer extends React.Component {
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
-                            return this.handleRenderItemCardComponent(item, index, cardIndex);
+                            if(item.visible){
+                                return this.handleRenderItemCardComponent(item, index, cardIndex);
+                            }
+                            return null;
                         })
                     }
                 </ScrollView>

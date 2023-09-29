@@ -12,7 +12,6 @@ import CardComponent from '../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import styles from '../styles';
-import get from "lodash/get";
 
 class LabResultsSingleGetInfoContainer extends PureComponent {
 
@@ -29,9 +28,11 @@ class LabResultsSingleGetInfoContainer extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('LabResultsSingleContainer render Details');
         return (
-            config.labResultsSingleScreen.generalInfo.map((item, index) => {
+            this.props.preparedFields.generalInfo.map((item, index) => {
+                if(!item.visible){
+                    return null;
+                }
                 return this.handleRenderItem(item, index)
             })
         );
@@ -61,6 +62,9 @@ class LabResultsSingleGetInfoContainer extends PureComponent {
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
+                            if(!item.visible){
+                                return null;
+                            }
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
                         })
                     }

@@ -83,3 +83,81 @@ export function checkValidEmails (arrayToCheck, pathToObject) {
     // }
     // return invalidEmails;
 }
+
+export function prepareFields(config, outbreakFields, screen, configTab) {
+    const configFields = Object.assign([],config.fields);
+    let atLeastOneVisible = false;
+    const result = configFields.map(cField =>{
+        let outbreakFieldKey;
+        const cFieldId = cField.fieldId || cField.id;
+        switch (configTab) {
+            case 'address':
+                if (screen === 'events' || screen === 'follow-ups'){
+                    outbreakFieldKey = `address____${cFieldId}`;
+                } else {
+                    outbreakFieldKey = `addresses____${cFieldId}`;
+                }
+                break;
+            case 'document':
+                outbreakFieldKey = `documents____${cFieldId}`;
+                break;
+            case 'vaccinesReceived':
+                outbreakFieldKey = `vaccinesReceived____${cFieldId}`;
+                break;
+            case 'dateRanges':
+                outbreakFieldKey = `dateRanges____${cFieldId}`;
+                break;
+            default:
+                outbreakFieldKey = cFieldId;
+                break;
+        }
+        if (cFieldId.includes('.')){
+            outbreakFieldKey = `${cFieldId.replace('.','[')}]`;
+        }
+        let newField = cField;
+        //default all are visible
+        newField.visible = true;
+        if (outbreakFields[outbreakFieldKey]){
+            newField.visible = outbreakFields[outbreakFieldKey].visible;
+            newField.isRequired = outbreakFields[outbreakFieldKey].mandatory;
+            atLeastOneVisible = true;
+            //TODO remove
+            // delete outbreakFields[outbreakFieldKey];
+        } else if (!cField.isNotField) {
+            console.log("Missed outbreak field", outbreakFieldKey)
+            newField.visible = false;
+        }
+        return newField;
+    });
+    // console.log("Missed config fields", outbreakFields);
+    console.log("???????????", {fields: result, visible: atLeastOneVisible});
+    return {fields: result, visible: atLeastOneVisible};
+}
+
+// returns parsed fields with correct visibility and isRequired properties, and a list of routes that shouldn't appear anymore
+export function prepareFieldsAndRoutes (outbreak, screen, config) {
+    //TODO: ALLOW ALL FIELDS FROM WEB AND CHECK FOR FIELDS THAT DOn"T EXIST ON WEB TO ALWAYS KEEP THEM VISIBLE ON MOBILE
+    let newConfig = Object.assign({},config);
+    if (outbreak?.visibleAndMandatoryFields && outbreak?.visibleAndMandatoryFields[screen]){
+        let outbreakFieldsClone = Object.assign({},outbreak.visibleAndMandatoryFields[screen]);
+        if (screen === "contacts" && outbreak?.visibleAndMandatoryFields["relationships"]){
+            outbreakFieldsClone = Object.assign(outbreakFieldsClone, outbreak?.visibleAndMandatoryFields["relationships"]);
+        }
+        for (const [key, value] of Object.entries(newConfig)) {
+            let fieldTab = key;
+            if (Array.isArray(value)){
+                 newConfig[key] = value.map(
+                    v => {
+                        return Object.assign({}, prepareFields(v, outbreakFieldsClone, screen, fieldTab));
+                    }
+                )
+                console.log(`Stinky ${fieldTab} is an array`, newConfig[key], newConfig[key][0].visible);
+            } else {
+                newConfig[key] = Object.assign({}, prepareFields(value, outbreakFieldsClone, screen, fieldTab))
+                console.log(`Stinky ${fieldTab} is NOT an array`, newConfig[key]);
+            }
+        }
+        console.log("Stinky 3", newConfig);
+    }
+    return newConfig;
+}

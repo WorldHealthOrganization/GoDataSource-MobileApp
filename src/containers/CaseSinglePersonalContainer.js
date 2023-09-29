@@ -68,8 +68,11 @@ class CaseSinglePersonalContainer extends Component {
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
-                            config.caseSingleScreen.personal.map((item, index) => {
-                                return this.handleRenderItem(item, index)
+                            this.props.preparedFields.personal.map((item, index) => {
+                                if (item.visible) {
+                                    return this.handleRenderItem(item, index)
+                                }
+                                return null;
                             })
                         }
                         <View style={style.container}>
@@ -109,11 +112,14 @@ class CaseSinglePersonalContainer extends Component {
     };
 
     handleRenderItemForDocumentsList = (item, index) => {
-        let fields = config.caseSingleScreen.document.fields.map((field) => {
-            field.isEditMode = this.props.isEditMode;
-            return field;
-        });
-        return this.renderItemCardComponent(fields, index)
+        if (this.props.preparedFields.document.visible) {
+            let fields = this.props.preparedFields.document.fields.map((field) => {
+                field.isEditMode = this.props.isEditMode;
+                return field;
+            });
+            return this.renderItemCardComponent(fields, index);
+        }
+        return null;
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
@@ -136,13 +142,16 @@ class CaseSinglePersonalContainer extends Component {
     };
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
-        return (
-            <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
-                {
-                    this.handleRenderItemByType(item, cardIndex)
-                }
-            </View>
-        )
+        if(item.visible){
+            return (
+                <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
+                    {
+                        this.handleRenderItemByType(item, cardIndex)
+                    }
+                </View>
+            )
+        }
+        return null;
     };
 
     handleRenderItemByType = (item, cardIndex) => {

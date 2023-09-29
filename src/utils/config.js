@@ -283,7 +283,8 @@ const addressFields = {
             isEditMode: true,
             multiline: false,
             objectType: 'Address',
-            keyboardType: 'numeric'
+            keyboardType: 'numeric',
+            fieldId: 'geoLocation'
         },
         {
             cardNumber: 1,
@@ -296,7 +297,8 @@ const addressFields = {
             isEditMode: true,
             multiline: false,
             objectType: 'Address',
-            keyboardType: 'numeric'
+            keyboardType: 'numeric',
+            fieldId: 'geoLocation'
         },
         {
             cardNumber: 1,
@@ -307,7 +309,8 @@ const addressFields = {
             textsStyleArray: [{color: styles.backgroundColor}],
             onPressArray: [],
             objectType: 'Address',
-            iconArray: ['delete']
+            iconArray: ['delete'],
+            isNotField: true
         }
     ]
 };
@@ -653,7 +656,8 @@ const labResultsFilterScreenNoContactPermission = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -718,7 +722,8 @@ const labResultsFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -805,7 +810,8 @@ const caseSingleScreen = {
                     values: 'TextSwitchSelectorAgeOrDobValues', //switch possibilities from config file
                     selectedItemIndexForTextSwitchSelector: 'selectedItemIndexForTextSwitchSelectorForAge', //name of state parameter that will contain the selected index from values
                     isEditMode: true,
-                    objectType: 'Case'
+                    objectType: 'Case',
+                    fieldId: 'ageDob'
                 },
                 {
                     cardNumber: 2,
@@ -818,7 +824,8 @@ const caseSingleScreen = {
                     isEditMode: true,
                     dependsOn: 'TextSwitchSelectorAgeOrDobValues', //if depends on this switch item and it is not selected, don't display
                     format: 'MM/dd/YYYY',
-                    objectType: 'Case'
+                    objectType: 'Case',
+                    fieldId: 'ageDob'
                 },
                 {
                     cardNumber: 2,
@@ -833,7 +840,8 @@ const caseSingleScreen = {
                     dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
                     selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
                     objectType: 'Case',
-                    keyboardType: 'numeric'
+                    keyboardType: 'numeric',
+                    fieldId: 'ageDob'
                 },
                 {
                     cardNumber: 1,
@@ -932,7 +940,9 @@ const caseSingleScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Documents',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                fieldId: 'additional',
+                isNotField: true
             }
         ]
     },
@@ -980,7 +990,8 @@ const caseSingleScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Vaccines',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     },
@@ -1227,7 +1238,8 @@ const caseSingleScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'DateRanges',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     },
@@ -1275,7 +1287,8 @@ const eventsFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -1474,7 +1487,8 @@ const eventSingleScreen = {
                     isEditMode: true,
                     multiline: false,
                     objectType: 'Address',
-                    keyboardType: 'numeric'
+                    keyboardType: 'numeric',
+                    fieldId: 'geoLocation'
                 },
                 {
                     cardNumber: 1,
@@ -1487,47 +1501,11 @@ const eventSingleScreen = {
                     isEditMode: true,
                     multiline: false,
                     objectType: 'Address',
-                    keyboardType: 'numeric'
+                    keyboardType: 'numeric',
+                    fieldId: 'geoLocation'
                 }
             ]
-        },
-    document: {
-        fields: [
-            {
-                cardNumber: 3,
-                id: 'type',
-                label: translations.caseSingleScreen.documentType,
-                type: 'DropdownInput',
-                categoryId: 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE',
-                value: '',
-                isRequired: true,
-                isEditMode: true,
-                objectType: 'Documents'
-            },
-            {
-                cardNumber: 3,
-                id: 'number',
-                label: translations.caseSingleScreen.documentNumber,
-                labelValue: 'test',
-                type: 'TextInput',
-                value: '',
-                isRequired: true,
-                isEditMode: true,
-                objectType: 'Documents'
-            },
-            {
-                cardNumber: 3,
-                id: 'deleteButton',
-                type: 'ActionsBar',
-                labelValue: 'test',
-                textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.backgroundColor}],
-                onPressArray: [],
-                objectType: 'Documents',
-                iconArray: ['delete']
-            }
-        ]
-    },
+        }
 }
 
 const personFilterScreen = {
@@ -1693,7 +1671,8 @@ const personFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -1856,7 +1835,8 @@ const followUpsFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -1924,7 +1904,8 @@ const helpFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -2114,7 +2095,8 @@ const casesFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -2251,7 +2233,8 @@ const addRelationshipScreen = [
         value: '',
         isRequired: true,
         isEditMode: true,
-        objectType: 'Contact'
+        objectType: 'Contact',
+        isNotField: true
     },
     {
         cardNumber: 1,
@@ -2479,7 +2462,8 @@ const contactsOfContactsPersonal = [
                 values: 'TextSwitchSelectorAgeOrDobValues', //switch possibilities from config file
                 selectedItemIndexForTextSwitchSelector: 'selectedItemIndexForTextSwitchSelectorForAge', //name of state parameter that will contain the selected index from values
                 isEditMode: true,
-                objectType: 'Contact'
+                objectType: 'Contact',
+                fieldId: 'ageDob'
             },
             {
                 cardNumber: 3,
@@ -2492,7 +2476,8 @@ const contactsOfContactsPersonal = [
                 isEditMode: true,
                 dependsOn: 'TextSwitchSelectorAgeOrDobValues', //if depends on this switch item and it is not selected, don't display
                 format: 'MM/dd/YYYY',
-                objectType: 'Contact'
+                objectType: 'Contact',
+                fieldId: 'ageDob'
             },
             {
                 cardNumber: 2,
@@ -2507,7 +2492,8 @@ const contactsOfContactsPersonal = [
                 dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
                 selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
                 objectType: 'Contact',
-                keyboardType: 'numeric'
+                keyboardType: 'numeric',
+                fieldId: 'ageDob'
             },
             {
                 cardNumber: 3,
@@ -2665,7 +2651,8 @@ const contactsSingleScreen = {
                     values: 'TextSwitchSelectorAgeOrDobValues', //switch possibilities from config file
                     selectedItemIndexForTextSwitchSelector: 'selectedItemIndexForTextSwitchSelectorForAge', //name of state parameter that will contain the selected index from values
                     isEditMode: true,
-                    objectType: 'Contact'
+                    objectType: 'Contact',
+                    fieldId: 'ageDob'
                 },
                 {
                     cardNumber: 3,
@@ -2678,7 +2665,8 @@ const contactsSingleScreen = {
                     isEditMode: true,
                     dependsOn: 'TextSwitchSelectorAgeOrDobValues', //if depends on this switch item and it is not selected, don't display
                     format: 'MM/dd/YYYY',
-                    objectType: 'Contact'
+                    objectType: 'Contact',
+                    fieldId: 'ageDob'
                 },
                 {
                     cardNumber: 2,
@@ -2693,7 +2681,8 @@ const contactsSingleScreen = {
                     dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
                     selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
                     objectType: 'Contact',
-                    keyboardType: 'numeric'
+                    keyboardType: 'numeric',
+                    fieldId: 'ageDob'
                 },
                 {
                     cardNumber: 3,
@@ -2802,7 +2791,8 @@ const contactsSingleScreen = {
                 value: '',
                 isRequired: true,
                 isEditMode: true,
-                objectType: 'Exposure'
+                objectType: 'Exposure',
+                isNotField: true
             },
             {
                 cardNumber: 1,
@@ -3075,7 +3065,7 @@ const manualSyncStages = [
     {id: 'sync', name: 'Sync', status: '...'}
 ];
 
-const dateRangeTypes ={
+const dateRangeTypes = {
     hospitalization: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION',
     isolation: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_ISOLATION',
     incubation: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_INCUBATION',

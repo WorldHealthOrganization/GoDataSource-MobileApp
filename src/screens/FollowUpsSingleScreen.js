@@ -18,7 +18,7 @@ import Breadcrumb from './../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
 import {addFollowUp, createFollowUp, updateFollowUpAndContact} from './../actions/followUps';
-import _, {cloneDeep, sortBy} from 'lodash';
+import _, {cloneDeep, remove, sortBy} from 'lodash';
 import {
     calculateDimension,
     createDate, createStackFromComponent, daysSince,
@@ -41,13 +41,21 @@ import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import styles from './../styles';
 import colors from "../styles/colors";
+import {prepareFieldsAndRoutes} from "../utils/formValidators";
 
 class FollowUpsSingleScreen extends Component {
 
     constructor(props) {
         super(props);
+
+        let routes = config.tabsValuesRoutes.followUpsSingle;
+        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'follow-ups', config.followUpsSingleScreen);
+        if (!this.preparedFields.address?.visible){
+            remove(routes, (route => route.key === 'address'))
+        }
+
         this.state = {
-            routes: config.tabsValuesRoutes.followUpsSingle,
+            routes: routes,
             index: 0,
             item: this.props.item,
             contact: this.props.contact,
@@ -165,7 +173,7 @@ class FollowUpsSingleScreen extends Component {
                                 <ElevatedView
                                     elevation={0}
                                     style={[
-                                        style.headerButton, 
+                                        style.headerButton,
                                         {
                                             width: calculateDimension(30, false, this.props.screenSize),
                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -193,7 +201,7 @@ class FollowUpsSingleScreen extends Component {
                                             button={
                                                 <Ripple
                                                     style={[
-                                                        style.moreMenuButton, 
+                                                        style.moreMenuButton,
                                                         {
                                                             width: calculateDimension(30, false, this.props.screenSize),
                                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -279,6 +287,7 @@ class FollowUpsSingleScreen extends Component {
                 return (
                     <FollowUpsSingleContainer
                         routeKey={this.state.routes[this.state.index].key}
+                        preparedFields={this.preparedFields}
                         isNew={this.props.isNew}
                         isEditMode={this.state.isEditMode}
                         item={this.state.item}
@@ -385,6 +394,22 @@ class FollowUpsSingleScreen extends Component {
         let checkRequiredFields = [];
         if (this.state.item.statusId === translations.generalLabels.noneLabel) {
             checkRequiredFields.push(getTranslation(_.get(config, 'followUpsSingleScreen.fields[1].label', 'Status'), this.props.translation));
+        }
+        for (let i = 0; i < this.preparedFields.generalInfo.length; i++ ){
+            for (let j = 0; j < this.preparedFields.generalInfo[i].fields.length; j++ ){
+                const field = this.preparedFields.generalInfo[i].fields[j];
+                if (field.isRequired && !this.state.item[field.id]){
+                    checkRequiredFields.push(getTranslation(field.label,this.props.translation));
+                }
+            }
+        }
+        for (let i = 0; i < this.preparedFields.address.length; i++ ){
+            for (let j = 0; j < this.preparedFields.address[i].fields.length; j++ ){
+                const field = this.preparedFields.address[i].fields[j];
+                if (field.isRequired && !this.state.item[field.id]){
+                    checkRequiredFields.push(getTranslation(field.label,this.props.translation));
+                }
+            }
         }
         return checkRequiredFields
     }

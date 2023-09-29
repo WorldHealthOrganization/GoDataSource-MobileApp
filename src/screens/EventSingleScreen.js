@@ -13,7 +13,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
 import config, {sideMenuKeys} from './../utils/config';
-import _, {sortBy, findIndex} from 'lodash';
+import _, {sortBy, findIndex, remove} from 'lodash';
 import EventSinglePersonalContainer from './../containers/EventSinglePersonalContainer';
 import EventSingleAddressContainer from './../containers/EventSingleAddressContainer';
 import {Icon} from 'react-native-material-ui';
@@ -46,7 +46,7 @@ import lodashGet from 'lodash/get';
 import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import withPincode from './../components/higherOrderComponents/withPincode';
-import {checkValidEmails, validateRequiredFields} from './../utils/formValidators';
+import {checkValidEmails, prepareFieldsAndRoutes, validateRequiredFields} from './../utils/formValidators';
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import Menu, {MenuItem} from "react-native-material-menu";
@@ -78,6 +78,11 @@ class EventSingleScreen extends Component {
             )) ?
                 config.tabsValuesRoutes.eventsSingleViewEdit :
                 config.tabsValuesRoutes.eventsSingle;
+
+        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'events', config.eventSingleScreen);
+        if (!this.preparedFields.address?.visible){
+            remove(routes, (route => route.key === 'address'))
+        }
 
         this.state = {
             interactionComplete: false,
@@ -424,7 +429,6 @@ class EventSingleScreen extends Component {
         this.setState({
             canChangeScreen: true,
         }, () => {
-            console.log("On index change 2");
             this.handleOnIndexChange(nextIndex)
         });
     };
@@ -530,6 +534,7 @@ class EventSingleScreen extends Component {
                 return (
                     <EventSinglePersonalContainer
                         eventStateControl={this.state.event.isDateOfReportingApproximate}
+                        preparedFields={this.preparedFields}
                         routeKey={this.state.routes[this.state.index].key}
                         event={this.state.event}
                         isEditMode={this.state.isEditMode}
@@ -559,6 +564,7 @@ class EventSingleScreen extends Component {
                 return (
                     <EventSingleAddressContainer
                         routeKey={this.state.routes[this.state.index].key}
+                        preparedFields={this.preparedFields}
                         event={this.state.event}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -1179,35 +1185,25 @@ class EventSingleScreen extends Component {
     checkRequiredFieldsPersonalInfo = () => {
         //personal info
         let requiredFields = [];
-        for (let i = 0; i < config.eventSingleScreen.details.length; i++) {
-            for (let j = 0; j < config.eventSingleScreen.details[i].fields.length; j++) {
-                if (config.eventSingleScreen.details[i].fields[j].isRequired && !this.state.event[config.eventSingleScreen.details[i].fields[j].id]) {
-                    requiredFields.push(getTranslation(config.eventSingleScreen.details[i].fields[j].label, this.props.translation));
+        for (let i = 0; i < this.preparedFields.details.length; i++) {
+            for (let j = 0; j < this.preparedFields.details[i].fields.length; j++) {
+                const field = this.preparedFields.details[i].fields[j];
+                if (field.isRequired && !this.state.event[field.id] && field.id !== 'visualId') {
+                    requiredFields.push(getTranslation(this.preparedFields.details[i].fields[j].label, this.props.translation));
                     // return false;
                 }
             }
         }
 
-        //documents
-        if (this.state.event && this.state.event.documents && Array.isArray(this.state.event.documents) && this.state.event.documents.length > 0) {
-            for (let i = 0; i < this.state.event.documents.length; i++) {
-                for (let j = 0; j < config.eventSingleScreen.document.fields.length; j++) {
-                    if (config.eventSingleScreen.document.fields[j].isRequired && !this.state.event.documents[i][config.eventSingleScreen.document.fields[j].id]) {
-                        requiredFields.push(getTranslation(config.eventSingleScreen.document.fields[j].label, this.props.translation));
-                        // return false;
-                    }
-                }
-            }
-        }
         return requiredFields;
         // return true;
     };
     checkRequiredFieldsAddress = () => {
         let requiredFields = [];
         if (this.state.event && this.state.event.address) {
-                for (let j = 0; j < config.eventSingleScreen.address.fields.length; j++) {
-                    if (config.eventSingleScreen.address.fields[j].isRequired && !this.state.event.address[config.eventSingleScreen.address.fields[j].id]) {
-                        requiredFields.push(getTranslation(config.eventSingleScreen.address.fields[j].label, this.props.translation));
+                for (let j = 0; j < this.preparedFields.address.fields.length; j++) {
+                    if (this.preparedFields.address.fields[j].isRequired && !this.state.event.address[this.preparedFields.address.fields[j].id]) {
+                        requiredFields.push(getTranslation(this.preparedFields.address.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }

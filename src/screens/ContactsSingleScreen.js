@@ -56,7 +56,12 @@ import {getItemByIdRequest} from './../actions/cases';
 import lodashGet from "lodash/get";
 import cloneDeep from "lodash/cloneDeep";
 import withPinconde from './../components/higherOrderComponents/withPincode';
-import {validateRequiredFields, checkValidEmails, formValidator} from './../utils/formValidators';
+import {
+    validateRequiredFields,
+    checkValidEmails,
+    formValidator,
+    prepareFieldsAndRoutes
+} from './../utils/formValidators';
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import {setDisableOutbreakChange} from "../actions/outbreak";
@@ -89,8 +94,14 @@ class ContactsSingleScreen extends Component {
                 config.tabsValuesRoutes.contactsSingle :
                 config.tabsValuesRoutes.contactsSingleWithoutExposures;
 
+
+
+        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'contacts', Object.assign({},config.contactsSingleScreen,{vaccinesReceived: config.caseSingleScreen.vaccinesReceived, document: config.caseSingleScreen.document}));
         if (this.props.outbreak && !this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC]) {
             remove(routes, (route => route.key === 'contacts'))
+        }
+        if (!this.preparedFields.address?.visible){
+            remove(routes, (route => route.key === 'address'))
         }
 
         this.state = {
@@ -713,6 +724,7 @@ class ContactsSingleScreen extends Component {
                 return (
                     <ContactsSinglePersonal
                         routeKey={this.state.routes[this.state.index].key}
+                        preparedFields={this.preparedFields}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
@@ -747,6 +759,7 @@ class ContactsSingleScreen extends Component {
                     <ContactsSingleAddress
                         type={this.props.type}
                         routeKey={this.state.routes[this.state.index].key}
+                        preparedFields={this.preparedFields}
                         contact={this.state.contact}
                         activeIndex={this.state.index}
                         onChangeText={this.handleOnChangeText}
@@ -1790,7 +1803,10 @@ class ContactsSingleScreen extends Component {
         let personalInfo = [];
         for (let i = 0; i < config.contactsSingleScreen.personal.length; i++) {
             for (let j = 0; j < config.contactsSingleScreen.personal[i].fields.length; j++) {
-                if (config.contactsSingleScreen.personal[i].fields[j].isRequired && !this.state.contact[config.contactsSingleScreen.personal[i].fields[j].id]) {
+                const field = config.contactsSingleScreen.personal[i].fields[j];
+                if (field.isRequired && !this.state.contact[field.id] &&
+                    !(field.id === 'pregnancyStatus' && (this.state.case?.gender === translations.localTranslationTokens.male)) &&
+                    field.id !== 'visualId') {
                     personalInfo.push(getTranslation(config.contactsSingleScreen.personal[i].fields[j].label, this.props.translation));
                     // return false;
                 }

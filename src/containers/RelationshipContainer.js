@@ -12,6 +12,7 @@ import CardComponent from './../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
 import styles from './../styles';
+import {prepareFieldsAndRoutes} from "../utils/formValidators";
 
 class RelationshipContainer extends PureComponent {
 
@@ -36,6 +37,16 @@ class RelationshipContainer extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+        let configFieldsToUse;
+        if (this.props.fromRelationshipScreen === true){
+            configFieldsToUse = config.addRelationshipScreen;
+        } else {
+            configFieldsToUse = config.contactsSingleScreen.relationship.fields;
+        }
+        const preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'relationships', {relationship: {fields: configFieldsToUse}})
+        if(!preparedFields.relationship.visible){
+            return null;
+        }
         return (
             <ScrollView
                 style={style.containerScrollView}
@@ -45,9 +56,9 @@ class RelationshipContainer extends PureComponent {
                 <View style={style.container}>
                     {
                         this.props.fromRelationshipScreen === true ? (
-                            this.renderItemCardComponent(config.addRelationshipScreen)
+                            this.renderItemCardComponent(preparedFields.relationship.fields)
                         ) : (
-                                this.handleRenderItem(null, 0)
+                                this.handleRenderItem(preparedFields, null, 0)
                             )
                     }
                 </View>
@@ -56,8 +67,8 @@ class RelationshipContainer extends PureComponent {
     }
 
     // Please write here all the methods that are not react native lifecycle methods
-    handleRenderItem = (item, index) => {
-        let fields = config.contactsSingleScreen.relationship.fields.map((field) => {
+    handleRenderItem = (preparedFields, item, index) => {
+        let fields = preparedFields.relationship.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true })
         });
         return this.renderItemCardComponent(fields, index)
