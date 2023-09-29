@@ -50,7 +50,7 @@ class FollowUpsSingleScreen extends Component {
 
         let routes = config.tabsValuesRoutes.followUpsSingle;
         this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'follow-ups', config.followUpsSingleScreen);
-        if (!this.preparedFields.address?.visible){
+        if (this.preparedFields.address?.invisible){
             remove(routes, (route => route.key === 'address'))
         }
 

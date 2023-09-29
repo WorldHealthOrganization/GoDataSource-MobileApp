@@ -70,7 +70,7 @@ class CaseSingleInfectionContainer extends Component {
                     >
                         {
                             this.props.preparedFields.infection.map((item, index) => {
-                                if (!item.visible){
+                                if (item.invisible){
                                     return null;
                                 }
                                 return this.handleRenderItem(item, index)
@@ -141,7 +141,7 @@ class CaseSingleInfectionContainer extends Component {
     };
 
     handleRenderItemForDateRangesList = (item, index) => {
-        if(!this.props.preparedFields.dateRanges.visible){
+        if(this.props.preparedFields.dateRanges.invisible){
             return null;
         }
         let fields = this.props.preparedFields.dateRanges.fields.map((field) => {
@@ -178,7 +178,7 @@ class CaseSingleInfectionContainer extends Component {
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
-                            if(item.visible){
+                            if(!item.invisible){
                                 return this.handleRenderItemCardComponent(item, index, cardIndex);
                             }
                             return null;

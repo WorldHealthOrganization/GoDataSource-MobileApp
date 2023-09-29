@@ -100,7 +100,7 @@ class ContactsSingleScreen extends Component {
         if (this.props.outbreak && !this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC]) {
             remove(routes, (route => route.key === 'contacts'))
         }
-        if (!this.preparedFields.address?.visible){
+        if (this.preparedFields.address?.invisible){
             remove(routes, (route => route.key === 'address'))
         }
 
@@ -1786,10 +1786,10 @@ class ContactsSingleScreen extends Component {
                 }
             }
         } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0 && this.state.contact.dob === null) {
-            //years dropdown 
+            //years dropdown
             ageClone.years = (this.state.contact.age && this.state.contact.age.years !== undefined && this.state.contact.age.years !== null) ? this.state.contact.age.years : 0
         } else if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 1 && this.state.contact.dob === null) {
-            //months dropdown 
+            //months dropdown
             ageClone.months = (this.state.contact.age && this.state.contact.age.months !== undefined && this.state.contact.age.months !== null) ? this.state.contact.age.months : 0
         }
         return {

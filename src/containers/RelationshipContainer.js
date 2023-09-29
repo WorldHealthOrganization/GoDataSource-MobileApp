@@ -44,7 +44,7 @@ class RelationshipContainer extends PureComponent {
             configFieldsToUse = config.contactsSingleScreen.relationship.fields;
         }
         const preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'relationships', {relationship: {fields: configFieldsToUse}})
-        if(!preparedFields.relationship.visible){
+        if(preparedFields.relationship.invisible){
             return null;
         }
         return (

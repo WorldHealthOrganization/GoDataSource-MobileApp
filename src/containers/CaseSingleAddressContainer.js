@@ -98,7 +98,7 @@ class CaseSingleAddressContainer extends React.Component {
                         </View>
                         {
                             this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start', 
+                                <View style={{ alignSelf: 'flex-start',
                                     marginHorizontal: calculateDimension(16, false, this.props.screenSize) }}>
                                     <Button
                                         title={this.props.case.addresses && this.props.case.addresses.length === 0 ? getTranslation(translations.caseSingleScreen.oneAddressText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreAddressesText, this.props.translation)}
@@ -120,7 +120,7 @@ class CaseSingleAddressContainer extends React.Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
-        if(this.props.preparedFields.address.visible){
+        if(!this.props.preparedFields.address.invisible){
             let fields = this.props.preparedFields.address.fields.map((field) => {
                 return Object.assign({}, field, { isEditMode: this.props.isEditMode })
             });
@@ -140,7 +140,7 @@ class CaseSingleAddressContainer extends React.Component {
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
-                            if(item.visible){
+                            if(!item.invisible){
                                 return this.handleRenderItemCardComponent(item, index, cardIndex);
                             }
                             return null;

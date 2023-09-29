@@ -75,7 +75,7 @@ class ContactsOfContactsSingleScreen extends Component {
 
         routes = routes.filter((e) => e.key !== 'investigation');
         this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'contacts-of-contacts',  Object.assign({}, config.contactsSingleScreen, {personal: config.contactsOfContactsPersonal, vaccinesReceived: config.caseSingleScreen.vaccinesReceived, document: config.caseSingleScreen.document}));
-        if (!this.preparedFields.address?.visible){
+        if (this.preparedFields.address?.invisible){
             remove(routes, (route => route.key === 'address'))
         }
         this.state = {
@@ -303,7 +303,7 @@ class ContactsOfContactsSingleScreen extends Component {
                                             button={
                                                 <Ripple
                                                     style={[
-                                                        style.moreMenuButton, 
+                                                        style.moreMenuButton,
                                                         {
                                                             width: calculateDimension(30, false, this.props.screenSize),
                                                             height: calculateDimension(30, true, this.props.screenSize)

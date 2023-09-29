@@ -44,7 +44,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     render() {
         return (
             this.props.preparedFields.generalInfo.map((item, index) => {
-                if(!item.visible){
+                if(item.invisible){
                     return null;
                 }
                 return this.handleRenderItem(item, index)
@@ -76,7 +76,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
-                            if(item.visible){
+                            if(item.invisible){
                                 return null;
                             }
                             return this.handleRenderItemCardComponent(item, index, cardIndex);

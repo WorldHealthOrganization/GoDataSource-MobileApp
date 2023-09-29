@@ -68,7 +68,7 @@ class EventSinglePersonalContainer extends Component {
                     >
                         {
                             this.props.preparedFields.details.map((item, index) => {
-                                if(item.visible){
+                                if(!item.invisible){
                                     return this.handleRenderItem(item, index)
                                 }
                                 return null;
@@ -100,7 +100,7 @@ class EventSinglePersonalContainer extends Component {
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
-                            if(item.visible){
+                            if(!item.invisible){
                                 return this.handleRenderItemCardComponent(item, index, cardIndex);
                             }
                             return null;

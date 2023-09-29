@@ -90,13 +90,13 @@ class CaseSingleScreen extends Component {
         // }
 
         this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'cases', config.caseSingleScreen);
-        if (!this.preparedFields.address?.visible){
+        if (this.preparedFields.address?.invisible){
             remove(routes, (route => route.key === 'address'))
         }
         if (
-            !this.preparedFields.infection.find(value => value.visible === true) &&
-            !this.preparedFields.vaccinesReceived.visible &&
-            !this.preparedFields.dateRanges.visible
+            !this.preparedFields.infection.find(value => value.invisible !== false) &&
+            this.preparedFields.vaccinesReceived.invisible &&
+            this.preparedFields.dateRanges.invisible
         ){
             remove(routes, (route => route.key === 'infection'))
         }

@@ -116,22 +116,17 @@ export function prepareFields(config, outbreakFields, screen, configTab) {
         }
         let newField = cField;
         //default all are visible
-        newField.visible = true;
+        newField.invisible = false;
         if (outbreakFields[outbreakFieldKey]){
-            newField.visible = outbreakFields[outbreakFieldKey].visible;
+            newField.invisible = !outbreakFields[outbreakFieldKey].visible;
             newField.isRequired = outbreakFields[outbreakFieldKey].mandatory;
             atLeastOneVisible = true;
-            //TODO remove
-            // delete outbreakFields[outbreakFieldKey];
         } else if (!cField.isNotField) {
-            console.log("Missed outbreak field", outbreakFieldKey)
-            newField.visible = false;
+            newField.invisible = true;
         }
         return newField;
     });
-    // console.log("Missed config fields", outbreakFields);
-    console.log("???????????", {fields: result, visible: atLeastOneVisible});
-    return {fields: result, visible: atLeastOneVisible};
+    return {fields: result, invisible: !atLeastOneVisible};
 }
 
 // returns parsed fields with correct visibility and isRequired properties, and a list of routes that shouldn't appear anymore
@@ -151,13 +146,10 @@ export function prepareFieldsAndRoutes (outbreak, screen, config) {
                         return Object.assign({}, prepareFields(v, outbreakFieldsClone, screen, fieldTab));
                     }
                 )
-                console.log(`Stinky ${fieldTab} is an array`, newConfig[key], newConfig[key][0].visible);
             } else {
                 newConfig[key] = Object.assign({}, prepareFields(value, outbreakFieldsClone, screen, fieldTab))
-                console.log(`Stinky ${fieldTab} is NOT an array`, newConfig[key]);
             }
         }
-        console.log("Stinky 3", newConfig);
     }
     return newConfig;
 }

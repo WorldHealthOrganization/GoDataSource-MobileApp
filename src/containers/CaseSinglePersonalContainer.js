@@ -69,7 +69,7 @@ class CaseSinglePersonalContainer extends Component {
                     >
                         {
                             this.props.preparedFields.personal.map((item, index) => {
-                                if (item.visible) {
+                                if (!item.invisible) {
                                     return this.handleRenderItem(item, index)
                                 }
                                 return null;
@@ -112,7 +112,7 @@ class CaseSinglePersonalContainer extends Component {
     };
 
     handleRenderItemForDocumentsList = (item, index) => {
-        if (this.props.preparedFields.document.visible) {
+        if (!this.props.preparedFields.document.invisible) {
             let fields = this.props.preparedFields.document.fields.map((field) => {
                 field.isEditMode = this.props.isEditMode;
                 return field;
@@ -142,7 +142,7 @@ class CaseSinglePersonalContainer extends Component {
     };
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
-        if(item.visible){
+        if(!item.invisible){
             return (
                 <View style={[style.subcontainerCardComponent, { flex: 1 }]} key={index}>
                     {

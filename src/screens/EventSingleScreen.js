@@ -80,7 +80,7 @@ class EventSingleScreen extends Component {
                 config.tabsValuesRoutes.eventsSingle;
 
         this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'events', config.eventSingleScreen);
-        if (!this.preparedFields.address?.visible){
+        if (this.preparedFields.address?.invisible){
             remove(routes, (route => route.key === 'address'))
         }
 

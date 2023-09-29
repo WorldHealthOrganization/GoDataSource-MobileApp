@@ -98,7 +98,7 @@ class ContactsSinglePersonal extends Component {
                         <View style={style.container}>
                             {
                                 this.props.preparedFields.personal.map((item, i) => {
-                                    if(!item.visible) {
+                                    if(item.invisible) {
                                         return null;
                                     }
                                     return this.handleRenderItem(item, i)
@@ -164,7 +164,7 @@ class ContactsSinglePersonal extends Component {
     };
 
     handleRenderItemForDocumentsList = (item, index) => {
-        if(!this.props.preparedFields?.document?.visible){
+        if(this.props.preparedFields?.document?.invisible){
             return null;
         }
         let fields = this.props.preparedFields?.document?.fields?.map((field) => {
@@ -174,7 +174,7 @@ class ContactsSinglePersonal extends Component {
     };
 
     handleRenderItemForVaccinesList = (item, index) => {
-        if(!this.props.preparedFields?.vaccinesReceived?.visible){
+        if(this.props.preparedFields?.vaccinesReceived?.invisible){
             return null;
         }
         let fields = this.props.preparedFields.vaccinesReceived.fields.map((field) => {
@@ -194,7 +194,7 @@ class ContactsSinglePersonal extends Component {
                 <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         fields && fields.map((item, index) => {
-                            if(!item.visible){
+                            if(item.invisible){
                                 return null;
                             }
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
