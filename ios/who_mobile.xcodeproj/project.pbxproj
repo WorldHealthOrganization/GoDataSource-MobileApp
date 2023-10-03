@@ -916,7 +916,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = YJDF2LWD3T;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YJDF2LWD3T;
@@ -960,7 +960,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = YJDF2LWD3T;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YJDF2LWD3T;
 				HEADER_SEARCH_PATHS = (

@@ -66,6 +66,7 @@ class LabResultsSingleContainer extends Component {
                     contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                 >
                     <LabResultsSingleGetInfoContainer
+                        preparedFields={this.props.preparedFields}
                         isNew={this.props.isNew}
                         isEditMode={this.props.isEditMode}
                         item={this.props.item}

@@ -529,7 +529,7 @@ function processFileGeneral(path, fileName, unzipLocation, hubConfig, encryptedD
         .catch((errorProcessFile) => Promise.reject(errorProcessFile));
 }
 
-export function comparePasswords(password, encryptedPassword, callback) {
+export function  comparePasswords(password, encryptedPassword, callback) {
     let start = new Date().getTime();
 
     let RNBcrypt = NativeModules.RNBcrypt;

@@ -13,7 +13,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
 import config, {sideMenuKeys} from './../utils/config';
-import _, {sortBy, findIndex} from 'lodash';
+import _, {sortBy, findIndex, remove} from 'lodash';
 import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalContainer';
 import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
 import CaseSingleInfectionContainer from './../containers/CaseSingleInfectionContainer';
@@ -50,7 +50,7 @@ import lodashGet from 'lodash/get';
 import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import withPincode from './../components/higherOrderComponents/withPincode';
-import {checkValidEmails, validateRequiredFields} from './../utils/formValidators';
+import {checkValidEmails, prepareFieldsAndRoutes, validateRequiredFields} from './../utils/formValidators';
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import Menu, {MenuItem} from "react-native-material-menu";
@@ -82,6 +82,24 @@ class CaseSingleScreen extends Component {
             )) ?
                 config.tabsValuesRoutes.casesSingleViewEdit :
                 config.tabsValuesRoutes.casesSingle;
+
+        // const results = prepareFieldsAndRoutes(this.props.outbreak, 'case', config.caseSingleScreen);
+        // if (results) {
+        //     routes = results.routes;
+        //     const fields = results.fields;
+        // }
+
+        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'cases', config.caseSingleScreen);
+        if (this.preparedFields.address?.invisible){
+            remove(routes, (route => route.key === 'address'))
+        }
+        if (
+            !this.preparedFields.infection.find(value => value.invisible !== false) &&
+            this.preparedFields.vaccinesReceived.invisible &&
+            this.preparedFields.dateRanges.invisible
+        ){
+            remove(routes, (route => route.key === 'infection'))
+        }
 
         this.state = {
             interactionComplete: false,
@@ -557,6 +575,7 @@ class CaseSingleScreen extends Component {
                 return (
                     <CaseSinglePersonalContainer
                         routeKey={this.state.routes[this.state.index].key}
+                        preparedFields={this.preparedFields}
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -586,6 +605,7 @@ class CaseSingleScreen extends Component {
                 return (
                     <CaseSingleAddressContainer
                         routeKey={this.state.routes[this.state.index].key}
+                        preparedFields={this.preparedFields}
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -609,12 +629,12 @@ class CaseSingleScreen extends Component {
                         hasPlaceOfResidence={this.state.hasPlaceOfResidence}
                     />
                 );
-
                 break;
             case 'infection':
                 return (
                     <CaseSingleInfectionContainer
                         routeKey={this.state.routes[this.state.index].key}
+                        preparedFields={this.preparedFields}
                         case={this.state.case}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -1484,10 +1504,15 @@ class CaseSingleScreen extends Component {
     checkRequiredFieldsPersonalInfo = () => {
         //personal info
         let requiredFields = [];
-        for (let i = 0; i < config.caseSingleScreen.personal.length; i++) {
-            for (let j = 0; j < config.caseSingleScreen.personal[i].fields.length; j++) {
-                if (config.caseSingleScreen.personal[i].fields[j].isRequired && !this.state.case[config.caseSingleScreen.personal[i].fields[j].id]) {
-                    requiredFields.push(getTranslation(config.caseSingleScreen.personal[i].fields[j].label, this.props.translation));
+
+        for (let i = 0; i < this.preparedFields.personal.length; i++) {
+            for (let j = 0; j < this.preparedFields.personal[i].fields.length; j++) {
+                const field = this.preparedFields.personal[i].fields[j];
+                if (field.isRequired && !this.state.case[field.id] &&
+                    !(field.id === 'pregnancyStatus' && (this.state.case?.gender === translations.localTranslationTokens.male)) &&
+                    field.id !== 'visualId'
+                ) {
+                    requiredFields.push(getTranslation(field.label, this.props.translation));
                     // return false;
                 }
             }
@@ -1518,9 +1543,6 @@ class CaseSingleScreen extends Component {
                     }
                 }
             }
-        } else {
-            return requiredFields;
-            // return false;
         }
         return requiredFields;
         // return true;
@@ -1530,9 +1552,13 @@ class CaseSingleScreen extends Component {
         //infection general info
         for (let i = 0; i < config.caseSingleScreen.infection.length; i++) {
             for (let j = 0; j < config.caseSingleScreen.infection[i].fields.length; j++) {
-                if (config.caseSingleScreen.infection[i].fields[j].isRequired && !this.state.case[config.caseSingleScreen.infection[i].fields[j].id]) {
-                    if (!(config.caseSingleScreen.infection[i].fields[j].id === 'dateOfOnset' && _.get(this.props, 'isDateOfOnsetRequired', null) === false)) {
-                        requiredFields.push(getTranslation(config.caseSingleScreen.infection[i].fields[j].label, this.props.translation));
+                const field = config.caseSingleScreen.infection[i].fields[j];
+                if (field.isRequired && !this.state.case[field.id]) {
+                    if (!(field.id === 'dateOfOnset' && _.get(this.props, 'isDateOfOnsetRequired', null) === false) &&
+                        !((field.id === 'safeBurial' || field.id === 'dateOfBurial' || field.id === 'burialLocationId' || field.id === 'burialPlaceName') &&
+                            (this.state.case.outcomeId !== config.caseFieldsForHardCodeCheck.outcomeIdDeceasedValue))
+                    ) {
+                        requiredFields.push(getTranslation(field.label, this.props.translation));
                     }
                     // return false;
                 }
@@ -1578,7 +1604,6 @@ class CaseSingleScreen extends Component {
             return [];
         }
         return requiredFields.concat(this.checkRequiredFieldsPersonalInfo(), this.checkRequiredFieldsAddresses(), this.checkRequiredFieldsInfection(), this.checkRequiredFieldsCaseInvestigationQuestionnaire());
-        // return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddresses() && this.checkRequiredFieldsInfection() && this.checkRequiredFieldsCaseInvestigationQuestionnaire()
     };
     checkAgeYearsRequirements = () => {
         if (this.state.selectedItemIndexForAgeUnitOfMeasureDropDown === 0) {

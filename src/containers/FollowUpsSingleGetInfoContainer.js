@@ -15,7 +15,6 @@ import _ from 'lodash';
 import {getTeamsForUserRequest} from "../queries/user";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import styles from '../styles';
-import get from "lodash/get";
 
 class FollowUpsSingleGetInfoContainer extends PureComponent {
 
@@ -43,9 +42,11 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        // console.log('FollowUpsSingleContainer render Details');
         return (
-            config.followUpsSingleScreen.generalInfo.map((item, index) => {
+            this.props.preparedFields.generalInfo.map((item, index) => {
+                if(item.invisible){
+                    return null;
+                }
                 return this.handleRenderItem(item, index)
             })
         );
@@ -75,6 +76,9 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
+                            if(item.invisible){
+                                return null;
+                            }
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
                         })
                     }
