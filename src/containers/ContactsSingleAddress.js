@@ -72,27 +72,27 @@ class ContactsSingleAddress extends Component {
         }
 
         return (
-                <View style={style.viewContainer}>
-                    <PermissionComponent
-                        render={() => (
-                            <TopContainerButtons
-                                isNew={this.props.isNew}
-                                isEditMode={this.props.isEditMode}
-                                index={this.props.activeIndex}
-                                numberOfTabs={this.props.numberOfTabs}
-                                onPressEdit={this.props.onPressEdit}
-                                onPressSaveEdit={this.props.onPressSaveEdit}
-                                onPressCancelEdit={this.props.onPressCancelEdit}
-                                onPressNextButton={this.props.onPressNextButton}
-                                onPressPreviousButton={this.handleBackButton}
-                            />
-                        )}
-                        permissionsList={permissionsList}
-                    />
-                    <ScrollView
-                        style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 16 }]}
-                    >
+            <View style={style.viewContainer}>
+                <PermissionComponent
+                    render={() => (
+                        <TopContainerButtons
+                            isNew={this.props.isNew}
+                            isEditMode={this.props.isEditMode}
+                            index={this.props.activeIndex}
+                            numberOfTabs={this.props.numberOfTabs}
+                            onPressEdit={this.props.onPressEdit}
+                            onPressSaveEdit={this.props.onPressSaveEdit}
+                            onPressCancelEdit={this.props.onPressCancelEdit}
+                            onPressNextButton={this.props.onPressNextButton}
+                            onPressPreviousButton={this.handleBackButton}
+                        />
+                    )}
+                    permissionsList={permissionsList}
+                />
+                <ScrollView
+                    style={style.containerScrollView}
+                    contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 16 }]}
+                >
                     <View style={style.container}>
                         {
                             this.props.contact && this.props.contact.addresses && this.props.contact.addresses.map((item, index) => {
@@ -115,9 +115,9 @@ class ContactsSingleAddress extends Component {
                             </View>
                         ) : null
                     }
-                    </ScrollView>
-                    {/* </KeyboardAwareScrollView> */}
-                </View>
+                </ScrollView>
+                {/* </KeyboardAwareScrollView> */}
+            </View>
         );
     }
 
