@@ -178,6 +178,7 @@ export default {
     'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE': 'Date of reporting approximate',
     'LNG_EVENT_FIELD_LABEL_DESCRIPTION': 'Description',
     'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID': 'Assigned User',
+    'LNG_EVENT_FIELD_LABEL_EVENT_ID': 'Event ID',
 
     'LNG_CASE_FIELD_LABEL_CLASSIFICATION': 'Classification',
     'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET': 'Date of onset',

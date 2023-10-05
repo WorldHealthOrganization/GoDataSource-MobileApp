@@ -13,7 +13,7 @@ import NavBarCustom from './../components/NavBarCustom';
 import Breadcrumb from './../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
 import config, {sideMenuKeys} from './../utils/config';
-import _, {sortBy, findIndex} from 'lodash';
+import _, {sortBy, findIndex, remove} from 'lodash';
 import EventSinglePersonalContainer from './../containers/EventSinglePersonalContainer';
 import EventSingleAddressContainer from './../containers/EventSingleAddressContainer';
 import {Icon} from 'react-native-material-ui';
@@ -46,7 +46,7 @@ import lodashGet from 'lodash/get';
 import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import withPincode from './../components/higherOrderComponents/withPincode';
-import {checkValidEmails, validateRequiredFields} from './../utils/formValidators';
+import {checkValidEmails, prepareFieldsAndRoutes, validateRequiredFields} from './../utils/formValidators';
 import {Navigation} from "react-native-navigation";
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import Menu, {MenuItem} from "react-native-material-menu";
@@ -55,6 +55,7 @@ import {setDisableOutbreakChange} from "../actions/outbreak";
 import EventSingleRelationshipContainer from "../containers/EventSingleRelationshipContainer";
 import styles from './../styles';
 import colors from "../styles/colors";
+import EventSingleInvestigationContainer from "../containers/EventSingleInvestigationContainer";
 
 const initialLayout = {
     height: 0,
@@ -77,6 +78,11 @@ class EventSingleScreen extends Component {
             )) ?
                 config.tabsValuesRoutes.eventsSingleViewEdit :
                 config.tabsValuesRoutes.eventsSingle;
+
+        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'events', config.eventSingleScreen);
+        if (this.preparedFields.address?.invisible){
+            remove(routes, (route => route.key === 'address'))
+        }
 
         this.state = {
             interactionComplete: false,
@@ -108,6 +114,7 @@ class EventSingleScreen extends Component {
                         // },
                         date: createDate(null)
                     },
+                questionnaireAnswers: {},
 
             } : Object.assign({}, this.props.event),
             isEditMode: this.props.isNew ? true : this.props.forceNew ? true : false,
@@ -155,6 +162,9 @@ class EventSingleScreen extends Component {
                     let relationsExposure = _.get(eventAndRelations, 'relationshipExposureData', []);
 
                     if (eventData !== null) {
+                        if(!eventData.address && eventData.addresses) {
+                            eventData.address = eventData.addresses[0];
+                        }
                         let mappedAnswers = mapAnswers(this.props.eventInvestigationQuestions, eventData.questionnaireAnswers);
                         let ageClone = {years: 0, months: 0};
                         let updateAge = false;
@@ -271,7 +281,7 @@ class EventSingleScreen extends Component {
                                 <ElevatedView
                                     elevation={0}
                                     style={[
-                                        style.headerButton, 
+                                        style.headerButton,
                                         {
                                             width: calculateDimension(30, false, this.props.screenSize),
                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -300,7 +310,7 @@ class EventSingleScreen extends Component {
                                             button={
                                                 <Ripple
                                                     style={[
-                                                        style.moreMenuButton, 
+                                                        style.moreMenuButton,
                                                         {
                                                             width: calculateDimension(30, false, this.props.screenSize),
                                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -419,7 +429,6 @@ class EventSingleScreen extends Component {
         this.setState({
             canChangeScreen: true,
         }, () => {
-            console.log("On index change 2");
             this.handleOnIndexChange(nextIndex)
         });
     };
@@ -436,7 +445,6 @@ class EventSingleScreen extends Component {
 
     //Generate TabBar
     handleRenderTabBar = (props) => {
-        console.log("Render tab bar");
         return (
             <TabBar
                 {...props}
@@ -469,6 +477,8 @@ class EventSingleScreen extends Component {
                 activeColor={styles.primaryColor}
                 inactiveColor={styles.secondaryColor}
                 renderLabel={this.handleRenderLabel(props)}
+                scrollEnabled={true}
+                bounces={true}
             />
         )
     };
@@ -524,6 +534,7 @@ class EventSingleScreen extends Component {
                 return (
                     <EventSinglePersonalContainer
                         eventStateControl={this.state.event.isDateOfReportingApproximate}
+                        preparedFields={this.preparedFields}
                         routeKey={this.state.routes[this.state.index].key}
                         event={this.state.event}
                         isEditMode={this.state.isEditMode}
@@ -553,6 +564,7 @@ class EventSingleScreen extends Component {
                 return (
                     <EventSingleAddressContainer
                         routeKey={this.state.routes[this.state.index].key}
+                        preparedFields={this.preparedFields}
                         event={this.state.event}
                         isEditMode={this.state.isEditMode}
                         index={this.state.index}
@@ -625,6 +637,32 @@ class EventSingleScreen extends Component {
                     />
                 );
                 break;
+            case 'eventInvestigation':
+                return (
+                  <EventSingleInvestigationContainer
+                    routeKey={this.state.routes[this.state.index].key}
+                    item={this.state.event}
+                    currentAnswers={this.state.currentAnswers}
+                    previousAnswers={this.state.previousAnswers}
+                    isEditMode={this.state.isEditMode}
+                    index={this.state.index}
+                    numberOfTabs={this.state.routes.length}
+                    onPressEdit={this.onPressEdit}
+                    onPressSave={this.handleOnPressSave}
+                    onPressSaveEdit={this.onPressSaveEdit}
+                    onPressCancelEdit={this.onPressCancelEdit}
+                    onChangeTextAnswer={this.onChangeTextAnswer}
+                    onChangeSingleSelection={this.onChangeSingleSelection}
+                    onChangeMultipleSelection={this.onChangeMultipleSelection}
+                    onChangeDateAnswer={this.onChangeDateAnswer}
+                    handleMoveToPrevieousScreenButton={this.handleMoveToPrevieousScreenButton}
+                    isNew={this.props.isNew ? true : this.props.forceNew ? true : false}
+                    onClickAddNewMultiFrequencyAnswer={this.onClickAddNewMultiFrequencyAnswer}
+                    onChangeAnswerDate={this.onChangeAnswerDate}
+                    savePreviousAnswers={this.savePreviousAnswers}
+                    copyAnswerDate={this.handleCopyAnswerDate}
+                  />
+                );
             default:
                 return null;
         }
@@ -671,7 +709,20 @@ class EventSingleScreen extends Component {
                                     }
                                 ])
                         } else {
-                            this.saveEventAction()
+                            if (this.checkAnswerDatesQuestionnaire()) {
+                                this.saveEventAction()
+                            } else {
+                                this.setState({loading: false}, () => {
+                                    Alert.alert(getTranslation(translations.alertMessages.validationErrorLabel, this.props.translation), getTranslation(translations.alertMessages.answerDateMissingError, this.props.translation), [
+                                        {
+                                            text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
+                                            onPress: () => {
+                                                this.hideMenu()
+                                            }
+                                        }
+                                    ])
+                                })
+                            }
                         }
                     } else {
                         this.setState({loading: false}, () => {
@@ -705,6 +756,8 @@ class EventSingleScreen extends Component {
         // Remap the previous answers
         // let questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
         // questionnaireAnswers = this.filterUnasweredQuestions();
+        eventClone.questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
+        eventClone.questionnaireAnswers = this.filterUnasweredQuestions(eventClone.questionnaireAnswers);
         this.setState(prevState => ({
             event: Object.assign({}, prevState.event, eventClone),
         }), () => {
@@ -1132,35 +1185,25 @@ class EventSingleScreen extends Component {
     checkRequiredFieldsPersonalInfo = () => {
         //personal info
         let requiredFields = [];
-        for (let i = 0; i < config.eventSingleScreen.details.length; i++) {
-            for (let j = 0; j < config.eventSingleScreen.details[i].fields.length; j++) {
-                if (config.eventSingleScreen.details[i].fields[j].isRequired && !this.state.event[config.eventSingleScreen.details[i].fields[j].id]) {
-                    requiredFields.push(getTranslation(config.eventSingleScreen.details[i].fields[j].label, this.props.translation));
+        for (let i = 0; i < this.preparedFields.details.length; i++) {
+            for (let j = 0; j < this.preparedFields.details[i].fields.length; j++) {
+                const field = this.preparedFields.details[i].fields[j];
+                if (field.isRequired && !this.state.event[field.id] && field.id !== 'visualId') {
+                    requiredFields.push(getTranslation(this.preparedFields.details[i].fields[j].label, this.props.translation));
                     // return false;
                 }
             }
         }
 
-        //documents
-        if (this.state.event && this.state.event.documents && Array.isArray(this.state.event.documents) && this.state.event.documents.length > 0) {
-            for (let i = 0; i < this.state.event.documents.length; i++) {
-                for (let j = 0; j < config.eventSingleScreen.document.fields.length; j++) {
-                    if (config.eventSingleScreen.document.fields[j].isRequired && !this.state.event.documents[i][config.eventSingleScreen.document.fields[j].id]) {
-                        requiredFields.push(getTranslation(config.eventSingleScreen.document.fields[j].label, this.props.translation));
-                        // return false;
-                    }
-                }
-            }
-        }
         return requiredFields;
         // return true;
     };
     checkRequiredFieldsAddress = () => {
         let requiredFields = [];
         if (this.state.event && this.state.event.address) {
-                for (let j = 0; j < config.eventSingleScreen.address.fields.length; j++) {
-                    if (config.eventSingleScreen.address.fields[j].isRequired && !this.state.event.address[config.eventSingleScreen.address.fields[j].id]) {
-                        requiredFields.push(getTranslation(config.eventSingleScreen.address.fields[j].label, this.props.translation));
+                for (let j = 0; j < this.preparedFields.address.fields.length; j++) {
+                    if (this.preparedFields.address.fields[j].isRequired && !this.state.event.address[this.preparedFields.address.fields[j].id]) {
+                        requiredFields.push(getTranslation(this.preparedFields.address.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }
@@ -1171,12 +1214,20 @@ class EventSingleScreen extends Component {
         return requiredFields;
         // return true;
     };
+    checkRequiredFieldsEventInvestigationQuestionnaire = () => {
+        let sortedQuestions = sortBy(cloneDeep(this.props.eventInvestigationQuestions), ['order', 'variable']);
+        sortedQuestions = extractAllQuestions(sortedQuestions, this.state.previousAnswers, 0);
+
+        let unAnsweredQuestions = checkRequiredQuestions(sortedQuestions, this.state.previousAnswers);
+
+        return unAnsweredQuestions;
+    };
     checkRequiredFields = () => {
         let requiredFields = [];
         if (this.state.event?.deleted) {
             return [];
         }
-        return requiredFields.concat(this.checkRequiredFieldsPersonalInfo(), this.checkRequiredFieldsAddress());
+        return requiredFields.concat(this.checkRequiredFieldsPersonalInfo(), this.checkRequiredFieldsAddress(), this.checkRequiredFieldsEventInvestigationQuestionnaire());
         // return this.checkRequiredFieldsPersonalInfo() && this.checkRequiredFieldsAddress() && this.checkRequiredFieldsInfection() && this.checkRequiredFieldsEventInvestigationQuestionnaire()
     };
 
@@ -1193,9 +1244,9 @@ class EventSingleScreen extends Component {
             if (typeof objectTypeOrIndex === 'phoneNumber' && objectTypeOrIndex >= 0 || typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
                 if (objectType && objectType === 'Address') {
                     let addressClone = _.cloneDeep(this.state.event.address);
+                    if(!addressClone) addressClone = {};
                     // Check if the lat/lng have changed
                     if (id === 'lng') {
-                        console.log("Wnna know lng", value);
                         if (value === '' || value.value === '') {
                             delete addressClone.geoLocation;
                         } else {
@@ -1314,6 +1365,7 @@ class EventSingleScreen extends Component {
                         })
                     } else if (objectType && objectType === 'Address') {
                         let addressClone = _.cloneDeep(this.state.event.address);
+                        if(!addressClone) addressClone = {};
                         addressClone[id] = value && value.value ? value.value : value;
                         this.setState(prevState => ({
                             event: Object.assign({}, prevState.event, {address: addressClone}),
@@ -1341,6 +1393,7 @@ class EventSingleScreen extends Component {
                 {
                     text: getTranslation(translations.generalLabels.noAnswer, this.props.translation), onPress: () => {
                         let addressClone = _.cloneDeep(this.state.event.address);
+                        if(!addressClone) addressClone = {};
                         addressClone.geoLocationAccurate = value;
                         this.setState(
                             (prevState) => ({
@@ -1356,6 +1409,7 @@ class EventSingleScreen extends Component {
                     text: getTranslation(translations.generalLabels.yesAnswer, this.props.translation), onPress: () => {
                         if (value) {
                             let addressClone = _.cloneDeep(this.state.event.address);
+                            if(!addressClone) addressClone = {};
                             addressClone.geoLocationAccurate = value;
                             this.setState(
                                 (prevState) => ({
@@ -1364,6 +1418,7 @@ class EventSingleScreen extends Component {
                                 }), () => {
                                     geolocation.getCurrentPosition((position) => {
                                             let addressClone = _.cloneDeep(this.state.event.address);
+                                            if(!addressClone) addressClone = {};
                                             if (!addressClone.geoLocation) {
                                                 addressClone.geoLocation = {};
                                                 addressClone.geoLocation.type = 'Point';
@@ -1390,6 +1445,7 @@ class EventSingleScreen extends Component {
                                                     text: getTranslation(translations.alertMessages.okButtonLabel, this.props.translation),
                                                     onPress: () => {
                                                         let addressClone = _.cloneDeep(this.state.event.address);
+                                                        if(!addressClone) addressClone = {};
                                                         if (!addressClone.geoLocation) {
                                                             addressClone.geoLocation = {};
                                                             addressClone.geoLocation.type = 'Point';
@@ -1421,6 +1477,7 @@ class EventSingleScreen extends Component {
                             )
                         } else {
                             let addressClone = _.cloneDeep(this.state.event.address);
+                            if(!addressClone) addressClone = {};
                             if (!addressClone.geoLocation) {
                                 addressClone.geoLocation = {};
                                 addressClone.geoLocation.type = 'Point';
@@ -1469,6 +1526,7 @@ class EventSingleScreen extends Component {
             if (typeof objectTypeOrIndex === 'number' && objectTypeOrIndex >= 0) {
                 if (objectType === 'Address') {
                     let addressClone = _.cloneDeep(this.state.event.address);
+                    if(!addressClone) addressClone = {};
 
                     let anotherPlaceOfResidenceWasChosen = false;
                     if (value && value.value !== undefined) {

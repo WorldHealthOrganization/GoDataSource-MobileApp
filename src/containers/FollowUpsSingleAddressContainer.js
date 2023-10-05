@@ -42,7 +42,10 @@ class FollowUpsSingleAddressContainer extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItemForAddress = () => {
-        let fields = config.followUpsSingleScreen.address.fields
+        if(this.props.preparedFields.address.invisible){
+            return null;
+        }
+        let fields = this.props.preparedFields.address.fields
         return this.renderItemCardComponent(fields)
     };
 
@@ -57,6 +60,9 @@ class FollowUpsSingleAddressContainer extends PureComponent {
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
+                            if(item.invisible){
+                                return null;
+                            }
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
                         })
                     }

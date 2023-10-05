@@ -50,9 +50,9 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
             deviceInfo = JSON.stringify({
                 id: installationId,
                 os: Platform.OS,
-                manufacturer: DeviceInfo.getManufacturer().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
+                manufacturer: DeviceInfo.getManufacturerSync().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
                 model: DeviceInfo.getModel().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
-                name: DeviceInfo.getDeviceName().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
+                name: DeviceInfo.getDeviceNameSync().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
             });
 
             // Before starting a download, first test if the API responds
@@ -137,9 +137,9 @@ export function postDatabaseSnapshotRequest(internetCredentials, path) {
             deviceInfo = JSON.stringify({
                 id: installationId,
                 os: Platform.OS,
-                manufacturer: DeviceInfo.getManufacturer().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
+                manufacturer: DeviceInfo.getManufacturerSync().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
                 model: DeviceInfo.getModel().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
-                name: DeviceInfo.getDeviceName().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
+                name: DeviceInfo.getDeviceNameSync().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
             });
             return testApiPromise(`${hubConfig.url}${constants.testApi}`, deviceInfo)
         })

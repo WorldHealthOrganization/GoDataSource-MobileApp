@@ -683,6 +683,7 @@ const eventSingleScreen = {
     responsibleUser: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
     detailsTitle: 'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
     addressTitle: 'LNG_PAGE_MODIFY_EVENT_TAB_ADDRESS_TITLE',
+    eventId: 'LNG_EVENT_FIELD_LABEL_EVENT_ID',
 
     personalTitle: 'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
 

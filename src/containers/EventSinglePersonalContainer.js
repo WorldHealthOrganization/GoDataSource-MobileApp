@@ -16,7 +16,6 @@ import _ from 'lodash';
 import TopContainerButtons from "../components/TopContainerButtons";
 import PermissionComponent from './../components/PermissionComponent';
 import constants from "./../utils/constants";
-import {checkArray} from "../utils/typeCheckingFunctions";
 import styles from './../styles';
 
 class EventSinglePersonalContainer extends Component {
@@ -68,8 +67,11 @@ class EventSinglePersonalContainer extends Component {
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
-                            config.eventSingleScreen.details.map((item, index) => {
-                                return this.handleRenderItem(item, index)
+                            this.props.preparedFields.details.map((item, index) => {
+                                if(!item.invisible){
+                                    return this.handleRenderItem(item, index)
+                                }
+                                return null;
                             })
                         }
                     </ScrollView>
@@ -87,14 +89,6 @@ class EventSinglePersonalContainer extends Component {
         return this.renderItemCardComponent(fields, index)
     };
 
-    handleRenderItemForDocumentsList = (item, index) => {
-        let fields = config.eventSingleScreen.document.fields.map((field) => {
-            field.isEditMode = this.props.isEditMode;
-            return field;
-        });
-        return this.renderItemCardComponent(fields, index)
-    };
-
     renderItemCardComponent = (fields, cardIndex = null) => {
         return (
             <ElevatedView elevation={5} key={cardIndex} style={[style.containerCardComponent, {
@@ -106,7 +100,10 @@ class EventSinglePersonalContainer extends Component {
                 <ScrollView scrollEnabled={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                     {
                         fields && fields.map((item, index) => {
-                            return this.handleRenderItemCardComponent(item, index, cardIndex);
+                            if(!item.invisible){
+                                return this.handleRenderItemCardComponent(item, index, cardIndex);
+                            }
+                            return null;
                         })
                     }
                 </ScrollView>

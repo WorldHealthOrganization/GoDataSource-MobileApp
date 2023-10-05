@@ -41,11 +41,16 @@ import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import styles from './../styles';
 import colors from "../styles/colors";
+import {prepareFieldsAndRoutes} from "../utils/formValidators";
 
 class LabResultsSingleScreen extends Component {
 
     constructor(props) {
         super(props);
+
+
+        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'lab-results', config.labResultsSingleScreen);
+
         this.state = {
             routes: config.tabsValuesRoutes.labResultsSingle,
             index: 0,
@@ -263,6 +268,7 @@ class LabResultsSingleScreen extends Component {
                 return (
                     <LabResultsSingleContainer
                         routeKey={this.state.routes[this.state.index].key}
+                        preparedFields={this.preparedFields}
                         isNew={this.props.isNew}
                         isEditMode={this.state.isEditMode}
                         item={this.state.item}

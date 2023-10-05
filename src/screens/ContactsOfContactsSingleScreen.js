@@ -22,7 +22,7 @@ import Ripple from 'react-native-material-ripple';
 import {addFollowUp, updateFollowUpAndContact} from './../actions/followUps';
 import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
-import _, {findIndex} from 'lodash';
+import _, {findIndex, remove} from 'lodash';
 import {
     calculateDimension,
     computeFullName,
@@ -40,7 +40,7 @@ import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import lodashIntersect from 'lodash/intersection';
 import {addContactOfContact, updateContactOfContact} from './../actions/contactsOfContacts';
 import contactsOfContactsScreen from "../utils/translations";
-import {checkValidEmails} from './../utils/formValidators';
+import {checkValidEmails, prepareFields, prepareFieldsAndRoutes} from './../utils/formValidators';
 import {validateRequiredFields} from "../utils/formValidators";
 import {Navigation} from "react-native-navigation";
 import {setDisableOutbreakChange} from "../actions/outbreak";
@@ -74,7 +74,10 @@ class ContactsOfContactsSingleScreen extends Component {
                 config.tabsValuesRoutes.contactsOfContactsSingleWithoutExposures;
 
         routes = routes.filter((e) => e.key !== 'investigation');
-
+        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'contacts-of-contacts',  Object.assign({}, config.contactsSingleScreen, {personal: config.contactsOfContactsPersonal, vaccinesReceived: config.caseSingleScreen.vaccinesReceived, document: config.caseSingleScreen.document}));
+        if (this.preparedFields.address?.invisible){
+            remove(routes, (route => route.key === 'address'))
+        }
         this.state = {
             interactionComplete: false,
             routes: routes,
@@ -274,7 +277,7 @@ class ContactsOfContactsSingleScreen extends Component {
                                 <ElevatedView
                                     elevation={0}
                                     style={[
-                                        style.headerButton, 
+                                        style.headerButton,
                                         {
                                             width: calculateDimension(30, false, this.props.screenSize),
                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -300,7 +303,7 @@ class ContactsOfContactsSingleScreen extends Component {
                                             button={
                                                 <Ripple
                                                     style={[
-                                                        style.moreMenuButton, 
+                                                        style.moreMenuButton,
                                                         {
                                                             width: calculateDimension(30, false, this.props.screenSize),
                                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -568,6 +571,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 return (
                     <ContactsSinglePersonal
                         type={translations.personTypes.contactsOfContacts}
+                        preparedFields={this.preparedFields}
                         contact={this.state.contact}
                         routeKey={this.state.routes[this.state.index].key}
                         activeIndex={this.state.index}
@@ -589,7 +593,6 @@ class ContactsOfContactsSingleScreen extends Component {
                         checkAgeMonthsRequirements={this.checkAgeMonthsRequirements}
                         checkAgeYearsRequirements={this.checkAgeYearsRequirements}
                         isEditMode={this.state.isEditMode}
-
                         numberOfTabs={this.state.routes.length}
                         onPressPreviousButton={this.handlePreviousPress}
                         onPressNextButton={this.handleMoveToNextScreenButton}
@@ -602,6 +605,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 return (
                     <ContactsSingleAddress
                         type={translations.personTypes.contactsOfContacts}
+                        preparedFields={this.preparedFields}
                         contact={this.state.contact}
                         routeKey={this.state.routes[this.state.index].key}
                         activeIndex={this.state.index}
@@ -621,7 +625,6 @@ class ContactsOfContactsSingleScreen extends Component {
                         anotherPlaceOfResidenceWasChosen={this.state.anotherPlaceOfResidenceWasChosen}
                         hasPlaceOfResidence={this.state.hasPlaceOfResidence}
                         isEditMode={this.state.isEditMode}
-
                         numberOfTabs={this.state.routes.length}
                         // onPressPreviousButton={this.handlePreviousPress}
                         onPressNextButton={this.handleMoveToNextScreenButton}
@@ -634,6 +637,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 return (
                     <ContactsSingleRelationship
                         type={translations.personTypes.contactsOfContacts}
+                        preparedFields={this.preparedFields.relationship}
                         relationshipType={constants.RELATIONSHIP_TYPE.exposure}
                         refreshRelations={this.refreshRelations}
                         contact={this.state.contact}
@@ -654,7 +658,6 @@ class ContactsOfContactsSingleScreen extends Component {
                         onChangeSwitch={this.handleOnChangeSwitch}
                         handleMoveToNextScreenButton={this.handleMoveToNextScreenButton}
                         selectedExposure={this.props.singleCase}
-
                         numberOfTabs={this.state.routes.length}
                         // onPressPreviousButton={this.handlePreviousPress}
                         onPressNextButton={this.handleMoveToNextScreenButton}
@@ -1587,7 +1590,10 @@ class ContactsOfContactsSingleScreen extends Component {
         let personalInfo = [];
         for (let i = 0; i < config.contactsSingleScreen.personal.length; i++) {
             for (let j = 0; j < config.contactsSingleScreen.personal[i].fields.length; j++) {
-                if (config.contactsSingleScreen.personal[i].fields[j].isRequired && !this.state.contact[config.contactsSingleScreen.personal[i].fields[j].id]) {
+                const field = config.contactsSingleScreen.personal[i].fields[j];
+                if (field.isRequired && !this.state.contact[field.id] &&
+                    !(field.id === 'pregnancyStatus' && (this.state.case?.gender === translations.localTranslationTokens.male)) &&
+                    field.id !== 'visualId') {
                     personalInfo.push(getTranslation(config.contactsSingleScreen.personal[i].fields[j].label, this.props.translation));
                     // return false;
                 }

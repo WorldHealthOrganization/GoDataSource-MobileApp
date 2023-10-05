@@ -23,7 +23,6 @@ import {
     PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
 } from "../utils/constants";
 import styles from './../styles';
-import get from "lodash/get";
 
 class ContactsSingleAddress extends Component {
 
@@ -73,27 +72,27 @@ class ContactsSingleAddress extends Component {
         }
 
         return (
-                <View style={style.viewContainer}>
-                    <PermissionComponent
-                        render={() => (
-                            <TopContainerButtons
-                                isNew={this.props.isNew}
-                                isEditMode={this.props.isEditMode}
-                                index={this.props.activeIndex}
-                                numberOfTabs={this.props.numberOfTabs}
-                                onPressEdit={this.props.onPressEdit}
-                                onPressSaveEdit={this.props.onPressSaveEdit}
-                                onPressCancelEdit={this.props.onPressCancelEdit}
-                                onPressNextButton={this.props.onPressNextButton}
-                                onPressPreviousButton={this.handleBackButton}
-                            />
-                        )}
-                        permissionsList={permissionsList}
-                    />
-                    <ScrollView
-                        style={style.containerScrollView}
-                        contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 16 }]}
-                    >
+            <View style={style.viewContainer}>
+                <PermissionComponent
+                    render={() => (
+                        <TopContainerButtons
+                            isNew={this.props.isNew}
+                            isEditMode={this.props.isEditMode}
+                            index={this.props.activeIndex}
+                            numberOfTabs={this.props.numberOfTabs}
+                            onPressEdit={this.props.onPressEdit}
+                            onPressSaveEdit={this.props.onPressSaveEdit}
+                            onPressCancelEdit={this.props.onPressCancelEdit}
+                            onPressNextButton={this.props.onPressNextButton}
+                            onPressPreviousButton={this.handleBackButton}
+                        />
+                    )}
+                    permissionsList={permissionsList}
+                />
+                <ScrollView
+                    style={style.containerScrollView}
+                    contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 16 }]}
+                >
                     <View style={style.container}>
                         {
                             this.props.contact && this.props.contact.addresses && this.props.contact.addresses.map((item, index) => {
@@ -116,18 +115,21 @@ class ContactsSingleAddress extends Component {
                             </View>
                         ) : null
                     }
-                    </ScrollView>
-                    {/* </KeyboardAwareScrollView> */}
-                </View>
+                </ScrollView>
+                {/* </KeyboardAwareScrollView> */}
+            </View>
         );
     }
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (item, index) => {
-        let fields = config.contactsSingleScreen.address.fields.map((field) => {
-            return Object.assign({}, field, { isEditMode: this.props.isEditMode })
-        });
-        return this.renderItemCardComponent(fields, index)
+        if(!this.props.preparedFields.address.invisible){
+            let fields = this.props.preparedFields.address.fields.map((field) => {
+                return Object.assign({}, field, { isEditMode: this.props.isEditMode })
+            });
+            return this.renderItemCardComponent(fields, index)
+        }
+        return null;
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {
@@ -141,7 +143,10 @@ class ContactsSingleAddress extends Component {
                 <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         fields && fields.map((item, index) => {
-                            return this.handleRenderItemCardComponent(item, index, cardIndex);
+                            if(!item.invisible){
+                                return this.handleRenderItemCardComponent(item, index, cardIndex);
+                            }
+                            return null;
                         })
                     }
                 </ScrollView>

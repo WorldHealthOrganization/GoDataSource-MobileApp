@@ -122,12 +122,14 @@ const tabsValuesRoutes = {
     eventsSingle: [
         {key: 'details', title: translations.eventSingleScreen.detailsTitle},
         {key: 'address', title: translations.eventSingleScreen.addressTitle},
+        {key: 'eventInvestigation', title: translations.followUpsSingleScreen.questionnaireTitle}
     ],
     eventsSingleViewEdit: [
         {key: 'details', title: translations.eventSingleScreen.detailsTitle},
         {key: 'address', title: translations.eventSingleScreen.addressTitle},
         {key: 'contacts', title: 'Contacts'},
         {key: 'exposures', title: 'Exposures'},
+        {key: 'eventInvestigation', title: translations.followUpsSingleScreen.questionnaireTitle}
     ],
     contactsSingle: [
         {key: 'personal', title: translations.contactSingleScreen.personalTitle},
@@ -281,7 +283,8 @@ const addressFields = {
             isEditMode: true,
             multiline: false,
             objectType: 'Address',
-            keyboardType: 'numeric'
+            keyboardType: 'numeric',
+            fieldId: 'geoLocation'
         },
         {
             cardNumber: 1,
@@ -294,7 +297,8 @@ const addressFields = {
             isEditMode: true,
             multiline: false,
             objectType: 'Address',
-            keyboardType: 'numeric'
+            keyboardType: 'numeric',
+            fieldId: 'geoLocation'
         },
         {
             cardNumber: 1,
@@ -305,7 +309,8 @@ const addressFields = {
             textsStyleArray: [{color: styles.backgroundColor}],
             onPressArray: [],
             objectType: 'Address',
-            iconArray: ['delete']
+            iconArray: ['delete'],
+            isNotField: true
         }
     ]
 };
@@ -651,7 +656,8 @@ const labResultsFilterScreenNoContactPermission = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -716,7 +722,8 @@ const labResultsFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -803,7 +810,8 @@ const caseSingleScreen = {
                     values: 'TextSwitchSelectorAgeOrDobValues', //switch possibilities from config file
                     selectedItemIndexForTextSwitchSelector: 'selectedItemIndexForTextSwitchSelectorForAge', //name of state parameter that will contain the selected index from values
                     isEditMode: true,
-                    objectType: 'Case'
+                    objectType: 'Case',
+                    fieldId: 'ageDob'
                 },
                 {
                     cardNumber: 2,
@@ -816,7 +824,8 @@ const caseSingleScreen = {
                     isEditMode: true,
                     dependsOn: 'TextSwitchSelectorAgeOrDobValues', //if depends on this switch item and it is not selected, don't display
                     format: 'MM/dd/YYYY',
-                    objectType: 'Case'
+                    objectType: 'Case',
+                    fieldId: 'ageDob'
                 },
                 {
                     cardNumber: 2,
@@ -831,7 +840,8 @@ const caseSingleScreen = {
                     dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
                     selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
                     objectType: 'Case',
-                    keyboardType: 'numeric'
+                    keyboardType: 'numeric',
+                    fieldId: 'ageDob'
                 },
                 {
                     cardNumber: 1,
@@ -930,7 +940,9 @@ const caseSingleScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Documents',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                fieldId: 'additional',
+                isNotField: true
             }
         ]
     },
@@ -978,7 +990,8 @@ const caseSingleScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Vaccines',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     },
@@ -1225,7 +1238,8 @@ const caseSingleScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'DateRanges',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     },
@@ -1273,7 +1287,8 @@ const eventsFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -1330,6 +1345,16 @@ const eventSingleScreen = {
                 },
                 {
                     cardNumber: 1,
+                    id: 'visualId',
+                    label: translations.eventSingleScreen.eventId,
+                    type: 'TextInput',
+                    value: '',
+                    isRequired: false,
+                    isEditMode: false,
+                    objectType: 'Event'
+                },
+                {
+                    cardNumber: 1,
                     id: 'description',
                     label: translations.eventSingleScreen.description,
                     type: 'TextInput',
@@ -1342,180 +1367,145 @@ const eventSingleScreen = {
         }
     ],
     address:{
-            fields: [
-                {
-                    cardNumber: 1,
-                    id: 'typeId',
-                    label: translations.addressFieldLabels.name,
-                    labelValue: 'test',
-                    type: 'DropdownInput',
-                    categoryId: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE',
-                    value: '',
-                    isRequired: true,
-                    isEditMode: true,
-                    objectType: 'Address'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'date',
-                    label: translations.addressFieldLabels.date,
-                    labelValue: 'test',
-                    value: '',
-                    type: "DatePicker",
-                    isRequired: false,
-                    isEditMode: true,
-                    format: 'MM/dd/YYYY',
-                    objectType: 'Address'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'phoneNumber',
-                    label: translations.caseSingleScreen.phoneNumber,
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    keyboardType: 'phone-pad',
-                    objectType: 'Address'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'emailAddress',
-                    label: 'Email',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    objectType: 'Address'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'locationId',
-                    label: translations.addressFieldLabels.area,
-                    labelValue: 'test',
-                    type: 'DropDownSectioned',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    objectType: 'Address',
-                    single: true
-                },
-                {
-                    cardNumber: 1,
-                    id: 'city',
-                    label: translations.addressFieldLabels.city,
-                    labelValue: 'test',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    multiline: true,
-                    objectType: 'Address'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'postalCode',
-                    label: translations.addressFieldLabels.zip,
-                    labelValue: 'test',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    multiline: true,
-                    objectType: 'Address'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'addressLine1',
-                    label: translations.addressFieldLabels.address,
-                    labelValue: 'test',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    multiline: true,
-                    objectType: 'Address'
-                },
-                // Is the person next to you support
-                {
-                    cardNumber: 1,
-                    id: 'geoLocationAccurate',
-                    label: translations.addressFieldLabels.isThePersonNextToYou,
-                    labelValue: 'test',
-                    type: 'SwitchInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    activeButtonColor: styles.backgroundColor,
-                    activeBackgroundColor: styles.dangerColor,
-                    objectType: 'Address'
-                },
-                // Add coordinates support
-                {
-                    cardNumber: 1,
-                    id: 'lng',
-                    label: translations.addressFieldLabels.longitude,
-                    labelValue: 'test',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    multiline: false,
-                    objectType: 'Address',
-                    keyboardType: 'numeric'
-                },
-                {
-                    cardNumber: 1,
-                    id: 'lat',
-                    label: translations.addressFieldLabels.latitude,
-                    labelValue: 'test',
-                    type: 'TextInput',
-                    value: '',
-                    isRequired: false,
-                    isEditMode: true,
-                    multiline: false,
-                    objectType: 'Address',
-                    keyboardType: 'numeric'
-                }
-            ]
-        },
-    document: {
         fields: [
             {
-                cardNumber: 3,
-                id: 'type',
-                label: translations.caseSingleScreen.documentType,
+                cardNumber: 1,
+                id: 'typeId',
+                label: translations.addressFieldLabels.name,
+                labelValue: 'test',
                 type: 'DropdownInput',
-                categoryId: 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE',
+                categoryId: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE',
                 value: '',
                 isRequired: true,
                 isEditMode: true,
-                objectType: 'Documents'
+                objectType: 'Address'
             },
             {
-                cardNumber: 3,
-                id: 'number',
-                label: translations.caseSingleScreen.documentNumber,
+                cardNumber: 1,
+                id: 'date',
+                label: translations.addressFieldLabels.date,
+                labelValue: 'test',
+                value: '',
+                type: "DatePicker",
+                isRequired: false,
+                isEditMode: true,
+                format: 'MM/dd/YYYY',
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'phoneNumber',
+                label: translations.caseSingleScreen.phoneNumber,
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                keyboardType: 'phone-pad',
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'emailAddress',
+                label: 'Email',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'locationId',
+                label: translations.addressFieldLabels.area,
+                labelValue: 'test',
+                type: 'DropDownSectioned',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                objectType: 'Address',
+                single: true
+            },
+            {
+                cardNumber: 1,
+                id: 'city',
+                label: translations.addressFieldLabels.city,
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
+                isRequired: false,
                 isEditMode: true,
-                objectType: 'Documents'
+                multiline: true,
+                objectType: 'Address'
             },
             {
-                cardNumber: 3,
-                id: 'deleteButton',
-                type: 'ActionsBar',
+                cardNumber: 1,
+                id: 'postalCode',
+                label: translations.addressFieldLabels.zip,
                 labelValue: 'test',
-                textsArray: [translations.caseSingleScreen.deleteButton],
-                textsStyleArray: [{color: styles.backgroundColor}],
-                onPressArray: [],
-                objectType: 'Documents',
-                iconArray: ['delete']
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: true,
+                objectType: 'Address'
+            },
+            {
+                cardNumber: 1,
+                id: 'addressLine1',
+                label: translations.addressFieldLabels.address,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: true,
+                objectType: 'Address'
+            },
+            // Is the person next to you support
+            {
+                cardNumber: 1,
+                id: 'geoLocationAccurate',
+                label: translations.addressFieldLabels.isThePersonNextToYou,
+                labelValue: 'test',
+                type: 'SwitchInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                activeButtonColor: styles.backgroundColor,
+                activeBackgroundColor: styles.dangerColor,
+                objectType: 'Address'
+            },
+            // Add coordinates support
+            {
+                cardNumber: 1,
+                id: 'lng',
+                label: translations.addressFieldLabels.longitude,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: false,
+                objectType: 'Address',
+                keyboardType: 'numeric',
+                fieldId: 'geoLocation'
+            },
+            {
+                cardNumber: 1,
+                id: 'lat',
+                label: translations.addressFieldLabels.latitude,
+                labelValue: 'test',
+                type: 'TextInput',
+                value: '',
+                isRequired: false,
+                isEditMode: true,
+                multiline: false,
+                objectType: 'Address',
+                keyboardType: 'numeric',
+                fieldId: 'geoLocation'
             }
         ]
-    },
+    }
 }
 
 const personFilterScreen = {
@@ -1681,7 +1671,8 @@ const personFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -1714,7 +1705,7 @@ const contactFilterScreen = {
                 }
             ]
         }
-        ],
+    ],
     sort: {
         ...personFilterScreen.sort
     }
@@ -1844,7 +1835,8 @@ const followUpsFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -1912,7 +1904,8 @@ const helpFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -2102,7 +2095,8 @@ const casesFilterScreen = {
                 textsStyleArray: [{color: styles.backgroundColor}],
                 onPressArray: [],
                 objectType: 'Sort',
-                iconArray: ['delete']
+                iconArray: ['delete'],
+                isNotField: true
             }
         ]
     }
@@ -2239,7 +2233,8 @@ const addRelationshipScreen = [
         value: '',
         isRequired: true,
         isEditMode: true,
-        objectType: 'Contact'
+        objectType: 'Contact',
+        isNotField: true
     },
     {
         cardNumber: 1,
@@ -2467,7 +2462,8 @@ const contactsOfContactsPersonal = [
                 values: 'TextSwitchSelectorAgeOrDobValues', //switch possibilities from config file
                 selectedItemIndexForTextSwitchSelector: 'selectedItemIndexForTextSwitchSelectorForAge', //name of state parameter that will contain the selected index from values
                 isEditMode: true,
-                objectType: 'Contact'
+                objectType: 'Contact',
+                fieldId: 'ageDob'
             },
             {
                 cardNumber: 3,
@@ -2480,7 +2476,8 @@ const contactsOfContactsPersonal = [
                 isEditMode: true,
                 dependsOn: 'TextSwitchSelectorAgeOrDobValues', //if depends on this switch item and it is not selected, don't display
                 format: 'MM/dd/YYYY',
-                objectType: 'Contact'
+                objectType: 'Contact',
+                fieldId: 'ageDob'
             },
             {
                 cardNumber: 2,
@@ -2495,7 +2492,8 @@ const contactsOfContactsPersonal = [
                 dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
                 selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
                 objectType: 'Contact',
-                keyboardType: 'numeric'
+                keyboardType: 'numeric',
+                fieldId: 'ageDob'
             },
             {
                 cardNumber: 3,
@@ -2653,7 +2651,8 @@ const contactsSingleScreen = {
                     values: 'TextSwitchSelectorAgeOrDobValues', //switch possibilities from config file
                     selectedItemIndexForTextSwitchSelector: 'selectedItemIndexForTextSwitchSelectorForAge', //name of state parameter that will contain the selected index from values
                     isEditMode: true,
-                    objectType: 'Contact'
+                    objectType: 'Contact',
+                    fieldId: 'ageDob'
                 },
                 {
                     cardNumber: 3,
@@ -2666,7 +2665,8 @@ const contactsSingleScreen = {
                     isEditMode: true,
                     dependsOn: 'TextSwitchSelectorAgeOrDobValues', //if depends on this switch item and it is not selected, don't display
                     format: 'MM/dd/YYYY',
-                    objectType: 'Contact'
+                    objectType: 'Contact',
+                    fieldId: 'ageDob'
                 },
                 {
                     cardNumber: 2,
@@ -2681,7 +2681,8 @@ const contactsSingleScreen = {
                     dropDownData: 'ageUnitOfMeasureDropDown', //drop down with values
                     selectedItemIndexForAgeUnitOfMeasureDropDown: 'selectedItemIndexForAgeUnitOfMeasureDropDown', //name of state parameter that will contain the selected index from values
                     objectType: 'Contact',
-                    keyboardType: 'numeric'
+                    keyboardType: 'numeric',
+                    fieldId: 'ageDob'
                 },
                 {
                     cardNumber: 3,
@@ -2790,7 +2791,8 @@ const contactsSingleScreen = {
                 value: '',
                 isRequired: true,
                 isEditMode: true,
-                objectType: 'Exposure'
+                objectType: 'Exposure',
+                isNotField: true
             },
             {
                 cardNumber: 1,
@@ -2996,7 +2998,7 @@ const followUpStatuses = {
 };
 
 const TextSwitchSelectorAgeOrDobValues = [
-     //value must be the id of the element
+    //value must be the id of the element
     { label: translations.TextSwitchSelectorAgeOrDobValues.ageLabel, value: 'age'},
     { label: translations.TextSwitchSelectorAgeOrDobValues.dobLabel, value: 'dob'}
 ];
@@ -3063,7 +3065,7 @@ const manualSyncStages = [
     {id: 'sync', name: 'Sync', status: '...'}
 ];
 
-const dateRangeTypes ={
+const dateRangeTypes = {
     hospitalization: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_HOSPITALIZATION',
     isolation: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_ISOLATION',
     incubation: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_DATE_TYPE_INCUBATION',

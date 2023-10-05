@@ -517,7 +517,7 @@ class AnimatedListView extends Component {
 
     listEmptyComponent = () => {
         let message = null;
-        switch(this.props.dataType) {
+        switch (this.props.dataType) {
             case 'FollowUp':
                 message = translations.followUpsScreen.noFollowupsMessage;
                 break;
@@ -535,6 +535,7 @@ class AnimatedListView extends Component {
                 break;
             case 'Event':
                 message = translations.eventsScreen.noEvents;
+                break;
             default:
                 message = translations.labResultsScreen.noLabResults;
         }

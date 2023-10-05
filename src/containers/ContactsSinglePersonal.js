@@ -29,8 +29,7 @@ class ContactsSinglePersonal extends Component {
         super(props);
         this.state = {
             interactionComplete: false,
-            teams: [],
-            fields: config.contactsSingleScreen.personal
+            teams: []
         };
     }
 
@@ -40,8 +39,7 @@ class ContactsSinglePersonal extends Component {
             getTeamsForUserRequest((errorGetTeams, teams) => {
                 this.setState({
                     interactionComplete: true,
-                    teams: checkArrayAndLength(teams) ? teams.map((e) => Object.assign({}, e, {teamId: extractIdFromPouchId(e._id, 'team')})) : [],
-                    fields: this.props.type === translations.personTypes.contactsOfContacts ? config.contactsOfContactsPersonal : config.contactsSingleScreen.personal
+                    teams: checkArrayAndLength(teams) ? teams.map((e) => Object.assign({}, e, {teamId: extractIdFromPouchId(e._id, 'team')})) : []
                 })
             });
         })
@@ -99,7 +97,10 @@ class ContactsSinglePersonal extends Component {
                     >
                         <View style={style.container}>
                             {
-                                this.state.fields.map((item, i) => {
+                                this.props.preparedFields.personal.map((item, i) => {
+                                    if(item.invisible) {
+                                        return null;
+                                    }
                                     return this.handleRenderItem(item, i)
                                 })
                             }
@@ -163,14 +164,20 @@ class ContactsSinglePersonal extends Component {
     };
 
     handleRenderItemForDocumentsList = (item, index) => {
-        let fields = config.caseSingleScreen.document.fields.map((field) => {
+        if(this.props.preparedFields?.document?.invisible){
+            return null;
+        }
+        let fields = this.props.preparedFields?.document?.fields?.map((field) => {
             return Object.assign({}, field, { isEditMode:  this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
     };
 
     handleRenderItemForVaccinesList = (item, index) => {
-        let fields = config.caseSingleScreen.vaccinesReceived.fields.map((field) => {
+        if(this.props.preparedFields?.vaccinesReceived?.invisible){
+            return null;
+        }
+        let fields = this.props.preparedFields.vaccinesReceived.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });
         return this.renderItemCardComponent(fields, index)
@@ -187,6 +194,9 @@ class ContactsSinglePersonal extends Component {
                 <ScrollView scrollEnabled={false} style={{flex: 1}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         fields && fields.map((item, index) => {
+                            if(item.invisible){
+                                return null;
+                            }
                             return this.handleRenderItemCardComponent(item, index, cardIndex);
                         })
                     }
