@@ -361,11 +361,13 @@ const followUpsSingleScreen = {
                     labelValue: 'test',
                     type: 'SwitchInput',
                     value: false,
-                    isRequired: true,
+                    // Makes no sense to be required as a switch input. Default is false?
+                    // isRequired: true,
                     isEditMode: true,
                     activeButtonColor: styles.backgroundColor,
                     activeBackgroundColor: styles.dangerColor,
-                    objectType: 'FollowUp'
+                    objectType: 'FollowUp',
+                    isNotField: true
                 },
             ]
         },
@@ -555,6 +557,7 @@ const labResultsSingleScreen = {
                     isEditMode: true,
                     objectType: 'LabResult',
                     dependsOn: 'sequence.hasSequence',
+                    dependsOnValue: false,
                     showWhenDependence: false
                 },
                 {
@@ -568,6 +571,7 @@ const labResultsSingleScreen = {
                     isEditMode: true,
                     objectType: 'LabResult',
                     dependsOn: 'sequence.hasSequence',
+                    dependsOnValue: true,
                     showWhenDependence: true,
                     format: 'MM/dd/YYYY'
                 },
@@ -583,6 +587,7 @@ const labResultsSingleScreen = {
                     isEditMode: true,
                     objectType: 'LabResult',
                     dependsOn: 'sequence.hasSequence',
+                    dependsOnValue: true,
                     showWhenDependence: true,
                 },
                 {
@@ -596,6 +601,7 @@ const labResultsSingleScreen = {
                     isEditMode: true,
                     objectType: 'LabResult',
                     dependsOn: 'sequence.hasSequence',
+                    dependsOnValue: true,
                     showWhenDependence: true,
                     format: 'MM/dd/YYYY'
                 },
@@ -611,6 +617,7 @@ const labResultsSingleScreen = {
                     isEditMode: true,
                     objectType: 'LabResult',
                     dependsOn: 'sequence.hasSequence',
+                    dependsOnValue: true,
                     showWhenDependence: true,
                 }
             ]

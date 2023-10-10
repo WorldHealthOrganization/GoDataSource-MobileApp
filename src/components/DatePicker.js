@@ -12,7 +12,7 @@ import Ripple from 'react-native-material-ripple';
 import moment from 'moment-timezone';
 import {getTranslation, getTooltip, createDate} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
-import stylesGlobal from './../styles';=
+import stylesGlobal from './../styles';
 import {useSelector} from "react-redux";
 
 const DatePicker = React.memo(({
@@ -133,15 +133,6 @@ const DatePicker = React.memo(({
     };
 
     const handleShowDatePicker = () => {
-        console.log("Show date picker", isDateTimePickerVisible);
-        console.log("Show date picker 2", `"${value}"`);
-        console.log("Show date picker 3", value ? new Date(
-            Date.parse(
-                moment.tz(new Date(value), 'DD/MM/YYYY', timezone).format(
-                    'ddd MMM DD YYYY HH:mm:ss ZZ',
-                ),
-            ),
-        ) : new Date())
         setIsDateTimePickerVisible(true);
     };
 

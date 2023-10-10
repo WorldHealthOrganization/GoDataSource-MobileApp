@@ -42,14 +42,16 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        return (
-            this.props.preparedFields.generalInfo.map((item, index) => {
+        return  this.props.preparedFields?.generalInfo ? (
+                this.props.preparedFields.generalInfo.map((item, index) => {
                 if(item.invisible){
                     return null;
                 }
                 return this.handleRenderItem(item, index)
             })
-        );
+        )
+        :
+        null
     };
 
     // Please write here all the methods that are not react native lifecycle methods

@@ -295,7 +295,6 @@ class CaseSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log("render called");
         return (
             <ViewHOC style={style.container}
                      showLoader={this && this.state && this.state.loading}

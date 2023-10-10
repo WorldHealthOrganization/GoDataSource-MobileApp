@@ -54,7 +54,7 @@ class LabResultsSingleScreen extends Component {
         this.state = {
             routes: config.tabsValuesRoutes.labResultsSingle,
             index: 0,
-            item: this.props.item,
+            item: this.props.item || {},
             contact: this.props.contact,
             savePressed: false,
             deletePressed: false,
@@ -369,18 +369,24 @@ class LabResultsSingleScreen extends Component {
     };
 
     checkRequiredFields = () => {
-        if(this.state.item.deleted){
+        if(this.state.item?.deleted){
             return [];
         }
         let checkRequiredFields = [];
-        if (!this.state.item?.dateSampleTaken) {
-            checkRequiredFields.push(getTranslation(translations.labResultsSingleScreen.sampleTaken, this.props.translation));
+        for (let i = 0; i < this.preparedFields.generalInfo.length; i++ ){
+            for (let j = 0; j < this.preparedFields.generalInfo[i].fields.length; j++ ){
+                const field = this.preparedFields.generalInfo[i].fields[j];
+                if (field.isRequired && !this.state.item[field.id] &&
+                    !(field.dependsOn && _.get(this.state.item,field.dependsOn,false) !== field.dependsOnValue)
+                ){
+                    checkRequiredFields.push(getTranslation(field.label,this.props.translation));
+                }
+            }
         }
         return checkRequiredFields
     }
 
     handleNextPress = () => {
-        console.log("Next pressed");
         // Before getting to the next screen, first do some checking of the required fields
         let checkRequiredFields = this.checkRequiredFields();
         if (checkArrayAndLength(checkRequiredFields)) {
@@ -391,7 +397,6 @@ class LabResultsSingleScreen extends Component {
                 }
             ])
         } else {
-            console.log("Next will go");
             this.handleOnIndexChange(this.state.index + 1);
         }
     };

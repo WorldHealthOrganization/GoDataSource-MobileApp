@@ -1903,16 +1903,17 @@ class ContactsSingleScreen extends Component {
         let relationships = _.get(this.state.contact, 'relationships', []);
         if (checkArrayAndLength(relationships)) {
             relationships = relationships.map((e) => _.get(e, 'relationshipData', e));
-            for (let i = 0; i < config.addRelationshipScreen.length; i++) {
-                if (config.addRelationshipScreen[i].id === 'exposure') {
+            const preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'relationships', {relationship: {fields: config.addRelationshipScreen}}).relationship.fields;
+            for (let i = 0; i < preparedFields.length; i++) {
+                if (preparedFields[i].id === 'exposure') {
                     if (relationships[0].persons.length === 0) {
                         requiredFields.push('Person')
                         // pass = false;
                     }
                 } else {
-                    if (config.addRelationshipScreen[i].isRequired) {
-                        if (!relationships[0][config.addRelationshipScreen[i].id]) {
-                            requiredFields.push(getTranslation(config.addRelationshipScreen[i].label, this.props.translation));
+                    if (preparedFields[i].isRequired) {
+                        if (!relationships[0][preparedFields[i].id]) {
+                            requiredFields.push(getTranslation(preparedFields[i].label, this.props.translation));
                             // pass = false;
                         }
                     }

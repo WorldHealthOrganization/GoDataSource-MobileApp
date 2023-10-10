@@ -119,10 +119,15 @@ export function prepareFields(config, outbreakFields, screen, configTab) {
         newField.invisible = false;
         if (outbreakFields[outbreakFieldKey]){
             newField.invisible = !outbreakFields[outbreakFieldKey].visible;
-            newField.isRequired = outbreakFields[outbreakFieldKey].mandatory;
+            if (!newField.isRequired) {
+                newField.isRequired = outbreakFields[outbreakFieldKey].mandatory;
+            }
             atLeastOneVisible = true;
         } else if (!cField.isNotField) {
             newField.invisible = true;
+        }
+        if (newField.isRequired && newField.invisible) {
+            newField.isRequired = false;
         }
         return newField;
     });
@@ -131,7 +136,6 @@ export function prepareFields(config, outbreakFields, screen, configTab) {
 
 // returns parsed fields with correct visibility and isRequired properties, and a list of routes that shouldn't appear anymore
 export function prepareFieldsAndRoutes (outbreak, screen, config) {
-    //TODO: ALLOW ALL FIELDS FROM WEB AND CHECK FOR FIELDS THAT DOn"T EXIST ON WEB TO ALWAYS KEEP THEM VISIBLE ON MOBILE
     let newConfig = Object.assign({},config);
     if (outbreak?.visibleAndMandatoryFields && outbreak?.visibleAndMandatoryFields[screen]){
         let outbreakFieldsClone = Object.assign({},outbreak.visibleAndMandatoryFields[screen]);
