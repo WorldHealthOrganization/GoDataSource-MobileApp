@@ -5,7 +5,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
 import {Platform} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {setSyncState} from './../actions/app';
+import {setSyncState, setTimezone} from './../actions/app';
 import DeviceInfo from 'react-native-device-info';
 import translations from './../utils/translations';
 import {testApi, testApiPromise} from './testApi';
@@ -69,7 +69,8 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                 })
         })
         .then((responseTestApi) => {
-            // console.log('Response TestApi: ', responseTestApi);
+            AsyncStorage.setItem('timezone', responseTestApi.timezone);
+            dispatch(setTimezone(responseTestApi.timezone));
             dispatch(setSyncState({id: 'testApi', status: 'Success', addLanguagePacks: checkArrayAndLength(languagePacks)}));
             dispatch(setSyncState({id: 'downloadDatabase', status: 'In progress', addLanguagePacks: checkArrayAndLength(languagePacks)}));
             // Here call the method computeHelpItemsAndCategories

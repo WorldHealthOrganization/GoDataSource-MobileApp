@@ -8,7 +8,7 @@ import {ScrollView, StyleSheet, View} from 'react-native';
 import {calculateDimension, extractIdFromPouchId, getTranslation} from '../utils/functions';
 import config from '../utils/config';
 import {connect} from "react-redux";
-import moment from "moment";
+import moment from "moment-timezone";
 import CardComponent from '../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
@@ -153,7 +153,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
             case 'statusId':
             case 'fillLocation':
             // case 'teamId':
-                if(moment().diff(this.props.item.date) < 0){
+                if(moment.tz(this.props.timezone).diff(this.props.item.date) < 0){
                     isEditable = false;
                 }
                 break;
@@ -226,7 +226,8 @@ function mapStateToProps(state) {
         translation: _.get(state, 'app.translation', []),
         referenceData: _.get(state, 'referenceData', []),
         userTeams: _.get(state, 'teams', []),
-        outbreak: _.get(state, 'outbreak', null)
+        outbreak: _.get(state, 'outbreak', null),
+        timezone: _.get(state, 'app.timezone', null)
     };
 }
 

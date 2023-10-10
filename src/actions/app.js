@@ -14,7 +14,7 @@ import {
     ACTION_TYPE_SAVE_TRANSLATION,
     ACTION_TYPE_SET_LOADER_STATE,
     ACTION_TYPE_SET_LOGIN_STATE,
-    ACTION_TYPE_SET_SYNC_STATE
+    ACTION_TYPE_SET_SYNC_STATE, ACTION_TYPE_SET_TIMEZONE
 } from './../utils/enums';
 import config from './../utils/config';
 import {Dimensions, Platform} from 'react-native';
@@ -109,6 +109,13 @@ export function setSyncState(syncState) {
     return {
         type: ACTION_TYPE_SET_SYNC_STATE,
         syncState: syncState
+    }
+}
+
+export function setTimezone(timezoneState) {
+    return {
+        type: ACTION_TYPE_SET_TIMEZONE,
+        timezoneState: timezoneState
     }
 }
 
@@ -712,6 +719,10 @@ export function appInitialized(nativeEventEmitter) {
             if (loggedUser !== null) {
                 try {
                     let activeDatabase = await AsyncStorage.getItem('activeDatabase');
+                    let timezone = await AsyncStorage.getItem('timezone');
+                    if (timezone) {
+                        dispatch(setTimezone(timezone));
+                    }
                     // console.log('Active database: ', activeDatabase);
                     if (activeDatabase !== null) {
                         dispatch(saveActiveDatabase(activeDatabase));

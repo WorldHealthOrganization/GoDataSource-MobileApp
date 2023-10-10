@@ -7,7 +7,7 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
-import moment from 'moment/min/moment.min';
+import moment from 'moment-timezone';
 import {InteractionManager, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import {calculateDimension, getTranslation} from './../utils/functions';

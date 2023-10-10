@@ -30,6 +30,7 @@ import {Dropdown} from "react-native-material-dropdown";
 import {getAllOutbreaks} from "../queries/outbreak";
 import {storeOutbreak} from "../actions/outbreak";
 import styles from './../styles';
+import {backgroundColor} from "react-native-calendars/src/style";
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
@@ -48,7 +49,6 @@ class NavigationDrawer extends Component {
     }
 
 
-
     componentWillMount() {
         this.populateOutbreakDropdown();
     }
@@ -60,10 +60,11 @@ class NavigationDrawer extends Component {
                 selectedScreen: this.props.selectedScreen
             })
         }
-        if (prevProps.syncState !== this.props.syncState && this.props.syncState === 'Finished'){
+        if (prevProps.syncState !== this.props.syncState && this.props.syncState === 'Finished') {
             this.populateOutbreakDropdown();
         }
     }
+
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -77,28 +78,28 @@ class NavigationDrawer extends Component {
                             marginTop: Platform.OS === 'ios' ? (this.props.screenSize.height === 812 ? 44 : 20) : 0
                         }
                     ]}>
-                        <ListItem
-                            numberOfLines={2}
-                            leftElement={<Icon name="account-circle" size={36} color={styles.primaryColor} />}
-                            centerElement={{
-                                primaryText: (this.props.user && this.props.user.firstName ? (this.props.user.firstName + ' ') : ' ') + (this.props.user && this.props.user.lastName ? this.props.user.lastName : ' '),
-                                secondaryText: this.props.user && this.props.user.email ? this.props.user.email : ' '
-                            }}
-                            style={{
-                                primaryText: {
-                                    color: styles.textColor, fontFamily: 'Roboto-Medium', fontSize: 18
-                                },
-                                secondaryText: {
-                                    color: styles.secondaryColor, fontFamily: 'Roboto-Regular', fontSize: 12
-                                },
-                                centerElementContainer: {
-                                    height: '100%', justifyContent: 'center'
-                                },
-                                container: {
-                                    borderBottomWidth: 1, borderBottomColor: styles.separatorColor
-                                }
-                            }}
-                        />
+                    <ListItem
+                        numberOfLines={2}
+                        leftElement={<Icon name="account-circle" size={36} color={styles.primaryColor}/>}
+                        centerElement={{
+                            primaryText: (this.props.user && this.props.user.firstName ? (this.props.user.firstName + ' ') : ' ') + (this.props.user && this.props.user.lastName ? this.props.user.lastName : ' '),
+                            secondaryText: this.props.user && this.props.user.email ? this.props.user.email : ' '
+                        }}
+                        style={{
+                            primaryText: {
+                                color: styles.textColor, fontFamily: 'Roboto-Medium', fontSize: 18
+                            },
+                            secondaryText: {
+                                color: styles.secondaryColor, fontFamily: 'Roboto-Regular', fontSize: 12
+                            },
+                            centerElementContainer: {
+                                height: '100%', justifyContent: 'center'
+                            },
+                            container: {
+                                borderBottomWidth: 1, borderBottomColor: styles.separatorColor
+                            }
+                        }}
+                    />
                     {
                         this.props && this.props.outbreak && this.props.outbreak.name ? (
                             <View style={style.activeOutbreakContainer}>
@@ -125,18 +126,32 @@ class NavigationDrawer extends Component {
                                     selectedItemColor={styles.primaryColor}
                                     disabled={!!this.props.outbreak?.disableOutbreakChange}
                                     data={this.state.outbreaks}
-                                    onChangeText={(value,index,data)=>{
+                                    onChangeText={(value, index, data) => {
                                         // computeCommonData()
                                         // this.props.storeOutbreak(data[index]);
-                                        AsyncStorage.setItem("outbreakId",value);
+                                        AsyncStorage.setItem("outbreakId", value);
                                         this.props.computeOutbreakSwitch(this.props.user, value);
                                     }}
                                 />
+                                {
+                                    this.props.timezone ?
+                                        <Text
+                                            style={{
+                                                marginHorizontal: 16,
+                                                textAlign: 'left',
+                                                marginBottom: 6,
+                                                justifyContent: 'center',
+                                                fontWeight: 'bold'
+                                            }}
+                                        >{this.props.timezone}</Text>
+                                        :
+                                        null
+                                }
                             </View>
                         ) : (null)
                     }
                 </View>
-                
+
                 <ScrollView scrollEnabled={true} style={{flex: 0.9}} contentContainerStyle={{flexGrow: 1}}>
                     {
                         Object.keys(config.sideMenuItems).map((item, index) => {
@@ -146,7 +161,7 @@ class NavigationDrawer extends Component {
                                 addButton = true;
                             }
 
-                            if(item === 'contactsOfContacts' && !(this.props.outbreak && this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC])) {
+                            if (item === 'contactsOfContacts' && !(this.props.outbreak && this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC])) {
                                 return (<></>);
                             }
 
@@ -164,10 +179,14 @@ class NavigationDrawer extends Component {
                             )
                         })
                     }
-                    <View style={styles.lineStyle} />
-                    <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.syncHubManually, this.props.translation)} name={'cached'} onPress={this.handleOnPressSync} />
-                    <NavigationDrawerListItem label={getTranslation(translations.navigationDrawer.changeHubConfig, this.props.translation)} name={'settings'} onPress={this.handleOnPressChangeHubConfig} />
-                    <View style={styles.lineStyle} />
+                    <View style={styles.lineStyle}/>
+                    <NavigationDrawerListItem
+                        label={getTranslation(translations.navigationDrawer.syncHubManually, this.props.translation)}
+                        name={'cached'} onPress={this.handleOnPressSync}/>
+                    <NavigationDrawerListItem
+                        label={getTranslation(translations.navigationDrawer.changeHubConfig, this.props.translation)}
+                        name={'settings'} onPress={this.handleOnPressChangeHubConfig}/>
+                    <View style={styles.lineStyle}/>
                     <View style={style.languageContainer}>
                         <PermissionComponent
                             render={() => (
@@ -177,16 +196,16 @@ class NavigationDrawer extends Component {
                                 />
 
                                 //<DropdownInput
-                                  //  id="test"
-                                    //label={getTranslation(translations.navigationDrawer.languagesLabel, this.props.translation)}
-                                    //value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
-                                    // data={this.props.availableLanguages}
-                                    // isEditMode={true}
-                                    // isRequired={false}
-                                    // onChange={this.handleOnChangeLanguage}
-                                    // style={{width: '90%'}}
-                                    // translation={this.props.translation}
-                                    // screenSize={this.props.screenSize}
+                                //  id="test"
+                                //label={getTranslation(translations.navigationDrawer.languagesLabel, this.props.translation)}
+                                //value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
+                                // data={this.props.availableLanguages}
+                                // isEditMode={true}
+                                // isRequired={false}
+                                // onChange={this.handleOnChangeLanguage}
+                                // style={{width: '90%'}}
+                                // translation={this.props.translation}
+                                // screenSize={this.props.screenSize}
                                 // />
                             )}
                             permissionsList={[
@@ -195,7 +214,7 @@ class NavigationDrawer extends Component {
                             ]}
                         />
                     </View>
-                    <View style={styles.lineStyle} />
+                    <View style={styles.lineStyle}/>
                     <NavigationDrawerListItem
                         label={getTranslation(translations.navigationDrawer.usersLabel, this.props.translation)}
                         name={'contact-phone'}
@@ -222,7 +241,7 @@ class NavigationDrawer extends Component {
                     <ListItem
                         onPress={this.handleLogout}
                         numberOfLines={1}
-                        leftElement={<Icon name="power-settings-new" color={styles.dangerColor} />}
+                        leftElement={<Icon name="power-settings-new" color={styles.dangerColor}/>}
                         centerElement={{
                             primaryText: getTranslation(translations.navigationDrawer.logoutLabel, this.props.translation)
                         }}
@@ -253,7 +272,7 @@ class NavigationDrawer extends Component {
         this.props.saveSelectedScreen(index);
         this.setState({
             selectedScreen: index
-            }, () => {
+        }, () => {
             Navigation.setStackRoot('CenterStack', {
                 component: {
                     name: mapSideMenuKeysToScreenName(index).screenToSwitchTo,
@@ -266,8 +285,8 @@ class NavigationDrawer extends Component {
                     }
                 }
             });
-            });
-       
+        });
+
     };
 
     handleCommunity = async () => {
@@ -280,7 +299,7 @@ class NavigationDrawer extends Component {
         this.setState({
             selectedScreen: key
         }, () => {
-            switch(key) {
+            switch (key) {
                 case 'contacts':
                 case 'cases':
                     console.log("Here");
@@ -297,7 +316,9 @@ class NavigationDrawer extends Component {
                             passProps: {
                                 isNew: true,
                                 isAddFromNavigation: true,
-                                refresh: () => {console.log('Default refresh')}
+                                refresh: () => {
+                                    console.log('Default refresh')
+                                }
                             }
                         }
                     });
@@ -310,14 +331,15 @@ class NavigationDrawer extends Component {
 
     };
 
-    populateOutbreakDropdown = () =>{
-        getAllOutbreaks((error, result)=>{
-            if(!error){
+    populateOutbreakDropdown = () => {
+        getAllOutbreaks((error, result) => {
+            if (!error) {
                 result.map(outbreak => {
-                    if(outbreak._id.includes("outbreak.json_")){
+                    if (outbreak._id.includes("outbreak.json_")) {
                         outbreak._id = outbreak._id.substring(14, outbreak._id.length);
                         return outbreak;
-                    }})
+                    }
+                })
                 this.setState({
                     outbreaks: result
                 })
@@ -407,6 +429,7 @@ function mapStateToProps(state) {
         outbreak: lodashGet(state, 'outbreak', {name: 'No outbreak', disableOutbreakChange: false}),
         translation: lodashGet(state, 'app.translation', []),
         syncState: lodashGet(state, 'app.syncState', null),
+        timezone: state.app?.timezone
     };
 }
 

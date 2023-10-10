@@ -31,7 +31,7 @@ import translations from './../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import ViewHOC from './../components/ViewHOC';
 import PermissionComponent from './../components/PermissionComponent';
-import moment from 'moment/min/moment.min';
+import moment from 'moment-timezone';
 import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
 import {checkRequiredQuestions, extractAllQuestions} from "../utils/functions";
 import constants from './../utils/constants';
@@ -91,8 +91,8 @@ class FollowUpsSingleScreen extends Component {
                 let today = createDate(null);
                 let itemDate = createDate(this.props.item.date);
 
-                let todayDate = createDate(moment.utc([today.getFullYear(), today.getMonth(), today.getDate()])._d);
-                let followUpDate = createDate(moment.utc([itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()])._d);
+                let todayDate = createDate(moment.tz([today.getFullYear(), today.getMonth(), today.getDate()], this.props.timezone)._d);
+                let followUpDate = createDate(moment.tz([itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()], this.props.timezone)._d);
 
                 if (followUpDate > todayDate) {
                     console.log('follow-ups date < today => needitabil');
@@ -313,7 +313,7 @@ class FollowUpsSingleScreen extends Component {
                         previousAnswers={this.state.previousAnswers}
                         contact={this.state.contact}
                         isNew={this.props.isNew}
-                        isEditMode={this.state.isEditMode && moment().diff(this.state.item.date) >= 0}
+                        isEditMode={this.state.isEditMode && moment.tz(this.props.timezone).diff(this.state.item.date) >= 0}
                         activeIndex={this.state.index}
                         onChangeTextAnswer={this.onChangeTextAnswer}
                         onChangeDateAnswer={this.onChangeDateAnswer}
@@ -486,10 +486,10 @@ class FollowUpsSingleScreen extends Component {
             let previousAnswers = this.state.previousAnswers;
             let mappedQuestions = this.state.mappedQuestions;
             let fillLocation = this.state.item.fillLocation;
-            if (id === 'date' && moment().diff(value) < 0){
+            if (id === 'date' && moment.tz(this.props.timezone).diff(value) < 0){
                 status = translations.followUpStatuses.notPerformed;
                 fillLocation = false;
-            } else if (id === 'date' && moment().diff(value) >= 0) {
+            } else if (id === 'date' && moment.tz(this.props.timezone).diff(value) >= 0) {
                 currentAnswers = {};
                 previousAnswers = {};
                 mappedQuestions = [];
@@ -1174,7 +1174,8 @@ function mapStateToProps(state) {
         screenSize: _.get(state, 'app.screenSize', config.designScreenSize),
         questions: _.get(state, 'outbreak.contactFollowUpTemplate', null),
         translation: _.get(state, 'app.translation', []),
-        role: _.get(state, 'role', [])
+        role: _.get(state, 'role', []),
+        timezone: _.get(state, 'app.timezone', null)
     };
 }
 

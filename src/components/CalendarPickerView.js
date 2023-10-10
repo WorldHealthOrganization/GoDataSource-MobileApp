@@ -10,7 +10,7 @@ import Calendar from "react-native-calendars/src/calendar/index";
 import Modal from 'react-native-root-modal';
 import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
-import moment from 'moment/min/moment.min';
+import moment from 'moment-timezone';
 import styles from './../styles';
 
 class CalendarPickerView extends PureComponent {
@@ -77,7 +77,7 @@ class CalendarPickerView extends PureComponent {
     };
 
     parseDate = (date) => {
-        return moment(date).format('YYYY-MM-DD');
+        return moment(date).tz(this.props.timezone).format('YYYY-MM-DD');
     };
 
     handleDateChanged = (date) => {
@@ -114,7 +114,8 @@ const style = StyleSheet.create({
 function mapStateToProps(state) {
     return {
         screenSize: state.app.screenSize,
-        translation: state.app.translation
+        translation: state.app.translation,
+        timezone: state.app.timezone
     };
 }
 

@@ -19,7 +19,7 @@ import set from 'lodash/set';
 import defaultTranslations from './defaultTranslations'
 import {decrypt, encrypt, getSyncEncryptPassword} from './../utils/encryption';
 import {extractLocations} from './../actions/locations';
-import moment from 'moment/min/moment.min';
+import moment from 'moment-timezone';
 import {checkArrayAndLength} from './typeCheckingFunctions';
 import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
 import translations from "./translations";
@@ -28,6 +28,8 @@ import constants from "./constants";
 import lodashMemoize from "lodash/memoize";
 import lodashIsEqual from "lodash/isEqual";
 import lodashIntersection from "lodash/intersection";
+import { store } from "./../App";
+import AsyncStorage from "@react-native-community/async-storage";
 
 export const checkPermissions = lodashMemoize((permissionsList, outbreakPermissions, outbreak, permissions) => {
     if (!checkArrayAndLength(permissionsList) && !checkArrayAndLength(outbreakPermissions)) {
@@ -777,7 +779,7 @@ export function generateId() {
 
 export function updateRequiredFields(outbreakId, userId, record, action, fileType = '', type = '') {
     // Set the date
-    let dateToBeSet = moment.utc()._d;
+    let dateToBeSet = moment.tz(store.getState().app.timezone)._d;
     dateToBeSet = dateToBeSet.toISOString();
 
     switch (action) {
@@ -1462,29 +1464,31 @@ export function getDropDownInputDisplayParameters(screenSize, dropDownDataLength
 }
 
 export function createDate(date, isEndOfDay, accurateDate) {
+    const timezone = store?.getState().app.timezone;
     if (accurateDate) {
         if (date) {
-            return moment.utc(date)._d;
+            return moment.tz(date, timezone)._d;
         }
-        return moment.utc()._d;
+        return moment.tz(timezone)._d;
     }
     if (isEndOfDay) {
         if (date) {
-            return moment.utc(date).endOf('day')._d;
+            return moment.tz(date, timezone).endOf('day')._d;
         }
-        return moment.utc().endOf('day')._d;
+        return moment.tz(timezone).endOf('day')._d;
     }
     if (date) {
-        return moment.utc(date).startOf('day')._d;
+        return moment.tz(date, timezone).startOf('day')._d;
     }
-    return moment.utc().startOf('day')._d;
+    return moment.tz(timezone).startOf('day')._d;
 }
 
 export function daysSince(startDate, endDate) {
     if (!startDate || !endDate) {
         return 0
     }
-    return moment.utc(endDate).startOf('day').diff(moment.utc(startDate).startOf('day'), 'days');
+    const timezone = store.getState().app.timezone;
+    return moment.tz(endDate, timezone).startOf('day').diff(moment.tz(startDate, timezone).startOf('day'), 'days');
 }
 
 export function calcDateDiff(startdate, enddate) {

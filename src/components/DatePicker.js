@@ -9,10 +9,11 @@ import PropTypes from 'prop-types';
 import {TextField} from 'react-native-material-textfield';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import Ripple from 'react-native-material-ripple';
-import moment from 'moment/min/moment.min';
+import moment from 'moment-timezone';
 import {getTranslation, getTooltip, createDate} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
-import stylesGlobal from './../styles';
+import stylesGlobal from './../styles';=
+import {useSelector} from "react-redux";
 
 const DatePicker = React.memo(({
                                    id,
@@ -36,6 +37,7 @@ const DatePicker = React.memo(({
         newDate = new Date(value);
     }
     const [date, setDate] = useState(newDate);
+    const timezone = useSelector((state) => state.app.timezone);
 
     React.useEffect(() => {
         if (date !== value) {
@@ -44,7 +46,7 @@ const DatePicker = React.memo(({
                 newDate = new Date(value);
             }
             if (fieldRef.current) {
-                fieldRef.current.setValue(newDate ? moment.utc(newDate).format('MM/DD/YYYY') : '');
+                fieldRef.current.setValue(newDate ? moment.tz(newDate, timezone).format('MM/DD/YYYY') : '');
             }
             setDate(newDate);
         }
@@ -65,7 +67,7 @@ const DatePicker = React.memo(({
                                 label={isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)}
                                 textColor={stylesGlobal.textColor}
                                 fontSize={14}
-                                value={date ? moment.utc(newDate).format('MM/DD/YYYY') : ''}
+                                value={date ? moment.tz(newDate, timezone).format('MM/DD/YYYY') : ''}
                                 ref={fieldRef}
                                 labelTextStyle={{fontFamily: 'Roboto-Regular'}}
                                 tintColor={stylesGlobal.primaryColor}
@@ -82,7 +84,7 @@ const DatePicker = React.memo(({
                             isDarkModeEnabled={false}
                             date={value ? new Date(
                                 Date.parse(
-                                    moment(new Date(value), 'DD/MM/YYYY').format(
+                                    moment.tz(new Date(value), 'DD/MM/YYYY', timezone).format(
                                         'ddd MMM DD YYYY HH:mm:ss ZZ',
                                     ),
                                 ),
@@ -116,7 +118,7 @@ const DatePicker = React.memo(({
                         )
                     }
                     <Text style={customStyles.datePickerValue}>
-                        {value !== null && value !== undefined && value !== '' ? moment.utc(value).format('MM/DD/YYYY') : ''}
+                        {value !== null && value !== undefined && value !== '' ? moment.tz(value, timezone).format('MM/DD/YYYY') : ''}
                     </Text>
                 </View>
                 {
@@ -135,7 +137,7 @@ const DatePicker = React.memo(({
         console.log("Show date picker 2", `"${value}"`);
         console.log("Show date picker 3", value ? new Date(
             Date.parse(
-                moment(new Date(value), 'DD/MM/YYYY').format(
+                moment.tz(new Date(value), 'DD/MM/YYYY', timezone).format(
                     'ddd MMM DD YYYY HH:mm:ss ZZ',
                 ),
             ),
