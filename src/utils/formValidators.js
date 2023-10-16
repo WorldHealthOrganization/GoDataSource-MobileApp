@@ -88,8 +88,9 @@ export function prepareFields(config, outbreakFields, screen, configTab) {
     const configFields = Object.assign([],config.fields);
     let atLeastOneVisible = false;
     const result = configFields.map(cField =>{
+        let newField = Object.assign({}, cField);
         let outbreakFieldKey;
-        const cFieldId = cField.fieldId || cField.id;
+        const cFieldId = newField.fieldId || newField.id;
         switch (configTab) {
             case 'address':
                 if (screen === 'events' || screen === 'follow-ups'){
@@ -114,13 +115,12 @@ export function prepareFields(config, outbreakFields, screen, configTab) {
         if (cFieldId.includes('.')){
             outbreakFieldKey = `${cFieldId.replace('.','[')}]`;
         }
-        let newField = cField;
         //default all are visible
         newField.invisible = false;
         if (outbreakFields[outbreakFieldKey]){
             newField.invisible = !outbreakFields[outbreakFieldKey].visible;
-            if (!newField.isRequired) {
-                newField.isRequired = outbreakFields[outbreakFieldKey].mandatory;
+            if (!newField.isAlwaysRequired) {
+                newField.isRequired = !!outbreakFields[outbreakFieldKey].mandatory;
             }
             atLeastOneVisible = true;
         } else if (!cField.isNotField) {

@@ -1801,13 +1801,15 @@ class ContactsSingleScreen extends Component {
 
     checkRequiredFieldsPersonalInfo = () => {
         let personalInfo = [];
-        for (let i = 0; i < config.contactsSingleScreen.personal.length; i++) {
-            for (let j = 0; j < config.contactsSingleScreen.personal[i].fields.length; j++) {
-                const field = config.contactsSingleScreen.personal[i].fields[j];
-                if (field.isRequired && !this.state.contact[field.id] &&
-                    !(field.id === 'pregnancyStatus' && (this.state.case?.gender === translations.localTranslationTokens.male)) &&
+        for (let i = 0; i < this.preparedFields.personal.length; i++) {
+            for (let j = 0; j < this.preparedFields.personal[i].fields.length; j++) {
+                const field = this.preparedFields.personal[i].fields[j];
+                if (field.isRequired && !_.get(this.state.contact,field.id,null) &&
                     field.id !== 'visualId') {
-                    personalInfo.push(getTranslation(config.contactsSingleScreen.personal[i].fields[j].label, this.props.translation));
+                    if (field.id === 'pregnancyStatus' && this.state.contact?.gender === translations.localTranslationTokens.male){
+                    } else {
+                        personalInfo.push(getTranslation(this.preparedFields.personal[i].fields[j].label, this.props.translation));
+                    }
                     // return false;
                 }
             }
@@ -1815,9 +1817,9 @@ class ContactsSingleScreen extends Component {
 
         if (checkArrayAndLength(_.get(this.state, 'contact.documents', []))) {
             for (let i = 0; i < _.get(this.state, 'contact.documents.length', 0); i++) {
-                for (let j = 0; j < _.get(config, 'caseSingleScreen.document.fields.length', 0); j++) {
-                    if (_.get(config, `caseSingleScreen.document.fields[${j}].isRequired`, false) && !_.get(this.state, `contact.documents[${i}][${config.caseSingleScreen.document.fields[j].id}]`, null)) {
-                        personalInfo.push(getTranslation(_.get(config, `caseSingleScreen.document.fields[${j}].label`, null), this.props.translation));
+                for (let j = 0; j < _.get(this.preparedFields, 'document.fields.length', 0); j++) {
+                    if (_.get(this.preparedFields, `document.fields[${j}].isRequired`, false) && !_.get(this.state, `contact.documents[${i}][${this.preparedFields.document.fields[j].id}]`, null)) {
+                        personalInfo.push(getTranslation(_.get(this.preparedFields, `document.fields[${j}].label`, null), this.props.translation));
                         // return false;
                     }
                 }
@@ -1826,14 +1828,15 @@ class ContactsSingleScreen extends Component {
 
         if (checkArrayAndLength(_.get(this.state, 'contact.vaccinesReceived', []))) {
             for (let i = 0; i < _.get(this.state, 'contact.vaccinesReceived.length', 0); i++) {
-                for (let j = 0; j < _.get(config, 'caseSingleScreen.vaccinesReceived.fields.length', 0); j++) {
-                    if (_.get(config, `caseSingleScreen.vaccinesReceived.fields[${j}].isRequired`, false) && !_.get(this.state, `contact.vaccinesReceived[${i}][${config.caseSingleScreen.vaccinesReceived.fields[j].id}]`, null)) {
-                        personalInfo.push(getTranslation(_.get(config, `caseSingleScreen.vaccinesReceived.fields[${j}].label`, null), this.props.translation));
+                for (let j = 0; j < _.get(this.preparedFields, 'vaccinesReceived.fields.length', 0); j++) {
+                    if (_.get(this.preparedFields, `vaccinesReceived.fields[${j}].isRequired`, false) && !_.get(this.state, `contact.vaccinesReceived[${i}][${this.preparedFields.vaccinesReceived.fields[j].id}]`, null)) {
+                        personalInfo.push(getTranslation(_.get(this.preparedFields, `vaccinesReceived.fields[${j}].label`, null), this.props.translation));
                         // return false;
                     }
                 }
             }
         }
+
 
         return personalInfo;
         // return true;
@@ -1843,9 +1846,9 @@ class ContactsSingleScreen extends Component {
         let addresses = [];
         if (this.state.contact && this.state.contact.addresses && Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0) {
             for (let i = 0; i < this.state.contact.addresses.length; i++) {
-                for (let j = 0; j < config.contactsSingleScreen.address.fields.length; j++) {
-                    if (config.contactsSingleScreen.address.fields[j].isRequired && !this.state.contact.addresses[i][config.contactsSingleScreen.address.fields[j].id]) {
-                        addresses.push(getTranslation(config.contactsSingleScreen.address.fields[j].label, this.props.translation));
+                for (let j = 0; j < this.preparedFields.address.fields.length; j++) {
+                    if (this.preparedFields.address.fields[j].isRequired && !this.state.contact.addresses[i][this.preparedFields.address.fields[j].id]) {
+                        addresses.push(getTranslation(this.preparedFields.address.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }

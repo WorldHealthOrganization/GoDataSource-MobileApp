@@ -173,6 +173,7 @@ const addressFields = {
             categoryId: "LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE",
             value: '',
             isRequired: true,
+            isAlwaysRequired: true,
             isEditMode: true,
             objectType: 'Address'
         },
@@ -216,7 +217,7 @@ const addressFields = {
             labelValue: 'test',
             type: 'DropDownSectioned',
             value: '',
-            isRequired: true,
+            isRequired: false,
             isEditMode: true,
             objectType: 'Address',
             single: true
@@ -326,6 +327,7 @@ const followUpsSingleScreen = {
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: false,
                     format: 'MM/dd/YYYY',
                     objectType: 'FollowUp'
@@ -380,6 +382,7 @@ const followUpsSingleScreen = {
                     type: 'DropdownInput',
                     value: '',
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: true,
                     objectType: 'FollowUp',
                     skipNone: true
@@ -410,6 +413,7 @@ const labResultsSingleScreen = {
                     type: 'DatePicker',
                     value: '',
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: true,
                     format: 'MM/dd/YYYY',
                     objectType: 'LabResult',
@@ -746,6 +750,7 @@ const caseSingleScreen = {
                     type: 'TextInput',
                     value: '',
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: false,
                     objectType: 'Case'
                 },
@@ -867,6 +872,7 @@ const caseSingleScreen = {
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: false,
                     format: 'YYYY-MM-dd',
                     objectType: 'Case'
@@ -924,6 +930,7 @@ const caseSingleScreen = {
                 categoryId: 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE',
                 value: '',
                 isRequired: true,
+                isAlwaysRequired: true,
                 isEditMode: true,
                 objectType: 'Documents'
             },
@@ -935,6 +942,7 @@ const caseSingleScreen = {
                 type: 'TextInput',
                 value: '',
                 isRequired: true,
+                isAlwaysRequired: true,
                 isEditMode: true,
                 objectType: 'Documents'
             },
@@ -963,6 +971,7 @@ const caseSingleScreen = {
                 categoryId: 'LNG_REFERENCE_DATA_CATEGORY_VACCINE',
                 value: '',
                 isRequired: true,
+                isAlwaysRequired: true,
                 isEditMode: true,
                 objectType: 'Vaccines'
             },
@@ -985,6 +994,7 @@ const caseSingleScreen = {
                 categoryId: 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS',
                 value: '',
                 isRequired: true,
+                isAlwaysRequired: true,
                 isEditMode: true,
                 objectType: 'Vaccines'
             },
@@ -1014,6 +1024,7 @@ const caseSingleScreen = {
                     categoryId: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION',
                     value: '',
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: false,
                     objectType: 'Case'
                 },
@@ -1024,6 +1035,7 @@ const caseSingleScreen = {
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: false,
                     format: 'YYYY-MM-dd',
                     objectType: 'Case'
@@ -1179,6 +1191,7 @@ const caseSingleScreen = {
                 value: '',
                 isEditMode: true,
                 isRequired: true,
+                isAlwaysRequired: true,
                 format: 'YYYY-MM-dd',
                 objectType: 'DateRanges'
             },
@@ -1311,6 +1324,7 @@ const eventSingleScreen = {
                     type: 'TextInput',
                     value: '',
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: false,
                     objectType: 'Event'
                 },
@@ -1322,6 +1336,7 @@ const eventSingleScreen = {
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: true,
                     format: 'MM/dd/YYYY',
                     objectType: 'Event'
@@ -1334,6 +1349,7 @@ const eventSingleScreen = {
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: true,
                     format: 'MM/dd/YYYY',
                     objectType: 'Event'
@@ -1384,6 +1400,7 @@ const eventSingleScreen = {
                     categoryId: 'LNG_REFERENCE_DATA_CATEGORY_ADDRESS_TYPE',
                     value: '',
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: true,
                     objectType: 'Address'
                 },
@@ -2224,6 +2241,7 @@ const addFollowUpScreen = [
         value: new Date,
         type: "DatePicker",
         isRequired: true,
+        isAlwaysRequired: true,
         isEditMode: true,
         format: 'MM/dd/YYYY',
         objectType: 'FollowUp'
@@ -2239,6 +2257,7 @@ const addRelationshipScreen = [
         type: 'SearchableDropdown',
         value: '',
         isRequired: true,
+        isAlwaysRequired: true,
         isEditMode: true,
         objectType: 'Contact',
         isNotField: true
@@ -2261,6 +2280,7 @@ const addRelationshipScreen = [
         value: createDate(null),
         type: "DatePicker",
         isRequired: true,
+        isAlwaysRequired: true,
         isEditMode: true,
         format: 'MM/dd/YYYY',
         objectType: 'Contact'
@@ -2396,6 +2416,7 @@ const contactsOfContactsPersonal = [
                 type: 'TextInput',
                 value: '',
                 isRequired: true,
+                isAlwaysRequired: true,
                 isEditMode: true,
                 multiline: false,
                 objectType: 'Contact'
@@ -2510,6 +2531,7 @@ const contactsOfContactsPersonal = [
                 value: '',
                 type: "DatePicker",
                 isRequired: true,
+                isAlwaysRequired: true,
                 isEditMode: true,
                 format: 'MM/dd/YYYY',
                 objectType: 'Contact'
@@ -2585,6 +2607,7 @@ const contactsSingleScreen = {
                     type: 'TextInput',
                     value: '',
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: true,
                     multiline: false,
                     objectType: 'Contact'
@@ -2699,6 +2722,7 @@ const contactsSingleScreen = {
                     value: '',
                     type: "DatePicker",
                     isRequired: true,
+                    isAlwaysRequired: true,
                     isEditMode: true,
                     format: 'MM/dd/YYYY',
                     objectType: 'Contact'
@@ -2797,6 +2821,7 @@ const contactsSingleScreen = {
                 type: 'SearchableDropdown',
                 value: '',
                 isRequired: true,
+                isAlwaysRequired: true,
                 isEditMode: true,
                 objectType: 'Exposure',
                 isNotField: true
@@ -2819,6 +2844,7 @@ const contactsSingleScreen = {
                 value: createDate(null),
                 type: "DatePicker",
                 isRequired: true,
+                isAlwaysRequired: true,
                 isEditMode: true,
                 format: 'MM/dd/YYYY',
                 objectType: 'Exposure'

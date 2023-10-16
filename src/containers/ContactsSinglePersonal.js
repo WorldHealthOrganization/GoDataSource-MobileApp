@@ -105,48 +105,61 @@ class ContactsSinglePersonal extends Component {
                                 })
                             }
 
-                            <View style={style.container}>
-                                {
-                                    checkArrayAndLength(_.get(this.props, 'contact.vaccinesReceived', [])) && _.get(this.props, 'contact.vaccinesReceived', []).map((item, index) => {
-                                        return this.handleRenderItemForVaccinesList(item, index)
-                                    })
-                                }
-                            </View>
                             {
-                                this.props.isEditMode ? (
-                                    <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}>
-                                        <Button
-                                            title={!_.get(this.props, 'contact.vaccinesReceived', null) || checkArray(this.props.contact.vaccinesReceived) && this.props.contact.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
-                                            onPress={this.props.onPressAddVaccine}
-                                            color={styles.backgroundColor}
-                                            titleColor={styles.textColor}
-                                            height={calculateDimension(35, true, this.props.screenSize)}
-                                            width={'100%'}
-                                            style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
-                                        />
-                                    </View>) : null
+                                this.props.preparedFields?.vaccinesReceived?.invisible ?
+                                    null
+                                    :
+                                    <>
+                                        <View style={style.container}>
+                                            {
+                                                checkArrayAndLength(_.get(this.props, 'contact.vaccinesReceived', [])) && _.get(this.props, 'contact.vaccinesReceived', []).map((item, index) => {
+                                                    return this.handleRenderItemForVaccinesList(item, index)
+                                                })
+                                            }
+                                        </View>
+                                        {
+                                            this.props.isEditMode ? (
+                                                <View style={{alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}>
+                                                    <Button
+                                                        title={!_.get(this.props, 'contact.vaccinesReceived', null) || checkArray(this.props.contact.vaccinesReceived) && this.props.contact.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
+                                                        onPress={this.props.onPressAddVaccine}
+                                                        color={styles.backgroundColor}
+                                                        titleColor={styles.textColor}
+                                                        height={calculateDimension(35, true, this.props.screenSize)}
+                                                        width={'100%'}
+                                                        style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                                    />
+                                                </View>) : null
+                                        }
+                                    </>
                             }
-
-                            <View style={style.container}>
-                                {
-                                    checkArray(_.get(this.props, 'contact.documents', [])) && _.get(this.props, 'contact.documents', []).map((item, index) => {
-                                        return this.handleRenderItemForDocumentsList(item, index)
-                                    })
-                                }
-                            </View>
                             {
-                                this.props.isEditMode ? (
-                                    <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}>
-                                        <Button
-                                            title={!_.get(this.props, 'contact.documents', null) || checkArray(this.props.contact.documents) && this.props.contact.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
-                                            onPress={this.props.onPressAddDocument}
-                                            color={styles.backgroundColor}
-                                            titleColor={styles.textColor}
-                                            height={calculateDimension(35, true, this.props.screenSize)}
-                                            width={'100%'}
-                                            style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
-                                        />
-                                    </View>) : null
+                                this.props.preparedFields?.document?.invisible ?
+                                    null
+                                    :
+                                    <>
+                                        <View style={style.container}>
+                                            {
+                                                checkArray(_.get(this.props, 'contact.documents', [])) && _.get(this.props, 'contact.documents', []).map((item, index) => {
+                                                    return this.handleRenderItemForDocumentsList(item, index)
+                                                })
+                                            }
+                                        </View>
+                                        {
+                                            this.props.isEditMode ? (
+                                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize)}}>
+                                                    <Button
+                                                        title={!_.get(this.props, 'contact.documents', null) || checkArray(this.props.contact.documents) && this.props.contact.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
+                                                        onPress={this.props.onPressAddDocument}
+                                                        color={styles.backgroundColor}
+                                                        titleColor={styles.textColor}
+                                                        height={calculateDimension(35, true, this.props.screenSize)}
+                                                        width={'100%'}
+                                                        style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                                    />
+                                                </View>) : null
+                                        }
+                                    </>
                             }
                         </View>
                     </ScrollView>
@@ -164,9 +177,6 @@ class ContactsSinglePersonal extends Component {
     };
 
     handleRenderItemForDocumentsList = (item, index) => {
-        if(this.props.preparedFields?.document?.invisible){
-            return null;
-        }
         let fields = this.props.preparedFields?.document?.fields?.map((field) => {
             return Object.assign({}, field, { isEditMode:  this.props.isEditMode })
         });
@@ -174,9 +184,6 @@ class ContactsSinglePersonal extends Component {
     };
 
     handleRenderItemForVaccinesList = (item, index) => {
-        if(this.props.preparedFields?.vaccinesReceived?.invisible){
-            return null;
-        }
         let fields = this.props.preparedFields.vaccinesReceived.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });

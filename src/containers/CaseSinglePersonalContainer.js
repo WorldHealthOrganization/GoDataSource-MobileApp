@@ -75,26 +75,33 @@ class CaseSinglePersonalContainer extends Component {
                                 return null;
                             })
                         }
-                        <View style={style.container}>
-                            {
-                                this.props.case && this.props.case.documents && this.props.case.documents.map((item, index) => {
-                                    return this.handleRenderItemForDocumentsList(item, index)
-                                })
-                            }
-                        </View>
                         {
-                            this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize) }}>
-                                    <Button
-                                        title={!_.get(this.props, 'case.documents', null) || checkArray(this.props.case.documents) && this.props.case.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
-                                        onPress={this.props.onPressAddDocument}
-                                        color={styles.backgroundColor}
-                                        titleColor={styles.textColor}
-                                        height={calculateDimension(35, true, this.props.screenSize)}
-                                        width={'100%'}
-                                        style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
-                                    />
-                                </View>) : null
+                            this.props.preparedFields?.document?.invisible ?
+                                null
+                                :
+                                <>
+                                    <View style={style.container}>
+                                        {
+                                            this.props.case && this.props.case.documents && this.props.case.documents.map((item, index) => {
+                                                return this.handleRenderItemForDocumentsList(item, index)
+                                            })
+                                        }
+                                    </View>
+                                    {
+                                        this.props.isEditMode ? (
+                                            <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize) }}>
+                                                <Button
+                                                    title={!_.get(this.props, 'case.documents', null) || checkArray(this.props.case.documents) && this.props.case.documents.length === 0 ? getTranslation(translations.caseSingleScreen.oneDocumentText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDocumentsText, this.props.translation)}
+                                                    onPress={this.props.onPressAddDocument}
+                                                    color={styles.backgroundColor}
+                                                    titleColor={styles.textColor}
+                                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                                    width={'100%'}
+                                                    style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                                />
+                                            </View>) : null
+                                    }
+                                </>
                         }
                     </ScrollView>
                 </View>
@@ -112,14 +119,11 @@ class CaseSinglePersonalContainer extends Component {
     };
 
     handleRenderItemForDocumentsList = (item, index) => {
-        if (!this.props.preparedFields.document.invisible) {
             let fields = this.props.preparedFields.document.fields.map((field) => {
                 field.isEditMode = this.props.isEditMode;
                 return field;
             });
             return this.renderItemCardComponent(fields, index);
-        }
-        return null;
     };
 
     renderItemCardComponent = (fields, cardIndex = null) => {

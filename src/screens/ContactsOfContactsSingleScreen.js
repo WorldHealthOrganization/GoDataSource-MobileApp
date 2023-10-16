@@ -1592,7 +1592,7 @@ class ContactsOfContactsSingleScreen extends Component {
             for (let j = 0; j < config.contactsSingleScreen.personal[i].fields.length; j++) {
                 const field = config.contactsSingleScreen.personal[i].fields[j];
                 if (field.isRequired && !this.state.contact[field.id] &&
-                    !(field.id === 'pregnancyStatus' && (this.state.case?.gender === translations.localTranslationTokens.male)) &&
+                    !(field.id === 'pregnancyStatus' && (this.state.contact?.gender === translations.localTranslationTokens.male)) &&
                     field.id !== 'visualId') {
                     personalInfo.push(getTranslation(config.contactsSingleScreen.personal[i].fields[j].label, this.props.translation));
                     // return false;
@@ -1658,7 +1658,7 @@ class ContactsOfContactsSingleScreen extends Component {
                     }
                 } else {
                     if (preparedFields[i].isRequired) {
-                        if (!exposureRelationships[0][preparedFieldsn[i].id]) {
+                        if (!exposureRelationships[0][preparedFields[i].id]) {
                             requiredFields.push(getTranslation(preparedFields[i].label, this.props.translation));
                             // pass = false;
                         }

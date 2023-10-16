@@ -369,21 +369,22 @@ class LabResultsSingleScreen extends Component {
     };
 
     checkRequiredFields = () => {
-        if(this.state.item?.deleted){
+        if (this.state.item?.deleted){
             return [];
         }
         let checkRequiredFields = [];
         for (let i = 0; i < this.preparedFields.generalInfo.length; i++ ){
             for (let j = 0; j < this.preparedFields.generalInfo[i].fields.length; j++ ){
                 const field = this.preparedFields.generalInfo[i].fields[j];
-                if (field.isRequired && !this.state.item[field.id] &&
+                if (field.isRequired && !_.get(this.state.item,field.id, null) &&
                     !(field.dependsOn && _.get(this.state.item,field.dependsOn,false) !== field.dependsOnValue)
                 ){
                     checkRequiredFields.push(getTranslation(field.label,this.props.translation));
                 }
             }
         }
-        return checkRequiredFields
+
+        return checkRequiredFields;
     }
 
     handleNextPress = () => {

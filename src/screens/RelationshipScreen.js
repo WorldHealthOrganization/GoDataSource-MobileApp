@@ -33,11 +33,16 @@ import withPincode from './../components/higherOrderComponents/withPincode';
 import {Navigation} from "react-native-navigation";
 import _ from "lodash";
 import styles from './../styles';
+import {prepareFields, prepareFieldsAndRoutes} from "../utils/formValidators";
 
 class RelationshipScreen extends Component {
 
+
+
     constructor(props) {
         super(props);
+
+        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'relationships', {relationship: {fields: config.addRelationshipScreen}})
         this.state = {
             exposure: this.props.exposure || {
                 outbreakId: this.props.outbreak._id,
@@ -135,6 +140,7 @@ class RelationshipScreen extends Component {
                         <RelationshipContainer
                             exposure={this.state.exposure}
                             person={person}
+                            preparedFields={this.preparedFields}
                             fromRelationshipScreen={true}
                             type={this.props.type}
                             isEditMode={this.props.isEditMode}
@@ -404,16 +410,16 @@ class RelationshipScreen extends Component {
     checkFields = () => {
         // let pass = true;
         let requiredFields = [];
-        for (let i=0; i<config.addRelationshipScreen.length; i++) {
-            if (config.addRelationshipScreen[i].id === 'exposure') {
+        for (let i=0; i<this.preparedFields.length; i++) {
+            if (this.preparedFields[i].id === 'exposure') {
                 if (this.state.exposure.persons.length === 0) {
                     requiredFields.push('Person')
                     // pass = false;
                 }
             } else {
-                if (config.addRelationshipScreen[i].isRequired) {
-                    if (!this.state.exposure[config.addRelationshipScreen[i].id]) {
-                        requiredFields.push(getTranslation(config.addRelationshipScreen[i].label, this.props.translation));
+                if (this.preparedFields[i].isRequired) {
+                    if (!this.state.exposure[this.preparedFields[i].id]) {
+                        requiredFields.push(getTranslation(this.preparedFields[i].label, this.props.translation));
                         // pass = false;
                     }
                 }

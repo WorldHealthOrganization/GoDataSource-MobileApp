@@ -1520,9 +1520,9 @@ class CaseSingleScreen extends Component {
         //documents
         if (this.state.case && this.state.case.documents && Array.isArray(this.state.case.documents) && this.state.case.documents.length > 0) {
             for (let i = 0; i < this.state.case.documents.length; i++) {
-                for (let j = 0; j < config.caseSingleScreen.document.fields.length; j++) {
-                    if (config.caseSingleScreen.document.fields[j].isRequired && !this.state.case.documents[i][config.caseSingleScreen.document.fields[j].id]) {
-                        requiredFields.push(getTranslation(config.caseSingleScreen.document.fields[j].label, this.props.translation));
+                for (let j = 0; j < this.preparedFields.document.fields.length; j++) {
+                    if (this.preparedFields.document.fields[j].isRequired && !this.state.case.documents[i][this.preparedFields.document.fields[j].id]) {
+                        requiredFields.push(getTranslation(this.preparedFields.document.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }
@@ -1535,9 +1535,9 @@ class CaseSingleScreen extends Component {
         let requiredFields = [];
         if (this.state.case && this.state.case.addresses && Array.isArray(this.state.case.addresses) && this.state.case.addresses.length > 0) {
             for (let i = 0; i < this.state.case.addresses.length; i++) {
-                for (let j = 0; j < config.caseSingleScreen.address.fields.length; j++) {
-                    if (config.caseSingleScreen.address.fields[j].isRequired && !this.state.case.addresses[i][config.caseSingleScreen.address.fields[j].id]) {
-                        requiredFields.push(getTranslation(config.caseSingleScreen.address.fields[j].label, this.props.translation));
+                for (let j = 0; j < this.preparedFields.address.fields.length; j++) {
+                    if (this.preparedFields.address.fields[j].isRequired && !this.state.case.addresses[i][this.preparedFields.address.fields[j].id]) {
+                        requiredFields.push(getTranslation(this.preparedFields.address.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }
@@ -1549,9 +1549,9 @@ class CaseSingleScreen extends Component {
     checkRequiredFieldsInfection = () => {
         let requiredFields = [];
         //infection general info
-        for (let i = 0; i < config.caseSingleScreen.infection.length; i++) {
-            for (let j = 0; j < config.caseSingleScreen.infection[i].fields.length; j++) {
-                const field = config.caseSingleScreen.infection[i].fields[j];
+        for (let i = 0; i < this.preparedFields.infection.length; i++) {
+            for (let j = 0; j < this.preparedFields.infection[i].fields.length; j++) {
+                const field = this.preparedFields.infection[i].fields[j];
                 if (field.isRequired && !this.state.case[field.id]) {
                     if (!(field.id === 'dateOfOnset' && _.get(this.props, 'isDateOfOnsetRequired', null) === false) &&
                         !((field.id === 'safeBurial' || field.id === 'dateOfBurial' || field.id === 'burialLocationId' || field.id === 'burialPlaceName') &&
@@ -1567,9 +1567,9 @@ class CaseSingleScreen extends Component {
         //dateRanges
         if (this.state.case && this.state.case.dateRanges && Array.isArray(this.state.case.dateRanges) && this.state.case.dateRanges.length > 0) {
             for (let i = 0; i < this.state.case.dateRanges.length; i++) {
-                for (let j = 0; j < config.caseSingleScreen.dateRanges.fields.length; j++) {
-                    if (config.caseSingleScreen.dateRanges.fields[j].isRequired && !this.state.case.dateRanges[i][config.caseSingleScreen.dateRanges.fields[j].id]) {
-                        requiredFields.push(getTranslation(config.caseSingleScreen.dateRanges.fields[j].label, this.props.translation));
+                for (let j = 0; j < this.preparedFields.dateRanges.fields.length; j++) {
+                    if (this.preparedFields.dateRanges.fields[j].isRequired && !this.state.case.dateRanges[i][this.preparedFields.dateRanges.fields[j].id]) {
+                        requiredFields.push(getTranslation(this.preparedFields.dateRanges.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }
