@@ -48,6 +48,7 @@ class CalendarPickerView extends PureComponent {
                         markedDates={{[this.state.selectedDate]: {selected: true, selectedColor: styles.primaryColor}}}
                         onDayPress={this.handleDateChanged}
                         monthFormat={'MMMM yyyy'}
+
                         style={style.calendarStyle}
                         theme={{
                             backgroundColor: 'transparent',

@@ -29,7 +29,6 @@ import lodashMemoize from "lodash/memoize";
 import lodashIsEqual from "lodash/isEqual";
 import lodashIntersection from "lodash/intersection";
 import { store } from "./../App";
-import AsyncStorage from "@react-native-community/async-storage";
 
 export const checkPermissions = lodashMemoize((permissionsList, outbreakPermissions, outbreak, permissions) => {
     if (!checkArrayAndLength(permissionsList) && !checkArrayAndLength(outbreakPermissions)) {
@@ -134,7 +133,8 @@ export function checkIfSameDay(date1, date2) {
     if (Object.prototype.toString.call(date1) !== '[object Date]' || Object.prototype.toString.call(date2) !== '[object Date]') {
         return false;
     }
-    return moment.utc(date1).isSame(moment.utc(date2), 'day')
+    const timezone = store?.getState().app.timezone;
+    return moment.tz(date1, timezone).isSame(moment.tz(date2, timezone), 'day')
 }
 
 export function getAddress(address, returnString, locationsList) {
@@ -1212,10 +1212,6 @@ export function getTranslation(value, allTransactions) {
     let valueToBeReturned = value;
     if (value && typeof value === 'string' && value.includes('LNG')) {
         let item = null;
-
-        // if(value===translations.contactsOfContactsScreen.contactsTitle){
-        //     console.log("What's this?", allTransactions);
-        // }
         if (value && allTransactions && Array.isArray(allTransactions)) {
             item = allTransactions.find(e => {
                 return e && e.token === value

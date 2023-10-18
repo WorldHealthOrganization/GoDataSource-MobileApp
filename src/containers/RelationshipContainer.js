@@ -36,7 +36,7 @@ class RelationshipContainer extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        if(this.props.preparedFields.relationship.invisible){
+        if (this.props.preparedFields.relationship.invisible) {
             return null;
         }
         return (

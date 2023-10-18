@@ -148,6 +148,16 @@ class LabResultsSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+            const resultField = this.preparedFields.generalInfo[0].fields.find(x=>x.id === 'result');
+            if (resultField.isRequired !== false) {
+                if (_.get(this.state.item,'status',null) === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_COMPLETED') {
+                    if (resultField.isRequired !== true){
+                        resultField.isRequired = true;
+                    }
+                } else if (resultField.isRequired !== undefined) {
+                    resultField.isRequired = undefined;
+                }
+            }
         return (
             <ViewHOC style={style.container}
                      showLoader={this && this.state && this.state.loading}
@@ -168,7 +178,7 @@ class LabResultsSingleScreen extends Component {
                                 <ElevatedView
                                     elevation={0}
                                     style={[
-                                        style.headerButton, 
+                                        style.headerButton,
                                         {
                                             width: calculateDimension(30, false, this.props.screenSize),
                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -194,7 +204,7 @@ class LabResultsSingleScreen extends Component {
                                             button={
                                                 <Ripple
                                                     style={[
-                                                        style.moreMenuButton, 
+                                                        style.moreMenuButton,
                                                         {
                                                             width: calculateDimension(30, false, this.props.screenSize),
                                                             height: calculateDimension(30, true, this.props.screenSize)

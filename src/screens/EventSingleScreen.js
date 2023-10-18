@@ -1011,7 +1011,8 @@ class EventSingleScreen extends Component {
         if (selectedItems && Array.isArray(selectedItems) && selectedItems.length > 0) {
             let address = _.cloneDeep(this.state.event.address);
             address.locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
-            if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
+            const visibleGeoLocationField = this.preparedFields.address?.fields?.find(x => x.fieldId === 'geoLocation' && !x.invisible);
+            if (visibleGeoLocationField && selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
                 if (selectedItems['0'].geoLocation.coordinates[0] !== '' || selectedItems['0'].geoLocation.coordinates[1] !== '') {
                     setTimeout(() => {
                         Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [

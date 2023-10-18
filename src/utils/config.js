@@ -489,9 +489,8 @@ const labResultsSingleScreen = {
                     value: '',
                     type: "DropdownInput",
                     categoryId: "LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT",
-                    isRequired: false,
                     isEditMode: true,
-                    objectType: 'LabResult'
+                    objectType: 'LabResult',
                 },{
                     cardNumber: 1,
                     id: 'testedFor',
@@ -966,7 +965,7 @@ const caseSingleScreen = {
             {
                 cardNumber: 2,
                 id: 'vaccine',
-                label: 'Vaccine',
+                label: translations.personFilter.vaccine,
                 type: 'DropdownInput',
                 categoryId: 'LNG_REFERENCE_DATA_CATEGORY_VACCINE',
                 value: '',
@@ -989,11 +988,10 @@ const caseSingleScreen = {
             {
                 cardNumber: 2,
                 id: 'status',
-                label: 'Vaccine status',
+                label: translations.personFilter.vaccineStatus,
                 type: 'DropdownInput',
                 categoryId: 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS',
                 value: '',
-                isRequired: true,
                 isAlwaysRequired: true,
                 isEditMode: true,
                 objectType: 'Vaccines'

@@ -83,7 +83,8 @@ class NavigationDrawer extends Component {
                         leftElement={<Icon name="account-circle" size={36} color={styles.primaryColor}/>}
                         centerElement={{
                             primaryText: (this.props.user && this.props.user.firstName ? (this.props.user.firstName + ' ') : ' ') + (this.props.user && this.props.user.lastName ? this.props.user.lastName : ' '),
-                            secondaryText: this.props.user && this.props.user.email ? this.props.user.email : ' '
+                            secondaryText: this.props.user && this.props.user.email ? this.props.user.email : ' ',
+                            tertiaryText: this.props.timezone ? this.props.timezone : null
                         }}
                         style={{
                             primaryText: {
@@ -133,20 +134,6 @@ class NavigationDrawer extends Component {
                                         this.props.computeOutbreakSwitch(this.props.user, value);
                                     }}
                                 />
-                                {
-                                    this.props.timezone ?
-                                        <Text
-                                            style={{
-                                                marginHorizontal: 16,
-                                                textAlign: 'left',
-                                                marginBottom: 6,
-                                                justifyContent: 'center',
-                                                fontWeight: 'bold'
-                                            }}
-                                        >{this.props.timezone}</Text>
-                                        :
-                                        null
-                                }
                             </View>
                         ) : (null)
                     }

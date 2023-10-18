@@ -130,6 +130,7 @@ class LabResultsSingleGetInfoContainer extends PureComponent {
             <CardComponent
                 key={cardIndex}
                 item={item}
+                isRequired={item.isRequired}
                 isEditMode={this.props.isEditMode}
                 isEditModeForDropDownInput={this.props.isEditMode}
                 value={value}

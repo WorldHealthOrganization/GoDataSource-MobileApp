@@ -410,16 +410,16 @@ class RelationshipScreen extends Component {
     checkFields = () => {
         // let pass = true;
         let requiredFields = [];
-        for (let i=0; i<this.preparedFields.length; i++) {
-            if (this.preparedFields[i].id === 'exposure') {
+        for (let i=0; i<this.preparedFields.relationship.fields.length; i++) {
+            if (this.preparedFields.relationship.fields[i].id === 'exposure') {
                 if (this.state.exposure.persons.length === 0) {
                     requiredFields.push('Person')
                     // pass = false;
                 }
             } else {
-                if (this.preparedFields[i].isRequired) {
-                    if (!this.state.exposure[this.preparedFields[i].id]) {
-                        requiredFields.push(getTranslation(this.preparedFields[i].label, this.props.translation));
+                if (this.preparedFields.relationship.fields[i].isRequired) {
+                    if (!this.state.exposure[this.preparedFields.relationship.fields[i].id]) {
+                        requiredFields.push(getTranslation(this.preparedFields.relationship.fields[i].label, this.props.translation));
                         // pass = false;
                     }
                 }

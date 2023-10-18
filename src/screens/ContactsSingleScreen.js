@@ -96,7 +96,7 @@ class ContactsSingleScreen extends Component {
 
 
 
-        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'contacts', Object.assign({},config.contactsSingleScreen,{vaccinesReceived: config.caseSingleScreen.vaccinesReceived, document: config.caseSingleScreen.document}));
+        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'contacts', Object.assign({},config.contactsSingleScreen,{vaccinesReceived: config.caseSingleScreen.vaccinesReceived, document: config.caseSingleScreen.document, relationship: {fields: config.addRelationshipScreen}}));
         if (this.props.outbreak && !this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC]) {
             remove(routes, (route => route.key === 'contacts'))
         }
@@ -790,6 +790,7 @@ class ContactsSingleScreen extends Component {
             case 'exposures':
                 return (
                     <ContactsSingleRelationship
+                        preparedFields={this.preparedFields}
                         routeKey={this.state.routes[this.state.index].key}
                         relationshipType={constants.RELATIONSHIP_TYPE.exposure}
                         contact={this.state.contact}
@@ -821,6 +822,7 @@ class ContactsSingleScreen extends Component {
             case 'contacts':
                 return (
                     <ContactsSingleRelationship
+                        preparedFields={this.preparedFields}
                         routeKey={this.state.routes[this.state.index].key}
                         contact={this.state.contact}
                         relationshipType={constants.RELATIONSHIP_TYPE.contact}
@@ -1524,7 +1526,8 @@ class ContactsSingleScreen extends Component {
         if (selectedItems && Array.isArray(selectedItems) && selectedItems.length > 0) {
             let addresses = _.cloneDeep(this.state.contact.addresses);
             addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
-            if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
+            const visibleGeoLocationField = this.preparedFields.address?.fields?.find(x => x.fieldId === 'geoLocation' && !x.invisible);
+            if (visibleGeoLocationField && selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
                 if (selectedItems['0'].geoLocation.coordinates[0] !== '' || selectedItems['0'].geoLocation.coordinates[1] !== '') {
                     setTimeout(() => {
                         Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
