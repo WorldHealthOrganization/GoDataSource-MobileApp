@@ -29,7 +29,6 @@ import {
 import {Navigation} from "react-native-navigation";
 import Button from './../components/Button';
 import styles from './../styles';
-import {prepareFieldsAndRoutes} from "../utils/formValidators";
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -38,9 +37,6 @@ class ContactsSingleRelationship extends Component {
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
         super(props);
-
-
-        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'relationships', {relationship: {fields: config.contactsSingleScreen.relationship.fields}})
 
         this.state = {
             interactionComplete: false

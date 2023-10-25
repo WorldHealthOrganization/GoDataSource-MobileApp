@@ -25,7 +25,6 @@ import Ripple from 'react-native-material-ripple';
 import {addFollowUp, getFollowUpsForContactId, updateFollowUpAndContact} from './../actions/followUps';
 import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
 import {removeErrors} from './../actions/errors';
-import DateTimePicker from 'react-native-modal-datetime-picker';
 import _, {findIndex, sortBy, remove} from 'lodash';
 import {
     calculateDimension,
@@ -95,7 +94,7 @@ class ContactsSingleScreen extends Component {
                 config.tabsValuesRoutes.contactsSingleWithoutExposures;
 
 
-
+        this.preparedFieldsRelationship = prepareFieldsAndRoutes(this.props.outbreak, 'relationships', {relationship: {fields: config.addRelationshipScreen}});
         this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'contacts', Object.assign({},config.contactsSingleScreen,{vaccinesReceived: config.caseSingleScreen.vaccinesReceived, document: config.caseSingleScreen.document, relationship: {fields: config.addRelationshipScreen}}));
         if (this.props.outbreak && !this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC]) {
             remove(routes, (route => route.key === 'contacts'))
@@ -790,7 +789,7 @@ class ContactsSingleScreen extends Component {
             case 'exposures':
                 return (
                     <ContactsSingleRelationship
-                        preparedFields={this.preparedFields}
+                        preparedFields={this.preparedFieldsRelationship}
                         routeKey={this.state.routes[this.state.index].key}
                         relationshipType={constants.RELATIONSHIP_TYPE.exposure}
                         contact={this.state.contact}
@@ -822,7 +821,7 @@ class ContactsSingleScreen extends Component {
             case 'contacts':
                 return (
                     <ContactsSingleRelationship
-                        preparedFields={this.preparedFields}
+                        preparedFields={this.preparedFieldsRelationship}
                         routeKey={this.state.routes[this.state.index].key}
                         contact={this.state.contact}
                         relationshipType={constants.RELATIONSHIP_TYPE.contact}
@@ -1409,7 +1408,7 @@ class ContactsSingleScreen extends Component {
 
     };
     handleOnChangeDropDown = (value, id, objectType, type) => {
-        console.log("onChangeDropDown: ", value, id, objectType, this.state.contact);
+        console.log("onChangeDropDown: ", value, id, objectType, type);
         if (objectType === 'FollowUp' || id === 'address') {
             if (id === 'address') {
                 if (!this.state.item[id]) {
@@ -1909,7 +1908,7 @@ class ContactsSingleScreen extends Component {
         let relationships = _.get(this.state.contact, 'relationships', []);
         if (checkArrayAndLength(relationships)) {
             relationships = relationships.map((e) => _.get(e, 'relationshipData', e));
-            const preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'relationships', {relationship: {fields: config.addRelationshipScreen}}).relationship.fields;
+            const preparedFields = this.preparedFieldsRelationship.relationship.fields;
             for (let i = 0; i < preparedFields.length; i++) {
                 if (preparedFields[i].id === 'exposure') {
                     if (relationships[0].persons.length === 0) {

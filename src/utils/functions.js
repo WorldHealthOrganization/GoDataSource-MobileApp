@@ -779,7 +779,7 @@ export function generateId() {
 
 export function updateRequiredFields(outbreakId, userId, record, action, fileType = '', type = '') {
     // Set the date
-    let dateToBeSet = moment.tz(store.getState().app.timezone)._d;
+    let dateToBeSet = moment.utc().toDate();
     dateToBeSet = dateToBeSet.toISOString();
 
     switch (action) {
@@ -1463,20 +1463,20 @@ export function createDate(date, isEndOfDay, accurateDate) {
     const timezone = store?.getState().app.timezone;
     if (accurateDate) {
         if (date) {
-            return moment.tz(date, timezone)._d;
+            return moment.tz(date, timezone).toDate();
         }
-        return moment.tz(timezone)._d;
+        return moment.tz(timezone).toDate();
     }
     if (isEndOfDay) {
         if (date) {
-            return moment.tz(date, timezone).endOf('day')._d;
+            return moment.tz(date, timezone).endOf('day').toDate();
         }
-        return moment.tz(timezone).endOf('day')._d;
+        return moment.tz(timezone).endOf('day').toDate();
     }
     if (date) {
-        return moment.tz(date, timezone).startOf('day')._d;
+        return moment.tz(date, timezone).startOf('day').toDate();
     }
-    return moment.tz(timezone).startOf('day')._d;
+    return moment.tz(timezone).startOf('day').toDate();
 }
 
 export function daysSince(startDate, endDate) {

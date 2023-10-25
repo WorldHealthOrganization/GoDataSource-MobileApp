@@ -11,6 +11,7 @@ import ButtonWithIcons from './ButtonWithIcons';
 import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
 import translations from './../utils/translations';
+import moment from "moment-timezone";
 
 class CalendarPicker extends PureComponent {
 
@@ -59,7 +60,7 @@ class CalendarPicker extends PureComponent {
         if (!checkIfSameDay(new Date(date.dateString), new Date())) {
             // dateAux format = "YYYY-MM-DD"
             // let date1Time = new Date(date.dateString).getTime();
-            dateAux = createDate(date.timestamp).toLocaleDateString();
+            dateAux = moment(date.dateString).utc(true).toDate().toLocaleDateString();
                 // new Date(date1Time + (new Date(date1Time).getTimezoneOffset() * 60 * 1000)).toLocaleDateString();
         }
         // let dateAux = checkIfSameDay(new Date(date.dateString), new Date()) ? 'Today' : new Date(date.dateString).toLocaleDateString();
@@ -67,7 +68,7 @@ class CalendarPicker extends PureComponent {
             label: dateAux
         }, () => {
             this.props.openCalendarModal();
-            this.props.onDayPress(createDate(date.timestamp));
+            this.props.onDayPress(moment(date.dateString).utc(true).toDate().toISOString());
         })
     };
 }

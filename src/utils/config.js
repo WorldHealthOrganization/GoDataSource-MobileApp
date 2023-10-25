@@ -351,7 +351,6 @@ const followUpsSingleScreen = {
                     type: 'DropdownInput',
                     categoryId: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE',
                     value: '',
-                    isRequired: true,
                     isEditMode: true,
                     objectType: 'FollowUp',
                     skipNone: true
@@ -381,8 +380,6 @@ const followUpsSingleScreen = {
                     label: translations.followUpsSingleScreen.team,
                     type: 'DropdownInput',
                     value: '',
-                    isRequired: true,
-                    isAlwaysRequired: true,
                     isEditMode: true,
                     objectType: 'FollowUp',
                     skipNone: true
@@ -412,8 +409,6 @@ const labResultsSingleScreen = {
                     label: translations.labResultsSingleScreen.sampleTaken,
                     type: 'DatePicker',
                     value: '',
-                    isRequired: true,
-                    isAlwaysRequired: true,
                     isEditMode: true,
                     format: 'MM/dd/YYYY',
                     objectType: 'LabResult',
@@ -870,8 +865,6 @@ const caseSingleScreen = {
                     label: translations.caseSingleScreen.dateOfReporting,
                     value: '',
                     type: "DatePicker",
-                    isRequired: true,
-                    isAlwaysRequired: true,
                     isEditMode: false,
                     format: 'YYYY-MM-dd',
                     objectType: 'Case'
@@ -928,8 +921,6 @@ const caseSingleScreen = {
                 type: 'DropdownInput',
                 categoryId: 'LNG_REFERENCE_DATA_CATEGORY_DOCUMENT_TYPE',
                 value: '',
-                isRequired: true,
-                isAlwaysRequired: true,
                 isEditMode: true,
                 objectType: 'Documents'
             },
@@ -940,8 +931,6 @@ const caseSingleScreen = {
                 labelValue: 'test',
                 type: 'TextInput',
                 value: '',
-                isRequired: true,
-                isAlwaysRequired: true,
                 isEditMode: true,
                 objectType: 'Documents'
             },
@@ -969,8 +958,6 @@ const caseSingleScreen = {
                 type: 'DropdownInput',
                 categoryId: 'LNG_REFERENCE_DATA_CATEGORY_VACCINE',
                 value: '',
-                isRequired: true,
-                isAlwaysRequired: true,
                 isEditMode: true,
                 objectType: 'Vaccines'
             },
@@ -992,7 +979,6 @@ const caseSingleScreen = {
                 type: 'DropdownInput',
                 categoryId: 'LNG_REFERENCE_DATA_CATEGORY_VACCINE_STATUS',
                 value: '',
-                isAlwaysRequired: true,
                 isEditMode: true,
                 objectType: 'Vaccines'
             },
@@ -1021,8 +1007,6 @@ const caseSingleScreen = {
                     type: 'DropdownInput',
                     categoryId: 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION',
                     value: '',
-                    isRequired: true,
-                    isAlwaysRequired: true,
                     isEditMode: false,
                     objectType: 'Case'
                 },
@@ -1032,8 +1016,6 @@ const caseSingleScreen = {
                     label: translations.caseSingleScreen.dateOfOnset,
                     value: '',
                     type: "DatePicker",
-                    isRequired: true,
-                    isAlwaysRequired: true,
                     isEditMode: false,
                     format: 'YYYY-MM-dd',
                     objectType: 'Case'
@@ -1333,8 +1315,6 @@ const eventSingleScreen = {
                     labelValue: 'test',
                     value: '',
                     type: "DatePicker",
-                    isRequired: true,
-                    isAlwaysRequired: true,
                     isEditMode: true,
                     format: 'MM/dd/YYYY',
                     objectType: 'Event'
@@ -1346,8 +1326,6 @@ const eventSingleScreen = {
                     labelValue: 'test',
                     value: '',
                     type: "DatePicker",
-                    isRequired: true,
-                    isAlwaysRequired: true,
                     isEditMode: true,
                     format: 'MM/dd/YYYY',
                     objectType: 'Event'
@@ -2257,7 +2235,7 @@ const addRelationshipScreen = [
         isRequired: true,
         isAlwaysRequired: true,
         isEditMode: true,
-        objectType: 'Contact',
+        objectType: 'Exposure',
         isNotField: true
     },
     {
@@ -2269,7 +2247,7 @@ const addRelationshipScreen = [
         isRequired: false,
         isEditMode: true,
         format: 'MM/dd/YYYY',
-        objectType: 'Contact'
+        objectType: 'Exposure'
     },
     {
         cardNumber: 1,
@@ -2281,7 +2259,7 @@ const addRelationshipScreen = [
         isAlwaysRequired: true,
         isEditMode: true,
         format: 'MM/dd/YYYY',
-        objectType: 'Contact'
+        objectType: 'Exposure'
     },
     {
         cardNumber: 1,
@@ -2306,7 +2284,7 @@ const addRelationshipScreen = [
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
-        objectType: 'Contact'
+        objectType: 'Exposure'
     },
     {
         cardNumber: 1,
@@ -2320,7 +2298,7 @@ const addRelationshipScreen = [
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
-        objectType: 'Contact'
+        objectType: 'Exposure'
     },
     {
         cardNumber: 1,
@@ -2334,7 +2312,7 @@ const addRelationshipScreen = [
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
-        objectType: 'Contact'
+        objectType: 'Exposure'
     },
     {
         cardNumber: 1,
@@ -2348,7 +2326,7 @@ const addRelationshipScreen = [
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
-        objectType: 'Contact'
+        objectType: 'Exposure'
     },
     {
         cardNumber: 1,
@@ -2362,7 +2340,7 @@ const addRelationshipScreen = [
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
-        objectType: 'Contact'
+        objectType: 'Exposure'
     },
     {
         cardNumber: 1,
@@ -2374,7 +2352,7 @@ const addRelationshipScreen = [
         isRequired: false,
         isEditMode: true,
         multiline: true,
-        objectType: 'Contact'
+        objectType: 'Exposure'
     },
     {
         cardNumber: 1,
@@ -2387,7 +2365,7 @@ const addRelationshipScreen = [
         isEditMode: true,
         activeButtonColor: 'red',
         activeBackgroundColor: 'red',
-        objectType: 'Contact'
+        objectType: 'Exposure'
     },
     {
         cardNumber: 1,
@@ -2399,7 +2377,7 @@ const addRelationshipScreen = [
         isRequired: false,
         isEditMode: true,
         multiline: true,
-        objectType: 'Contact'
+        objectType: 'Exposure'
     }
 ];
 
@@ -2528,8 +2506,6 @@ const contactsOfContactsPersonal = [
                 labelValue: 'test',
                 value: '',
                 type: "DatePicker",
-                isRequired: true,
-                isAlwaysRequired: true,
                 isEditMode: true,
                 format: 'MM/dd/YYYY',
                 objectType: 'Contact'
@@ -2719,8 +2695,6 @@ const contactsSingleScreen = {
                     labelValue: 'test',
                     value: '',
                     type: "DatePicker",
-                    isRequired: true,
-                    isAlwaysRequired: true,
                     isEditMode: true,
                     format: 'MM/dd/YYYY',
                     objectType: 'Contact'

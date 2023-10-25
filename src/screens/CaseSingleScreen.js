@@ -1580,9 +1580,9 @@ class CaseSingleScreen extends Component {
         // isolation Date
         if (this.state.case && this.state.case.vaccinesReceived && Array.isArray(this.state.case.vaccinesReceived) && this.state.case.vaccinesReceived.length > 0) {
             for (let i = 0; i < this.state.case.vaccinesReceived.length; i++) {
-                for (let j = 0; j < config.caseSingleScreen.vaccinesReceived.fields.length; j++) {
-                    if (config.caseSingleScreen.vaccinesReceived.fields[j].isRequired && !this.state.case.vaccinesReceived[i][config.caseSingleScreen.vaccinesReceived.fields[j].id]) {
-                        requiredFields.push(getTranslation(config.caseSingleScreen.vaccinesReceived.fields[j].label, this.props.translation));
+                for (let j = 0; j < this.preparedFields.vaccinesReceived.fields.length; j++) {
+                    if (this.preparedFields.vaccinesReceived.fields[j].isRequired && !this.state.case.vaccinesReceived[i][this.preparedFields.vaccinesReceived.fields[j].id]) {
+                        requiredFields.push(getTranslation(this.preparedFields.vaccinesReceived.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }

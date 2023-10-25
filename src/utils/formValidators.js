@@ -122,8 +122,10 @@ export function prepareFields(config, outbreakFields, screen, configTab) {
             if (!newField.isAlwaysRequired) {
                 newField.isRequired = !!outbreakFields[outbreakFieldKey].mandatory;
             }
-            atLeastOneVisible = true;
-        } else if (!cField.isNotField) {
+            if (!newField.invisible) {
+                atLeastOneVisible = true;
+            }
+        } else if (!newField.isNotField) {
             newField.invisible = true;
         }
         if (newField.isRequired && newField.invisible) {

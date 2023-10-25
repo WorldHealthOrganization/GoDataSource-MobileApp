@@ -1,6 +1,4 @@
 import App from './src/App';
-import './shim.js';
-import crypto from "crypto";
 import appConfig from './app.config';
 
 import { Sentry } from 'react-native-sentry';

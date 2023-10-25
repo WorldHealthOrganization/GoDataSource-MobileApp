@@ -14,6 +14,8 @@ import {getTranslation, getTooltip, createDate} from './../utils/functions';
 import TooltipComponent from './TooltipComponent';
 import stylesGlobal from './../styles';
 import {useSelector} from "react-redux";
+import {Button, Icon} from "react-native-material-ui";
+import colors from "../styles/colors";
 
 const DatePicker = React.memo(({
                                    id,
@@ -41,12 +43,12 @@ const DatePicker = React.memo(({
 
     React.useEffect(() => {
         if (date !== value) {
-            let newDate = value;
-            if (newDate && typeof newDate === 'string' && newDate !== '') {
-                newDate = new Date(value);
+            let nDate = value;
+            if (nDate && typeof nDate === 'string' && nDate !== '') {
+                nDate = new Date(value);
             }
             if (fieldRef.current) {
-                fieldRef.current.setValue(newDate ? moment.tz(newDate, timezone).format('MM/DD/YYYY') : '');
+                fieldRef.current.setValue(nDate ? moment.tz(nDate, timezone).format('MM/DD/YYYY') : '');
             }
             setDate(newDate);
         }
@@ -67,7 +69,7 @@ const DatePicker = React.memo(({
                                 label={isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)}
                                 textColor={stylesGlobal.textColor}
                                 fontSize={14}
-                                value={date ? moment.tz(newDate, timezone).format('MM/DD/YYYY') : ''}
+                                value={date ? moment.tz(newDate, timezone).format('MM/DD/YYYY') : ' '}
                                 ref={fieldRef}
                                 labelTextStyle={{fontFamily: 'Roboto-Regular'}}
                                 tintColor={stylesGlobal.primaryColor}
@@ -77,7 +79,7 @@ const DatePicker = React.memo(({
                         <DateTimePicker
                             minimumDate={minimumDate || null}
                             maximumDate={maximumDate || null}
-                            timeZoneOffsetInMinutes={0}
+                            timeZoneOffsetInMinutes={moment.tz(timezone).utcOffset()}
                             isVisible={isDateTimePickerVisible}
                             onConfirm={handleDatePicked}
                             onCancel={handleDateCancelled}
@@ -92,6 +94,39 @@ const DatePicker = React.memo(({
                         />
                     </View>
                 </TouchableWithoutFeedback>
+                {
+                    date !== undefined && date !== null ?
+                        <TouchableWithoutFeedback
+                            onPress={press => {
+                                // setDate(null);
+                                onChange(
+                                    null,
+                                    id,
+                                    objectType ? (objectType === 'Address' || objectType === 'DateRanges' || objectType === 'Vaccines' ? index : objectType) : null,
+                                    objectType
+                                );
+                            }}
+                        >
+                            <View style={{
+                                marginTop: 16,
+                                justifySelf: 'center',
+                                justifyContent: 'center',
+                                alignSelf: 'center',
+                                alignContent: 'center'
+                            }}>
+                                <Icon
+                                    name={'cancel'}
+                                    color={colors.primaryColor}
+                                    style={{
+                                        width: 30,
+                                    }}
+                                    size={22}
+                                />
+                            </View>
+                        </TouchableWithoutFeedback>
+                        :
+                        null
+                }
                 {
                     tooltip.hasTooltip === true ? (
                         <TooltipComponent
@@ -142,12 +177,11 @@ const DatePicker = React.memo(({
         }
     };
 
-    const handleDatePicked = (date) => {
-        // console.log("### date picked: ", date, moment.utc(date).format());
+    const handleDatePicked = (datePicked) => {
         handleDateCancelled();
-        setDate(createDate(date));
+        setDate(createDate(datePicked));
         onChange(
-            createDate(date),
+            createDate(datePicked),
             id,
             objectType ? (objectType === 'Address' || objectType === 'DateRanges' || objectType === 'Vaccines' ? index : objectType) : null,
             objectType

@@ -45,15 +45,14 @@ export async function retriablePromise (promise, numberOfRetries, timeout, error
     try {
         let response = isPromise(promise) ? await promise : await promise();
         return Promise.resolve(response)
-    } catch (error) {
-
+    } catch (e) {
         let {Platform} = require('react-native');
 
         if (Platform.OS === 'ios') {
             await wait(timeout);
         }
 
-        return retriablePromise(promise, numberOfRetries - 1, timeout, error);
+        return retriablePromise(promise, numberOfRetries - 1, timeout, e);
     }
 }
 

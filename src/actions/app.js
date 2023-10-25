@@ -115,6 +115,7 @@ export function setSyncState(syncState) {
 export function setTimezone(timezoneState) {
     return {
         type: ACTION_TYPE_SET_TIMEZONE,
+        // timezoneState: 'Europe/Bucharest'
         timezoneState: timezoneState
     }
 }
@@ -564,6 +565,7 @@ export function sendDatabaseToServer () {
                         break;
                     }
                 }
+
                 for (let i=0; i<config.changingSQLiteCollections.length; i++) {
                     try {
                         let status = await getDataFromDatabaseFromFileSql(config.changingSQLiteCollections[i], lastSyncDate, password);
@@ -601,6 +603,7 @@ export function sendDatabaseToServer () {
                         dispatch(setSyncState({id: 'getData', status: 'Success'}));
                         dispatch(setSyncState({id: 'createFile', status: 'In progress'}));
                     }
+                    console.log("Nasty in 2.8")
 
                     return promise;
                 }
@@ -621,7 +624,7 @@ export function sendDatabaseToServer () {
                 } else if (!skipZip) {
                     dispatch(setSyncState({id: 'sendData', status: 'Success'}));
                 }
-                getDatabaseSnapshotRequestNew(
+                return getDatabaseSnapshotRequestNew(
                     {
                         url: internetCredentialsGlobal.server ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
                         clientId: internetCredentialsGlobal.username,

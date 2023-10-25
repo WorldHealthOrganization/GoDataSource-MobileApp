@@ -91,8 +91,8 @@ class FollowUpsSingleScreen extends Component {
                 let today = createDate(null);
                 let itemDate = createDate(this.props.item.date);
 
-                let todayDate = createDate(moment.tz([today.getFullYear(), today.getMonth(), today.getDate()], this.props.timezone)._d);
-                let followUpDate = createDate(moment.tz([itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()], this.props.timezone)._d);
+                let todayDate = createDate(moment.tz([today.getFullYear(), today.getMonth(), today.getDate()], this.props.timezone).toDate());
+                let followUpDate = createDate(moment.tz([itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate()], this.props.timezone).toDate());
 
                 if (followUpDate > todayDate) {
                     console.log('follow-ups date < today => needitabil');

@@ -16,6 +16,7 @@ import {getHelpItemsRequest} from './helpItem';
 import {createDate, handleResponseFromRNFetchBlob} from './../utils/functions';
 import {checkArrayAndLength, retriablePromise} from "../utils/typeCheckingFunctions";
 import constants from './constants';
+import moment from "moment-timezone";
 
 export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch, languagePacks, noDateFilter) {
     // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
@@ -28,7 +29,7 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
 
     if (lastSyncDate && !noDateFilter) {
         filter.where = {
-            fromDate: createDate(lastSyncDate)
+            fromDate: moment(lastSyncDate).toISOString()
         }
     }
     if (languagePacks) {
@@ -119,7 +120,6 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                         console.log("Received", received, total)
                     })
                     .then((res) => {
-                        //console.log("RNFetchBlob response", res);
                         return handleResponseFromRNFetchBlob(res)
                     }), 3)
                     .then((response) => Promise.resolve(databaseLocation))
