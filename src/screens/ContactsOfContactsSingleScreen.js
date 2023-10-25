@@ -118,7 +118,7 @@ class ContactsOfContactsSingleScreen extends Component {
                         persons: []
                     }
                 ],
-                addresses: [
+                addresses: this.preparedFields.address?.invisible ? [] : [
                     {
                         typeId: config.userResidenceAddress.userPlaceOfResidence,
                         country: '',
@@ -128,10 +128,6 @@ class ContactsOfContactsSingleScreen extends Component {
                         postalCode: '',
                         locationId: '',
                         phoneNumber: '',
-                        // geoLocation: {
-                        //     coordinates: ['', ''],
-                        //     type: 'Point'
-                        // },
                         date: createDate(null)
                     }
                 ]
@@ -144,7 +140,7 @@ class ContactsOfContactsSingleScreen extends Component {
             isDateTimePickerVisible: false,
             canChangeScreen: false,
             anotherPlaceOfResidenceWasChosen: false,
-            hasPlaceOfResidence: true,
+            hasPlaceOfResidence: !this.preparedFields.address?.invisible,
             updateExposure: false,
             isEditMode: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab

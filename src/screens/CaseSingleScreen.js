@@ -137,7 +137,7 @@ class CaseSingleScreen extends Component {
                 dateOfBurial: null,
                 burialLocationId: '',
                 burialPlaceName: '',
-                addresses: [
+                addresses: this.preparedFields.address?.invisible ? [] : [
                     {
                         typeId: config.userResidenceAddress.userPlaceOfResidence,
                         country: '',
@@ -147,10 +147,6 @@ class CaseSingleScreen extends Component {
                         postalCode: '',
                         locationId: '',
                         phoneNumber: '',
-                        // geoLocation: {
-                        //     coordinates: ['', ''],
-                        //     type: 'Point'
-                        // },
                         date: createDate(null)
                     }
                 ],
@@ -165,7 +161,7 @@ class CaseSingleScreen extends Component {
             isModified: false,
             caseBeforeEdit: {},
             anotherPlaceOfResidenceWasChosen: false,
-            hasPlaceOfResidence: true,
+            hasPlaceOfResidence: !this.preparedFields.address?.invisible,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.case && this.props.case.age && this.props.case.age.years !== undefined && this.props.case.age.years !== null && this.props.case.age.years > 0) ? 0 : 1, //default age dropdown value,
             currentAnswers: {},

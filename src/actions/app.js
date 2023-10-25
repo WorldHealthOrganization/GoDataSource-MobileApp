@@ -603,7 +603,6 @@ export function sendDatabaseToServer () {
                         dispatch(setSyncState({id: 'getData', status: 'Success'}));
                         dispatch(setSyncState({id: 'createFile', status: 'In progress'}));
                     }
-                    console.log("Nasty in 2.8")
 
                     return promise;
                 }

@@ -95,11 +95,15 @@ class ContactsSingleScreen extends Component {
 
 
         this.preparedFieldsRelationship = prepareFieldsAndRoutes(this.props.outbreak, 'relationships', {relationship: {fields: config.addRelationshipScreen}});
-        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'contacts', Object.assign({},config.contactsSingleScreen,{vaccinesReceived: config.caseSingleScreen.vaccinesReceived, document: config.caseSingleScreen.document, relationship: {fields: config.addRelationshipScreen}}));
+        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'contacts', Object.assign({}, config.contactsSingleScreen, {
+            vaccinesReceived: config.caseSingleScreen.vaccinesReceived,
+            document: config.caseSingleScreen.document,
+            relationship: {fields: config.addRelationshipScreen}
+        }));
         if (this.props.outbreak && !this.props.outbreak[constants.PERMISSIONS_OUTBREAK.allowRegistrationOfCoC]) {
             remove(routes, (route => route.key === 'contacts'))
         }
-        if (this.preparedFields.address?.invisible){
+        if (this.preparedFields.address?.invisible) {
             remove(routes, (route => route.key === 'address'))
         }
 
@@ -146,23 +150,22 @@ class ContactsSingleScreen extends Component {
                         persons: []
                     }
                 ],
-                addresses: [
-                    {
-                        typeId: config.userResidenceAddress.userPlaceOfResidence,
-                        country: '',
-                        city: '',
-                        addressLine1: '',
-                        addressLine2: '',
-                        postalCode: '',
-                        locationId: '',
-                        phoneNumber: '',
-                        // geoLocation: {
-                        //     coordinates: ['', ''],
-                        //     type: 'Point'
-                        // },
-                        date: createDate(null)
-                    }
-                ]
+                addresses: this.preparedFields.address?.invisible ?
+                    []
+                    :
+                    [
+                        {
+                            typeId: config.userResidenceAddress.userPlaceOfResidence,
+                            country: '',
+                            city: '',
+                            addressLine1: '',
+                            addressLine2: '',
+                            postalCode: '',
+                            locationId: '',
+                            phoneNumber: '',
+                            date: createDate(null)
+                        }
+                    ]
             } : Object.assign({}, this.props.contact),
             contactBeforeEdit: {},
             savePressed: false,
@@ -171,7 +174,7 @@ class ContactsSingleScreen extends Component {
             isModified: false,
             canChangeScreen: false,
             anotherPlaceOfResidenceWasChosen: false,
-            hasPlaceOfResidence: true,
+            hasPlaceOfResidence: !this.preparedFields.address?.invisible,
             // updateExposure: false,
             isEditMode: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
@@ -335,7 +338,7 @@ class ContactsSingleScreen extends Component {
                                     ]}
                                 >
                                     <Ripple style={style.headerButtonInner} onPress={this.goToHelpScreen}>
-                                        <Icon name="help" color={styles.textColor} size={18} />
+                                        <Icon name="help" color={styles.textColor} size={18}/>
                                     </Ripple>
                                 </ElevatedView>
                             </View>
@@ -360,7 +363,7 @@ class ContactsSingleScreen extends Component {
                                                     ]}
                                                     onPress={this.showMenu}
                                                     hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
-                                                    <Icon name="more-vert" color={styles.textColor} size={24} />
+                                                    <Icon name="more-vert" color={styles.textColor} size={24}/>
                                                 </Ripple>
                                             }
                                             style={{top: 36}}
@@ -1806,9 +1809,9 @@ class ContactsSingleScreen extends Component {
         for (let i = 0; i < this.preparedFields.personal.length; i++) {
             for (let j = 0; j < this.preparedFields.personal[i].fields.length; j++) {
                 const field = this.preparedFields.personal[i].fields[j];
-                if (field.isRequired && !_.get(this.state.contact,field.id,null) &&
+                if (field.isRequired && !_.get(this.state.contact, field.id, null) &&
                     field.id !== 'visualId') {
-                    if (field.id === 'pregnancyStatus' && this.state.contact?.gender === translations.localTranslationTokens.male){
+                    if (field.id === 'pregnancyStatus' && this.state.contact?.gender === translations.localTranslationTokens.male) {
                     } else {
                         personalInfo.push(getTranslation(this.preparedFields.personal[i].fields[j].label, this.props.translation));
                     }
@@ -2210,9 +2213,9 @@ class ContactsSingleScreen extends Component {
         let sortedQuestions = sortBy(cloneDeep(this.props.questions), ['order', 'variable']);
         sortedQuestions = extractAllQuestions(sortedQuestions, previousAnswersClone, 0);
 
-        for (let question of sortedQuestions){
-            if (question.variable && question.answerType !== "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP"){
-                if (previousAnswersClone[question.variable]){
+        for (let question of sortedQuestions) {
+            if (question.variable && question.answerType !== "LNG_REFERENCE_DATA_CATEGORY_QUESTION_ANSWER_TYPE_MARKUP") {
+                if (previousAnswersClone[question.variable]) {
                     previousAnswersClone[question.variable] = previousAnswersClone[question.variable].map((e) => {
                         return Object.assign(e, {date: e.date || createDate(value).toISOString()})
                     })

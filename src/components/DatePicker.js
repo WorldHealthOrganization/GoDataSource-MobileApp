@@ -109,16 +109,17 @@ const DatePicker = React.memo(({
                         >
                             <View style={{
                                 marginTop: 16,
+                                marginLeft: 8,
                                 justifySelf: 'center',
                                 justifyContent: 'center',
                                 alignSelf: 'center',
-                                alignContent: 'center'
+                                alignContent: 'center',
                             }}>
                                 <Icon
                                     name={'cancel'}
                                     color={colors.primaryColor}
                                     style={{
-                                        width: 30,
+                                        width: 22,
                                     }}
                                     size={22}
                                 />
