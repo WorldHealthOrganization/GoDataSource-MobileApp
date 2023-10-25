@@ -68,7 +68,11 @@ target 'who_mobile' do
     installer.pods_project.targets.each do |target|
                 if target.name == "RNSqlite2"
                 end
+                target.build_configurations.each do |config|
+                    config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', '_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION']
+                    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.4'
+                end
             end
+    __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end
-
 end
