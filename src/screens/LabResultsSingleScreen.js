@@ -449,7 +449,7 @@ class LabResultsSingleScreen extends Component {
     onChangeDate = (value, id, objectType) => {
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({},_.set(prevState.item || {},id,new Date(value).toISOString())),
+                    item: Object.assign({},_.set(prevState.item || {},id,value ? new Date(value).toISOString() : null)),
                     isModified: true
                 })
                 , () => {

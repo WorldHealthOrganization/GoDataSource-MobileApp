@@ -481,6 +481,15 @@ class FollowUpsSingleScreen extends Component {
     onChangeDate = (value, id, objectType) => {
 
         if (objectType === 'FollowUp') {
+            if (!value) {
+                this.setState(
+                    (prevState) => ({
+                        item: Object.assign({}, prevState.item, { [id]: value, statusId: translations.followUpStatuses.notPerformed, fillLocation: false }),
+                        isModified: true,
+                    })
+                )
+                return;
+            }
             let status = this.state.item.statusId;
             let currentAnswers = this.state.currentAnswers;
             let previousAnswers = this.state.previousAnswers;

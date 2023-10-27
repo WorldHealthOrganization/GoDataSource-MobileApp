@@ -78,7 +78,7 @@ class CalendarPickerView extends PureComponent {
     };
 
     parseDate = (date) => {
-        return moment(date).tz(this.props.timezone).format('YYYY-MM-DD');
+        return moment.tz(date, this.props.timezone).format('YYYY-MM-DD');
     };
 
     handleDateChanged = (date) => {

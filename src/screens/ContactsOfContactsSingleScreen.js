@@ -929,6 +929,16 @@ class ContactsOfContactsSingleScreen extends Component {
     handleOnChangeDate = (value, id, objectTypeOrIndex, objectType) => {
         console.log("onChangeDate: ", value, id, objectType);
         if (id === 'dob') {
+            if (!value) {
+                this.setState(prevState => ({
+                    case: Object.assign({}, prevState.case, {age: null}, {dob: value}),
+                    selectedItemIndexForAgeUnitOfMeasureDropDown: 0,
+                    isModified: true
+                }), () => {
+                    // console.log("handleOnChangeDate dob", id, " ", value, " ", this.state.case);
+                })
+                return;
+            }
             let today = createDate(null);
             let nrOFYears = this.calcDateDiff(value, today);
             if (nrOFYears !== undefined && nrOFYears !== null) {
