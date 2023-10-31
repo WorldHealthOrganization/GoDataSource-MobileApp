@@ -155,7 +155,7 @@ class FollowUpsSingleGetInfoContainer extends PureComponent {
             case 'statusId':
             case 'fillLocation':
             // case 'teamId':
-                if(moment.tz(this.props.timezone).diff(this.props.item.date) < 0){
+                if(moment.utc().diff(this.props.item.date) < 0){
                     isEditable = false;
                 }
                 break;

@@ -416,7 +416,7 @@ function mapStateToProps(state) {
         outbreak: lodashGet(state, 'outbreak', {name: 'No outbreak', disableOutbreakChange: false}),
         translation: lodashGet(state, 'app.translation', []),
         syncState: lodashGet(state, 'app.syncState', null),
-        timezone: state.app?.timezone
+        timezone: lodashGet(state, 'app.timezone', null),
     };
 }
 

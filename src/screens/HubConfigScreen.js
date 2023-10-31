@@ -758,17 +758,18 @@ class FirstConfigScreen extends Component {
     };
 
     activateHub = (database) => {
+        let hubConfig = null;
         getInternetCredentials(database.id)
             .then((internetCredentials) => {
                 let server = Platform.OS === 'ios' ? internetCredentials?.server : internetCredentials?.service;
-                const hubConfig = JSON.parse(internetCredentials.username);
-                AsyncStorage.getItem(`timezone-${hubConfig.url}`)
-                    .then(timezone => {
-                        if (timezone) {
-                            setTimezone(timezone);
-                        }
-                    })
+                hubConfig = JSON.parse(internetCredentials.username);
                 return createDatabase(server, internetCredentials?.password, true);
+            })
+            .then(()=>AsyncStorage.getItem(`timezone-${hubConfig.url}`))
+            .then(timezone => {
+                if (timezone) {
+                    this.props.setTimezone(timezone);
+                }
             })
             .then(()=> AsyncStorage.setItem('databaseVersioningToken', `${database.id}${DeviceInfo.getVersion()}${DATABASE_VERSION}`))
             .then((newDatabase) => AsyncStorage.setItem('activeDatabase', database.id))
