@@ -281,12 +281,12 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                                         console.log(`Time for processing file: ${pouchFiles[i]}: ${new Date().getTime() - startTimeForProcessingOneFile}`);
                                         promiseResponses.push(auxData);
                                     } else {
-                                        console.log('There was an error at processing file: ', pouchFiles[i]);
+                                        console.log('There was an error at processing file 1: ', pouchFiles[i]);
                                         dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${pouchFiles[i]}`, addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                         break;
                                     }
                                 } catch (errorProcessFile) {
-                                    console.log('There was an error at processing file: ', pouchFiles[i], errorProcessFile);
+                                    console.log('There was an error at processing file 2: ', pouchFiles[i], errorProcessFile);
                                     dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${pouchFiles[i]}: ${JSON.stringify(errorProcessFile)}`, addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                     break;
                                 }
@@ -311,12 +311,12 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                                         console.log(`Time for processing file: ${sqlFiles[i]}: ${new Date().getTime() - startTimeForProcessingOneFile}`);
                                         promiseResponses.push(auxData);
                                     } else {
-                                        console.log('There was an error at processing file: ', sqlFiles[i]);
+                                        console.log('There was an error at processing file 3: ', sqlFiles[i]);
                                         dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${sqlFiles[i]}`, addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                         break;
                                     }
                                 } catch(errorProcessingFilesForSql) {
-                                    console.log('There was an error at processing file: ', sqlFiles[i], errorProcessingFilesForSql);
+                                    console.log('There was an error at processing file 4: ', sqlFiles[i], errorProcessingFilesForSql);
                                     dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${sqlFiles[i]}: ${JSON.stringify(errorProcessingFilesForSql)}`, addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                     break;
                                 }
@@ -721,10 +721,6 @@ export function appInitialized(nativeEventEmitter) {
             if (loggedUser !== null) {
                 try {
                     let activeDatabase = await AsyncStorage.getItem('activeDatabase');
-                    let timezone = await AsyncStorage.getItem('timezone');
-                    if (timezone) {
-                        dispatch(setTimezone(timezone));
-                    }
                     // console.log('Active database: ', activeDatabase);
                     if (activeDatabase !== null) {
                         dispatch(saveActiveDatabase(activeDatabase));
@@ -734,6 +730,12 @@ export function appInitialized(nativeEventEmitter) {
                             if (databaseCredentials) {
                                 // console.log('Database credentials: ', databaseCredentials);
                                 let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
+
+                                const hubConfig = JSON.parse(databaseCredentials.username);
+                                let timezone = await AsyncStorage.getItem(`timezone-${hubConfig.url}`);
+                                if (timezone) {
+                                    dispatch(setTimezone(timezone));
+                                }
                                 try {
                                     let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                     if (database) {

@@ -70,7 +70,7 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                 })
         })
         .then((responseTestApi) => {
-            AsyncStorage.setItem('timezone', responseTestApi.timezone);
+            AsyncStorage.setItem(`timezone-${hubConfiguration.url}`, responseTestApi.timezone);
             dispatch(setTimezone(responseTestApi.timezone));
             dispatch(setSyncState({id: 'testApi', status: 'Success', addLanguagePacks: checkArrayAndLength(languagePacks)}));
             dispatch(setSyncState({id: 'downloadDatabase', status: 'In progress', addLanguagePacks: checkArrayAndLength(languagePacks)}));
@@ -123,6 +123,8 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                         return handleResponseFromRNFetchBlob(res)
                     }), 3)
                     .then((response) => Promise.resolve(databaseLocation))
+                .catch(e => {
+                })
             }
         )
 }
@@ -168,7 +170,11 @@ export function postDatabaseSnapshotRequest(internetCredentials, path) {
                     return Promise.resolve(data?.error?.message || res);
                 }
             })
+            .catch(e => {
+            })
         )
+        .catch(e => {
+        })
 }
 
 function getAllLanguageTokens () {

@@ -67,7 +67,7 @@ export default function app(state = { root: undefined, screenSize: {width: 375, 
             });
         case ACTION_TYPE_SET_TIMEZONE:
             return Object.assign({}, state, {
-                timezone: action.timezoneState
+                timezone: action.timezoneState || 'UTC'
             })
         case ACTION_TYPE_SAVE_GENERATED_FOLLOWUPS:
             console.log('generatedFollowUps',action.generatedFollowUps);

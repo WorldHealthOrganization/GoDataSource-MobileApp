@@ -20,7 +20,7 @@ import {bindActionCreators} from 'redux';
 import lodashGet from 'lodash/get';
 import {logoutUser, cleanDataAfterLogout} from './../actions/user';
 import {removeErrors} from './../actions/errors';
-import {saveActiveDatabase, changeAppRoot, verifyChangesExist} from './../actions/app';
+import {saveActiveDatabase, changeAppRoot, verifyChangesExist, setTimezone} from './../actions/app';
 import NavBarCustom from './../components/NavBarCustom';
 import config from './../utils/config';
 import IntervalPicker from './../components/IntervalPicker';
@@ -623,7 +623,7 @@ class FirstConfigScreen extends Component {
                         color={styles.primaryColor}
                         height={calculateDimension(35, true, this.props.screenSize)}
                         width={calculateDimension(164, false, this.props.screenSize)}
-                        title={'Make active'}
+                        title={getTranslation(translations.hubConfigScreen.makeActiveLabel, this.props.translation)}
                         titleColor={styles.backgroundColor}
                         onPress={() => {
                             this.onPressMakeHubActive(database)
@@ -761,6 +761,13 @@ class FirstConfigScreen extends Component {
         getInternetCredentials(database.id)
             .then((internetCredentials) => {
                 let server = Platform.OS === 'ios' ? internetCredentials?.server : internetCredentials?.service;
+                const hubConfig = JSON.parse(internetCredentials.username);
+                AsyncStorage.getItem(`timezone-${hubConfig.url}`)
+                    .then(timezone => {
+                        if (timezone) {
+                            setTimezone(timezone);
+                        }
+                    })
                 return createDatabase(server, internetCredentials?.password, true);
             })
             .then(()=> AsyncStorage.setItem('databaseVersioningToken', `${database.id}${DeviceInfo.getVersion()}${DATABASE_VERSION}`))
@@ -790,7 +797,6 @@ class FirstConfigScreen extends Component {
                 databaseToBeDeleted: hubId
             });
         }
-
     };
 
     hideModal = () => {
@@ -875,7 +881,8 @@ function matchDispatchToProps(dispatch) {
         saveActiveDatabase,
         verifyChangesExist,
         changeAppRoot,
-        cleanDataAfterLogout
+        cleanDataAfterLogout,
+        setTimezone
     }, dispatch);
 }
 

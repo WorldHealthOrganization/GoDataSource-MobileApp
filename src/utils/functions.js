@@ -29,6 +29,7 @@ import lodashMemoize from "lodash/memoize";
 import lodashIsEqual from "lodash/isEqual";
 import lodashIntersection from "lodash/intersection";
 import { store } from "./../App";
+import {exists} from "react-native-fs";
 
 export const checkPermissions = lodashMemoize((permissionsList, outbreakPermissions, outbreak, permissions) => {
     if (!checkArrayAndLength(permissionsList) && !checkArrayAndLength(outbreakPermissions)) {
@@ -480,7 +481,7 @@ function processUnencryptedFile(path, fileName, unzipLocation) {
         .then((unzipPath) => RNFetchBlobFS.readFile(getFilePath(unzipPath, fileName), 'utf8'))
         .then((data) => Promise.resolve(JSON.parse(data)))
         .catch((processingUnencryptedData) => {
-            return Promise.reject('Error at syncing file' + fileName);
+            return Promise.reject('Error at syncing file' + fileName, processingUnencryptedData);
         })
 }
 
@@ -627,6 +628,7 @@ function writeOperations(collectionName, index, data, password, jsonPath) {
     let zipPathGlobal = null;
     return Promise.resolve()
         .then(() => RNFetchBlobFS.createFile(jsonPath, JSON.stringify(data), 'utf8'))
+        .then(() => deleteFile(`${jsonPath}.zip`))
         .then((writtenBytes) => zip(jsonPath, `${jsonPath}.zip`))
         .then((zipPath) => {
             zipPathGlobal = zipPath;
@@ -637,9 +639,15 @@ function writeOperations(collectionName, index, data, password, jsonPath) {
                 return RNFetchBlobFS.readFile(zipPathGlobal, 'base64')
                     .then((rawZipFile) => encrypt(password, rawZipFile))
                     .then((encryptedData) => RNFetchBlobFS.writeFile(zipPathGlobal, encryptedData, 'base64'))
-                    .then((writtenEncryptedData) => Promise.resolve('Finished creating file'));
+                    .then((writtenEncryptedData) => Promise.resolve('Finished creating file'))
+                    // .then(() => RNFetchBlobFS.readFile(zipPathGlobal, 'base64'))
+                    // .then((encryptedData) => decrypt(password, encryptedData))
+                    // .then((decryptedData) => RNFetchBlobFS.writeFile(`${zipPathGlobal}`, decryptedData, 'base64'))
+                    // .catch((errorDecrypt) => console.log("Nasty error decrypt", errorDecrypt));
             }
             return Promise.resolve('Success')
+        })
+        .catch(e => {
         })
 }
 
@@ -711,8 +719,7 @@ export async function createFilesWithName(fileName, data, password) {
                         return Promise.reject(errorCreateFileWithIndex);
                     }
                 }
-
-                if (arrayOfResponses.length === numberOfChunks) {
+                if (arrayOfResponses.length === numberOfChunks + 1) {
                     return Promise.resolve('Success');
                 }
             } catch (errorCreateDir) {
@@ -731,10 +738,13 @@ export function createZipFileAtPath(source, target) {
         .then(() => RNFetchBlobFS.exists(source))
         .then((exists) => {
             if (exists) {
-                return zip(source, target)
+                return deleteFile(target, true)
             } else {
                 return Promise.reject(`File does not exist at path: ${source}`);
             }
+        })
+        .then(()=>{
+            return zip(source, target)
         })
 }
 
