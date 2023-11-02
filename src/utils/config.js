@@ -2270,7 +2270,8 @@ const addRelationshipScreen = [
         isRequired: false,
         isEditMode: true,
         activeButtonColor: styles.backgroundColor,
-        activeBackgroundColor: styles.dangerColor
+        activeBackgroundColor: styles.dangerColor,
+        objectType: 'Exposure'
     },
     {
         cardNumber: 1,

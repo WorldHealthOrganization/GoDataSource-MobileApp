@@ -57,7 +57,7 @@ export async function retriablePromise (promise, numberOfRetries, timeout, error
 }
 
 export function fetchWitTimeout (url, config) {
-    let timeout = 2000;
+    let timeout = 8000;
     if (!url || typeof url !== 'string') {
         return Promise.reject('Invalid url');
     }

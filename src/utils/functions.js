@@ -640,14 +640,8 @@ function writeOperations(collectionName, index, data, password, jsonPath) {
                     .then((rawZipFile) => encrypt(password, rawZipFile))
                     .then((encryptedData) => RNFetchBlobFS.writeFile(zipPathGlobal, encryptedData, 'base64'))
                     .then((writtenEncryptedData) => Promise.resolve('Finished creating file'))
-                    // .then(() => RNFetchBlobFS.readFile(zipPathGlobal, 'base64'))
-                    // .then((encryptedData) => decrypt(password, encryptedData))
-                    // .then((decryptedData) => RNFetchBlobFS.writeFile(`${zipPathGlobal}`, decryptedData, 'base64'))
-                    // .catch((errorDecrypt) => console.log("Nasty error decrypt", errorDecrypt));
             }
             return Promise.resolve('Success')
-        })
-        .catch(e => {
         })
 }
 

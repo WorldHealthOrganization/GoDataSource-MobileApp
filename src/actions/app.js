@@ -411,7 +411,7 @@ function saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfi
                 pairArray.push(['activeDatabase', hubConfiguration.url]);
                 pairArray.push(['databaseVersioningToken', `${hubConfiguration.url}${DeviceInfo.getVersion()}${DATABASE_VERSION}`]);
                 if (!checkArrayAndLength(languagePacks)) {
-                    pairArray.push([hubConfiguration.url, createDate(null, null, true).toISOString()]);
+                    pairArray.push([hubConfiguration.url, new Date().toISOString()]);
                 }
 
                 let storeMultipleDataPromise = AsyncStorage.multiSet(pairArray);

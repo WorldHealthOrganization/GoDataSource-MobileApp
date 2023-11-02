@@ -123,8 +123,6 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                         return handleResponseFromRNFetchBlob(res)
                     }), 3)
                     .then((response) => Promise.resolve(databaseLocation))
-                .catch(e => {
-                })
             }
         )
 }
@@ -170,11 +168,7 @@ export function postDatabaseSnapshotRequest(internetCredentials, path) {
                     return Promise.resolve(data?.error?.message || res);
                 }
             })
-            .catch(e => {
-            })
         )
-        .catch(e => {
-        })
 }
 
 function getAllLanguageTokens () {
