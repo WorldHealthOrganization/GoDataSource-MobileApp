@@ -13,7 +13,7 @@ import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import GeneralListItem from '../components/GeneralListItem';
-import moment from 'moment/min/moment.min';
+import moment from 'moment-timezone';
 import translations from './../utils/translations';
 import RelationshipContainer from '../containers/RelationshipContainer';
 import get from 'lodash/get';
@@ -37,6 +37,7 @@ class ContactsSingleRelationship extends Component {
     // This will be a container, so put as less business logic here as possible
     constructor(props) {
         super(props);
+
         this.state = {
             interactionComplete: false
         };
@@ -137,6 +138,7 @@ class ContactsSingleRelationship extends Component {
                     ) : (
                         <RelationshipContainer
                             person={this.props.contact}
+                            preparedFields={this.props.preparedFields}
                             exposure={this.props.contact.relationships[0]}
                             addContactFromCasesScreen={this.props.addContactFromCasesScreen}
                             fromRelationshipScreen={false}
@@ -233,7 +235,7 @@ class ContactsSingleRelationship extends Component {
         let relationshipData = get(relation, 'relationshipData');
         let caseData = get(relation, 'caseData');
 
-        return {title: computeFullName(caseData), primaryText: moment.utc(relationshipData.contactDate).format("YYYY-MM-DD").toString(), secondaryText: getTranslation(relationshipData.certaintyLevelId, this.props.translation)};
+        return {title: computeFullName(caseData), primaryText: moment.tz(relationshipData.contactDate, this.props.timezone).format("YYYY-MM-DD").toString(), secondaryText: getTranslation(relationshipData.certaintyLevelId, this.props.translation)};
     };
 
     onPressAddExposure = () => {
@@ -286,7 +288,8 @@ function mapStateToProps(state) {
     return {
         screenSize: get(state, 'app.screenSize', config),
         translation: get(state, 'app.translation', []),
-        role: get(state, 'role', [])
+        role: get(state, 'role', []),
+        timezone: get(state, 'app.timezone', null)
     };
 }
 

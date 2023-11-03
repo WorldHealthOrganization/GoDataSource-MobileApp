@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 07/11/2018.
  */
-import crypto from 'react-native-crypto';
+import crypto from 'react-native-quick-crypto';
 import {Buffer} from 'buffer';
 
 // encryption parameters
@@ -61,9 +61,13 @@ export function encrypt(password, data) {
                 return reject(err);
             }
             // encipher data
-            const cipher = crypto.createCipheriv(algorithm, key.key, key.iv);
-            const result = Buffer.concat([key.iv, key.salt, cipher.update(data), cipher.final()]);
-            resolve(result.toString('base64'));
+            try {
+                const cipher = crypto.createCipheriv(algorithm, key.key, key.iv);
+                const result = Buffer.concat([key.iv, key.salt, Buffer.from(cipher.update(data)), Buffer.from(cipher.final())]);
+                resolve(result.toString('base64'));
+            } catch (e) {
+                console.log("Crypto error", e);
+            }
         });
     });
 }
@@ -95,7 +99,7 @@ export function decrypt(password, data) {
             try {
                 // decipher text
                 const decipher = crypto.createCipheriv(algorithm, key, iv);
-                buffer = Buffer.concat([decipher.update(encrypted) , decipher.final()]);
+                buffer = Buffer.concat([Buffer.from(decipher.update(encrypted)) , Buffer.from(decipher.final())]);
             } catch (decipherError) {
                 error = new Error('Failed to decrypt config properties. Stack Trace: ' + decipherError.stack);
             }
@@ -127,5 +131,9 @@ export function getSyncEncryptPassword(password, clientCredentials) {
  * @return {string}
  */
 function sha256(string){
-    return crypto.createHash('sha256').update(string).digest('hex');
+    try {
+        return crypto.createHash('sha256').update(string).digest('hex');
+    } catch (e) {
+        console.log("Crypto error", e);
+    }
 }

@@ -74,10 +74,11 @@ class ContactsOfContactsSingleScreen extends Component {
                 config.tabsValuesRoutes.contactsOfContactsSingleWithoutExposures;
 
         routes = routes.filter((e) => e.key !== 'investigation');
-        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'contacts-of-contacts',  Object.assign({}, config.contactsSingleScreen, {personal: config.contactsOfContactsPersonal, vaccinesReceived: config.caseSingleScreen.vaccinesReceived, document: config.caseSingleScreen.document}));
+        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'contacts-of-contacts',  Object.assign({}, config.contactsSingleScreen, {personal: config.contactsOfContactsPersonal, vaccinesReceived: config.caseSingleScreen.vaccinesReceived, document: config.caseSingleScreen.document, relationship: {fields: config.addRelationshipScreen}}));
         if (this.preparedFields.address?.invisible){
             remove(routes, (route => route.key === 'address'))
         }
+        this.preparedFieldsRelationship = prepareFieldsAndRoutes(this.props.outbreak, 'relationships', {relationship: {fields: config.addRelationshipScreen}})
         this.state = {
             interactionComplete: false,
             routes: routes,
@@ -117,7 +118,7 @@ class ContactsOfContactsSingleScreen extends Component {
                         persons: []
                     }
                 ],
-                addresses: [
+                addresses: this.preparedFields.address?.invisible ? [] : [
                     {
                         typeId: config.userResidenceAddress.userPlaceOfResidence,
                         country: '',
@@ -127,10 +128,6 @@ class ContactsOfContactsSingleScreen extends Component {
                         postalCode: '',
                         locationId: '',
                         phoneNumber: '',
-                        // geoLocation: {
-                        //     coordinates: ['', ''],
-                        //     type: 'Point'
-                        // },
                         date: createDate(null)
                     }
                 ]
@@ -143,7 +140,7 @@ class ContactsOfContactsSingleScreen extends Component {
             isDateTimePickerVisible: false,
             canChangeScreen: false,
             anotherPlaceOfResidenceWasChosen: false,
-            hasPlaceOfResidence: true,
+            hasPlaceOfResidence: !this.preparedFields.address?.invisible,
             updateExposure: false,
             isEditMode: true,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
@@ -432,7 +429,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 break;
             case 1:
                 missingFields = this.checkRequiredFieldsAddresses();
-                invalidEmails = validateRequiredFields(_.get(this.state, 'contact.addresses', []), config?.addressFields?.fields, (dataToBeValidated, fields, defaultFunction) => {
+                invalidEmails = validateRequiredFields(_.get(this.state, 'contact.addresses', []), this.preparedFields.address?.fields, (dataToBeValidated, fields, defaultFunction) => {
                     if (fields.id === 'emailAddress') {
                         return checkValidEmails(dataToBeValidated, fields?.id);
                     }
@@ -637,7 +634,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 return (
                     <ContactsSingleRelationship
                         type={translations.personTypes.contactsOfContacts}
-                        preparedFields={this.preparedFields.relationship}
+                        preparedFields={this.preparedFieldsRelationship}
                         relationshipType={constants.RELATIONSHIP_TYPE.exposure}
                         refreshRelations={this.refreshRelations}
                         contact={this.state.contact}
@@ -932,6 +929,16 @@ class ContactsOfContactsSingleScreen extends Component {
     handleOnChangeDate = (value, id, objectTypeOrIndex, objectType) => {
         console.log("onChangeDate: ", value, id, objectType);
         if (id === 'dob') {
+            if (!value) {
+                this.setState(prevState => ({
+                    case: Object.assign({}, prevState.case, {age: null}, {dob: value}),
+                    selectedItemIndexForAgeUnitOfMeasureDropDown: 0,
+                    isModified: true
+                }), () => {
+                    // console.log("handleOnChangeDate dob", id, " ", value, " ", this.state.case);
+                })
+                return;
+            }
             let today = createDate(null);
             let nrOFYears = this.calcDateDiff(value, today);
             if (nrOFYears !== undefined && nrOFYears !== null) {
@@ -1273,7 +1280,8 @@ class ContactsOfContactsSingleScreen extends Component {
         if (selectedItems && Array.isArray(selectedItems) && selectedItems.length > 0) {
             let addresses = _.cloneDeep(this.state.contact.addresses);
             addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
-            if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
+            const visibleGeoLocationField = this.preparedFields.address?.fields?.find(x => x.fieldId === 'geoLocation' && !x.invisible);
+            if (visibleGeoLocationField && selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
                 if (selectedItems['0'].geoLocation.coordinates[0] !== '' || selectedItems['0'].geoLocation.coordinates[1] !== '') {
                     setTimeout(() => {
                         Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
@@ -1372,7 +1380,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 return;
             }
             let relationshipsMissingFields = this.checkFields();
-            let invalidEmails = validateRequiredFields(_.get(this.state, 'contact.addresses', []), config?.addressFields?.fields, (dataToBeValidated, fields, defaultFunction) => {
+            let invalidEmails = validateRequiredFields(_.get(this.state, 'contact.addresses', []), this.preparedFields?.address?.fields, (dataToBeValidated, fields, defaultFunction) => {
                 if (fields.id === 'emailAddress') {
                     return checkValidEmails(dataToBeValidated, fields?.id);
                 }
@@ -1588,13 +1596,13 @@ class ContactsOfContactsSingleScreen extends Component {
 
     checkRequiredFieldsPersonalInfo = () => {
         let personalInfo = [];
-        for (let i = 0; i < config.contactsSingleScreen.personal.length; i++) {
-            for (let j = 0; j < config.contactsSingleScreen.personal[i].fields.length; j++) {
-                const field = config.contactsSingleScreen.personal[i].fields[j];
+        for (let i = 0; i < this.preparedFields.personal.length; i++) {
+            for (let j = 0; j < this.preparedFields.personal[i].fields.length; j++) {
+                const field = this.preparedFields.personal[i].fields[j];
                 if (field.isRequired && !this.state.contact[field.id] &&
-                    !(field.id === 'pregnancyStatus' && (this.state.case?.gender === translations.localTranslationTokens.male)) &&
+                    !(field.id === 'pregnancyStatus' && (this.state.contact?.gender === translations.localTranslationTokens.male)) &&
                     field.id !== 'visualId') {
-                    personalInfo.push(getTranslation(config.contactsSingleScreen.personal[i].fields[j].label, this.props.translation));
+                    personalInfo.push(getTranslation(this.preparedFields.personal[i].fields[j].label, this.props.translation));
                     // return false;
                 }
             }
@@ -1602,9 +1610,9 @@ class ContactsOfContactsSingleScreen extends Component {
 
         if (checkArrayAndLength(_.get(this.state, 'contact.documents', []))) {
             for (let i = 0; i < _.get(this.state, 'contact.documents.length', 0); i++) {
-                for (let j = 0; j < _.get(config, 'caseSingleScreen.document.fields.length', 0); j++) {
-                    if (_.get(config, `caseSingleScreen.document.fields[${j}].isRequired`, false) && !_.get(this.state, `contact.documents[${i}][${config.caseSingleScreen.document.fields[j].id}]`, null)) {
-                        personalInfo.push(getTranslation(_.get(config, `caseSingleScreen.document.fields[${j}].label`, null), this.props.translation));
+                for (let j = 0; j < _.get(this, 'preparedFields.document.fields.length', 0); j++) {
+                    if (_.get(this, `preparedFields.document.fields[${j}].isRequired`, false) && !_.get(this.state, `contact.documents[${i}][${this.preparedFields.document.fields[j].id}]`, null)) {
+                        personalInfo.push(getTranslation(_.get(this, `preparedFields.document.fields[${j}].label`, null), this.props.translation));
                         // return false;
                     }
                 }
@@ -1613,9 +1621,9 @@ class ContactsOfContactsSingleScreen extends Component {
 
         if (checkArrayAndLength(_.get(this.state, 'contact.vaccinesReceived', []))) {
             for (let i = 0; i < _.get(this.state, 'contact.vaccinesReceived.length', 0); i++) {
-                for (let j = 0; j < _.get(config, 'caseSingleScreen.vaccinesReceived.fields.length', 0); j++) {
-                    if (_.get(config, `caseSingleScreen.vaccinesReceived.fields[${j}].isRequired`, false) && !_.get(this.state, `contact.vaccinesReceived[${i}][${config.caseSingleScreen.vaccinesReceived.fields[j].id}]`, null)) {
-                        personalInfo.push(getTranslation(_.get(config, `caseSingleScreen.vaccinesReceived.fields[${j}].label`, null), this.props.translation));
+                for (let j = 0; j < _.get(this, 'preparedFields.vaccinesReceived.fields.length', 0); j++) {
+                    if (_.get(this, `preparedFields.vaccinesReceived.fields[${j}].isRequired`, false) && !_.get(this.state, `contact.vaccinesReceived[${i}][${this.preparedFields.vaccinesReceived.fields[j].id}]`, null)) {
+                        personalInfo.push(getTranslation(_.get(this, `preparedFields.vaccinesReceived.fields[${j}].label`, null), this.props.translation));
                         // return false;
                     }
                 }
@@ -1629,9 +1637,9 @@ class ContactsOfContactsSingleScreen extends Component {
         let addresses = [];
         if (this.state.contact && this.state.contact.addresses && Array.isArray(this.state.contact.addresses) && this.state.contact.addresses.length > 0) {
             for (let i = 0; i < this.state.contact.addresses.length; i++) {
-                for (let j = 0; j < config.contactsSingleScreen.address.fields.length; j++) {
-                    if (config.contactsSingleScreen.address.fields[j].isRequired && !this.state.contact.addresses[i][config.contactsSingleScreen.address.fields[j].id]) {
-                        addresses.push(getTranslation(config.contactsSingleScreen.address.fields[j].label, this.props.translation));
+                for (let j = 0; j < this.preparedFields.address.fields.length; j++) {
+                    if (this.preparedFields.address.fields[j].isRequired && !this.state.contact.addresses[i][this.preparedFields.address.fields[j].id]) {
+                        addresses.push(getTranslation(this.preparedFields.address.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }
@@ -1649,16 +1657,17 @@ class ContactsOfContactsSingleScreen extends Component {
         let exposureRelationships = _.get(this.state.contact, 'relationships', []);
         if (checkArrayAndLength(exposureRelationships)) {
             exposureRelationships = exposureRelationships.map((e) => _.get(e, 'relationshipData', e));
-            for (let i = 0; i < config.addRelationshipScreen.length; i++) {
-                if (config.addRelationshipScreen[i].id === 'exposure') {
+            const preparedFields = this.preparedFieldsRelationship.relationship.fields;
+            for (let i = 0; i < preparedFields.length; i++) {
+                if (preparedFields[i].id === 'exposure') {
                     if (exposureRelationships[0].persons.length === 0) {
                         requiredFields.push('Person')
                         // pass = false;
                     }
                 } else {
-                    if (config.addRelationshipScreen[i].isRequired) {
-                        if (!exposureRelationships[0][config.addRelationshipScreen[i].id]) {
-                            requiredFields.push(getTranslation(config.addRelationshipScreen[i].label, this.props.translation));
+                    if (preparedFields[i].isRequired) {
+                        if (!exposureRelationships[0][preparedFields[i].id]) {
+                            requiredFields.push(getTranslation(preparedFields[i].label, this.props.translation));
                             // pass = false;
                         }
                     }

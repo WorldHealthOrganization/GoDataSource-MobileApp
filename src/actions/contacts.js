@@ -2,7 +2,7 @@
  * Created by florinpopa on 20/07/2018.
  */
 import {createDate, updateRequiredFields} from './../utils/functions';
-import moment from 'moment/min/moment.min';
+import moment from 'moment-timezone';
 import config from './../utils/config';
 import max from 'lodash/max';
 import get from 'lodash/get';
@@ -13,6 +13,7 @@ import translations from "../utils/translations";
 import sqlConstants from "../queries/sqlTools/constants";
 import {insertOrUpdateExposure} from './exposure';
 import {getPersonWithRelationsForOutbreakId} from "../queries/sqlTools/sqlQueryInterface";
+import {store} from './../App';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFilter, lastElement, offset}, computeCount) {
@@ -295,11 +296,12 @@ function updateContactFollowUpFields(contact, exposures, outbreakPeriodOfFollowu
         if (!contact.followUp) {
             contact.followUp = {};
         }
-        contact.followUp.startDate = moment.utc(maxDate).add(1, 'days')._d.toISOString();
+        const timezone = store.getState().app.timezone;
+        contact.followUp.startDate = moment.tz(maxDate, timezone).add(1, 'days')._d.toISOString();
         if (!contact.followUp.originalStartDate) {
             contact.followUp.originalStartDate = contact.followUp.startDate;
         }
-        contact.followUp.endDate = moment.utc(contact.followUp.startDate)
+        contact.followUp.endDate = moment.tz(contact.followUp.startDate, timezone)
             .add(outbreakPeriodOfFollowup > 0 ? outbreakPeriodOfFollowup - 1 : 0, 'days')._d.toISOString();
         if (oldStartDate !== contact.followUp.startDate) {
             contact.followUp.status = config.contactFollowUpStatuses.underFollowUp;

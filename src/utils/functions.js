@@ -19,7 +19,7 @@ import set from 'lodash/set';
 import defaultTranslations from './defaultTranslations'
 import {decrypt, encrypt, getSyncEncryptPassword} from './../utils/encryption';
 import {extractLocations} from './../actions/locations';
-import moment from 'moment/min/moment.min';
+import moment from 'moment-timezone';
 import {checkArrayAndLength} from './typeCheckingFunctions';
 import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
 import translations from "./translations";
@@ -28,6 +28,8 @@ import constants from "./constants";
 import lodashMemoize from "lodash/memoize";
 import lodashIsEqual from "lodash/isEqual";
 import lodashIntersection from "lodash/intersection";
+import { store } from "./../App";
+import {exists} from "react-native-fs";
 
 export const checkPermissions = lodashMemoize((permissionsList, outbreakPermissions, outbreak, permissions) => {
     if (!checkArrayAndLength(permissionsList) && !checkArrayAndLength(outbreakPermissions)) {
@@ -132,7 +134,8 @@ export function checkIfSameDay(date1, date2) {
     if (Object.prototype.toString.call(date1) !== '[object Date]' || Object.prototype.toString.call(date2) !== '[object Date]') {
         return false;
     }
-    return moment.utc(date1).isSame(moment.utc(date2), 'day')
+    const timezone = store?.getState().app.timezone;
+    return moment.tz(date1, timezone).isSame(moment.tz(date2, timezone), 'day')
 }
 
 export function getAddress(address, returnString, locationsList) {
@@ -478,7 +481,7 @@ function processUnencryptedFile(path, fileName, unzipLocation) {
         .then((unzipPath) => RNFetchBlobFS.readFile(getFilePath(unzipPath, fileName), 'utf8'))
         .then((data) => Promise.resolve(JSON.parse(data)))
         .catch((processingUnencryptedData) => {
-            return Promise.reject('Error at syncing file' + fileName);
+            return Promise.reject('Error at syncing file' + fileName, processingUnencryptedData);
         })
 }
 
@@ -625,6 +628,7 @@ function writeOperations(collectionName, index, data, password, jsonPath) {
     let zipPathGlobal = null;
     return Promise.resolve()
         .then(() => RNFetchBlobFS.createFile(jsonPath, JSON.stringify(data), 'utf8'))
+        .then(() => deleteFile(`${jsonPath}.zip`))
         .then((writtenBytes) => zip(jsonPath, `${jsonPath}.zip`))
         .then((zipPath) => {
             zipPathGlobal = zipPath;
@@ -635,7 +639,7 @@ function writeOperations(collectionName, index, data, password, jsonPath) {
                 return RNFetchBlobFS.readFile(zipPathGlobal, 'base64')
                     .then((rawZipFile) => encrypt(password, rawZipFile))
                     .then((encryptedData) => RNFetchBlobFS.writeFile(zipPathGlobal, encryptedData, 'base64'))
-                    .then((writtenEncryptedData) => Promise.resolve('Finished creating file'));
+                    .then((writtenEncryptedData) => Promise.resolve('Finished creating file'))
             }
             return Promise.resolve('Success')
         })
@@ -709,8 +713,7 @@ export async function createFilesWithName(fileName, data, password) {
                         return Promise.reject(errorCreateFileWithIndex);
                     }
                 }
-
-                if (arrayOfResponses.length === numberOfChunks) {
+                if (arrayOfResponses.length === numberOfChunks + 1) {
                     return Promise.resolve('Success');
                 }
             } catch (errorCreateDir) {
@@ -729,10 +732,13 @@ export function createZipFileAtPath(source, target) {
         .then(() => RNFetchBlobFS.exists(source))
         .then((exists) => {
             if (exists) {
-                return zip(source, target)
+                return deleteFile(target, true)
             } else {
                 return Promise.reject(`File does not exist at path: ${source}`);
             }
+        })
+        .then(()=>{
+            return zip(source, target)
         })
 }
 
@@ -777,7 +783,7 @@ export function generateId() {
 
 export function updateRequiredFields(outbreakId, userId, record, action, fileType = '', type = '') {
     // Set the date
-    let dateToBeSet = moment.utc()._d;
+    let dateToBeSet = moment.utc().toDate();
     dateToBeSet = dateToBeSet.toISOString();
 
     switch (action) {
@@ -1210,10 +1216,6 @@ export function getTranslation(value, allTransactions) {
     let valueToBeReturned = value;
     if (value && typeof value === 'string' && value.includes('LNG')) {
         let item = null;
-
-        // if(value===translations.contactsOfContactsScreen.contactsTitle){
-        //     console.log("What's this?", allTransactions);
-        // }
         if (value && allTransactions && Array.isArray(allTransactions)) {
             item = allTransactions.find(e => {
                 return e && e.token === value
@@ -1462,29 +1464,31 @@ export function getDropDownInputDisplayParameters(screenSize, dropDownDataLength
 }
 
 export function createDate(date, isEndOfDay, accurateDate) {
+    const timezone = store?.getState().app.timezone;
     if (accurateDate) {
         if (date) {
-            return moment.utc(date)._d;
+            return moment.tz(date, timezone).toDate();
         }
-        return moment.utc()._d;
+        return moment.tz(timezone).toDate();
     }
     if (isEndOfDay) {
         if (date) {
-            return moment.utc(date).endOf('day')._d;
+            return moment.tz(date, timezone).endOf('day').toDate();
         }
-        return moment.utc().endOf('day')._d;
+        return moment.tz(timezone).endOf('day').toDate();
     }
     if (date) {
-        return moment.utc(date).startOf('day')._d;
+        return moment.tz(date, timezone).startOf('day').toDate();
     }
-    return moment.utc().startOf('day')._d;
+    return moment.tz(timezone).startOf('day').toDate();
 }
 
 export function daysSince(startDate, endDate) {
     if (!startDate || !endDate) {
         return 0
     }
-    return moment.utc(endDate).startOf('day').diff(moment.utc(startDate).startOf('day'), 'days');
+    const timezone = store.getState().app.timezone;
+    return moment.tz(endDate, timezone).startOf('day').diff(moment.tz(startDate, timezone).startOf('day'), 'days');
 }
 
 export function calcDateDiff(startdate, enddate) {

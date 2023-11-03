@@ -76,48 +76,62 @@ class CaseSingleInfectionContainer extends Component {
                                 return this.handleRenderItem(item, index)
                             })
                         }
-                        <View style={style.container}>
-                            {
-                                this.props.case && this.props.case.vaccinesReceived && this.props.case.vaccinesReceived.map((item, index) => {
-                                    return this.handleRenderItemForVaccinesList(item, index)
-                                })
-                            }
-                        </View>
                         {
-                            this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize) }}>
-                                    <Button
-                                        title={this.props.case.vaccinesReceived && this.props.case.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
-                                        onPress={this.props.onPressAddVaccine}
-                                        color={styles.backgroundColor}
-                                        titleColor={styles.textColor}
-                                        height={calculateDimension(35, true, this.props.screenSize)}
-                                        width={'100%'}
-                                        style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
-                                    />
-                                </View>) : null
+                            this.props.preparedFields.vaccinesReceived.invisible ?
+                                null
+                                :
+                                <>
+                                    <View style={style.container}>
+                                        {
+                                            this.props.case && this.props.case.vaccinesReceived && this.props.case.vaccinesReceived.map((item, index) => {
+                                                return this.handleRenderItemForVaccinesList(item, index)
+                                            })
+                                        }
+                                    </View>
+                                    {
+                                        this.props.isEditMode ? (
+                                            <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize) }}>
+                                                <Button
+                                                    title={this.props.case.vaccinesReceived && this.props.case.vaccinesReceived.length === 0 ? getTranslation('Add vaccine', this.props.translation) : getTranslation('Add another vaccine', this.props.translation)}
+                                                    onPress={this.props.onPressAddVaccine}
+                                                    color={styles.backgroundColor}
+                                                    titleColor={styles.textColor}
+                                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                                    width={'100%'}
+                                                    style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                                />
+                                            </View>) : null
+                                    }
+                                </>
                         }
-                        <View style={style.container}>
-                            {
-                                this.props.case && this.props.case.dateRanges && this.props.case.dateRanges.map((item, index) => {
-                                    return this.handleRenderItemForDateRangesList(item, index)
-                                })
-                            }
-                        </View>
                         {
-                            this.props.isEditMode ? (
-                                <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize) }}>
-                                    <Button
-                                        title={this.props.case.dateRanges && this.props.case.dateRanges.length === 0 ? getTranslation(translations.caseSingleScreen.oneDateRangeText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDateRangeText, this.props.translation)}
-                                        onPress={this.props.onPressAddDateRange}
-                                        color={styles.backgroundColor}
-                                        titleColor={styles.textColor}
-                                        height={calculateDimension(35, true, this.props.screenSize)}
-                                        width={'100%'}
-                                        style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
-                                    />
-                                </View>
-                            ) : null
+                            this.props.preparedFields.dateRanges.invisible ?
+                                null
+                                :
+                                <>
+                                    <View style={style.container}>
+                                        {
+                                            this.props.case && this.props.case.dateRanges && this.props.case.dateRanges.map((item, index) => {
+                                                return this.handleRenderItemForDateRangesList(item, index)
+                                            })
+                                        }
+                                    </View>
+                                    {
+                                        this.props.isEditMode ? (
+                                            <View style={{ alignSelf: 'flex-start', marginHorizontal: calculateDimension(16, false, this.props.screenSize) }}>
+                                                <Button
+                                                    title={this.props.case.dateRanges && this.props.case.dateRanges.length === 0 ? getTranslation(translations.caseSingleScreen.oneDateRangeText, this.props.translation) : getTranslation(translations.caseSingleScreen.moreDateRangeText, this.props.translation)}
+                                                    onPress={this.props.onPressAddDateRange}
+                                                    color={styles.backgroundColor}
+                                                    titleColor={styles.textColor}
+                                                    height={calculateDimension(35, true, this.props.screenSize)}
+                                                    width={'100%'}
+                                                    style={{marginVertical: calculateDimension(8, true, this.props.screenSize)}}
+                                                />
+                                            </View>
+                                        ) : null
+                                    }
+                                </>
                         }
                     </ScrollView>
                 </View>
@@ -141,9 +155,6 @@ class CaseSingleInfectionContainer extends Component {
     };
 
     handleRenderItemForDateRangesList = (item, index) => {
-        if(this.props.preparedFields.dateRanges.invisible){
-            return null;
-        }
         let fields = this.props.preparedFields.dateRanges.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: this.props.isEditMode })
         });

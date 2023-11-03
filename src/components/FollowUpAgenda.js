@@ -11,6 +11,8 @@ import {Agenda} from 'react-native-calendars';
 import {calculateDimension, getTranslation} from "../utils/functions";
 import translation from './../utils/translations';
 import FollowUpAgendaItem from './FollowUpAgendaItem';
+import {prepareFieldsAndRoutes} from "../utils/formValidators";
+import config from "../utils/config";
 
 class FollowUpAgenda extends PureComponent {
 
@@ -20,6 +22,8 @@ class FollowUpAgenda extends PureComponent {
         this.state = {
             collapsed: {}
         };
+
+        this.preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'follow-ups', config.followUpsSingleScreen);
     }
 
     // Please add here the react lifecycle methods that you need
@@ -52,6 +56,7 @@ class FollowUpAgenda extends PureComponent {
                 firstItemInDay={firstItemInDay}
                 item={item}
                 collapsed={this.state.collapsed}
+                preparedFields={this.preparedFields}
                 ChangeCollpased={this.ChangeCollpased}
             />
         )

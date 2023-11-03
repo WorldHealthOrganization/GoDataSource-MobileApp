@@ -14,7 +14,7 @@ import {
     ACTION_TYPE_SAVE_TRANSLATION,
     ACTION_TYPE_SET_LOADER_STATE,
     ACTION_TYPE_SET_LOGIN_STATE,
-    ACTION_TYPE_SET_SYNC_STATE
+    ACTION_TYPE_SET_SYNC_STATE, ACTION_TYPE_SET_TIMEZONE
 } from './../utils/enums';
 import config from './../utils/config';
 import {Dimensions, Platform} from 'react-native';
@@ -109,6 +109,14 @@ export function setSyncState(syncState) {
     return {
         type: ACTION_TYPE_SET_SYNC_STATE,
         syncState: syncState
+    }
+}
+
+export function setTimezone(timezoneState) {
+    return {
+        type: ACTION_TYPE_SET_TIMEZONE,
+        // timezoneState: 'Europe/Bucharest'
+        timezoneState: timezoneState
     }
 }
 
@@ -273,12 +281,12 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                                         console.log(`Time for processing file: ${pouchFiles[i]}: ${new Date().getTime() - startTimeForProcessingOneFile}`);
                                         promiseResponses.push(auxData);
                                     } else {
-                                        console.log('There was an error at processing file: ', pouchFiles[i]);
+                                        console.log('There was an error at processing file 1: ', pouchFiles[i]);
                                         dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${pouchFiles[i]}`, addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                         break;
                                     }
                                 } catch (errorProcessFile) {
-                                    console.log('There was an error at processing file: ', pouchFiles[i], errorProcessFile);
+                                    console.log('There was an error at processing file 2: ', pouchFiles[i], errorProcessFile);
                                     dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${pouchFiles[i]}: ${JSON.stringify(errorProcessFile)}`, addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                     break;
                                 }
@@ -303,12 +311,12 @@ async function processFilesForSyncNew(error, response, hubConfiguration, isFirst
                                         console.log(`Time for processing file: ${sqlFiles[i]}: ${new Date().getTime() - startTimeForProcessingOneFile}`);
                                         promiseResponses.push(auxData);
                                     } else {
-                                        console.log('There was an error at processing file: ', sqlFiles[i]);
+                                        console.log('There was an error at processing file 3: ', sqlFiles[i]);
                                         dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${sqlFiles[i]}`, addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                         break;
                                     }
                                 } catch(errorProcessingFilesForSql) {
-                                    console.log('There was an error at processing file: ', sqlFiles[i], errorProcessingFilesForSql);
+                                    console.log('There was an error at processing file 4: ', sqlFiles[i], errorProcessingFilesForSql);
                                     dispatch(setSyncState({id: 'sync', status: 'Error', error: `There was an error at processing file: ${sqlFiles[i]}: ${JSON.stringify(errorProcessingFilesForSql)}`, addLanguagePacks: checkArrayAndLength(languagePacks)}));
                                     break;
                                 }
@@ -403,7 +411,7 @@ function saveActiveDatabaseAndCleanup(syncSuccessful, hubConfiguration, hubConfi
                 pairArray.push(['activeDatabase', hubConfiguration.url]);
                 pairArray.push(['databaseVersioningToken', `${hubConfiguration.url}${DeviceInfo.getVersion()}${DATABASE_VERSION}`]);
                 if (!checkArrayAndLength(languagePacks)) {
-                    pairArray.push([hubConfiguration.url, createDate(null, null, true).toISOString()]);
+                    pairArray.push([hubConfiguration.url, new Date().toISOString()]);
                 }
 
                 let storeMultipleDataPromise = AsyncStorage.multiSet(pairArray);
@@ -557,6 +565,7 @@ export function sendDatabaseToServer () {
                         break;
                     }
                 }
+
                 for (let i=0; i<config.changingSQLiteCollections.length; i++) {
                     try {
                         let status = await getDataFromDatabaseFromFileSql(config.changingSQLiteCollections[i], lastSyncDate, password);
@@ -614,7 +623,7 @@ export function sendDatabaseToServer () {
                 } else if (!skipZip) {
                     dispatch(setSyncState({id: 'sendData', status: 'Success'}));
                 }
-                getDatabaseSnapshotRequestNew(
+                return getDatabaseSnapshotRequestNew(
                     {
                         url: internetCredentialsGlobal.server ? internetCredentialsGlobal.server : internetCredentialsGlobal.service,
                         clientId: internetCredentialsGlobal.username,
@@ -721,6 +730,12 @@ export function appInitialized(nativeEventEmitter) {
                             if (databaseCredentials) {
                                 // console.log('Database credentials: ', databaseCredentials);
                                 let server = Platform.OS === 'ios' ? databaseCredentials.server : databaseCredentials.service;
+
+                                const hubConfig = JSON.parse(databaseCredentials.username);
+                                let timezone = await AsyncStorage.getItem(`timezone-${hubConfig.url}`);
+                                if (timezone) {
+                                    dispatch(setTimezone(timezone));
+                                }
                                 try {
                                     let database = await createDatabase(server.replace(/\/|\.|\:/g, ''), databaseCredentials.password, false);
                                     if (database) {

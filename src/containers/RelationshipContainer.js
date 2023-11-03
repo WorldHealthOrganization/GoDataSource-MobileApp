@@ -12,7 +12,6 @@ import CardComponent from './../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
 import styles from './../styles';
-import {prepareFieldsAndRoutes} from "../utils/formValidators";
 
 class RelationshipContainer extends PureComponent {
 
@@ -37,14 +36,7 @@ class RelationshipContainer extends PureComponent {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        let configFieldsToUse;
-        if (this.props.fromRelationshipScreen === true){
-            configFieldsToUse = config.addRelationshipScreen;
-        } else {
-            configFieldsToUse = config.contactsSingleScreen.relationship.fields;
-        }
-        const preparedFields = prepareFieldsAndRoutes(this.props.outbreak, 'relationships', {relationship: {fields: configFieldsToUse}})
-        if(preparedFields.relationship.invisible){
+        if (this.props.preparedFields.relationship.invisible) {
             return null;
         }
         return (
@@ -56,9 +48,9 @@ class RelationshipContainer extends PureComponent {
                 <View style={style.container}>
                     {
                         this.props.fromRelationshipScreen === true ? (
-                            this.renderItemCardComponent(preparedFields.relationship.fields)
+                            this.renderItemCardComponent(this.props.preparedFields.relationship.fields)
                         ) : (
-                                this.handleRenderItem(preparedFields, null, 0)
+                                this.handleRenderItem(this.props.preparedFields, null, 0)
                             )
                     }
                 </View>
@@ -68,6 +60,9 @@ class RelationshipContainer extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleRenderItem = (preparedFields, item, index) => {
+        if (preparedFields.relationship.invisible) {
+            return null;
+        }
         let fields = preparedFields.relationship.fields.map((field) => {
             return Object.assign({}, field, { isEditMode: this.props.isEditMode !== undefined && this.props.isEditMode !== null ? this.props.isEditMode : true })
         });
@@ -95,6 +90,9 @@ class RelationshipContainer extends PureComponent {
     };
 
     handleRenderItemCardComponent = (item, index, cardIndex) => {
+        if (item.invisible) {
+            return null;
+        }
         return (
             <View style={[style.subcontainerCardComponent, {flex: 1}]} key={index}>
                 {
