@@ -1,7 +1,7 @@
 # GoDataSource-MobileApp
- Source code for the outbreak investigation and contact follow-up tool Go.Data including web and mobile components. A readme file is included.
- 
- This repository contains the souce code for the Go.Data outbreak investigation and contract tracing system, both the PC-installable user interface and database parts and the mobile application.  Go.Data is available for Windows, Linux and Apple and the mobile application is built for Android and IOS.
+Source code for the outbreak investigation and contact follow-up tool Go.Data including web and mobile components. A readme file is included.
+
+This repository contains the souce code for the Go.Data outbreak investigation and contract tracing system, both the PC-installable user interface and database parts and the mobile application.  Go.Data is available for Windows, Linux and Apple and the mobile application is built for Android and IOS.
 
 This repository is for the mobile application code - available for iPhone and Android.
 

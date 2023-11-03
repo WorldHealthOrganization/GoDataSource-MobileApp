@@ -54,7 +54,7 @@ class LabResultsSingleScreen extends Component {
         this.state = {
             routes: config.tabsValuesRoutes.labResultsSingle,
             index: 0,
-            item: this.props.item,
+            item: this.props.item || {},
             contact: this.props.contact,
             savePressed: false,
             deletePressed: false,
@@ -148,6 +148,16 @@ class LabResultsSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
+            const resultField = this.preparedFields.generalInfo[0].fields.find(x=>x.id === 'result');
+            if (resultField.isRequired !== false) {
+                if (_.get(this.state.item,'status',null) === 'LNG_REFERENCE_DATA_CATEGORY_LAB_TEST_RESULT_STATUS_COMPLETED') {
+                    if (resultField.isRequired !== true){
+                        resultField.isRequired = true;
+                    }
+                } else if (resultField.isRequired !== undefined) {
+                    resultField.isRequired = undefined;
+                }
+            }
         return (
             <ViewHOC style={style.container}
                      showLoader={this && this.state && this.state.loading}
@@ -168,7 +178,7 @@ class LabResultsSingleScreen extends Component {
                                 <ElevatedView
                                     elevation={0}
                                     style={[
-                                        style.headerButton, 
+                                        style.headerButton,
                                         {
                                             width: calculateDimension(30, false, this.props.screenSize),
                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -194,7 +204,7 @@ class LabResultsSingleScreen extends Component {
                                             button={
                                                 <Ripple
                                                     style={[
-                                                        style.moreMenuButton, 
+                                                        style.moreMenuButton,
                                                         {
                                                             width: calculateDimension(30, false, this.props.screenSize),
                                                             height: calculateDimension(30, true, this.props.screenSize)
@@ -369,18 +379,25 @@ class LabResultsSingleScreen extends Component {
     };
 
     checkRequiredFields = () => {
-        if(this.state.item.deleted){
+        if (this.state.item?.deleted){
             return [];
         }
         let checkRequiredFields = [];
-        if (!this.state.item?.dateSampleTaken) {
-            checkRequiredFields.push(getTranslation(translations.labResultsSingleScreen.sampleTaken, this.props.translation));
+        for (let i = 0; i < this.preparedFields.generalInfo.length; i++ ){
+            for (let j = 0; j < this.preparedFields.generalInfo[i].fields.length; j++ ){
+                const field = this.preparedFields.generalInfo[i].fields[j];
+                if (field.isRequired && !_.get(this.state.item,field.id, null) &&
+                    !(field.dependsOn && _.get(this.state.item,field.dependsOn,false) !== field.dependsOnValue)
+                ){
+                    checkRequiredFields.push(getTranslation(field.label,this.props.translation));
+                }
+            }
         }
-        return checkRequiredFields
+
+        return checkRequiredFields;
     }
 
     handleNextPress = () => {
-        console.log("Next pressed");
         // Before getting to the next screen, first do some checking of the required fields
         let checkRequiredFields = this.checkRequiredFields();
         if (checkArrayAndLength(checkRequiredFields)) {
@@ -391,7 +408,6 @@ class LabResultsSingleScreen extends Component {
                 }
             ])
         } else {
-            console.log("Next will go");
             this.handleOnIndexChange(this.state.index + 1);
         }
     };
@@ -433,7 +449,7 @@ class LabResultsSingleScreen extends Component {
     onChangeDate = (value, id, objectType) => {
             this.setState(
                 (prevState) => ({
-                    item: Object.assign({},_.set(prevState.item || {},id,new Date(value).toISOString())),
+                    item: Object.assign({},_.set(prevState.item || {},id,value ? new Date(value).toISOString() : null)),
                     isModified: true
                 })
                 , () => {

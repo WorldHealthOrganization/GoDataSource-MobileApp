@@ -47,7 +47,6 @@ class TextInput extends Component {
         let propsValue = lodashGet(this.props, 'value', ' ');
         if (prevProps.isEditMode !== this.props.isEditMode || prevProps.value !== propsValue) {
             if(this.state.value !== propsValue && this.fieldRef.current){
-                console.log("What's the ref", this.fieldRef.current);
                 this.fieldRef.current.setValue(propsValue);
                 this.setState({
                     value: propsValue

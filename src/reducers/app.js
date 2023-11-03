@@ -17,7 +17,7 @@ import {
     ACTION_TYPE_SAVE_TRANSLATION,
     ACTION_TYPE_SET_LOADER_STATE,
     ACTION_TYPE_SET_LOGIN_STATE,
-    ACTION_TYPE_SET_SYNC_STATE
+    ACTION_TYPE_SET_SYNC_STATE, ACTION_TYPE_SET_TIMEZONE
 } from './../utils/enums';
 import {sideMenuKeys} from './../utils/config';
 
@@ -65,6 +65,10 @@ export default function app(state = { root: undefined, screenSize: {width: 375, 
             return Object.assign({}, state, {
                 syncState: action.syncState
             });
+        case ACTION_TYPE_SET_TIMEZONE:
+            return Object.assign({}, state, {
+                timezone: action.timezoneState || 'UTC'
+            })
         case ACTION_TYPE_SAVE_GENERATED_FOLLOWUPS:
             console.log('generatedFollowUps',action.generatedFollowUps);
             return Object.assign({}, state, {

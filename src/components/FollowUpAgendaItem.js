@@ -64,6 +64,7 @@ class FollowUpAgendaItem extends PureComponent {
                                 <FollowUpsSingleGetInfoContainer
                                     isNew={false}
                                     isEditMode={false}
+                                    preparedFields={this.props.preparedFields}
                                     item={get(this.props, 'item.text', {})}
                                     contact={this.props.contact}
                                             />
@@ -91,6 +92,7 @@ class FollowUpAgendaItem extends PureComponent {
                                             <FollowUpsSingleAddressContainer
                                                 item={get(this.props, 'item.text', {})}
                                                 contact={this.props.contact}
+                                                preparedFields={this.props.preparedFields}
                                             />
                                         </Collapsible>) : null
                                 }

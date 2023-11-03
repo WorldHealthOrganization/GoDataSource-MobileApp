@@ -13,7 +13,7 @@ export function checkDeviceStatus(url, installationId, clientId, clientSecret, c
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
-            timeout: 2000
+            timeout: 8000
         }),3, 100)
             .then((response) => {
                 return handleResponse(response);

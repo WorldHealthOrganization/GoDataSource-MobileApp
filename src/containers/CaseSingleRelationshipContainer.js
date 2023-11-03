@@ -11,7 +11,7 @@ import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import GeneralListItem from '../components/GeneralListItem';
 import Button from './../components/Button';
-import moment from 'moment/min/moment.min';
+import moment from 'moment-timezone';
 import translations from './../utils/translations';
 import config from './../utils/config';
 import get from 'lodash/get';
@@ -188,7 +188,7 @@ class CaseSingleRelationshipContainer extends Component {
         let relationshipData = get(relation, 'relationshipData');
         let caseData = get(relation, 'contactData');
 
-        return {title: computeFullName(caseData), primaryText: moment.utc(relationshipData.contactDate).format("YYYY-MM-DD").toString(), secondaryText: getTranslation(relationshipData.certaintyLevelId, this.props.translation)};
+        return {title: computeFullName(caseData), primaryText: moment.tz(relationshipData.contactDate, this.props.timezone).format("YYYY-MM-DD").toString(), secondaryText: getTranslation(relationshipData.certaintyLevelId, this.props.translation)};
     };
 
     onPressAddExposure = () => {
@@ -239,7 +239,8 @@ function mapStateToProps(state) {
     return {
         screenSize: get(state, 'app.screenSize', config.designScreenSize),
         translation: get(state, 'app.translation', []),
-        role: get(state, 'role', [])
+        role: get(state, 'role', []),
+        timezone: get(state, 'app.timezone', null)
     };
 }
 

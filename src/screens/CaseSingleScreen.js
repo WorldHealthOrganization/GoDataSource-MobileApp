@@ -94,7 +94,7 @@ class CaseSingleScreen extends Component {
             remove(routes, (route => route.key === 'address'))
         }
         if (
-            !this.preparedFields.infection.find(value => value.invisible !== false) &&
+            !this.preparedFields.infection.find(value => !value.invisible) &&
             this.preparedFields.vaccinesReceived.invisible &&
             this.preparedFields.dateRanges.invisible
         ){
@@ -137,7 +137,7 @@ class CaseSingleScreen extends Component {
                 dateOfBurial: null,
                 burialLocationId: '',
                 burialPlaceName: '',
-                addresses: [
+                addresses: this.preparedFields.address?.invisible ? [] : [
                     {
                         typeId: config.userResidenceAddress.userPlaceOfResidence,
                         country: '',
@@ -147,10 +147,6 @@ class CaseSingleScreen extends Component {
                         postalCode: '',
                         locationId: '',
                         phoneNumber: '',
-                        // geoLocation: {
-                        //     coordinates: ['', ''],
-                        //     type: 'Point'
-                        // },
                         date: createDate(null)
                     }
                 ],
@@ -165,7 +161,7 @@ class CaseSingleScreen extends Component {
             isModified: false,
             caseBeforeEdit: {},
             anotherPlaceOfResidenceWasChosen: false,
-            hasPlaceOfResidence: true,
+            hasPlaceOfResidence: !this.preparedFields.address?.invisible,
             selectedItemIndexForTextSwitchSelectorForAge: 0, // age/dob - switch tab
             selectedItemIndexForAgeUnitOfMeasureDropDown: this.props.isNew ? 0 : (this.props.case && this.props.case.age && this.props.case.age.years !== undefined && this.props.case.age.years !== null && this.props.case.age.years > 0) ? 0 : 1, //default age dropdown value,
             currentAnswers: {},
@@ -295,7 +291,6 @@ class CaseSingleScreen extends Component {
     // because this will be called whenever there is a new setState call
     // and can slow down the app
     render() {
-        console.log("render called");
         return (
             <ViewHOC style={style.container}
                      showLoader={this && this.state && this.state.loading}
@@ -1330,7 +1325,8 @@ class CaseSingleScreen extends Component {
         if (selectedItems && Array.isArray(selectedItems) && selectedItems.length > 0) {
             let addresses = _.cloneDeep(this.state.case.addresses);
             addresses[index].locationId = extractIdFromPouchId(selectedItems['0']._id, 'location');
-            if (selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
+            const visibleGeoLocationField = this.preparedFields.address?.fields?.find(x => x.fieldId === 'geoLocation' && !x.invisible);
+            if ( visibleGeoLocationField && selectedItems['0'].geoLocation && selectedItems['0'].geoLocation.coordinates && Array.isArray(selectedItems['0'].geoLocation.coordinates)) {
                 if (selectedItems['0'].geoLocation.coordinates[0] !== '' || selectedItems['0'].geoLocation.coordinates[1] !== '') {
                     setTimeout(() => {
                         Alert.alert(getTranslation(translations.alertMessages.alertLabel, this.props.translation), getTranslation(translations.alertMessages.replaceCurrentCoordinates, this.props.translation), [
@@ -1521,9 +1517,9 @@ class CaseSingleScreen extends Component {
         //documents
         if (this.state.case && this.state.case.documents && Array.isArray(this.state.case.documents) && this.state.case.documents.length > 0) {
             for (let i = 0; i < this.state.case.documents.length; i++) {
-                for (let j = 0; j < config.caseSingleScreen.document.fields.length; j++) {
-                    if (config.caseSingleScreen.document.fields[j].isRequired && !this.state.case.documents[i][config.caseSingleScreen.document.fields[j].id]) {
-                        requiredFields.push(getTranslation(config.caseSingleScreen.document.fields[j].label, this.props.translation));
+                for (let j = 0; j < this.preparedFields.document.fields.length; j++) {
+                    if (this.preparedFields.document.fields[j].isRequired && !this.state.case.documents[i][this.preparedFields.document.fields[j].id]) {
+                        requiredFields.push(getTranslation(this.preparedFields.document.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }
@@ -1536,9 +1532,9 @@ class CaseSingleScreen extends Component {
         let requiredFields = [];
         if (this.state.case && this.state.case.addresses && Array.isArray(this.state.case.addresses) && this.state.case.addresses.length > 0) {
             for (let i = 0; i < this.state.case.addresses.length; i++) {
-                for (let j = 0; j < config.caseSingleScreen.address.fields.length; j++) {
-                    if (config.caseSingleScreen.address.fields[j].isRequired && !this.state.case.addresses[i][config.caseSingleScreen.address.fields[j].id]) {
-                        requiredFields.push(getTranslation(config.caseSingleScreen.address.fields[j].label, this.props.translation));
+                for (let j = 0; j < this.preparedFields.address.fields.length; j++) {
+                    if (this.preparedFields.address.fields[j].isRequired && !this.state.case.addresses[i][this.preparedFields.address.fields[j].id]) {
+                        requiredFields.push(getTranslation(this.preparedFields.address.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }
@@ -1550,9 +1546,9 @@ class CaseSingleScreen extends Component {
     checkRequiredFieldsInfection = () => {
         let requiredFields = [];
         //infection general info
-        for (let i = 0; i < config.caseSingleScreen.infection.length; i++) {
-            for (let j = 0; j < config.caseSingleScreen.infection[i].fields.length; j++) {
-                const field = config.caseSingleScreen.infection[i].fields[j];
+        for (let i = 0; i < this.preparedFields.infection.length; i++) {
+            for (let j = 0; j < this.preparedFields.infection[i].fields.length; j++) {
+                const field = this.preparedFields.infection[i].fields[j];
                 if (field.isRequired && !this.state.case[field.id]) {
                     if (!(field.id === 'dateOfOnset' && _.get(this.props, 'isDateOfOnsetRequired', null) === false) &&
                         !((field.id === 'safeBurial' || field.id === 'dateOfBurial' || field.id === 'burialLocationId' || field.id === 'burialPlaceName') &&
@@ -1568,9 +1564,9 @@ class CaseSingleScreen extends Component {
         //dateRanges
         if (this.state.case && this.state.case.dateRanges && Array.isArray(this.state.case.dateRanges) && this.state.case.dateRanges.length > 0) {
             for (let i = 0; i < this.state.case.dateRanges.length; i++) {
-                for (let j = 0; j < config.caseSingleScreen.dateRanges.fields.length; j++) {
-                    if (config.caseSingleScreen.dateRanges.fields[j].isRequired && !this.state.case.dateRanges[i][config.caseSingleScreen.dateRanges.fields[j].id]) {
-                        requiredFields.push(getTranslation(config.caseSingleScreen.dateRanges.fields[j].label, this.props.translation));
+                for (let j = 0; j < this.preparedFields.dateRanges.fields.length; j++) {
+                    if (this.preparedFields.dateRanges.fields[j].isRequired && !this.state.case.dateRanges[i][this.preparedFields.dateRanges.fields[j].id]) {
+                        requiredFields.push(getTranslation(this.preparedFields.dateRanges.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }
@@ -1580,9 +1576,9 @@ class CaseSingleScreen extends Component {
         // isolation Date
         if (this.state.case && this.state.case.vaccinesReceived && Array.isArray(this.state.case.vaccinesReceived) && this.state.case.vaccinesReceived.length > 0) {
             for (let i = 0; i < this.state.case.vaccinesReceived.length; i++) {
-                for (let j = 0; j < config.caseSingleScreen.vaccinesReceived.fields.length; j++) {
-                    if (config.caseSingleScreen.vaccinesReceived.fields[j].isRequired && !this.state.case.vaccinesReceived[i][config.caseSingleScreen.vaccinesReceived.fields[j].id]) {
-                        requiredFields.push(getTranslation(config.caseSingleScreen.vaccinesReceived.fields[j].label, this.props.translation));
+                for (let j = 0; j < this.preparedFields.vaccinesReceived.fields.length; j++) {
+                    if (this.preparedFields.vaccinesReceived.fields[j].isRequired && !this.state.case.vaccinesReceived[i][this.preparedFields.vaccinesReceived.fields[j].id]) {
+                        requiredFields.push(getTranslation(this.preparedFields.vaccinesReceived.fields[j].label, this.props.translation));
                         // return false;
                     }
                 }
@@ -1736,6 +1732,16 @@ class CaseSingleScreen extends Component {
     };
     onChangeDate = (value, id, objectTypeOrIndex, objectType) => {
         if (id === 'dob') {
+            if (!value) {
+                this.setState(prevState => ({
+                    case: Object.assign({}, prevState.case, {age: null}, {dob: value}),
+                    selectedItemIndexForAgeUnitOfMeasureDropDown: 0,
+                    isModified: true
+                }), () => {
+                    // console.log("handleOnChangeDate dob", id, " ", value, " ", this.state.case);
+                })
+                return;
+            }
             let today = createDate(null);
             let nrOFYears = this.calcDateDiff(value, today);
             if (nrOFYears !== undefined && nrOFYears !== null) {

@@ -45,20 +45,19 @@ export async function retriablePromise (promise, numberOfRetries, timeout, error
     try {
         let response = isPromise(promise) ? await promise : await promise();
         return Promise.resolve(response)
-    } catch (error) {
-
+    } catch (e) {
         let {Platform} = require('react-native');
 
         if (Platform.OS === 'ios') {
             await wait(timeout);
         }
 
-        return retriablePromise(promise, numberOfRetries - 1, timeout, error);
+        return retriablePromise(promise, numberOfRetries - 1, timeout, e);
     }
 }
 
 export function fetchWitTimeout (url, config) {
-    let timeout = 2000;
+    let timeout = 8000;
     if (!url || typeof url !== 'string') {
         return Promise.reject('Invalid url');
     }

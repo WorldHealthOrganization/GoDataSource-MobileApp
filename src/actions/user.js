@@ -11,7 +11,7 @@ import {
     saveSelectedScreen,
     saveTranslation,
     setLoaderState,
-    setLoginState,
+    setLoginState, setTimezone,
     storeData
 } from './app';
 import {getUserByIdRequest, getUserTeamMembers, loginUserRequest, updateUserRequest} from './../queries/user';

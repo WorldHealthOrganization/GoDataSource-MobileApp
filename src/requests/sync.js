@@ -5,7 +5,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 import base64 from 'base-64';
 import {Platform} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {setSyncState} from './../actions/app';
+import {setSyncState, setTimezone} from './../actions/app';
 import DeviceInfo from 'react-native-device-info';
 import translations from './../utils/translations';
 import {testApi, testApiPromise} from './testApi';
@@ -16,6 +16,7 @@ import {getHelpItemsRequest} from './helpItem';
 import {createDate, handleResponseFromRNFetchBlob} from './../utils/functions';
 import {checkArrayAndLength, retriablePromise} from "../utils/typeCheckingFunctions";
 import constants from './constants';
+import moment from "moment-timezone";
 
 export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch, languagePacks, noDateFilter) {
     // hubConfiguration = {url: databaseName, clientId: JSON.stringify({name, url, clientId, clientSecret, encryptedData}), clientSecret: databasePass}
@@ -28,7 +29,7 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
 
     if (lastSyncDate && !noDateFilter) {
         filter.where = {
-            fromDate: createDate(lastSyncDate)
+            fromDate: moment(lastSyncDate).toISOString()
         }
     }
     if (languagePacks) {
@@ -69,7 +70,8 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                 })
         })
         .then((responseTestApi) => {
-            // console.log('Response TestApi: ', responseTestApi);
+            AsyncStorage.setItem(`timezone-${hubConfiguration.url}`, responseTestApi.timezone);
+            dispatch(setTimezone(responseTestApi.timezone));
             dispatch(setSyncState({id: 'testApi', status: 'Success', addLanguagePacks: checkArrayAndLength(languagePacks)}));
             dispatch(setSyncState({id: 'downloadDatabase', status: 'In progress', addLanguagePacks: checkArrayAndLength(languagePacks)}));
             // Here call the method computeHelpItemsAndCategories
@@ -118,7 +120,6 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
                         console.log("Received", received, total)
                     })
                     .then((res) => {
-                        //console.log("RNFetchBlob response", res);
                         return handleResponseFromRNFetchBlob(res)
                     }), 3)
                     .then((response) => Promise.resolve(databaseLocation))

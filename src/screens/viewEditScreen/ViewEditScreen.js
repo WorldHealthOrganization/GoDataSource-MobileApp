@@ -445,6 +445,7 @@ class ViewEditScreen extends Component {
                     let ContactsSingleRelationship = require('./../../containers/ContactsSingleRelationship').default;
                         return (
                             <ContactsSingleRelationship
+                                preparedFields={this.props.preparedFields}
                                 isNew={this.props.isNew}
                                 isEditMode={this.props.isEditMode}
                                 contact={this.props.element}
