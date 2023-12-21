@@ -226,7 +226,7 @@ class ContactsSingleAddress extends Component {
                 minimumDate={minimumDate}
                 maximumDate={maximumDate}
                 index={cardIndex}
-
+                dropdownDataChanged={item?.data?.length}
                 onChangeText={this.props.onChangeText}
                 onChangeDate={this.props.onChangeDate}
                 onChangeSwitch={this.props.onChangeSwitch}
@@ -296,7 +296,7 @@ class ContactsSingleAddress extends Component {
                     !this.props.outbreak?.allowedRefDataItems ||
                     !this.props.outbreak.allowedRefDataItems[o.categoryId] ||
                     this.props.outbreak.allowedRefDataItems[o.categoryId][o.value]
-                );
+                ) && (o.value !== config.userResidenceAddress.userPlaceOfResidence || !this.props.hasPlaceOfResidence);
             })
                 .sort((a, b) => { return a.order - b.order; })
                 .map((o) => { return { value: getTranslation(o.value, this.props.translation), id: o.value } })

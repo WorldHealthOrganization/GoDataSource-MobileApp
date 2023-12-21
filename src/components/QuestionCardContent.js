@@ -39,7 +39,7 @@ class QuestionCardContent extends PureComponent {
                             <View style={{flexDirection: 'row', marginHorizontal: this.props.viewMarginHorizontal}}>
                                 <DatePicker
                                     id={'answerDate'}
-                                    label={'Answer Date'}
+                                    label={'Answer Date?????'}
                                     value={answerDate}
                                     multiAnswer={this.props.item.multiAnswer}
                                     isEditMode={!!(this.props.isEditMode && this.props.editableQuestionDate)}
@@ -293,7 +293,6 @@ class QuestionCardContent extends PureComponent {
                         }
                     }
                 }
-
                 return (
                     <DropdownInput
                         key={item.variable}

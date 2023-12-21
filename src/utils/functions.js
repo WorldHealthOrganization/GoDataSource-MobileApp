@@ -1083,7 +1083,7 @@ export function mapAnswers(questions, answers) {
                                     const a = Object.assign({}, mappedAnswers[sortedQuestions[j].variable][indexForStuff], {subAnswers: {}});
                                     mappedAnswers[sortedQuestions[j].variable][indexForStuff] = a;
                                 }
-                                mappedAnswers[sortedQuestions[j].variable][indexForStuff].subAnswers[questionId] = [questionnaireAnswers[questionId][i]];
+                                // mappedAnswers[sortedQuestions[j].variable][indexForStuff].subAnswers[questionId] = [questionnaireAnswers[questionId][i]];
                             }
                         }
                     }

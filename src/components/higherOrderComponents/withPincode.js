@@ -34,7 +34,6 @@ export default function withPincode() {
                         .then((hasPin) => {
                             if (props.isAppInitialize) {
                                 Navigation.mergeOptions(props.componentId, {
-
                                     sideMenu: {
                                         left: {
                                             visible: false,

@@ -443,6 +443,7 @@ const alertMessages = {
 
     // Permissions alert messages
     permission: 'LNG_MOBILE_DIALOG_ALERT_MESSAGE_PERMISSION',
+    multipleCurrentAdresses: 'LNG_MOBILE_DIALOG_MULTIPLE_CURRENT_ADDRESSES',
 
     dialNumberAlertDescription: 'LNG_DIAL_NUMBER_DESCRIPTION'
 };

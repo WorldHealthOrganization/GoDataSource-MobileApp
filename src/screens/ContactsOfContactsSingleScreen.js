@@ -1224,16 +1224,6 @@ class ContactsOfContactsSingleScreen extends Component {
                 let addressesClone = _.cloneDeep(this.state.contact.addresses);
 
                 let anotherPlaceOfResidenceWasChosen = false;
-                if (value && value.value !== undefined) {
-                    if (value.value === config.userResidenceAddress.userPlaceOfResidence) {
-                        addressesClone.forEach(element => {
-                            if (element[id] === value.value) {
-                                element[id] = config.userResidenceAddress.userOtherResidence
-                                anotherPlaceOfResidenceWasChosen = true
-                            }
-                        });
-                    }
-                }
 
                 addressesClone[objectType][id] = value && value.value !== undefined ? value.value : value;
                 let hasPlaceOfResidence = false;
