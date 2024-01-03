@@ -618,7 +618,7 @@ export function sendDatabaseToServer () {
             })
             .then((resultPostDatabase) => {
                 if (resultPostDatabase && !resultPostDatabase.includes('Finished')) {
-                    dispatch(setSyncState({id: 'sendData', status: 'Error', error: JSON.stringify(resultPostDatabase)}));
+                    dispatch(setSyncState({id: 'sendData', status: 'Error', error: JSON.stringify(get(resultPostDatabase, 'message', resultPostDatabase))}));
                     noDateFilter = true;
                 } else if (!skipZip) {
                     dispatch(setSyncState({id: 'sendData', status: 'Success'}));
@@ -642,12 +642,12 @@ export function sendDatabaseToServer () {
                         if (errorGetDatabase === 'No data to export') {
                             dispatch(setSyncState({id: 'getDataFromServer', status: 'No data to export'}));
                         } else {
-                            dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(errorGetDatabase)}));
+                            dispatch(setSyncState({id: 'getDataFromServer', status: 'Error', error: JSON.stringify(get(errorGetDatabase, 'message', errorGetDatabase))}));
                         }
                     })
             })
             .catch((errorSendDatabase) => {
-                dispatch(setSyncState({id: 'sendData', status: 'Error', error: JSON.stringify(errorSendDatabase)}));
+                dispatch(setSyncState({id: 'sendData', status: 'Error', error: JSON.stringify(get(errorSendDatabase, 'message', errorSendDatabase))}));
             })
     }
 }

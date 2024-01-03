@@ -14,7 +14,6 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
 
     let queryFollowUps = createQueryFollowUps(outbreakId, followUpFilter, userTeams, contactsFilter, exposureFilter, lastElement, offset);
 
-
     if (computeCount) {
         let followUpCount = createQueryFollowUps(outbreakId, followUpFilter, userTeams, contactsFilter, exposureFilter, lastElement, offset, true);
 
@@ -22,20 +21,23 @@ export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams
     }
     followUpPromise = executeQuery(queryFollowUps);
 
+
     return Promise.all([followUpPromise, countPromise])
         .then(([followUps, followUpsCount]) => {
             console.log('Returned values FollowUps: ', followUps.length);
             return Promise.resolve({data: followUps, dataCount: checkArrayAndLength(followUpsCount) ? followUpsCount[0].countRecords : undefined});
         })
-        .catch((errorGetFollowUps) => Promise.reject(errorGetFollowUps))
+        .catch((errorGetFollowUps) => {
+            Promise.reject(errorGetFollowUps)
+        })
 }
 
-function createQueryContactsWithRelations(outbreakId, dataType, mainFilter) {
+function createQueryContactsWithRelations(outbreakId, dataTypes, mainFilter) {
 
     let contactAlias = 'Contact';
     let relationAlias = 'Relation';
 
-    let condition = createConditionContactsWithRelations(outbreakId, dataType, mainFilter);
+    let condition = createConditionContactsWithRelations(outbreakId, dataTypes, mainFilter);
 
     return {
         type: 'select',
@@ -53,12 +55,12 @@ function createQueryContactsWithRelations(outbreakId, dataType, mainFilter) {
     }
 }
 
-function createConditionContactsWithRelations(outbreakId, dataType, filter) {
+function createConditionContactsWithRelations(outbreakId, dataTypes, filter) {
     let contactAlias = 'Contact';
 
     let condition = {
         [`${contactAlias}.deleted`]: 0,
-        [`${contactAlias}.type`]: dataType,
+        [`${contactAlias}.type`]: { ['$in']: dataTypes },
         [`${contactAlias}.outbreakId`]: outbreakId
     };
 
@@ -96,8 +98,8 @@ function createQueryFollowUps(outbreakId, followUpsFilter, userTeams, contactsFi
     let aliasForFilteredExposures = 'FilteredExposures';
     let aliasForAllExposures = 'AllExposures';
 
-    let innerQuery = createQueryContactsWithRelations(outbreakId, translations.personTypes.contacts, contactsFilter);
-    let {condition, sort} = createConditionFollowUps(outbreakId, followUpsFilter, userTeams, translations.personTypes.contacts, contactsFilter, searchText, lastElement, offset, isCount);
+    let innerQuery = createQueryContactsWithRelations(outbreakId, [translations.personTypes.contacts, translations.personTypes.cases], contactsFilter);
+    let {condition, sort} = createConditionFollowUps(outbreakId, followUpsFilter, userTeams, [translations.personTypes.contacts, translations.personTypes.cases], contactsFilter, searchText, lastElement, offset, isCount);
 
     let query = {
         type: 'select',
@@ -171,7 +173,7 @@ function createQueryFollowUps(outbreakId, followUpsFilter, userTeams, contactsFi
     return query;
 }
 
-function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataType, contactsFilter, search, lastElement, offset, skipExposure) {
+function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTypes, contactsFilter, search, lastElement, offset, skipExposure) {
     let aliasFollowUps = 'FollowUps';
     let aliasForContacts = 'Contacts';
     let aliasForFilteredExposures = 'FilteredExposures';
@@ -214,7 +216,7 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
 
     // Here take care of searches
     if (search) {
-        if (dataType === translations.personTypes.cases) {
+        if (dataTypes === translations.personTypes.cases) {
             condition['$or'] = [
                 {[`${aliasForContacts}.firstName`]: {'$like': `%${search.text}%`}},
                 {[`${aliasForContacts}.lastName`]: {'$like': `%${search.text}%`}},

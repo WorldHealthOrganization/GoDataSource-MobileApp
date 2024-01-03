@@ -410,6 +410,7 @@ export default {
 
     // TODO add to backend permissions
     'LNG_MOBILE_DIALOG_ALERT_MESSAGE_PERMISSION': `You don't have permissions for the following operation: `,
+    'LNG_MOBILE_DIALOG_MULTIPLE_CURRENT_ADDRESSES': 'You cannot add multiple current addresses.',
 
     //loadingScreenMessages
     'LNG_LOADING_SCREEN_MESSAGE': 'Loading...',

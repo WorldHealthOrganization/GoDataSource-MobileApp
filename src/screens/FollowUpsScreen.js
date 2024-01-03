@@ -128,7 +128,7 @@ class FollowUpsScreen extends Component {
                                 <ElevatedView
                                     elevation={0}
                                     style={[
-                                        style.headerButton, 
+                                        style.headerButton,
                                         {
                                             width: calculateDimension(30, false, this.props.screenSize),
                                             height: calculateDimension(30, true, this.props.screenSize)

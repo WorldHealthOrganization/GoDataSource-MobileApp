@@ -303,11 +303,12 @@ class PreviousAnswers extends Component {
 
         if (get(questionnaireAnswers, `[${index}].subAnswers`, null) !== null && get(questionnaireAnswers, `[${index}].subAnswers`, null) !== {}) {
             for (let subQuestionId in get(questionnaireAnswers, `[${index}].subAnswers`, null)) {
-                set(questionnaireAnswers, `[${index}].subAnswers[${subQuestionId}].date`, value);
+                questionnaireAnswers[index].subAnswers[subQuestionId] = questionnaireAnswers[index].subAnswers[subQuestionId].map((e) => {
+                    return {value: e.value, date: value};
+                })
             }
         }
 
-        // console.log('~~~~~~~~~~ onChangeAnswerDate', questionnaireAnswers);
         this.setState({
             previousAnswers: questionnaireAnswers || [],
             isModified: true

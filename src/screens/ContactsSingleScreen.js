@@ -218,7 +218,6 @@ class ContactsSingleScreen extends Component {
                 })
             }
             let mappedAnswers = mapAnswers(this.props.caseInvestigationQuestions, this.props.contact.questionnaireAnswers);
-
             //permissions check
             let isEditMode = _.get(this.props, 'isEditMode', false);
             this.setState({
@@ -1482,16 +1481,6 @@ class ContactsSingleScreen extends Component {
                 let addressesClone = _.cloneDeep(this.state.contact.addresses);
 
                 let anotherPlaceOfResidenceWasChosen = false;
-                if (value && value.value !== undefined) {
-                    if (value.value === config.userResidenceAddress.userPlaceOfResidence) {
-                        addressesClone.forEach(element => {
-                            if (element[id] === value.value) {
-                                element[id] = config.userResidenceAddress.userOtherResidence
-                                anotherPlaceOfResidenceWasChosen = true
-                            }
-                        });
-                    }
-                }
 
                 addressesClone[objectType][id] = value && value.value !== undefined ? value.value : value;
                 let hasPlaceOfResidence = false;
@@ -1763,7 +1752,6 @@ class ContactsSingleScreen extends Component {
         contactClone.questionnaireAnswers = reMapAnswers(_.cloneDeep(this.state.previousAnswers));
         contactClone.questionnaireAnswers = this.filterUnasweredQuestions(contactClone.questionnaireAnswers);
         contactClone = updateRequiredFields(this.props.outbreak._id, this.props.user._id, contactClone, operation, 'person.json', 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT');
-
         if (operation === 'create') {
             promise = addContact(contactClone, _.get(this.props, 'periodOfFollowUp', 1), _.get(this.props, 'user._id'))
         } else {
@@ -2136,7 +2124,6 @@ class ContactsSingleScreen extends Component {
 
     // Questionnaire methods
     onChangeAnswer = (value, id, parentId, index) => {
-        console.log("Quest value", value);
         let questionnaireAnswers = _.cloneDeep(this.state.previousAnswers);
 
         if (parentId) {

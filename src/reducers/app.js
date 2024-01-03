@@ -22,7 +22,7 @@ import {
 import {sideMenuKeys} from './../utils/config';
 
 // Do not add unnecessary business logic in the reducer. Here should only be updated the store
-export default function app(state = { root: undefined, screenSize: {width: 375, height: 667}, changesExist: 'Unverified', selectedScreen: sideMenuKeys[0], filters: {}, translation: {}, helpCategory: {}, helpItem: {}, availableLanguages: [], hubConfiguration:{}, syncState: '', generatedFollowUps: '', loginState: '',  loaderState: false, activeDatabase: '' }, action = {}) {
+export default function app(state = { root: undefined, screenSize: {width: 375, height: 667}, changesExist: 'Unverified', selectedScreen: sideMenuKeys[0], filters: {}, translation: {}, helpCategory: {}, helpItem: {}, availableLanguages: [], hubConfiguration:{}, syncState: '', generatedFollowUps: '', loginState: '',  loaderState: false, activeDatabase: '', timezone: 'UTC' }, action = {}) {
     let stateClone = null;
     switch (action.type) {
         case ACTION_TYPE_ROOT_CHANGE:
