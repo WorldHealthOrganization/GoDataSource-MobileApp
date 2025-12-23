@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 31
     defaultConfig {
         minSdkVersion 20
         targetSdkVersion 28
@@ -30,5 +30,5 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation 'com.google.firebase:firebase-messaging:17.0.0'
     implementation 'com.github.parse-community.Parse-SDK-Android:parse:1.18.5'
-    implementation 'com.github.parse-community.Parse-SDK-Android:fcm:1.18.5'
+    implementation 'androidx.work:work-runtime:2.7.1'
 }

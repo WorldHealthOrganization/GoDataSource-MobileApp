@@ -79,10 +79,10 @@ import com.android.build.OutputFile
 
 project.ext.react = [
     enableHermes: false,  // clean and rebuild if changing
+    nodeExecutableAndArgs: [project.hasProperty("NODE_BINARY") ? project.property("NODE_BINARY") : "/usr/bin/node"]
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
-apply from: "../../node_modules/react-native-sentry/sentry.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -142,7 +142,7 @@ android {
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion 33
-    buildToolsVersion '29.0.3'
+    buildToolsVersion '30.0.2'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -154,8 +154,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 33
         multiDexEnabled true
-        versionCode 51
-        versionName "2.49.0"
+        versionCode 52
+        versionName "2.50.3"
         ndk {
             abiFilters "armeabi-v7a", "x86", 'arm64-v8a', 'x86_64'
         }
@@ -199,6 +199,16 @@ android {
         }
     }
 
+    packagingOptions {
+        pickFirst 'lib/x86/libreact_nativemodule_core.so'
+        pickFirst 'lib/x86_64/libreact_nativemodule_core.so'
+        pickFirst 'lib/armeabi-v7a/libreact_nativemodule_core.so'
+        pickFirst 'lib/arm64-v8a/libreact_nativemodule_core.so'
+        pickFirst 'lib/x86/libturbomodulejsijni.so'
+        pickFirst 'lib/x86_64/libturbomodulejsijni.so'
+        pickFirst 'lib/armeabi-v7a/libturbomodulejsijni.so'
+        pickFirst 'lib/arm64-v8a/libturbomodulejsijni.so'
+    }
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -227,7 +237,6 @@ dependencies {
     implementation project(':react-native-version-number')
     implementation project(':react-native-randombytes')
     implementation project(':react-native-bcrypt')
-    implementation project(':react-native-sentry')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-exit-app')
 //    implementation(project(':react-native-camera')) {
@@ -282,7 +291,7 @@ dependencies {
     }
 
     implementation "com.github.parse-community.Parse-SDK-Android:parse:1.18.5"
-    implementation "com.github.parse-community.Parse-SDK-Android:fcm:1.18.5"
+    implementation "androidx.work:work-runtime:2.7.1"
     implementation project(path: ':parse-receiver')
     // From node_modules
 }
@@ -290,7 +299,7 @@ dependencies {
 // Run this once to be able to run the application with BUCK
 // puts all compile dependencies into folder libs for BUCK to use
 task copyDownloadableDepsToLibs(type: Copy) {
-    from configurations.compile
+    from configurations.implementation
     into 'libs'
 }
 

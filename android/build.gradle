@@ -2,18 +2,17 @@
 
 buildscript {
     ext {
-        buildToolsVersion = "29.0.3"
+        buildToolsVersion = "30.0.2"
         minSdkVersion = 21
-        compileSdkVersion = 30
+        compileSdkVersion = 31
         targetSdkVersion = 30
         ndkVersion = "20.1.5948944"
         //react-native-navigation
-        kotlinVersion = "1.4.31"
+        kotlinVersion = "1.5.10"
         RNNKotlinVersion = kotlinVersion
     }
     repositories {
         google()
-        jcenter()
         mavenLocal()
         //react-native-navigation
         mavenCentral {
@@ -24,6 +23,8 @@ buildscript {
             }
         }
         maven { url 'https://www.jitpack.io' }
+        jcenter()
+       maven { url "https://maven.aliyun.com/repository/jcenter" }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
@@ -40,7 +41,7 @@ allprojects {
     repositories {
         google()
         mavenLocal()
-        jcenter()
+        mavenCentral()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url("$rootDir/../node_modules/react-native/android")
@@ -52,6 +53,8 @@ allprojects {
         maven {
             url("https://www.jitpack.io")
         }
+         jcenter()
+      maven { url "https://maven.aliyun.com/repository/jcenter" }
 
     }
 }
@@ -78,8 +81,8 @@ subprojects {
     afterEvaluate {project ->
         if (project.hasProperty("android")) {
             android {
-                compileSdkVersion 30
-                buildToolsVersion "29.0.3"
+                compileSdkVersion 31
+                buildToolsVersion "30.0.2"
             }
         }
     }

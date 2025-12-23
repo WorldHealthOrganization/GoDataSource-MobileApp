@@ -81,6 +81,14 @@ let textFieldsStructure = [
         keyboardType: 'email-address'
     },
     {
+        id: 'apiKey',
+        label: 'Api key',
+        type: 'TextInput',
+        value: '',
+        isRequired: false,
+        isEditMode: true,
+    },
+    {
         id: 'encryptedData',
         label: translations.manualConfigScreen.encryptDataLabel,
         type: 'SwitchInput',
@@ -123,6 +131,7 @@ class FirstConfigScreen extends Component {
             clientId: '',
             clientSecret: '',
             userEmail: '',
+            apiKey: '',
             encryptedData: true,
             chunkSize: 2500,
             allDatabases: [],
@@ -168,6 +177,7 @@ class FirstConfigScreen extends Component {
                     clientId: currentHubConfig.clientId,
                     clientSecret: currentHubConfig.clientSecret,
                     userEmail: currentHubConfig.userEmail,
+                    apiKey: currentHubConfig.apiKey,
                     encryptedData: currentHubConfig.encryptedData,
                     chunkSize: currentHubConfig.chunkSize,
                     lastSyncDate: lastSyncDate,
@@ -665,6 +675,7 @@ class FirstConfigScreen extends Component {
             url: QRCodeInfo.url,
             clientId: QRCodeInfo.clientId,
             clientSecret: QRCodeInfo.clientSecret,
+            apiKey: QRCodeInfo.apiKey,
             isModified: true
         })
     };
@@ -685,6 +696,7 @@ class FirstConfigScreen extends Component {
                     clientSecret: this.state.clientSecret,
                     encryptedData: this.state.encryptedData,
                     userEmail: this.state.userEmail,
+                    apiKey: this.state.apiKey,
                     chunkSize: this.state.chunkSize
                 });
                 setInternetCredentials(server, previousInternetCredentials.username, previousInternetCredentials.password)

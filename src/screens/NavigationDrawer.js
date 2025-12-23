@@ -277,7 +277,7 @@ class NavigationDrawer extends Component {
     };
 
     handleCommunity = async () => {
-        await Linking.openURL('https://community-godata.who.int/');
+        await Linking.openURL('https://godata.who.int/');
     };
 
     handleOnPressAdd = (key, index) => {

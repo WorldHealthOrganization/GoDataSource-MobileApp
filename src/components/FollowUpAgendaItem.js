@@ -59,8 +59,7 @@ class FollowUpAgendaItem extends PureComponent {
                     ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUp, this.props.translation), this.props.screenSize, itemId, this.props.ChangeCollpased, this.props.collapsed, 25)
                 }
                 {
-                    this.props.collapsed[itemId] === false ? (
-                            <Collapsible collapsed={this.props.collapsed[itemId]}>
+                            <Collapsible collapsed={this.props.collapsed[itemId] ?? true}>
                                 <FollowUpsSingleGetInfoContainer
                                     isNew={false}
                                     isEditMode={false}
@@ -72,8 +71,7 @@ class FollowUpAgendaItem extends PureComponent {
                                     ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUpQuestionnaire, this.props.translation), this.props.screenSize, itemIdQuestionnaire, this.props.ChangeCollpased, this.props.collapsed, 30)
                                 }
                                 {
-                                    this.props.collapsed[itemIdQuestionnaire] === false ? (
-                                        <Collapsible collapsed={this.props.collapsed[itemIdQuestionnaire]}>
+                                        <Collapsible collapsed={this.props.collapsed[itemIdQuestionnaire] ?? true}>
                                             <FollowUpsSingleQuestionnarireContainer
                                                 item={get(this.props, 'item.text', {})}
                                                 previousAnswers={get(mappedAnswers, 'mappedAnswers', {})}
@@ -81,23 +79,21 @@ class FollowUpAgendaItem extends PureComponent {
                                                 isEditMode={false}
                                                 noEditButton={true}
                                             />
-                                        </Collapsible>) : null
+                                        </Collapsible>
                                 }
                                 {
                                     ToggleFollowUpDetails(getTranslation(translation.followUpAgenda.followUpAddress, this.props.translation), this.props.screenSize, itemIdAddress, this.props.ChangeCollpased, this.props.collapsed, 30)
                                 }
                                 {
-                                    this.props.collapsed[itemIdAddress] === false ? (
-                                        <Collapsible collapsed={this.props.collapsed[itemIdAddress]}>
+                                        <Collapsible collapsed={this.props.collapsed[itemIdAddress] ?? true}>
                                             <FollowUpsSingleAddressContainer
                                                 item={get(this.props, 'item.text', {})}
                                                 contact={this.props.contact}
                                                 preparedFields={this.props.preparedFields}
                                             />
-                                        </Collapsible>) : null
+                                        </Collapsible>
                                 }
-                            </Collapsible>)
-                        : null
+                            </Collapsible>
                 }
             </View >
         )

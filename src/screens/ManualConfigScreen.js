@@ -43,6 +43,7 @@ class ManualConfigScreen extends PureComponent {
     clientIdRef = React.createRef();
     clientSecretRef = React.createRef();
     userEmailRef = React.createRef();
+    apiKeyRef = React.createRef();
 
     constructor(props) {
         super(props);
@@ -52,6 +53,7 @@ class ManualConfigScreen extends PureComponent {
             clientId: appConfig.env === 'development' ? config.whocdCredentials.clientId : '',
             clientSecret: appConfig.env === 'development' ? config.whocdCredentials.clientSecret : '',
             userEmail: appConfig.env === 'development' ? config.whocdCredentials.userEmail : '',
+            apiKey: appConfig.env === 'development' ? config.whocdCredentials.apiKey : '',
             encryptedData: appConfig.env === 'development' ? config.whocdCredentials.encryptedConnection : true,
             chunkSize: appConfig.env === 'development' ? config.whocdCredentials.numberOfData : 2500,
             hasAlert: false,
@@ -111,6 +113,7 @@ class ManualConfigScreen extends PureComponent {
                                     clientId: activeDatabaseCredentials.clientId,
                                     clientSecret: activeDatabaseCredentials.clientSecret,
                                     userEmail: activeDatabaseCredentials.userEmail,
+                                    apiKey: activeDatabaseCredentials.apiKey,
                                     encryptedData: activeDatabaseCredentials.encryptedData,
                                     allUrls: allUrls
                                 }, ()=>{
@@ -119,6 +122,7 @@ class ManualConfigScreen extends PureComponent {
                                     this.clientIdRef.current.setValue(this.state.clientId);
                                     this.clientSecretRef.current.setValue(this.state.clientSecret);
                                     this.userEmailRef.current.setValue(this.state.userEmail);
+                                    this.apiKeyref.current.setValue(this.state.apiKey);
                                 })
                             } else {
                                 console.log("No active database found");
@@ -288,6 +292,20 @@ class ManualConfigScreen extends PureComponent {
                             baseColor={styles.secondaryColor}
                             textColor={styles.textColor}
                         />
+                        <TextField
+                            ref={this.apiKeyRef}
+                            value={this.state.apiKey}
+                            autoCorrect={false}
+                            lineWidth={1}
+                            enablesReturnKeyAutomatically={true}
+                            containerStyle={style.textInput}
+                            onChangeText={this.handleTextChange}
+                            label={getTranslation(translations.manualConfigScreen.apiKeyLabel, null)}
+                            autoCapitalize={'none'}
+                            tintColor={styles.primaryColor}
+                            baseColor={styles.secondaryColor}
+                            textColor={styles.textColor}
+                        />
                         <SwitchInput
                             id="encryptedData"
                             label={'Encrypted connection'}
@@ -399,11 +417,13 @@ class ManualConfigScreen extends PureComponent {
             this.setState({
                 url: QRCodeData.url || '',
                 clientId: QRCodeData.clientId || '',
-                clientSecret: QRCodeData.clientSecret || ''
+                clientSecret: QRCodeData.clientSecret || '',
+                apiKey: QRCodeData.apiKey || '',
             }, ()=>{
                 this.urlRef.current.setValue(this.state.url);
                 this.clientIdRef.current.setValue(this.state.clientId);
                 this.clientSecretRef.current.setValue(this.state.clientSecret);
+                this.apiKeyRef.current.setValue(this.state.apiKey);
             })
         }
     }
@@ -440,7 +460,7 @@ class ManualConfigScreen extends PureComponent {
     };
 
     checkFields = (nextFunction, validateUrl) => {
-        if (!this.state.name || !this.state.url || !this.state.clientId || !this.state.clientSecret || !this.state.userEmail) {
+        if (!this.state.name || !this.state.url || !this.state.clientId || !this.state.clientSecret || !this.state.userEmail || !this.state.apiKey) {
             Alert.alert("Alert", "Please make sure you have completed all the fields before moving forward", [
                 {
                     text: 'Ok', onPress: () => {console.log('Ok pressed')}
@@ -505,6 +525,7 @@ class ManualConfigScreen extends PureComponent {
                     clientId: this.state.clientId,
                     clientSecret: this.state.clientSecret,
                     userEmail: this.state.userEmail,
+                    apiKey: this.state.apiKey,
                     encryptedData: this.state.encryptedData,
                     chunkSize: this.state.chunkSize
                 };
@@ -543,6 +564,7 @@ class ManualConfigScreen extends PureComponent {
                     clientId: this.state.clientId,
                     clientSecret: this.state.clientSecret,
                     userEmail: this.state.userEmail,
+                    apiKey: this.state.apiKey,
                     encryptedData: this.state.encryptedData,
                     chunkSize: this.state.chunkSize,
                     language: []
@@ -579,6 +601,7 @@ class ManualConfigScreen extends PureComponent {
             clientId: this.state.clientId,
             clientSecret: this.state.clientSecret,
             userEmail: this.state.userEmail,
+            apiKey: this.state.apiKey,
             encryptedData: this.state.encryptedData,
             chunkSize: this.state.chunkSize,
             language: [this.state.selectedLanguage]
@@ -607,7 +630,7 @@ class ManualConfigScreen extends PureComponent {
     };
 
     handleTextChange = (text) => {
-        ['name', 'url', 'clientId', 'clientSecret', 'userEmail']
+        ['name', 'url', 'clientId', 'clientSecret', 'userEmail' , 'apiKey']
             .map((name) => ({ name, ref: this[`${name}Ref`] }))
             .forEach(({ name, ref }) => {
                 if (ref.current && ref.current.isFocused()) {
