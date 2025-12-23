@@ -3,13 +3,14 @@
  */
 import {handleResponse} from './../utils/functions';
 
-export function testApi(testUrl, deviceInfo, callback) {
+export function testApi(testUrl, deviceInfo, callback, apiKey) {
     fetch(testUrl, {
         method: 'GET',
         headers: {
             'device-info': deviceInfo,
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'api-key': apiKey
         }
     })
         .then((response) => {
@@ -22,13 +23,14 @@ export function testApi(testUrl, deviceInfo, callback) {
 }
 
 
-export function testApiPromise(testUrl, deviceInfo) {
+export function testApiPromise(testUrl, deviceInfo, apiKey) {
     return fetch(testUrl, {
         method: 'GET',
         headers: {
             'device-info': deviceInfo,
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'api-key': apiKey
         }
     })
         .then(handleResponse)

@@ -3143,6 +3143,7 @@ const whocdCredentials = {
     clientId: 'test',
     clientSecret: 'test',
     userEmail: 'andrei.postelnicu@clarisoft.com',
+    apiKey: 'test',
     encryptedConnection: false,
     numberOfData: 5000
 };

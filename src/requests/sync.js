@@ -58,7 +58,7 @@ export function getDatabaseSnapshotRequestNew(hubConfig, lastSyncDate, dispatch,
 
             // Before starting a download, first test if the API responds
             dispatch(setSyncState({id: 'testApi', status: 'In progress', addLanguagePacks: checkArrayAndLength(languagePacks)}));
-            return testApiPromise(`${hubConfiguration.url}${constants.testApi}`, deviceInfo)
+            return testApiPromise(`${hubConfiguration.url}${constants.testApi}`, deviceInfo, hubConfiguration.apiKey)
                 .catch((errorTestAPI) => {
                     dispatch(setSyncState({
                         id: 'testApi',
@@ -142,7 +142,7 @@ export function postDatabaseSnapshotRequest(internetCredentials, path) {
                 model: DeviceInfo.getModel().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`),
                 name: DeviceInfo.getDeviceNameSync().replace(/\u0022|\u0027|\u0060|\u00b4|\u2018|\u2019|\u201c|\u201d/g, `\'`)
             });
-            return testApiPromise(`${hubConfig.url}${constants.testApi}`, deviceInfo)
+            return testApiPromise(`${hubConfig.url}${constants.testApi}`, deviceInfo, hubConfig.apiKey)
         })
         .then((responseTestApi) => RNFetchBlob.config({timeout: (30 * 60 * 10 * 1000)})
             .fetch('POST', requestUrl, {

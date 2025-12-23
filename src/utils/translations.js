@@ -509,6 +509,7 @@ const manualConfigScreen = {
     hubUrlLabel: 'HUB URL',
     clientIdLabel: 'Client ID',
     userEmailLabel: 'User Email',
+    apiKeyLabel: 'API Key',
     clientSecretPass: 'Client secret',
     saveHubConfigButton: 'Save and sync HUB',
     encryptDataLabel: 'Encrypted connection'
@@ -603,6 +604,7 @@ const hubConfigScreen = {
     hubUrlLabel: 'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_CONFIG_URL',
     hubClientIdLabel: 'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_CONFIG_CLIENT_ID',
     hubClientSecretLabel: 'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_CONFIG_CLIENT_SECRET',
+    hubApiKeyLabel: 'LNG_HUB_CONFIGURATION_SCREEN_CURRENT_CONFIG_API_KEY',
     lastSyncDate: 'LNG_HUB_CONFIGURATION_SCREEN_LAST_SYNC_DATE',
     scanQRButtonLabel: 'LNG_HUB_CONFIGURATION_SCREEN_SCAN_QR_CODE_BUTTON',
     saveCurrentHubButtonLabel: 'LNG_COMMON_BUTTON_SAVE',

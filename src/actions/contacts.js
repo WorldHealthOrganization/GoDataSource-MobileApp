@@ -277,7 +277,9 @@ export function checkForNameDuplicated(id, firstName, lastName, outbreakId) {
             '_id': {'$ne': id},
             'outbreakId': outbreakId,
             'firstName': firstName,
-            'lastName': lastName
+            'lastName': lastName,
+            "deleted": 0,
+            "type": translations.personTypes.contacts
         }
     };
 
