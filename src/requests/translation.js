@@ -1,8 +1,8 @@
 /**
  * Created by florinpopa on 20/08/2018.
  */
-import url from './../utils/url';
-import {handleResponse} from './../utils/functions';
+import url from '../utils/url';
+import {handleResponse} from '../utils/functions';
 
 export function getTranslationRequest(languageId, callback) {
     let requestUrl = url.getLanguagesUrl() + '/' + languageId + "/language-tokens";

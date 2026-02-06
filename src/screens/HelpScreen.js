@@ -5,13 +5,13 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Alert, Animated, BackHandler, FlatList, StyleSheet, Text, View} from 'react-native';
-import NavBarCustom from './../components/NavBarCustom';
+import NavBarCustom from '../components/NavBarCustom';
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
-import SearchFilterView from './../components/SearchFilterView';
-import HelpListItem from './../components/HelpListItem';
-import {addFilterForScreen, removeFilterForScreen} from './../actions/app'
-import {setDisableOutbreakChange} from './../actions/outbreak'
+import SearchFilterView from '../components/SearchFilterView';
+import HelpListItem from '../components/HelpListItem';
+import {addFilterForScreen, removeFilterForScreen} from '../actions/app'
+import {setDisableOutbreakChange} from '../actions/outbreak'
 import _ from 'lodash';
 import {
     calculateDimension, createStackFromComponent,
@@ -19,15 +19,14 @@ import {
     getTranslation,
     localSortHelpItem,
     navigation
-} from './../utils/functions';
-import ViewHOC from './../components/ViewHOC';
-import translations from './../utils/translations'
+} from '../utils/functions';
+import ViewHOC from '../components/ViewHOC';
+import translations from '../utils/translations'
 import RNExitApp from 'react-native-exit-app';
-import withPincode from './../components/higherOrderComponents/withPincode';
+import withPincode from '../components/higherOrderComponents/withPincode';
 import config from "../utils/config";
-import PermissionComponent from './../components/PermissionComponent';
-import {Navigation} from "react-native-navigation";
-import styles from './../styles';
+import PermissionComponent from '../components/PermissionComponent';
+import styles from '../styles';
 
 let AnimatedListView = Animated.createAnimatedComponent(FlatList);
 
@@ -69,7 +68,7 @@ class HelpScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         
         this.props.removeFilterForScreen('HelpFilterScreen');
 
@@ -86,13 +85,11 @@ class HelpScreen extends Component {
             })
         }
 
-        const listener = {
-            componentDidAppear: () => {
-                this.props.setDisableOutbreakChange(false);
-            }
-        };
-        // Register the listener to all events related to our component
-        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+        if (this.props.navigation) {
+             this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+                 this.props.setDisableOutbreakChange(false);
+             });
+        }
     };
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -104,8 +101,10 @@ class HelpScreen extends Component {
     }
 
     componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-        this.navigationListener.remove();
+        if (this.backHandler) this.backHandler.remove();
+        if (this.unsubscribeFocus) {
+            this.unsubscribeFocus();
+        }
     }
 
     handleBackButtonClick() {
@@ -246,18 +245,12 @@ class HelpScreen extends Component {
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
         this.state.displayModalFormat === true ? (
-            Navigation.dismissModal(this.props.componentId)
+            this.props.navigation && this.props.navigation.goBack()
         ) : (
             this.setState({
                 calendarPickerOpen: false
             }, () => {
-                Navigation.mergeOptions(this.props.componentId, {
-                    sideMenu: {
-                        left: {
-                            visible: true,
-                        },
-                    },
-                });
+                if (this.props.navigation) this.props.navigation.openDrawer();
             })
         )
     };
@@ -322,17 +315,14 @@ class HelpScreen extends Component {
         console.log("### handlePressFollowUp: ", item);
 
         let itemClone = Object.assign({}, item);
-        Navigation.push(this.props.componentId,{
-            component:{
-                name: 'HelpSingleScreen',
-                passProps: {
-                    isNew: false,
-                    item: itemClone,
-                    filter: this.state.filter,
-                    startLoadingScreen: this.startLoadingScreen
-                }
-            }
-        })
+        if (this.props.navigation) {
+            this.props.navigation.navigate('HelpSingleScreen', {
+                isNew: false,
+                item: itemClone,
+                filter: this.state.filter,
+                startLoadingScreen: this.startLoadingScreen
+            });
+        }
     };
 
     //PrepareFieldsForHelpFromPage
@@ -443,14 +433,13 @@ class HelpScreen extends Component {
     };
 
     handlePressFilter = () => {
-        Navigation.showModal(createStackFromComponent({
-            name: 'FilterScreen',
-            passProps: {
+        if (this.props.navigation) {
+            this.props.navigation.navigate('FilterScreen', {
                 activeFilters: this.state.filterFromFilterScreen || null,
                 onApplyFilters: this.handleOnApplyFilters,
                 screen: 'HelpFilterScreen'
-            }
-        }))
+            });
+        }
     };
 
     handleOnChangeText = (text) => {

@@ -5,18 +5,18 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {calculateDimension, createDate, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import {calculateDimension, createDate, getTranslation} from '../utils/functions';
+import config from '../utils/config';
 import {connect} from "react-redux";
-import CardComponent from './../components/CardComponent';
+import CardComponent from '../components/CardComponent';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
-import translations from './../utils/translations'
+import translations from '../utils/translations'
 import _ from 'lodash';
 import TopContainerButtons from "../components/TopContainerButtons";
-import PermissionComponent from './../components/PermissionComponent';
-import constants from "./../utils/constants";
-import styles from './../styles';
+import PermissionComponent from '../components/PermissionComponent';
+import constants from "../utils/constants";
+import styles from '../styles';
 
 class EventSinglePersonalContainer extends Component {
 

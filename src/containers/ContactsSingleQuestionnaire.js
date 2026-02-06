@@ -13,15 +13,15 @@ import cloneDeep from 'lodash/cloneDeep';
 import uniqueId from 'lodash/uniqueId';
 import get from 'lodash/get';
 import TopContainerButtons from "../components/TopContainerButtons";
-import PermissionComponent from './../components/PermissionComponent';
+import PermissionComponent from '../components/PermissionComponent';
 import constants, {
     PERMISSION_CREATE_CONTACT,
     PERMISSION_CREATE_CONTACT_OF_CONTACT, PERMISSION_EDIT_CONTACT,
     PERMISSION_EDIT_CONTACT_OF_CONTACT
-} from "./../utils/constants";
-import config from "./../utils/config";
+} from "../utils/constants";
+import config from "../utils/config";
 import translations from "../utils/translations";
-import styles from './../styles';
+import styles from '../styles';
 import ElevatedView from "react-native-elevated-view";
 import Section from "../components/Section";
 

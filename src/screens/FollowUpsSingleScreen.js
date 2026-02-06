@@ -7,17 +7,17 @@ import React, {Component} from 'react';
 import geolocation from '@react-native-community/geolocation';
 import {Alert, Animated, BackHandler, Platform, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import NavBarCustom from './../components/NavBarCustom';
-import config from './../utils/config';
+import NavBarCustom from '../components/NavBarCustom';
+import config from '../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
-import FollowUpsSingleContainer from './../containers/FollowUpsSingleContainer';
-import FollowUpsSingleQuestionnaireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
-import Breadcrumb from './../components/Breadcrumb';
+import FollowUpsSingleContainer from '../containers/FollowUpsSingleContainer';
+import FollowUpsSingleQuestionnaireContainer from '../containers/FollowUpsSingleQuestionnaireContainer';
+import Breadcrumb from '../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import {addFollowUp, createFollowUp, updateFollowUpAndContact} from './../actions/followUps';
+import {addFollowUp, createFollowUp, updateFollowUpAndContact} from '../actions/followUps';
 import _, {cloneDeep, remove, sortBy} from 'lodash';
 import {
     calculateDimension,
@@ -26,20 +26,19 @@ import {
     mapAnswers,
     reMapAnswers,
     updateRequiredFields
-} from './../utils/functions';
-import translations from './../utils/translations'
+} from '../utils/functions';
+import translations from '../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
-import ViewHOC from './../components/ViewHOC';
-import PermissionComponent from './../components/PermissionComponent';
+import ViewHOC from '../components/ViewHOC';
+import PermissionComponent from '../components/PermissionComponent';
 import moment from 'moment-timezone';
-import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
+import {checkArrayAndLength} from '../utils/typeCheckingFunctions';
 import {checkRequiredQuestions, extractAllQuestions} from "../utils/functions";
-import constants from './../utils/constants';
-import withPincode from './../components/higherOrderComponents/withPincode';
-import {Navigation} from "react-native-navigation";
+import constants from '../utils/constants';
+import withPincode from '../components/higherOrderComponents/withPincode';
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import {setDisableOutbreakChange} from "../actions/outbreak";
-import styles from './../styles';
+import styles from '../styles';
 import colors from "../styles/colors";
 import {prepareFieldsAndRoutes} from "../utils/formValidators";
 
@@ -75,14 +74,12 @@ class FollowUpsSingleScreen extends Component {
     }
 
     componentDidMount() {
-        const listener = {
-            componentDidAppear: () => {
-                this.props.setDisableOutbreakChange(true);
-            }
-        };
-        // Register the listener to all events related to our component
-        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        if (this.props.navigation) {
+             this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+                 this.props.setDisableOutbreakChange(true);
+             });
+        }
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
 
         let isEditMode = _.get(this.props, 'isEditMode', true);
 
@@ -121,9 +118,10 @@ class FollowUpsSingleScreen extends Component {
     }
 
     componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-
-        this.navigationListener.remove();
+        if (this.backHandler) this.backHandler.remove();
+        if (this.unsubscribeFocus) {
+             this.unsubscribeFocus();
+        }
     }
 
     handleBackButtonClick() {
@@ -132,7 +130,7 @@ class FollowUpsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        Navigation.pop(this.props.componentId)
+                        if (this.props.navigation) this.props.navigation.goBack();
                     }
                 },
                 {
@@ -142,7 +140,7 @@ class FollowUpsSingleScreen extends Component {
                 }
             ])
         } else {
-            Navigation.pop(this.props.componentId)
+            if (this.props.navigation) this.props.navigation.goBack();
         }
         return true;
     }
@@ -267,13 +265,9 @@ class FollowUpsSingleScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        Navigation.mergeOptions(this.props.componentId, {
-            sideMenu: {
-                left: {
-                    visible: true,
-                },
-            },
-        });
+        if (this.props.navigation) {
+            this.props.navigation.openDrawer();
+        }
     };
 
     handleOnIndexChange = _.throttle((index) => {
@@ -439,7 +433,7 @@ class FollowUpsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        Navigation.pop(this.props.componentId)
+                        if (this.props.navigation) this.props.navigation.goBack();
                     }
                 },
                 {
@@ -449,7 +443,7 @@ class FollowUpsSingleScreen extends Component {
                 }
             ])
         } else {
-            Navigation.pop(this.props.componentId);
+            if (this.props.navigation) this.props.navigation.goBack();
         }
     };
 

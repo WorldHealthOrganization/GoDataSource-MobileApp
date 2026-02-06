@@ -6,36 +6,36 @@
 import React, {Component} from 'react';
 import DeviceInfo from 'react-native-device-info';
 import {Alert, Platform, StyleSheet, Text, View, ScrollView} from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Modal from 'react-native-modal';
 import {Icon, Button as MaterialButton } from 'react-native-material-ui';
-import ViewHOC from './../components/ViewHOC';
-import Section from './../components/Section';
+import ViewHOC from '../components/ViewHOC';
+import Section from '../components/Section';
 import ElevatedView from 'react-native-elevated-view';
-import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
-import Button from './../components/Button';
-import TextInput from './../components/TextInput';
+import {calculateDimension, createStackFromComponent, getTranslation} from '../utils/functions';
+import Button from '../components/Button';
+import TextInput from '../components/TextInput';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import lodashGet from 'lodash/get';
-import {logoutUser, cleanDataAfterLogout} from './../actions/user';
-import {removeErrors} from './../actions/errors';
-import {saveActiveDatabase, changeAppRoot, verifyChangesExist, setTimezone} from './../actions/app';
-import NavBarCustom from './../components/NavBarCustom';
-import config from './../utils/config';
-import IntervalPicker from './../components/IntervalPicker';
-import translations from './../utils/translations';
+import {logoutUser, cleanDataAfterLogout} from '../actions/user';
+import {removeErrors} from '../actions/errors';
+import {saveActiveDatabase, changeAppRoot, verifyChangesExist, setTimezone} from '../actions/app';
+import NavBarCustom from '../components/NavBarCustom';
+import config from '../utils/config';
+import IntervalPicker from '../components/IntervalPicker';
+import translations from '../utils/translations';
 import {getInternetCredentials, setInternetCredentials, resetInternetCredentials} from 'react-native-keychain';
-import {createDatabase, DATABASE_VERSION} from './../queries/database';
+import {createDatabase, DATABASE_VERSION} from '../queries/database';
 import SwitchInput from "../components/SwitchInput";
-import {modalStyle} from './../styles/views';
+import {modalStyle} from '../styles/views';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import DropdownInput from "../components/DropdownInput";
 import RNFS from 'react-native-fs';
-import RNFetchBlobFS from 'rn-fetch-blob/fs';
+import RNFetchBlobFS from 'react-native-blob-util/fs';
+
 import RippleFeedback from 'react-native-material-ripple';
-import {Navigation} from "react-native-navigation";
-import styles from './../styles';
+import styles from '../styles';
 
 let textFieldsStructure = [
     {
@@ -428,14 +428,16 @@ class FirstConfigScreen extends Component {
         if (this.state.isModified) {
             Alert.alert('', getTranslation(translations.hubConfigScreen.exitWithoutSavingMessage), [
                 {
-                    text: 'Yes', onPress: () => {Navigation.dismissModal(this.props.componentId)}
+                    text: 'Yes', onPress: () => {
+                        if (this.props.navigation) this.props.navigation.goBack();
+                    }
                 },
                 {
                     text: 'Cancel', onPress: () => {console.log('Cancel pressed')}
                 }
             ])
         } else {
-            Navigation.dismissModal(this.props.componentId);
+             if (this.props.navigation) this.props.navigation.goBack();
         }
     };
 
@@ -662,12 +664,11 @@ class FirstConfigScreen extends Component {
 
     handleOnPressQr = () => {
         console.log("QR code scan");
-        Navigation.showModal(createStackFromComponent({
-            name: 'QRScanScreen',
-            passProps: {
+        if (this.props.navigation) {
+            this.props.navigation.navigate('QRScanScreen', {
                 pushNewScreen: this.pushNewScreen
-            }
-        }))
+            });
+        }
     };
 
     pushNewScreen = (QRCodeInfo) => {
@@ -742,16 +743,13 @@ class FirstConfigScreen extends Component {
     handleOnPressAddHub = async () => {
         console.log("Check", this.props.componentId, this.props.stackComponentId);
         try {
-            await Navigation.push(this.props.componentId,{
-                component:{
-                    name: 'FirstConfigScreen',
-                    passProps: {
-                        allowBack: true,
-                        skipEdit: true,
-                        isMultipleHub: true
-                    }
-                }
-            })
+            if (this.props.navigation) {
+                this.props.navigation.navigate('FirstConfigScreen', {
+                    allowBack: true,
+                    skipEdit: true,
+                    isMultipleHub: true
+                });
+            }
         } catch (e) {
             console.log("Error seen here",e );
         }

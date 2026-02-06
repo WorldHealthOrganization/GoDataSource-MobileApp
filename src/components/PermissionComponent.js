@@ -6,7 +6,7 @@ import lodashGet from 'lodash/get';
 import lodashIntersection from 'lodash/intersection';
 import lodashIsEqual from 'lodash/isEqual';
 import lodashMemoize from 'lodash/memoize';
-import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
+import {checkArrayAndLength} from '../utils/typeCheckingFunctions';
 
 // This component renders another component if the user has the permissions described in the permissionsList prop
 class PermissionComponent extends Component {
@@ -54,7 +54,7 @@ class PermissionComponent extends Component {
 PermissionComponent.propTypes = {
     render: PropTypes.func.isRequired,
     permissionsList: PropTypes.arrayOf(PropTypes.oneOf(PropTypes.string, PropTypes.array)).isRequired,
-    outbreakPermissions: PropTypes.arrayOf(PropTypes.oneOf(PropTypes.string)),
+    outbreakPermissions: PropTypes.arrayOf(PropTypes.oneOf(PropTypes.string, PropTypes.array)),
     alternativeRender: PropTypes.func,
 };
 

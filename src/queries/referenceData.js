@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 18/09/2018.
  */
-import config from './../utils/config';
+import config from '../utils/config';
 import {rawSQLQuery} from "./sqlHelper";
 
 // Credentials: {email, encryptedPassword}

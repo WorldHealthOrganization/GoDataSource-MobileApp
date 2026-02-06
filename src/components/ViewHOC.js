@@ -4,10 +4,10 @@
 import React, {Component} from 'react';
 import {Platform, View} from 'react-native';
 import {LoaderScreen} from 'react-native-ui-lib';
-import config from './../utils/config';
+import config from '../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {getUserById} from './../actions/user';
+import {getUserById} from '../actions/user';
 import cloneDeep from 'lodash/cloneDeep';
 import KeyboardManager from 'react-native-keyboard-manager';
 import ModalSyncStatus from './ModalSyncStatus';

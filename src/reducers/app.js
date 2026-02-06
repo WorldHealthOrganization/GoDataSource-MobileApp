@@ -18,8 +18,8 @@ import {
     ACTION_TYPE_SET_LOADER_STATE,
     ACTION_TYPE_SET_LOGIN_STATE,
     ACTION_TYPE_SET_SYNC_STATE, ACTION_TYPE_SET_TIMEZONE
-} from './../utils/enums';
-import {sideMenuKeys} from './../utils/config';
+} from '../utils/enums';
+import {sideMenuKeys} from '../utils/config';
 
 // Do not add unnecessary business logic in the reducer. Here should only be updated the store
 export default function app(state = { root: undefined, screenSize: {width: 375, height: 667}, changesExist: 'Unverified', selectedScreen: sideMenuKeys[0], filters: {}, translation: {}, helpCategory: {}, helpItem: {}, availableLanguages: [], hubConfiguration:{}, syncState: '', generatedFollowUps: '', loginState: '',  loaderState: false, activeDatabase: '', timezone: 'UTC' }, action = {}) {

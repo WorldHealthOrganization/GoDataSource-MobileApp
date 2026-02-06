@@ -8,10 +8,10 @@ import {View, StyleSheet, Text} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import {connect} from "react-redux";
 import SectionedMultiSelect from './SectionedMultiSelect';
-import translations from './../utils/translations'
-import {getTranslation, getTooltip} from './../utils/functions';
+import translations from '../utils/translations'
+import {getTranslation, getTooltip} from '../utils/functions';
 import TooltipComponent from './TooltipComponent';
-import styles from './../styles';
+import styles from '../styles';
 
 class DropDownSectioned extends Component {
 

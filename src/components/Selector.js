@@ -8,7 +8,7 @@ import {FlatList, StyleSheet, Text, View} from 'react-native';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {getTranslation} from "../utils/functions";
-import styles from './../styles';
+import styles from '../styles';
 
 class Selector extends PureComponent {
 

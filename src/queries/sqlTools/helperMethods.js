@@ -1,12 +1,12 @@
 import SQLite, {encodeName} from 'react-native-sqlcipher-2';
-import {database} from './../database';
+import {database} from '../database';
 import constants from './constants';
 import get from 'lodash/get';
-import {extractLocationId} from './../../utils/functions';
-import {checkArray, checkArrayAndLength} from './../../utils/typeCheckingFunctions';
+import {extractLocationId} from '../../utils/functions';
+import {checkArray, checkArrayAndLength} from '../../utils/typeCheckingFunctions';
 import translations from "../../utils/translations";
 import {generalMapping} from "../../actions/followUps";
-import appConfig from './../../../app.config';
+import appConfig from '../../../app.config';
 
 var jsonSql = require('json-sql')();
 var jsonSqlPrime = require('json-sql')();

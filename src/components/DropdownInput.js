@@ -6,11 +6,11 @@
 import React, {PureComponent} from 'react';
 import {View, StyleSheet, Text} from 'react-native';
 import PropTypes from 'prop-types';
-import {getTranslation, getTooltip, getDropDownInputDisplayParameters} from './../utils/functions';
+import {getTranslation, getTooltip, getDropDownInputDisplayParameters} from '../utils/functions';
 import { Dropdown } from 'react-native-material-dropdown';
 import TooltipComponent from './TooltipComponent'
 import get from 'lodash/get';
-import styles from './../styles';
+import styles from '../styles';
 
 class DropdownInput extends PureComponent {
 

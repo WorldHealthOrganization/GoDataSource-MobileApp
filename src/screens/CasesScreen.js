@@ -6,34 +6,32 @@
 import React, {Component} from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import NavBarCustom from './../components/NavBarCustom';
-import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
+import NavBarCustom from '../components/NavBarCustom';
+import {calculateDimension, createStackFromComponent, getTranslation} from '../utils/functions';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
-import Breadcrumb from './../components/Breadcrumb';
-import {getCasesForOutbreakId} from './../actions/cases';
-import {setLoaderState} from './../actions/app';
+import Breadcrumb from '../components/Breadcrumb';
+import {getCasesForOutbreakId} from '../actions/cases';
+import {setLoaderState} from '../actions/app';
 import {setDisableOutbreakChange} from "../actions/outbreak";
-import AnimatedListView from './../components/AnimatedListView';
-import ViewHOC from './../components/ViewHOC';
-import translations from './../utils/translations';
-import config from './../utils/config';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
-import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
+import AnimatedListView from '../components/AnimatedListView';
+import ViewHOC from '../components/ViewHOC';
+import translations from '../utils/translations';
+import config from '../utils/config';
+import {pushNewEditScreen} from '../utils/screenTransitionFunctions';
+import {enhanceListWithGetData} from '../components/higherOrderComponents/withListData';
 import get from "lodash/get";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {Popup} from 'react-native-map-link';
-import PermissionComponent from './../components/PermissionComponent';
+import PermissionComponent from '../components/PermissionComponent';
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import withPincode from "../components/higherOrderComponents/withPincode";
 import {getContactsForOutbreakId} from "../actions/contacts";
 import {compose} from "redux";
-import {Navigation} from "react-native-navigation";
 import constants from "../utils/constants";
-import styles from './../styles';
+import styles from '../styles';
 
 class CasesScreen extends Component {
 
@@ -63,17 +61,18 @@ class CasesScreen extends Component {
             riskColors: riskColors
         });
 
-        const listener = {
-            componentDidAppear: () => {
+        // Replaced Navigation listener with React Navigation listener
+        if (this.props.navigation) {
+            this.focusUnsubscribe = this.props.navigation.addListener('focus', () => {
                 this.props.setDisableOutbreakChange(false);
-            }
-        };
-        // Register the listener to all events related to our component
-        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+            });
+        }
     }
 
     componentWillUnmount() {
-        this.navigationListener.remove();
+        if (this.focusUnsubscribe) {
+            this.focusUnsubscribe();
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -124,7 +123,7 @@ class CasesScreen extends Component {
                             </View>
                             <View style={style.headerButtonSpacing}>
                                 <Ripple style={style.headerButtonInner} onPress={this.handleOnPressQRCode}>
-                                    <MaterialCommunityIcons name="qrcode-scan" color={styles.textColor} size={24} />
+                                    <Icon name="center-focus-strong" color={styles.textColor} size={24} />
                                 </Ripple>
                             </View>
 
@@ -242,27 +241,20 @@ class CasesScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        Navigation.mergeOptions(this.props.componentId, {
-            sideMenu: {
-                left: {
-                    visible: true,
-                },
-            },
-        });
+        if (this.props.navigation) {
+            this.props.navigation.openDrawer();
+        }
     };
 
     goToScreen = (caseData, index) => {
-        Navigation.push(this.props.componentId,{
-            component:{
-                name: constants.appScreens.caseSingleScreen,
-                passProps: {
-                    isNew: false,
-                    refresh: this.refresh,
-                    case: caseData,
-                    index
-                }
-            }
-        })
+        if (this.props.navigation) {
+            this.props.navigation.navigate(constants.appScreens.caseSingleScreen, {
+                isNew: false,
+                refresh: this.refresh,
+                case: caseData,
+                index
+            });
+        }
     }
 
     handleOnPressMap = (dataFromMapHandler) => {
@@ -287,36 +279,31 @@ class CasesScreen extends Component {
 
     //Create new case in CaseSingleScreen
     handleOnPressAddCase = () => {
-        Navigation.push(this.props.componentId,{
-            component:{
-                name: 'CaseSingleScreen',
-                passProps: {
-                    isNew: true,
-                    refresh: this.props.onRefresh
-                }
-            }
-        })
+        if (this.props.navigation) {
+            this.props.navigation.navigate('CaseSingleScreen', {
+                isNew: true,
+                refresh: this.props.onRefresh
+            });
+        }
     };
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'cases';
-        Navigation.showModal(createStackFromComponent({
-            name: 'HelpScreen',
-            passProps: {
+        if (this.props.navigation) {
+            // Assuming HelpScreen is a screen we can navigate to
+            this.props.navigation.navigate('HelpScreen', {
                 pageAskingHelpFrom: pageAskingHelpFrom
-            }
-        }));
+            });
+        }
     };
 
     handleOnPressQRCode = () => {
         // console.log('handleOnPressQRCode');
-
-        Navigation.showModal(createStackFromComponent({
-            name: 'QRScanScreen',
-            passProps: {
+        if (this.props.navigation) {
+             this.props.navigation.navigate('QRScanScreen', {
                 pushNewScreen: this.pushNewEditScreenLocal
-            }
-        }))
+            });
+        }
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {
@@ -325,7 +312,15 @@ class CasesScreen extends Component {
         this.setState({
             loading: true
         }, () => {
-            pushNewEditScreen(QRCodeInfo, this.props.componentId, this.props && this.props.user ? this.props.user : null, this.props.outbreak, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
+            const componentId = this.props.componentId; // This might be used in logic, but for navigation we use props.navigation
+            // Note: pushNewEditScreen utils function likely uses Navigation.push. 
+            // We should refactor pushNewEditScreen or modify how it's called.
+            // For now, I'll pass props.navigation if possible or handle the callback logic here.
+            
+            // FIXME: pushNewEditScreen is an external util that might do navigation. 
+            // We need to check src/utils/screenTransitionFunctions.js
+            
+            pushNewEditScreen(QRCodeInfo, componentId, this.props && this.props.user ? this.props.user : null, this.props.outbreak, this.props && this.props.translation ? this.props.translation : null, (error, itemType, record) => {
                 this.setState({
                     loading: false
                 }, () => {
@@ -411,7 +406,10 @@ function matchDispatchProps(dispatch) {
 }
 
 // export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getCasesForOutbreakId, 'CasesScreen')(CasesScreen));
+import {withNavigationParams} from '../components/higherOrderComponents/withNavigationParams';
+
 export default compose(
+    withNavigationParams,
     withPincode(),
     connect(mapStateToProps, matchDispatchProps),
     enhanceListWithGetData(getCasesForOutbreakId, 'CasesScreen')

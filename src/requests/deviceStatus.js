@@ -1,6 +1,6 @@
 import base64 from 'base-64';
-import {handleResponse} from './../utils/functions';
-import {fetchWitTimeout, retriablePromise} from './../utils/typeCheckingFunctions';
+import {handleResponse} from '../utils/functions';
+import {fetchWitTimeout, retriablePromise} from '../utils/typeCheckingFunctions';
 
 export function checkDeviceStatus(url, installationId, clientId, clientSecret, callback) {
     if (url && installationId) {

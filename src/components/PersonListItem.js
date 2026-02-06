@@ -10,7 +10,7 @@ import React, {Component} from 'react';
 import moment from 'moment-timezone';
 import {InteractionManager, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
 import GeneralListItem from './GeneralListItem';
 import {getAddress, handleExposedTo} from "../utils/functions";
@@ -20,10 +20,10 @@ import PersonListItemExposuresComponent from './PersonListItemExposuresComponent
 import PermissionComponent from './PermissionComponent';
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
-import constants from './../utils/constants';
+import constants from '../utils/constants';
 import translations from "../utils/translations";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import styles from './../styles';
+import styles from '../styles';
 
 class PersonListItem extends Component {
     constructor(props) {

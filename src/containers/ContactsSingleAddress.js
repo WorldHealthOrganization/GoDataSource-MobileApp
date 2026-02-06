@@ -6,23 +6,23 @@
 import React, {Component} from 'react';
 import {Alert, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {LoaderScreen} from 'react-native-ui-lib';
-import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from '../utils/functions';
+import config from '../utils/config';
 import {connect} from "react-redux";
-import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
-import Button from './../components/Button';
-import CardComponent from './../components/CardComponent';
-import translations from './../utils/translations'
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from '../utils/constants';
+import Button from '../components/Button';
+import CardComponent from '../components/CardComponent';
+import translations from '../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
-import TopContainerButtons from "./../components/TopContainerButtons";
-import PermissionComponent from './../components/PermissionComponent';
+import TopContainerButtons from "../components/TopContainerButtons";
+import PermissionComponent from '../components/PermissionComponent';
 import {
     PERMISSION_CREATE_CONTACT,
     PERMISSION_CREATE_CONTACT_OF_CONTACT,
     PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
 } from "../utils/constants";
-import styles from './../styles';
+import styles from '../styles';
 
 class ContactsSingleAddress extends Component {
 

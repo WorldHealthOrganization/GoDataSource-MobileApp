@@ -9,11 +9,11 @@ import {connect} from "react-redux";
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import PropTypes from 'prop-types';
 import CustomMarker from './CustomMarker';
-import {getTooltip} from './../utils/functions';
+import {getTooltip} from '../utils/functions';
 import TooltipComponent from './TooltipComponent';
 import lodashGet from 'lodash/get';
 import {Switch} from 'react-native-ui-lib';
-import styles from './../styles';
+import styles from '../styles';
 
 class IntervalPicker extends PureComponent {
 
@@ -28,7 +28,7 @@ class IntervalPicker extends PureComponent {
     }
     // Please add here the react lifecycle methods that you need
 
-    componentWillReceiveProps(nextProps, nextContext) {
+    UNSAFE_componentWillReceiveProps(nextProps, nextContext) {
         if (nextProps.value !== this.props.value){
             this.state.interval = this.props.value ? this.props.value : [this.props.min, this.props.max];
             // this.setState({

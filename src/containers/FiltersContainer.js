@@ -5,12 +5,12 @@ import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scrol
 import ElevatedView from 'react-native-elevated-view';
 import filter from 'lodash/filter';
 import get from 'lodash/get';
-import {calculateDimension, extractIdFromPouchId, getTranslation} from './../utils/functions';
-import config from './../utils/config';
-import Button from './../components/Button';
-import CardComponent from './../components/CardComponent';
-import translations from './../utils/translations';
-import styles from './../styles';
+import {calculateDimension, extractIdFromPouchId, getTranslation} from '../utils/functions';
+import config from '../utils/config';
+import Button from '../components/Button';
+import CardComponent from '../components/CardComponent';
+import translations from '../utils/translations';
+import styles from '../styles';
 
 class FiltersContainer extends PureComponent {
     constructor(props) {

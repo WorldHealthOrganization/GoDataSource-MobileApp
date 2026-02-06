@@ -8,17 +8,17 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {StyleSheet, View} from 'react-native';
-import Button from './../components/Button';
+import Button from '../components/Button';
 import {connect} from "react-redux";
 import get from 'lodash/get';
 import ElevatedView from 'react-native-elevated-view';
-import {calculateDimension, createDate, getTranslation} from './../utils/functions';
-import Section from './../components/Section';
-import DatePicker from './../components/DatePicker';
+import {calculateDimension, createDate, getTranslation} from '../utils/functions';
+import Section from '../components/Section';
+import DatePicker from '../components/DatePicker';
 import {Dialog} from 'react-native-ui-lib';
-import translations from './../utils/translations';
-import config from './../utils/config';
-import styles from './../styles';
+import translations from '../utils/translations';
+import config from '../utils/config';
+import styles from '../styles';
 
 class AddFollowUpScreen extends PureComponent{
 

@@ -5,12 +5,12 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {calculateDimension, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import {calculateDimension, getTranslation} from '../utils/functions';
+import config from '../utils/config';
 import {connect} from "react-redux";
 import Button from './Button';
 import ElevatedView from 'react-native-elevated-view';
-import translations from './../utils/translations';
+import translations from '../utils/translations';
 import QuestionCardTitle from './QuestionCardTitle';
 import QuestionCardContent from './QuestionCardContent';
 import get from "lodash/get";
@@ -18,7 +18,7 @@ import {sortBy} from "lodash";
 import PreviousAnswers from "./PreviousAnswers";
 import uniqueId from "lodash/uniqueId";
 import isEqual from "lodash/isEqual";
-import styles from './../styles';
+import styles from '../styles';
 
 class QuestionCard extends PureComponent {
 

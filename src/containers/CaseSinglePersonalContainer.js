@@ -5,19 +5,19 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {calculateDimension, createDate, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import {calculateDimension, createDate, getTranslation} from '../utils/functions';
+import config from '../utils/config';
 import {connect} from "react-redux";
-import CardComponent from './../components/CardComponent';
-import Button from './../components/Button';
+import CardComponent from '../components/CardComponent';
+import Button from '../components/Button';
 import ElevatedView from 'react-native-elevated-view';
-import translations from './../utils/translations'
+import translations from '../utils/translations'
 import _ from 'lodash';
 import TopContainerButtons from "../components/TopContainerButtons";
-import PermissionComponent from './../components/PermissionComponent';
-import constants from "./../utils/constants";
+import PermissionComponent from '../components/PermissionComponent';
+import constants from "../utils/constants";
 import {checkArray} from "../utils/typeCheckingFunctions";
-import styles from './../styles';
+import styles from '../styles';
 
 class CaseSinglePersonalContainer extends Component {
 
@@ -68,7 +68,7 @@ class CaseSinglePersonalContainer extends Component {
                         contentContainerStyle={[style.contentContainerStyle, { paddingBottom: this.props.screenSize.height < 600 ? 70 : 20 }]}
                     >
                         {
-                            this.props.preparedFields.personal.map((item, index) => {
+                            this.props.preparedFields?.personal?.map((item, index) => {
                                 if (!item.invisible) {
                                     return this.handleRenderItem(item, index)
                                 }
@@ -172,10 +172,10 @@ class CaseSinglePersonalContainer extends Component {
         if (item.type === 'DropdownInput') {
             item.data = this.computeDataForCasesSingleScreenDropdownInput(item);
         } else if (item.type === 'ActionsBar') {
-            item.onPressArray = [this.props.onDeletePress]
+            item.onPressArray = [this.props?.onDeletePress]
         }
 
-        if (item.type === 'SwitchInput' && this.props.case[item.id] !== undefined) {
+        if (item.type === 'SwitchInput' && this.props?.case?.[item.id] !== undefined) {
             value = this.props.case[item.id]
         } else {
             value = this.computeValueForCasesSingleScreen(item, cardIndex);

@@ -6,7 +6,7 @@
 import React, { Component} from 'react';
 import {View, Text, StyleSheet, Linking, Alert} from 'react-native';
 import {WebView} from 'react-native-webview';
-import {calculateDimension, getTranslation, createDate, callPhone, getMaskRegExpStringForSearch} from './../utils/functions';
+import {calculateDimension, getTranslation, createDate, callPhone, getMaskRegExpStringForSearch} from '../utils/functions';
 import {connect} from "react-redux";
 import DropdownInput from './DropdownInput';
 import DropDown from './DropDown';
@@ -23,10 +23,10 @@ import Section from './Section';
 import Selector from './Selector';
 import IntervalPicker from './IntervalPicker';
 import ActionsBar from './ActionsBar';
-import translations from './../utils/translations';
+import translations from '../utils/translations';
 import SearchableDropdown from './SearchableDropdown';
 import PermissionComponent from './PermissionComponent';
-import styles from "./../styles";
+import styles from "../styles";
 
 class CardComponent extends Component {
 

@@ -9,20 +9,20 @@ import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet
 import {PagerAndroid, PagerPan, PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
-import NavBarCustom from './../components/NavBarCustom';
-import Breadcrumb from './../components/Breadcrumb';
+import NavBarCustom from '../components/NavBarCustom';
+import Breadcrumb from '../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
-import config, {sideMenuKeys} from './../utils/config';
+import config, {sideMenuKeys} from '../utils/config';
 import _, {sortBy, findIndex, remove} from 'lodash';
-import EventSinglePersonalContainer from './../containers/EventSinglePersonalContainer';
-import EventSingleAddressContainer from './../containers/EventSingleAddressContainer';
+import EventSinglePersonalContainer from '../containers/EventSinglePersonalContainer';
+import EventSingleAddressContainer from '../containers/EventSingleAddressContainer';
 import {Icon} from 'react-native-material-ui';
 import {
     addEvent,
     getEventAndRelationshipsById,
     getRelationsContactForEvent, getRelationsExposureForEvent,
     updateEvent
-} from './../actions/events';
+} from '../actions/events';
 import {saveSelectedScreen} from "../actions/app";
 import {
     calculateDimension,
@@ -35,25 +35,24 @@ import {
     mapAnswers,
     reMapAnswers,
     updateRequiredFields
-} from './../utils/functions';
+} from '../utils/functions';
 import moment from 'moment/min/moment.min';
-import translations from './../utils/translations'
+import translations from '../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
-import ViewHOC from './../components/ViewHOC';
+import ViewHOC from '../components/ViewHOC';
 import cloneDeep from "lodash/cloneDeep";
 import lodashIntersect from "lodash/intersection";
 import lodashGet from 'lodash/get';
 import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import withPincode from './../components/higherOrderComponents/withPincode';
-import {checkValidEmails, prepareFieldsAndRoutes, validateRequiredFields} from './../utils/formValidators';
-import {Navigation} from "react-native-navigation";
+import withPincode from '../components/higherOrderComponents/withPincode';
+import {checkValidEmails, prepareFieldsAndRoutes, validateRequiredFields} from '../utils/formValidators';
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import Menu, {MenuItem} from "react-native-material-menu";
 import PermissionComponent from "../components/PermissionComponent";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import EventSingleRelationshipContainer from "../containers/EventSingleRelationshipContainer";
-import styles from './../styles';
+import styles from '../styles';
 import colors from "../styles/colors";
 import EventSingleInvestigationContainer from "../containers/EventSingleInvestigationContainer";
 
@@ -141,19 +140,17 @@ class EventSingleScreen extends Component {
         };
         // Bind here methods, or at least don't declare methods in the render method
         // this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
-        this.screenEventListener = Navigation.events().registerComponentDidDisappearListener(this.onNavigatorEvent.bind(this))
+        // this.screenEventListener = Navigation.events().registerComponentDidDisappearListener(this.onNavigatorEvent.bind(this))
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     componentDidMount() {
-        const listener = {
-            componentDidAppear: () => {
-                this.props.setDisableOutbreakChange(true);
-            }
-        };
-        // Register the listener to all events related to our component
-        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        if (this.props.navigation) {
+             this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+                 this.props.setDisableOutbreakChange(true);
+             });
+        }
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew && this.props.event) {
             getEventAndRelationshipsById(this.props.event._id)
                 .then((eventAndRelations) => {
@@ -198,9 +195,11 @@ class EventSingleScreen extends Component {
     }
 
     componentWillUnmount() {
-        this.navigationListener.remove();
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-        this.screenEventListener.remove();
+        if (this.unsubscribeFocus) {
+             this.unsubscribeFocus();
+        }
+        if (this.backHandler) this.backHandler.remove();
+        // this.screenEventListener.remove();
     }
 
     handleBackButtonClick() {
@@ -209,20 +208,10 @@ class EventSingleScreen extends Component {
                 {
                     text: 'Yes', onPress: () => {
                         if (this.props.isAddFromNavigation) {
-                            Navigation.setStackRoot(this.props.componentId, {
-                                component: {
-                                    name: 'EventsScreen',
-                                    options: {
-                                        animations: {
-                                            push: fadeInAnimation,
-                                            pop: fadeOutAnimation
-                                        }
-                                    }
-                                }
-
-                            })
+                            // Navigation.setStackRoot
+                            if (this.props.navigation) this.props.navigation.navigate('EventsScreen'); 
                         } else {
-                            Navigation.pop(this.props.componentId)
+                            if (this.props.navigation) this.props.navigation.goBack();
                         }
                     }
                 },
@@ -234,19 +223,9 @@ class EventSingleScreen extends Component {
             ])
         } else {
             if (this.props.isAddFromNavigation) {
-                Navigation.setStackRoot(this.props.componentId, {
-                    component: {
-                        name: 'EventsScreen',
-                        options: {
-                            animations: {
-                                push: fadeInAnimation,
-                                pop: fadeOutAnimation
-                            }
-                        }
-                    }
-                })
+                 if (this.props.navigation) this.props.navigation.navigate('EventsScreen'); 
             } else {
-                Navigation.pop(this.props.componentId)
+                if (this.props.navigation) this.props.navigation.goBack();
             }
         }
         return true;
@@ -363,13 +342,9 @@ class EventSingleScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        Navigation.mergeOptions(this.props.componentId, {
-            sideMenu: {
-                left: {
-                    visible: true,
-                },
-            },
-        });
+        if (this.props.navigation) {
+            this.props.navigation.openDrawer();
+        }
     };
 
     handleOnPressDelete = () => {

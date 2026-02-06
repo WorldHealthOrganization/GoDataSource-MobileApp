@@ -1,4 +1,4 @@
-import {insertOrUpdate} from './../queries/sqlTools/helperMethods';
+import {insertOrUpdate} from '../queries/sqlTools/helperMethods';
 export function insertOrUpdateExposure(exposure) {
     exposure.persons?.forEach(person=>{
         if (person.target === true){

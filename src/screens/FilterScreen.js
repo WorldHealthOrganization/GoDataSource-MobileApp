@@ -5,16 +5,15 @@ import {bindActionCreators} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
-import NavBarCustom from './../components/NavBarCustom';
-import {extractIdFromPouchId, getTranslation} from './../utils/functions';
-import config from './../utils/config';
-import {addFilterForScreen, removeFilterForScreen} from './../actions/app';
-import FiltersContainer from './../containers/FiltersContainer';
-import SortContainer from './../containers/SortContainer';
-import translations from './../utils/translations';
-import {Navigation} from "react-native-navigation";
+import NavBarCustom from '../components/NavBarCustom';
+import {extractIdFromPouchId, getTranslation} from '../utils/functions';
+import config from '../utils/config';
+import {addFilterForScreen, removeFilterForScreen} from '../actions/app';
+import FiltersContainer from '../containers/FiltersContainer';
+import SortContainer from '../containers/SortContainer';
+import translations from '../utils/translations';
 import throttle from 'lodash/throttle';
-import styles from './../styles';
+import styles from '../styles';
 
 class FilterScreen extends Component {
 
@@ -323,14 +322,18 @@ class FilterScreen extends Component {
 
     // Buttons action
     handlePressNavbarButton = () => {
-        Navigation.dismissModal(this.props.componentId);
+        if (this.props.navigation) {
+            this.props.navigation.goBack();
+        }
     };
 
     handleResetFilters = async () => {
         const { componentId, screen, onApplyFilters, removeFilterForScreen } = this.props;
 
         removeFilterForScreen(screen);
-        await Navigation.dismissModal(componentId);
+        if (this.props.navigation) {
+            this.props.navigation.goBack();
+        }
         onApplyFilters(null);
     };
 
@@ -407,7 +410,9 @@ class FilterScreen extends Component {
         }
 
         addFilterForScreen(screen, filterClone);
-        await Navigation.dismissModal(componentId);
+        if (this.props.navigation) {
+            this.props.navigation.goBack();
+        }
         onApplyFilters(filterClone)
     };
 

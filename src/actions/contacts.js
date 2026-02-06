@@ -1,9 +1,9 @@
 /**
  * Created by florinpopa on 20/07/2018.
  */
-import {createDate, updateRequiredFields} from './../utils/functions';
+import {createDate, updateRequiredFields} from '../utils/functions';
 import moment from 'moment-timezone';
-import config from './../utils/config';
+import config from '../utils/config';
 import max from 'lodash/max';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -13,7 +13,7 @@ import translations from "../utils/translations";
 import sqlConstants from "../queries/sqlTools/constants";
 import {insertOrUpdateExposure} from './exposure';
 import {getPersonWithRelationsForOutbreakId} from "../queries/sqlTools/sqlQueryInterface";
-import {store} from './../App';
+import {store} from '../App';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function getContactsForOutbreakId({outbreakId, contactsFilter, exposureFilter, lastElement, offset}, computeCount) {

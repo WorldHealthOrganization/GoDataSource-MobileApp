@@ -9,24 +9,25 @@ import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet
 import {PagerAndroid, PagerPan, PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
-import NavBarCustom from './../components/NavBarCustom';
-import Breadcrumb from './../components/Breadcrumb';
+import NavBarCustom from '../components/NavBarCustom';
+import {withNavigationParams} from '../components/higherOrderComponents/withNavigationParams';
+import Breadcrumb from '../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
-import config, {sideMenuKeys} from './../utils/config';
+import config, {sideMenuKeys} from '../utils/config';
 import _, {sortBy, findIndex, remove} from 'lodash';
-import CaseSinglePersonalContainer from './../containers/CaseSinglePersonalContainer';
-import CaseSingleAddressContainer from './../containers/CaseSingleAddressContainer';
-import CaseSingleInfectionContainer from './../containers/CaseSingleInfectionContainer';
+import CaseSinglePersonalContainer from '../containers/CaseSinglePersonalContainer';
+import CaseSingleAddressContainer from '../containers/CaseSingleAddressContainer';
+import CaseSingleInfectionContainer from '../containers/CaseSingleInfectionContainer';
 import CaseSingleInvestigationContainer from '../containers/CaseSingleInvestigationContainer';
 import CaseSingleRelationshipContainer from '../containers/CaseSingleRelationshipContainer';
 import {Icon} from 'react-native-material-ui';
-import {checkForNameDuplicatesRequest} from './../queries/cases';
+import {checkForNameDuplicatesRequest} from '../queries/cases';
 import {
     addCase,
     getCaseAndRelationshipsById,
     getRelationsContactForCase, getRelationsExposureForCase,
     updateCase
-} from './../actions/cases';
+} from '../actions/cases';
 import {saveSelectedScreen} from "../actions/app";
 import {
     calculateDimension,
@@ -39,24 +40,23 @@ import {
     mapAnswers,
     reMapAnswers,
     updateRequiredFields
-} from './../utils/functions';
+} from '../utils/functions';
 import moment from 'moment/min/moment.min';
-import translations from './../utils/translations'
+import translations from '../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
-import ViewHOC from './../components/ViewHOC';
+import ViewHOC from '../components/ViewHOC';
 import cloneDeep from "lodash/cloneDeep";
 import lodashIntersect from "lodash/intersection";
 import lodashGet from 'lodash/get';
 import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import withPincode from './../components/higherOrderComponents/withPincode';
-import {checkValidEmails, prepareFieldsAndRoutes, validateRequiredFields} from './../utils/formValidators';
-import {Navigation} from "react-native-navigation";
+import withPincode from '../components/higherOrderComponents/withPincode';
+import {checkValidEmails, prepareFieldsAndRoutes, validateRequiredFields} from '../utils/formValidators';
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import Menu, {MenuItem} from "react-native-material-menu";
 import PermissionComponent from "../components/PermissionComponent";
 import {setDisableOutbreakChange} from "../actions/outbreak";
-import styles from './../styles';
+import styles from '../styles';
 import colors from "../styles/colors";
 
 const initialLayout = {
@@ -179,28 +179,29 @@ class CaseSingleScreen extends Component {
         };
         // Bind here methods, or at least don't declare methods in the render method
         // this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent.bind(this));
-        this.screenEventListener = Navigation.events().registerComponentDidDisappearListener(this.onNavigatorEvent.bind(this))
+        // this.screenEventListener = Navigation.events().registerComponentDidDisappearListener(this.onNavigatorEvent.bind(this))
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
     componentDidMount() {
-        const listener = {
-            componentDidAppear: () => {
-                this.props.setDisableOutbreakChange(true);
-            }
-        };
-        // Register the listener to all events related to our component
-        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        if (this.props.navigation) {
+             this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+                 this.props.setDisableOutbreakChange(true);
+             });
+             this.unsubscribeBlur = this.props.navigation.addListener('blur', () => {
+                 this.onNavigatorEvent({id: 'didDisappear'});
+             });
+        }
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
-            getCaseAndRelationshipsById(this.props.case._id)
+            getCaseAndRelationshipsById(this.props.case?._id)
                 .then((caseAndRelations) => {
                     let caseData = _.get(caseAndRelations, 'caseData', null);
                     let relationsContact = _.get(caseAndRelations, 'relationshipContactData', []);
                     let relationsExposure = _.get(caseAndRelations, 'relationshipExposureData', []);
 
                     if (caseData !== null) {
-                        let mappedAnswers = mapAnswers(this.props.caseInvestigationQuestions, caseData.questionnaireAnswers);
+                        let mappedAnswers = mapAnswers(this.props.caseInvestigationQuestions, caseData?.questionnaireAnswers || []);
                         let ageClone = {years: 0, months: 0};
                         let updateAge = false;
                         if (_.get(caseData, 'age.years', null) !== null || _.get(caseData, 'age.months', null) !== null) {
@@ -217,7 +218,8 @@ class CaseSingleScreen extends Component {
                         })
                     } else {
                         this.setState({
-                            case: null
+                            case: null,
+                            loading: false
                         })
                     }
                 })
@@ -233,9 +235,14 @@ class CaseSingleScreen extends Component {
     }
 
     componentWillUnmount() {
-        this.navigationListener.remove();
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-        this.screenEventListener.remove();
+        if (this.unsubscribeFocus) {
+             this.unsubscribeFocus();
+        }
+        if (this.unsubscribeBlur) {
+             this.unsubscribeBlur();
+        }
+        if (this.backHandler) this.backHandler.remove();
+        // this.screenEventListener.remove();
     }
 
     handleBackButtonClick() {
@@ -244,20 +251,9 @@ class CaseSingleScreen extends Component {
                 {
                     text: 'Yes', onPress: () => {
                         if (this.props.isAddFromNavigation) {
-                            Navigation.setStackRoot(this.props.componentId, {
-                                component: {
-                                    name: 'CasesScreen',
-                                    options: {
-                                        animations: {
-                                            push: fadeInAnimation,
-                                            pop: fadeOutAnimation
-                                        }
-                                    }
-                                }
-
-                            })
+                            if (this.props.navigation) this.props.navigation.navigate('CasesScreen');
                         } else {
-                            Navigation.pop(this.props.componentId)
+                            if (this.props.navigation) this.props.navigation.goBack();
                         }
                     }
                 },
@@ -269,19 +265,9 @@ class CaseSingleScreen extends Component {
             ])
         } else {
             if (this.props.isAddFromNavigation) {
-                Navigation.setStackRoot(this.props.componentId, {
-                    component: {
-                        name: 'CasesScreen',
-                        options: {
-                            animations: {
-                                push: fadeInAnimation,
-                                pop: fadeOutAnimation
-                            }
-                        }
-                    }
-                })
+                 if (this.props.navigation) this.props.navigation.navigate('CasesScreen');
             } else {
-                Navigation.pop(this.props.componentId)
+                 if (this.props.navigation) this.props.navigation.goBack();
             }
         }
         return true;
@@ -420,13 +406,9 @@ class CaseSingleScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        Navigation.mergeOptions(this.props.componentId, {
-            sideMenu: {
-                left: {
-                    visible: true,
-                },
-            },
-        });
+        if (this.props.navigation) {
+            this.props.navigation.openDrawer();
+        }
     };
 
     handleOnPressDelete = () => {
@@ -946,7 +928,7 @@ class CaseSingleScreen extends Component {
                                 if (_.isFunction(this.props.refresh)) {
                                     this.props.refresh();
                                 }
-                                Navigation.pop(this.props.componentId)
+                                if (this.props.navigation) this.props.navigation.goBack();
                             })
                             .catch((errorUpdateCase) => {
                                 console.log('errorUpdateCase', errorUpdateCase);
@@ -1004,19 +986,9 @@ class CaseSingleScreen extends Component {
                                         this.props.refresh();
                                     }
                                     if (this.props.isAddFromNavigation) {
-                                        Navigation.setStackRoot(this.props.componentId, {
-                                            component: {
-                                                name: 'CasesScreen',
-                                                options: {
-                                                    animations: {
-                                                        push: fadeInAnimation,
-                                                        pop: fadeOutAnimation
-                                                    }
-                                                }
-                                            }
-                                        })
+                                         if (this.props.navigation) this.props.navigation.navigate('CasesScreen');
                                     } else {
-                                        Navigation.pop(this.props.componentId)
+                                         if (this.props.navigation) this.props.navigation.goBack();
                                     }
                                 })
                                 .catch((errorUpdateCase) => {
@@ -1037,17 +1009,10 @@ class CaseSingleScreen extends Component {
                         if (this.props.selectedScreen !== sideMenuKeys[3]) {
                             this.props.saveSelectedScreen(sideMenuKeys[3]);
                         }
-                        Navigation.setStackRoot(this.props.componentId, {
-                            component: {
-                                name: 'CasesScreen',
-                                options: {
-                                    animations: {
-                                        push: fadeInAnimation,
-                                        pop: fadeOutAnimation
-                                    }
-                                }
-                            }
-                        })
+                        if (this.props.selectedScreen !== sideMenuKeys[3]) {
+                            this.props.saveSelectedScreen(sideMenuKeys[3]);
+                        }
+                        if (this.props.navigation) this.props.navigation.navigate('CasesScreen');
                     }
                 },
                 {
@@ -1060,17 +1025,10 @@ class CaseSingleScreen extends Component {
             if (this.props.selectedScreen !== sideMenuKeys[3]) {
                 this.props.saveSelectedScreen(sideMenuKeys[3]);
             }
-            Navigation.setStackRoot(this.props.componentId, {
-                component: {
-                    name: 'CasesScreen',
-                    options: {
-                        animations: {
-                            push: fadeInAnimation,
-                            pop: fadeOutAnimation
-                        }
-                    }
-                }
-            })
+            if (this.props.selectedScreen !== sideMenuKeys[3]) {
+                this.props.saveSelectedScreen(sideMenuKeys[3]);
+            }
+            if (this.props.navigation) this.props.navigation.navigate('CasesScreen');
         }
     };
 
@@ -1228,9 +1186,8 @@ class CaseSingleScreen extends Component {
     };
     handleOnPressEditExposure = (relation, index) => {
         _.set(relation || {}, 'contactData.fullName', computeFullName(_.get(relation, 'contactData', null)));
-        Navigation.showModal(createStackFromComponent({
-            name: 'RelationshipScreen',
-            passProps: {
+        if (this.props.navigation) {
+            this.props.navigation.navigate('RelationshipScreen', {
                 exposure: _.get(relation, 'relationshipData', null),
                 selectedExposure: _.get(relation, 'contactData', null),
                 contact: this.props.isNew ? null : this.props.contact,
@@ -1240,8 +1197,8 @@ class CaseSingleScreen extends Component {
                 isEditMode: false,
                 addContactFromCasesScreen: false,
                 refreshRelations: this.refreshRelations
-            }
-        }))
+            });
+        }
     };
     refreshRelations = (exposure) => {
         this.setState({
@@ -2488,6 +2445,7 @@ function matchDispatchProps(dispatch) {
 }
 
 export default compose(
+    withNavigationParams,
     withPincode(),
     connect(mapStateToProps, matchDispatchProps)
 )(CaseSingleScreen);

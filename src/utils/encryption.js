@@ -1,8 +1,10 @@
 /**
  * Created by florinpopa on 07/11/2018.
  */
-import crypto from 'react-native-quick-crypto';
+import CryptoJS from 'crypto-js';
 import {Buffer} from 'buffer';
+import {getRandomValues} from 'react-native-get-random-values';
+
 
 // encryption parameters
 const
@@ -26,23 +28,23 @@ const
  * @param password
  * @param callback (error, encrypted buffer)
  */
-function createKeyIv(password, callback) {
-    // generate salt
-    const salt = crypto.randomBytes(saltLength);
-    // generate IV
-    const iv = crypto.randomBytes(ivLength);
-    // derive encryption key from password & salt
-    crypto.pbkdf2(password, salt, iterations, keyLength, digest, function (err, key) {
-        if (err) {
-            callback(err);
-        }
-        callback(null, {
-            salt: salt,
-            key: key,
-            iv: iv
-        });
-    });
+function createKeyIv(password) {
+  const salt = randomBytes(saltLength);
+  const iv = randomBytes(ivLength);
+
+  const key = CryptoJS.PBKDF2(password, CryptoJS.enc.Hex.parse(salt.toString('hex')), {
+    keySize: keyLength / 4,
+    iterations,
+    hasher: CryptoJS.algo.SHA256,
+  });
+
+  return {
+    salt,
+    key: Buffer.from(key.toString(), 'hex'),
+    iv,
+  };
 }
+
 
 /**
  * Encrypts data
@@ -51,26 +53,34 @@ function createKeyIv(password, callback) {
  * @return {Promise<any>}
  */
 export function encrypt(password, data) {
-    // promisify the result
-    return new Promise(function (resolve, reject) {
-        // prepare encryption key & IV
-        // convert from base64
-        data = Buffer.from(data, 'base64');
-        createKeyIv(password, function (err, key) {
-            if (err) {
-                return reject(err);
-            }
-            // encipher data
-            try {
-                const cipher = crypto.createCipheriv(algorithm, key.key, key.iv);
-                const result = Buffer.concat([key.iv, key.salt, Buffer.from(cipher.update(data)), Buffer.from(cipher.final())]);
-                resolve(result.toString('base64'));
-            } catch (e) {
-                console.log("Crypto error", e);
-            }
-        });
-    });
+  return new Promise((resolve, reject) => {
+    try {
+      data = Buffer.from(data, 'base64');
+      const keyData = createKeyIv(password);
+
+      const encrypted = CryptoJS.AES.encrypt(
+        CryptoJS.lib.WordArray.create(data),
+        CryptoJS.enc.Hex.parse(keyData.key.toString('hex')),
+        {
+          iv: CryptoJS.enc.Hex.parse(keyData.iv.toString('hex')),
+          mode: CryptoJS.mode.CTR,
+          padding: CryptoJS.pad.NoPadding,
+        }
+      );
+
+      const result = Buffer.concat([
+        keyData.iv,
+        keyData.salt,
+        Buffer.from(encrypted.ciphertext.toString(), 'hex'),
+      ]);
+
+      resolve(result.toString('base64'));
+    } catch (e) {
+      reject(e);
+    }
+  });
 }
+
 
 /**
  * Decrypts data
@@ -79,37 +89,37 @@ export function encrypt(password, data) {
  * @return {Promise<any>}
  */
 export function decrypt(password, data) {
-    // promisify the result
-    return new Promise(function (resolve, reject) {
-        // convert from base64
-        const cypherText = Buffer.from(data, 'base64');
-        // read IV
-        const iv = cypherText.slice(0, ivLength);
-        // read salt
-        const salt = cypherText.slice(ivLength, ivLength + saltLength);
-        // read encrypted text
-        const encrypted = cypherText.slice(ivLength + saltLength);
-        // derive key from password & salt
-        crypto.pbkdf2(password, salt, iterations, keyLength, digest, function (err, key) {
-            if (err) {
-                return reject(err);
-            }
-            let error;
-            let buffer;
-            try {
-                // decipher text
-                const decipher = crypto.createCipheriv(algorithm, key, iv);
-                buffer = Buffer.concat([Buffer.from(decipher.update(encrypted)) , Buffer.from(decipher.final())]);
-            } catch (decipherError) {
-                error = new Error('Failed to decrypt config properties. Stack Trace: ' + decipherError.stack);
-            }
-            if (error) {
-                return reject(error);
-            }
-            resolve(buffer.toString('base64'));
-        });
-    });
+  return new Promise((resolve, reject) => {
+    try {
+      const cipherText = Buffer.from(data, 'base64');
+      const iv = cipherText.slice(0, ivLength);
+      const salt = cipherText.slice(ivLength, ivLength + saltLength);
+      const encrypted = cipherText.slice(ivLength + saltLength);
+
+      const key = CryptoJS.PBKDF2(password, CryptoJS.enc.Hex.parse(salt.toString('hex')), {
+        keySize: keyLength / 4,
+        iterations,
+        hasher: CryptoJS.algo.SHA256,
+      });
+
+      const decrypted = CryptoJS.AES.decrypt(
+        {ciphertext: CryptoJS.enc.Hex.parse(encrypted.toString('hex'))},
+        key,
+        {
+          iv: CryptoJS.enc.Hex.parse(iv.toString('hex')),
+          mode: CryptoJS.mode.CTR,
+          padding: CryptoJS.pad.NoPadding,
+        }
+      );
+
+      const result = Buffer.from(decrypted.toString(), 'hex');
+      resolve(result.toString('base64'));
+    } catch (e) {
+      reject(e);
+    }
+  });
 }
+
 
 export function getSyncEncryptPassword(password, clientCredentials) {
     // if a password was not provided, but client credentials were
@@ -132,8 +142,14 @@ export function getSyncEncryptPassword(password, clientCredentials) {
  */
 function sha256(string){
     try {
-        return crypto.createHash('sha256').update(string).digest('hex');
+        return CryptoJS.SHA256(string).toString(CryptoJS.enc.Hex);
     } catch (e) {
         console.log("Crypto error", e);
     }
+}
+
+function randomBytes(length) {
+  const arr = new Uint8Array(length);
+  getRandomValues(arr);
+  return Buffer.from(arr);
 }

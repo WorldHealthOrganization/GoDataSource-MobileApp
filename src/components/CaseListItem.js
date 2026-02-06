@@ -9,15 +9,15 @@
 import React, {Component} from 'react';
 import { View, Text, StyleSheet,Image, InteractionManager} from 'react-native';
 import {ListItem, Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import {calculateDimension, getTranslation} from '../utils/functions';
+import config from '../utils/config';
 import {connect} from 'react-redux';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
-import translations from './../utils/translations'
-import {getAddress} from './../utils/functions';
+import translations from '../utils/translations'
+import {getAddress} from '../utils/functions';
 import get from 'lodash/get';
-import styles from './../styles';
+import styles from '../styles';
 
 class CaseListItem extends Component {
 

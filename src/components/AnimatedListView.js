@@ -6,10 +6,10 @@
 import React, {Component} from 'react';
 import {View, Text, ActivityIndicator, Animated, FlatList, Alert, StyleSheet} from 'react-native';
 import geolocation from '@react-native-community/geolocation';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import translations from './../utils/translations';
+import translations from '../utils/translations';
 import get from 'lodash/get';
 import PersonListItem from "./PersonListItem";
 import PropTypes from 'prop-types';
@@ -17,7 +17,7 @@ import SearchFilterView from "./SearchFilterView";
 import config from "../utils/config";
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import styles from './../styles';
+import styles from '../styles';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 

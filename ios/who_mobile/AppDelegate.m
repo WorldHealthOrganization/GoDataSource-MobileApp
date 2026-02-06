@@ -9,9 +9,7 @@
 
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
-#import <ReactNativeNavigation/ReactNativeNavigation.h>
-
-#import <React/RCTBundleURLProvider.h>
+#import <React/RCTBridge.h>
 
 #import "APNSEventEmitter.h"
 #import "APNSEventManager.h"
@@ -59,21 +57,9 @@ static void InitializeFlipper(UIApplication *application) {
   InitializeFlipper(application);
 #endif
   
-  NSURL *jsCodeLocation;
-#ifdef DEBUG
-  jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-#else
-  jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-#endif
   
   self.queuedNotifications = [NSMutableArray array];
   
-  self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    if (@available(iOS 13.0, *)) {
-        self.window.backgroundColor = [UIColor systemBackgroundColor];
-    } else {
-        self.window.backgroundColor = [UIColor whiteColor];
-    }
   
   [self registerForRemoteNotifications:[UIApplication sharedApplication]];
   
@@ -88,7 +74,22 @@ static void InitializeFlipper(UIApplication *application) {
     [self application:application didReceiveRemoteNotification:notification];
   }
   
-  [ReactNativeNavigation bootstrapWithDelegate:self launchOptions:launchOptions];
+  RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+  RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
+                                                   moduleName:@"who_mobile"
+                                            initialProperties:nil];
+
+  if (@available(iOS 13.0, *)) {
+      rootView.backgroundColor = [UIColor systemBackgroundColor];
+  } else {
+      rootView.backgroundColor = [UIColor whiteColor];
+  }
+
+  self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+  UIViewController *rootViewController = [UIViewController new];
+  rootViewController.view = rootView;
+  self.window.rootViewController = rootViewController;
+  [self.window makeKeyAndVisible];
   
   return YES;
 }
@@ -102,9 +103,7 @@ static void InitializeFlipper(UIApplication *application) {
   #endif
 }
 
-- (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge {
-  return [ReactNativeNavigation extraModulesForBridge:bridge];
-}
+
 
 - (void)registerForRemoteNotifications:(UIApplication *)application {
   if ([application respondsToSelector:@selector(registerUserNotificationSettings:)]) {

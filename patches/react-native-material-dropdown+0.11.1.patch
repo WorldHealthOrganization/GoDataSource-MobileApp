@@ -1,0 +1,26 @@
+diff --git a/node_modules/react-native-material-dropdown/src/components/dropdown/index.js b/node_modules/react-native-material-dropdown/src/components/dropdown/index.js
+index b1e65a1..96c3809 100644
+--- a/node_modules/react-native-material-dropdown/src/components/dropdown/index.js
++++ b/node_modules/react-native-material-dropdown/src/components/dropdown/index.js
+@@ -133,7 +133,7 @@ export default class Dropdown extends PureComponent {
+     disabledItemColor: PropTypes.string,
+     baseColor: PropTypes.string,
+ 
+-    itemTextStyle: Text.propTypes.style,
++    itemTextStyle: PropTypes.any,
+ 
+     itemCount: PropTypes.number,
+     itemPadding: PropTypes.number,
+@@ -146,9 +146,9 @@ export default class Dropdown extends PureComponent {
+     renderBase: PropTypes.func,
+     renderAccessory: PropTypes.func,
+ 
+-    containerStyle: (ViewPropTypes || View.propTypes).style,
+-    overlayStyle: (ViewPropTypes || View.propTypes).style,
+-    pickerStyle: (ViewPropTypes || View.propTypes).style,
++    containerStyle: null,
++    overlayStyle: null,
++    pickerStyle: null,
+ 
+     supportedOrientations: PropTypes.arrayOf(PropTypes.string),
+ 

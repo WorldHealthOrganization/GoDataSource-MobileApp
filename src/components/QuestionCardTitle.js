@@ -3,7 +3,7 @@
  */
 import React, {PureComponent} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import styles from './../styles';
+import styles from '../styles';
 
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box

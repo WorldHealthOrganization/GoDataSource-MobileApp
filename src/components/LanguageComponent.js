@@ -7,14 +7,14 @@ import lodashDifference from 'lodash/differenceBy';
 import {Dropdown} from 'react-native-material-dropdown';
 import LanguageModalComponent from './LanguageModalComponent';
 import {updateRequiredFields, getTranslation} from "../utils/functions";
-import {updateUser} from './../actions/user';
-import {getTranslationsAsync, addLanguagePacks} from './../actions/app';
+import {updateUser} from '../actions/user';
+import {getTranslationsAsync, addLanguagePacks} from '../actions/app';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import {selectTranslations, selectUserLanguage, selectUser, selectAllLanguages, selectOutbreak} from './../utils/selectors';
+import {selectTranslations, selectUserLanguage, selectUser, selectAllLanguages, selectOutbreak} from '../utils/selectors';
 import {useSetStateWithCallback} from "../utils/hooks";
-import translations from './../utils/translations';
-import {Navigation} from "react-native-navigation";
-import styles from './../styles';
+import translations from '../utils/translations';
+import styles from '../styles';
+import { useNavigation } from '@react-navigation/native';
 
 const selectReduxDataForLanguageComponent = createSelector(
     [selectTranslations, selectUserLanguage, selectAllLanguages, selectUser, selectOutbreak],
@@ -36,16 +36,11 @@ const LanguageComponent = React.memo(({style, componentId}) => {
         }
     }, [deviceLanguages, apiLanguages]);
 
+    const navigation = useNavigation();
     function setUserLanguage(value) {
         // console.log('value', value)
         if (value === 'addLanguagePack') {
-            Navigation.mergeOptions(componentId, {
-                sideMenu: {
-                    left: {
-                        visible: false,
-                    },
-                },
-            });
+            navigation.closeDrawer();
             //Timeout?
             setTimeout(() => {
                 setShowModal(true);

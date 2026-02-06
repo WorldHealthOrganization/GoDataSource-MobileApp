@@ -3,10 +3,10 @@ import {Text, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
-import {calculateDimension, getTranslation} from './../utils/functions';
-import FollowUpsSingleQuestionnarireContainer from './../containers/FollowUpsSingleQuestionnaireContainer';
-import FollowUpsSingleGetInfoContainer from './../containers/FollowUpsSingleGetInfoContainer'
-import FollowUpsSingleAddressContainer from './../containers/FollowUpsSingleAddressContainer'
+import {calculateDimension, getTranslation} from '../utils/functions';
+import FollowUpsSingleQuestionnarireContainer from '../containers/FollowUpsSingleQuestionnaireContainer';
+import FollowUpsSingleGetInfoContainer from '../containers/FollowUpsSingleGetInfoContainer'
+import FollowUpsSingleAddressContainer from '../containers/FollowUpsSingleAddressContainer'
 import Collapsible from 'react-native-collapsible';
 import get from "lodash/get";
 import translation from "../utils/translations";

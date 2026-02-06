@@ -1,13 +1,12 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {View, AppState} from 'react-native';
 import PINCode, {deleteUserPinCode, resetPinCodeInternalStates} from '@haskkor/react-native-pincode';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
-import {logoutUser} from './../../actions/user';
-import appConfig from './../../../app.config';
+import {logoutUser} from '../../actions/user';
+import appConfig from '../../../app.config';
 import {LoaderScreen} from 'react-native-ui-lib';
-import {Navigation} from "react-native-navigation";
-import styles from './../../styles';
+import styles from '../../styles';
 
 export default function withPincode() {
     return function withPincodeFunction (WrappedComponent) {
@@ -33,50 +32,33 @@ export default function withPincode() {
                         .then((resp) => AsyncStorage.getItem('wasPinSet'))
                         .then((hasPin) => {
                             if (props.isAppInitialize) {
-                                Navigation.mergeOptions(props.componentId, {
-                                    sideMenu: {
-                                        left: {
-                                            visible: false,
-                                        },
-                                    },
-                                });
-                                // Navigation.setDrawerEnabled({
-                                //     side: 'left',
-                                //     enabled: false
-                                // });
+                                // Lock drawer if needed, but for now we set status
                                 setStatus(hasPin ? 'enter' : 'choose');
                             } else {
                                 setValidPinCode(true);
                             }
 
                             if (hasPin || props.isAppInitialize) {
-                                AppState.addEventListener('change', handleAppStateChange);
-
-                                // This is added because the event listener is added after the app changes state.
-                                // The initialization from the top makes it 'background', and it would remain to background unless updated manually here
-                                // Since this code is only ran at the first render, this should not cause any issues
+                                const subscription = AppState.addEventListener('change', handleAppStateChange);
                                 appStateStatus.current = AppState.currentState;
+
+                                return () => {
+                                    subscription.remove();
+                                };
                             }
                         });
                 }
 
                 return () => {
                     // console.log("withPincode component has unmounted somehow ", appStateStatus, appStateStatusTimer);
-                    AppState.removeEventListener('change', handleAppStateChange);
                 }
             }, []);
 
             const handleAppStateChange = (nextAppState) => {
                 // console.log(`withPincode handleAppStateChange appStateStatus: ${appStateStatus.current} --- nextAppState: ${nextAppState}`);
-                if (props && props.componentId) {
-                    Navigation.mergeOptions(props.componentId, {
-                        sideMenu: {
-                            left: {
-                                visible: false,
-                            },
-                        },
-                    });
-                }
+                // if (props && props.componentId) {
+                //    // Lock drawer?
+                // }
                 if (appStateStatus.current ==='active' && nextAppState.match(/inactive|background/)) {
                     // console.log("withPincode moving to background", appStateStatus, appStateStatusTimer);
                     appStateStatusTimer.current = new Date().getTime();
@@ -84,13 +66,7 @@ export default function withPincode() {
                 if (appStateStatus.current.match(/inactive|background/) && nextAppState === 'active') {
                     // console.log("withPincode coming from background", appStateStatus, appStateStatusTimer);
                     if (new Date().getTime() - appStateStatusTimer.current > INACTIVE_TIMEOUT) {
-                        Navigation.mergeOptions(props.componentId, {
-                            sideMenu: {
-                                left: {
-                                    visible: false,
-                                },
-                            },
-                        });
+                        // Lock drawer?
                         // props.navigator.setDrawerEnabled({
                         //     side: 'left',
                         //     enabled: false
@@ -130,13 +106,7 @@ export default function withPincode() {
                     console.log('wasPinSetError: ', wasPinSetError);
                 }
                 console.log("FINISH PROCESS?");
-                Navigation.mergeOptions(props.componentId, {
-                    sideMenu: {
-                        left: {
-                            visible: false,
-                        },
-                    },
-                });
+                // Unlock drawer?
                 // props.navigator.setDrawerEnabled({
                 //     side: 'left',
                 //     enabled: true

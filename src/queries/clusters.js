@@ -1,5 +1,5 @@
 import {getDatabase} from './database';
-import config from './../utils/config';
+import config from '../utils/config';
 
 export function getClustersdRequest (outbreakId, callback) {
     let start = new Date().getTime();

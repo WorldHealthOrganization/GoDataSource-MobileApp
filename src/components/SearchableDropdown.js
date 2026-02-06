@@ -8,11 +8,11 @@ import TextInput from './TextInput';
 import {useSelector} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 import debounce from 'lodash/debounce';
-import {getPersonsByName} from './../actions/cases';
-import {computeFullName} from './../utils/functions';
-import translations from './../utils/translations';
+import {getPersonsByName} from '../actions/cases';
+import {computeFullName} from '../utils/functions';
+import translations from '../utils/translations';
 import lodashGet from "lodash/get";
-import {createSelector} from "reselect/lib/index";
+import {createSelector} from "reselect";
 
 const selectOutbreakId = createSelector(
     state => lodashGet(state, 'outbreak._id', null),
@@ -124,7 +124,7 @@ SearchableDropDown.propTypes = {
     isEditMode: PropTypes.bool,
     onSelectExposure: PropTypes.func,
     value: PropTypes.string,
-    type: PropTypes.oneOf('Contact', 'Case').required
+    type: PropTypes.oneOf(['Contact', 'Case']).required
 };
 
 SearchableDropDown.defaultProps = {

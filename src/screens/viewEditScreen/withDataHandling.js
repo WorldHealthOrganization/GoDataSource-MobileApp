@@ -8,12 +8,11 @@ import {getContactById, getExposuresForContact} from '../../actions/contacts';
 import {getFollowUpById, getFollowUpsForContactId} from '../../actions/followUps';
 import {getItemByIdRequest, getRelationsForCase} from '../../actions/cases';
 import translations from "../../utils/translations";
-import {calcDateDiff, createDate, getLocationAccurate, getTranslation} from "./../../utils/functions";
+import {calcDateDiff, createDate, getLocationAccurate, getTranslation} from "../../utils/functions";
 import lodashCloneDeep from "lodash/cloneDeep";
-import {checkArray, checkArrayAndLength, checkInteger, checkObject} from './../../utils/typeCheckingFunctions';
+import {checkArray, checkArrayAndLength, checkInteger, checkObject} from '../../utils/typeCheckingFunctions';
 import {extractAllQuestions, extractIdFromPouchId} from "../../utils/functions";
 import _, {sortBy} from "lodash";
-import {Navigation} from "react-native-navigation";
 import cloneDeep from "lodash/cloneDeep";
 
 export function enhanceTabsWithDataHandling() {
@@ -711,7 +710,7 @@ export function enhanceTabsWithDataHandling() {
                     previousAnswers: Object.assign({}, prevState.previousAnswers, { [previousAnswersId]: previousAnswers }),
                     isModified: true
                 }), () => {
-                    Navigation.dismissAllModals();
+                    if (this.props.navigation) this.props.navigation.goBack();
                 })
             };
             copyAnswerDate = (value) => {

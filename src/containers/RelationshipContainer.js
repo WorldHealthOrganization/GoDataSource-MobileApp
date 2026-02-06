@@ -5,13 +5,13 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {InteractionManager, ScrollView, StyleSheet, View} from 'react-native';
-import {calculateDimension, computeFullName, extractIdFromPouchId, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import {calculateDimension, computeFullName, extractIdFromPouchId, getTranslation} from '../utils/functions';
+import config from '../utils/config';
 import {connect} from "react-redux";
-import CardComponent from './../components/CardComponent';
+import CardComponent from '../components/CardComponent';
 import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
-import styles from './../styles';
+import styles from '../styles';
 
 class RelationshipContainer extends PureComponent {
 

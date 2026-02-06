@@ -6,12 +6,11 @@
 import React, {PureComponent} from 'react';
 import {InteractionManager, Platform, StyleSheet, Text, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
-import {Navigation} from "react-native-navigation";
-import styles from './../styles';
+import styles from '../styles';
 
 class NavBarCustom extends PureComponent {
 
@@ -92,13 +91,11 @@ class NavBarCustom extends PureComponent {
         console.log("Clicked the nav bar button");
         InteractionManager.runAfterInteractions(() => {
             console.log("After interaction", this.props.componentId);
-            Navigation.mergeOptions(this.props.componentId,{
-                sideMenu: {
-                    left: {
-                        visible: true
-                    }
-                }});
-            this.props.handlePressNavbarButton();
+            if (this.props.handlePressNavbarButton) {
+                this.props.handlePressNavbarButton();
+            } else if (this.props.navigation) {
+                this.props.navigation.openDrawer();
+            }
         })
     }
 

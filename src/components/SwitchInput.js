@@ -4,12 +4,12 @@
 import React, {PureComponent} from 'react';
 import {Text, View, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
-import translations from './../utils/translations'
-import {getTooltip, getTranslation} from './../utils/functions';
+import translations from '../utils/translations'
+import {getTooltip, getTranslation} from '../utils/functions';
 import TooltipComponent from './TooltipComponent';
 import {Switch} from 'react-native-ui-lib';
-import {isFunction} from './../utils/typeCheckingFunctions';
-import styles from './../styles';
+import {isFunction} from '../utils/typeCheckingFunctions';
+import styles from '../styles';
 
 class SwitchInput extends PureComponent {
 

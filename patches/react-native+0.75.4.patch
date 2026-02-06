@@ -1,0 +1,29 @@
+diff --git a/node_modules/react-native/index.js b/node_modules/react-native/index.js
+index f087b70..0506932 100644
+--- a/node_modules/react-native/index.js
++++ b/node_modules/react-native/index.js
+@@ -190,7 +190,11 @@ module.exports = {
+     return require('./Libraries/Components/Touchable/TouchableWithoutFeedback');
+   },
+   get View(): View {
+-    return require('./Libraries/Components/View/View');
++    const View = require('./Libraries/Components/View/View');
++    if (View && !View.propTypes) {
++      View.propTypes = { style: () => null };
++    }
++    return View;
+   },
+   get VirtualizedList(): VirtualizedList {
+     return require('./Libraries/Lists/VirtualizedList');
+@@ -380,6 +384,11 @@ module.exports = {
+         'LogBox is enabled by default so there is no need to call unstable_enableLogBox() anymore. This is a no op and will be removed in the next version.',
+       );
+   },
++  // --- EMERGENCY FIX FOR VIEWPROPTYPES ---
++  get ViewPropTypes(): any {
++    return require('deprecated-react-native-prop-types').ViewPropTypes || { style: () => null };
++  },
++  // --- END FIX ---
+ };
+ 
+ if (__DEV__) {

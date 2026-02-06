@@ -1,7 +1,7 @@
 /**
  * Created by mobileclarisoft on 05/12/2018.
  */
-import config from './../utils/config';
+import config from '../utils/config';
 import {rawSQLQuery} from "./sqlHelper";
 import {getDatabase} from "./database";
 

@@ -7,24 +7,24 @@ import React, {Component} from 'react';
 import geolocation from '@react-native-community/geolocation';
 import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import NavBarCustom from './../components/NavBarCustom';
-import ViewHOC from './../components/ViewHOC';
-import config from './../utils/config';
+import NavBarCustom from '../components/NavBarCustom';
+import ViewHOC from '../components/ViewHOC';
+import config from '../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
 import {TabBar, TabView} from 'react-native-tab-view';
-import ContactsSingleAddress from './../containers/ContactsSingleAddress';
-import ContactsSingleCalendar from './../containers/ContactsSingleCalendar';
-import ContactsSingleRelationship from './../containers/ContactsSingleRelationship';
-import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
-import ContactsSingleQuestionnaire from './../containers/ContactsSingleQuestionnaire';
-import RelationshipScreen from './../screens/RelationshipScreen';
-import Breadcrumb from './../components/Breadcrumb';
+import ContactsSingleAddress from '../containers/ContactsSingleAddress';
+import ContactsSingleCalendar from '../containers/ContactsSingleCalendar';
+import ContactsSingleRelationship from '../containers/ContactsSingleRelationship';
+import ContactsSinglePersonal from '../containers/ContactsSinglePersonal';
+import ContactsSingleQuestionnaire from '../containers/ContactsSingleQuestionnaire';
+import RelationshipScreen from './RelationshipScreen';
+import Breadcrumb from '../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import {addFollowUp, getFollowUpsForContactId, updateFollowUpAndContact} from './../actions/followUps';
-import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
-import {removeErrors} from './../actions/errors';
+import {addFollowUp, getFollowUpsForContactId, updateFollowUpAndContact} from '../actions/followUps';
+import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from '../actions/contacts';
+import {removeErrors} from '../actions/errors';
 import _, {findIndex, sortBy, remove} from 'lodash';
 import {
     calculateDimension,
@@ -35,9 +35,9 @@ import {
     getTranslation,
     navigation,
     updateRequiredFields
-} from './../utils/functions';
+} from '../utils/functions';
 import moment from 'moment/min/moment.min';
-import translations from './../utils/translations';
+import translations from '../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import AddFollowUpScreen from './AddFollowUpScreen';
 import {
@@ -49,23 +49,23 @@ import {
 } from "../utils/functions";
 import constants from "../utils/constants";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import PermissionComponent from './../components/PermissionComponent';
+import PermissionComponent from '../components/PermissionComponent';
 import lodashIntersect from 'lodash/intersection';
-import {getItemByIdRequest} from './../actions/cases';
+import {getItemByIdRequest} from '../actions/cases';
 import lodashGet from "lodash/get";
 import cloneDeep from "lodash/cloneDeep";
-import withPinconde from './../components/higherOrderComponents/withPincode';
+import withPinconde from '../components/higherOrderComponents/withPincode';
+import {withNavigationParams} from '../components/higherOrderComponents/withNavigationParams';
 import {
     validateRequiredFields,
     checkValidEmails,
     formValidator,
     prepareFieldsAndRoutes
-} from './../utils/formValidators';
-import {Navigation} from "react-native-navigation";
+} from '../utils/formValidators';
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import {getContactRelationForContact} from "../actions/contacts";
-import styles from './../styles';
+import styles from '../styles';
 import get from "lodash/get";
 import colors from "../styles/colors";
 
@@ -195,15 +195,13 @@ class ContactsSingleScreen extends Component {
 
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
-        const listener = {
-            componentDidAppear: () => {
-                this.props.setDisableOutbreakChange(true);
-            }
-        };
-        // Register the listener to all events related to our component
-        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+        if (this.props.navigation) {
+             this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+                 this.props.setDisableOutbreakChange(true);
+             });
+        }
 
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
             let ageClone = {years: 0, months: 0};
             let updateAge = false;
@@ -217,7 +215,7 @@ class ContactsSingleScreen extends Component {
                     console.log('old contact with age as string update')
                 })
             }
-            let mappedAnswers = mapAnswers(this.props.caseInvestigationQuestions, this.props.contact.questionnaireAnswers);
+            let mappedAnswers = mapAnswers(this.props.caseInvestigationQuestions, this.props.contact?.questionnaireAnswers || []);
             //permissions check
             let isEditMode = _.get(this.props, 'isEditMode', false);
             this.setState({
@@ -278,8 +276,10 @@ class ContactsSingleScreen extends Component {
     };
 
     componentWillUnmount() {
-        this.navigationListener.remove();
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+        if (this.unsubscribeFocus) {
+             this.unsubscribeFocus();
+        }
+        if (this.backHandler) this.backHandler.remove();
     };
 
     handleBackButtonClick() {
@@ -288,7 +288,7 @@ class ContactsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        Navigation.pop(this.props.componentId)
+                        if (this.props.navigation) this.props.navigation.goBack();
                     }
                 },
                 {
@@ -298,7 +298,7 @@ class ContactsSingleScreen extends Component {
                 }
             ])
         } else {
-            Navigation.pop(this.props.componentId);
+            if (this.props.navigation) this.props.navigation.goBack();
         }
         return true;
     };
@@ -497,24 +497,15 @@ class ContactsSingleScreen extends Component {
             //         text: 'Follow-up added'
             //     }
             // })
-            Navigation.push(this.props.componentId, {
-                component: {
-                    name: 'FollowUpsSingleScreen',
-                    options: {
-                        animations: {
-                            push: fadeInAnimation,
-                            pop: fadeOutAnimation
-                        }
-                    },
-                    passProps: {
-                        isNew: true,
-                        isEditMode: true,
-                        item: followUp,
-                        contact: this.state.contact,
-                        previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
-                    }
-                }
-            })
+            if (this.props.navigation) {
+                this.props.navigation.navigate('FollowUpsSingleScreen', {
+                    isNew: true,
+                    isEditMode: true,
+                    item: followUp,
+                    contact: this.state.contact,
+                    previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
+                });
+            }
             // })
             // .catch((errorAddFollowUp) => {
             //     console.log('ErrorAddFollowUp: ', errorAddFollowUp);
@@ -552,13 +543,9 @@ class ContactsSingleScreen extends Component {
         ])
     };
     handlePressNavbarButton = () => {
-        Navigation.mergeOptions(this.props.componentId, {
-            sideMenu: {
-                left: {
-                    visible: true,
-                },
-            },
-        });
+        if (this.props.navigation) {
+            this.props.navigation.openDrawer();
+        }
     };
 
     handleOnIndexChange = _.throttle((index) => {
@@ -2358,6 +2345,7 @@ function matchDispatchProps(dispatch) {
 };
 
 export default compose(
+    withNavigationParams,
     withPinconde(),
     connect(mapStateToProps, matchDispatchProps)
 )(ContactsSingleScreen);

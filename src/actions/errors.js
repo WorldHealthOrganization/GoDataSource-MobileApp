@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 01/08/2018.
  */
-import {ACTION_TYPE_ADD_ERROR, ACTION_TYPE_REMOVE_ERRORS} from './../utils/enums';
+import {ACTION_TYPE_ADD_ERROR, ACTION_TYPE_REMOVE_ERRORS} from '../utils/enums';
 
 export function addError(error) {
     return {

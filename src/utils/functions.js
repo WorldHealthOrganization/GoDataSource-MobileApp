@@ -3,33 +3,38 @@
  */
 import errorTypes from './errorTypes';
 import config, {sideMenuKeys} from './config';
-import appConfig from './../../app.config';
+import appConfig from '../../app.config';
 import geolocation from '@react-native-community/geolocation';
-import RNFetchBlobFS from 'rn-fetch-blob/fs';
+import RNFetchBlobFS from 'react-native-blob-util/fs';
+
 import {unzip, zip} from 'react-native-zip-archive';
-import {processBulkDocs, updateFileInDatabase} from './../queries/database';
-import {setSyncState} from './../actions/app';
+import {processBulkDocs, updateFileInDatabase} from '../queries/database';
+import {setSyncState} from '../actions/app';
 import {Alert, Linking, NativeModules} from 'react-native';
-import uuid from 'react-native-uuid';
+import { v4 as uuidv4 } from 'uuid';
 import get from 'lodash/get';
 import sortBy from 'lodash/sortBy';
 import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
 import set from 'lodash/set';
 import defaultTranslations from './defaultTranslations'
-import {decrypt, encrypt, getSyncEncryptPassword} from './../utils/encryption';
-import {extractLocations} from './../actions/locations';
+import {decrypt, encrypt, getSyncEncryptPassword} from './encryption';
+import {extractLocations} from '../actions/locations';
 import moment from 'moment-timezone';
 import {checkArrayAndLength} from './typeCheckingFunctions';
-import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
+import {executeQuery, insertOrUpdate} from '../queries/sqlTools/helperMethods';
 import translations from "./translations";
-import sqlConstants from './../queries/sqlTools/constants';
+import sqlConstants from '../queries/sqlTools/constants';
 import constants from "./constants";
 import lodashMemoize from "lodash/memoize";
 import lodashIsEqual from "lodash/isEqual";
 import lodashIntersection from "lodash/intersection";
-import { store } from "./../App";
+import { store } from "../App";
 import {exists} from "react-native-fs";
+import {createDate} from './shared';
+// utils/functions.js
+export { createDate } from './shared';
+
 
 export const checkPermissions = lodashMemoize((permissionsList, outbreakPermissions, outbreak, permissions) => {
     if (!checkArrayAndLength(permissionsList) && !checkArrayAndLength(outbreakPermissions)) {
@@ -778,7 +783,7 @@ export function computeIdForFileType(fileType, outbreakId, file, type) {
 }
 
 export function generateId() {
-    return uuid.v4();
+    return uuidv4();
 }
 
 export function updateRequiredFields(outbreakId, userId, record, action, fileType = '', type = '') {
@@ -1463,25 +1468,7 @@ export function getDropDownInputDisplayParameters(screenSize, dropDownDataLength
     }
 }
 
-export function createDate(date, isEndOfDay, accurateDate) {
-    const timezone = store?.getState().app.timezone;
-    if (accurateDate) {
-        if (date) {
-            return moment.tz(date, timezone).toDate();
-        }
-        return moment.tz(timezone).toDate();
-    }
-    if (isEndOfDay) {
-        if (date) {
-            return moment.tz(date, timezone).endOf('day').toDate();
-        }
-        return moment.tz(timezone).endOf('day').toDate();
-    }
-    if (date) {
-        return moment.tz(date, timezone).startOf('day').toDate();
-    }
-    return moment.tz(timezone).startOf('day').toDate();
-}
+// createDate moved to shared.js
 
 export function daysSince(startDate, endDate) {
     if (!startDate || !endDate) {

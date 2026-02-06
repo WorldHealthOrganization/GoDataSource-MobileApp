@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 03/07/2018.
  */
-import {ACTION_TYPE_STORE_USER} from './../utils/enums';
+import {ACTION_TYPE_STORE_USER} from '../utils/enums';
 import {batchActions} from 'redux-batched-actions';
 import {
     changeAppRoot,
@@ -14,9 +14,9 @@ import {
     setLoginState, setTimezone,
     storeData
 } from './app';
-import {getUserByIdRequest, getUserTeamMembers, loginUserRequest, updateUserRequest} from './../queries/user';
-import {getUserRoles} from './../actions/role';
-import {getUserTeams} from './../actions/teams';
+import {getUserByIdRequest, getUserTeamMembers, loginUserRequest, updateUserRequest} from '../queries/user';
+import {getUserRoles} from './role';
+import {getUserTeams} from './teams';
 import {getClusters, storeClusters} from './clusters';
 import {
     getOutbreakById,
@@ -30,18 +30,18 @@ import {addError} from './errors';
 import {getReferenceData, storeReferenceData} from './referenceData';
 import {getHelpCategory, storeHelpCategory} from './helpCategory';
 import {getHelpItem, storeHelpItem} from './helpItem';
-import errorTypes from './../utils/errorTypes';
+import errorTypes from '../utils/errorTypes';
 import {storeUserTeams} from './teams';
 import {storePermissions} from './role';
 import {getLocations} from './locations';
 import get from 'lodash/get';
 import lodashIntersection from 'lodash/intersection';
-import {filterByUser} from './../utils/functions';
-import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
+import {filterByUser} from '../utils/functions';
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from '../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {updateRequiredFields} from "../utils/functions";
-import {sideMenuKeys} from './../utils/config';
-import AsyncStorage from '@react-native-community/async-storage';
+import {sideMenuKeys} from '../utils/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Add here only the actions, not also the requests that are executed.
 // For that purpose is the requests directory

@@ -9,11 +9,11 @@ import {Icon, ListItem} from 'react-native-material-ui';
 import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
-import {calculateDimension} from './../utils/functions';
-import PermissionComponent from './../components/PermissionComponent';
-import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
+import {calculateDimension} from '../utils/functions';
+import PermissionComponent from './PermissionComponent';
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from '../utils/constants';
 import {sideMenuKeys} from "../utils/config";
-import styles from './../styles';
+import styles from '../styles';
 
 class NavigationDrawerListItem extends PureComponent {
 

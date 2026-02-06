@@ -8,27 +8,26 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Animated, FlatList, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {calculateDimension, computeFullName, createStackFromComponent, getTranslation} from './../utils/functions';
+import {calculateDimension, computeFullName, createStackFromComponent, getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import GeneralListItem from '../components/GeneralListItem';
 import moment from 'moment-timezone';
-import translations from './../utils/translations';
-import RelationshipContainer from '../containers/RelationshipContainer';
+import translations from '../utils/translations';
+import RelationshipContainer from './RelationshipContainer';
 import get from 'lodash/get';
-import TopContainerButtons from "./../components/TopContainerButtons";
-import PermissionComponent from './../components/PermissionComponent';
-import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../utils/constants';
-import config from './../utils/config';
+import TopContainerButtons from "../components/TopContainerButtons";
+import PermissionComponent from '../components/PermissionComponent';
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from '../utils/constants';
+import config from '../utils/config';
 import {
     PERMISSION_CREATE_CONTACT,
     PERMISSION_CREATE_CONTACT_OF_CONTACT,
     PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
 } from "../utils/constants";
-import {Navigation} from "react-native-navigation";
-import Button from './../components/Button';
-import styles from './../styles';
+import Button from '../components/Button';
+import styles from '../styles';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -239,16 +238,15 @@ class ContactsSingleRelationship extends Component {
     };
 
     onPressAddExposure = () => {
-        Navigation.showModal(createStackFromComponent({
-            name: "RelationshipScreen",
-            passProps: {
+        if (this.props.navigation) {
+            this.props.navigation.navigate("RelationshipScreen", {
                 contact: this.props.contact,
                 type: this.props.type === translations.personTypes.contactsOfContacts ? 'ContactOfContact' : 'Contact',
                 saveExposure: this.props.saveExposure,
                 refreshRelations: this.props.refreshRelations,
                 relationshipType: this.props.relationshipType
-            }
-        }))
+            });
+        }
     };
 }
 

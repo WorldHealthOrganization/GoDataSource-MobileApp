@@ -9,7 +9,7 @@ import {connect} from "react-redux";
 import cloneDeep from "lodash/cloneDeep";
 import {Agenda} from 'react-native-calendars';
 import {calculateDimension, getTranslation} from "../utils/functions";
-import translation from './../utils/translations';
+import translation from '../utils/translations';
 import FollowUpAgendaItem from './FollowUpAgendaItem';
 import {prepareFieldsAndRoutes} from "../utils/formValidators";
 import config from "../utils/config";

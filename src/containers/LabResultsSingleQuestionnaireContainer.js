@@ -11,19 +11,19 @@ import {
     createDate,
     extractAllQuestions,
     getTranslation
-} from './../utils/functions';
+} from '../utils/functions';
 import {connect} from "react-redux";
-import QuestionCard from './../components/QuestionCard';
+import QuestionCard from '../components/QuestionCard';
 import {LoaderScreen} from 'react-native-ui-lib';
 import _, {sortBy} from 'lodash';
-import translations from './../utils/translations';
-import constants from './../utils/constants';
-import config from './../utils/config';
+import translations from '../utils/translations';
+import constants from '../utils/constants';
+import config from '../utils/config';
 import cloneDeep from "lodash/cloneDeep";
 import uniqueId from "lodash/uniqueId";
-import TopContainerButtons from './../components/TopContainerButtons';
-import PermissionComponent from './../components/PermissionComponent';
-import styles from './../styles';
+import TopContainerButtons from '../components/TopContainerButtons';
+import PermissionComponent from '../components/PermissionComponent';
+import styles from '../styles';
 import ElevatedView from "react-native-elevated-view";
 import Section from "../components/Section";
 

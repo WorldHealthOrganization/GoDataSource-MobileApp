@@ -5,22 +5,22 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import {calculateDimension, createDate, extractIdFromPouchId, getTranslation} from '../utils/functions';
+import config from '../utils/config';
 import {connect} from "react-redux";
-import CardComponent from './../components/CardComponent';
+import CardComponent from '../components/CardComponent';
 import {LoaderScreen} from 'react-native-ui-lib';
-import translations from './../utils/translations'
+import translations from '../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import _ from 'lodash';
 import lodashGet from "lodash/get";
 import {checkArray, checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import TopContainerButtons from "./../components/TopContainerButtons";
-import PermissionComponent from './../components/PermissionComponent';
-import constants, {PERMISSIONS_CONTACT_OF_CONTACT, PERMISSION_CREATE_CONTACT, PERMISSION_CREATE_CONTACT_OF_CONTACT, PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT} from "./../utils/constants";
-import {getTeamsForUserRequest} from './../queries/user';
-import Button from './../components/Button';
-import styles from './../styles';
+import TopContainerButtons from "../components/TopContainerButtons";
+import PermissionComponent from '../components/PermissionComponent';
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT, PERMISSION_CREATE_CONTACT, PERMISSION_CREATE_CONTACT_OF_CONTACT, PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT} from "../utils/constants";
+import {getTeamsForUserRequest} from '../queries/user';
+import Button from '../components/Button';
+import styles from '../styles';
 
 class ContactsSinglePersonal extends Component {
 

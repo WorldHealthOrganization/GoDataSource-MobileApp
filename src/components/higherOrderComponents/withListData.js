@@ -3,13 +3,12 @@ import {Alert, BackHandler} from 'react-native';
 import get from 'lodash/get';
 import debounce from 'lodash/debounce';
 import union from 'lodash/union';
-import {createDate, createStackFromComponent} from './../../utils/functions';
+import {createDate, createStackFromComponent} from '../../utils/functions';
 import {extractIdFromPouchId, extractMainAddress, getTranslation, navigation} from "../../utils/functions";
 import RNExitApp from "react-native-exit-app";
 import translations from "../../utils/translations";
-import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from './../../utils/constants';
-import {screenTransition} from './../../utils/screenTransitionFunctions';
-import {Navigation} from "react-native-navigation";
+import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from '../../utils/constants';
+import {screenTransition} from '../../utils/screenTransitionFunctions';
 import {fadeInAnimation, fadeOutAnimation} from "../../utils/animations";
 
 
@@ -41,7 +40,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             }
 
             componentDidMount() {
-                BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+                this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
                 if (get(this.props, 'outbreak._id', null) !== null) {
                     if (this.props.isAddFromNavigation && this.props.addScreen) {
                         this.setState({
@@ -62,7 +61,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             }
 
             componentWillUnmount() {
-                BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+                if (this.backHandler) this.backHandler.remove();
             };
 
             handleBackButtonClick() {
@@ -196,23 +195,12 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     }, () => {
                         // Why the timeout?
                         setTimeout(() => {
-                            Navigation.push(this.props.componentId,{
-                                component: {
-                                    // this addScreen prop doesn't seem to be anywhere else
-                                    name: this.props.addScreen,
-                                    passProps: {
-                                        isNew: true,
-                                        refresh: this.refresh
-                                    },
-                                    // fade-in animation
-                                    options: {
-                                        animations: {
-                                            push: fadeInAnimation,
-                                            pop: fadeOutAnimation
-                                        }
-                                    }
-                                }
-                            })
+                            if (this.props.navigation) {
+                                this.props.navigation.navigate(this.props.addScreen, {
+                                    isNew: true,
+                                    refresh: this.refresh
+                                });
+                            }
                         }, 100)
                     })
                 } else {
@@ -337,14 +325,13 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             // Navigator methods
             onPressFilter = () => {
                 // const activeFilters = (this.state.mainFilter && Object.keys(this.state.mainFilter).length !== 0) ? this.state.mainFilter :
-                Navigation.showModal(createStackFromComponent({
-                    name: constants.appScreens.filterScreen,
-                    passProps: {
+                if (this.props.navigation) {
+                    this.props.navigation.navigate(constants.appScreens.filterScreen, {
                         activeFilters: this.state.mainFilter,
                         onApplyFilters: this.setMainFilter,
                         screen: screenType
-                    }
-                }))
+                    });
+                }
             };
 
             // onPressView handles what happens when the user clicks on the lower left button of the list
@@ -381,31 +368,16 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     default:
                         break;
                 }
-                if (forwardScreen) {
-                    Navigation.push(this.props.componentId,{
-                        component:{
-                            name: forwardScreen,
-                            passProps: forwardProps,
-                            options: {
-                                //fade-in animation
-                                animations: {
-                                    pop: fadeOutAnimation,
-                                    push: fadeInAnimation
-                                }
-                            }
-                        }
-                    });
+                if (forwardScreen && this.props.navigation) {
+                    this.props.navigation.navigate(forwardScreen, forwardProps);
                 }
             };
 
             onPressAddExposure = (dataToForward) => {
                 let forwardScreen = this.computeForwardScreen('onPressAddExposure');
                 if (screenType === 'CasesScreen') {
-                    Navigation.push(this.props.componentId,{
-                        component: {
-                            //contactSingleScreen
-                            name: forwardScreen,
-                            passProps: {
+                    if (this.props.navigation) {
+                         this.props.navigation.navigate(forwardScreen, {
                                 isNew: true,
                                 type: translations.personTypes.cases,
                                 addContactFromCasesScreen: true,
@@ -413,15 +385,11 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 caseAddress: extractMainAddress(get(dataToForward, 'addresses', [])),
                                 singleCase: dataToForward,
                                 refresh: this.refresh
-                            }
-                        }
-                    })
+                         });
+                    }
                 } else if (screenType === 'EventsScreen'){
-                    Navigation.push(this.props.componentId,{
-                        component: {
-                            //contactSingleScreen
-                            name: forwardScreen,
-                            passProps: {
+                    if (this.props.navigation) {
+                         this.props.navigation.navigate(forwardScreen, {
                                 isNew: true,
                                 type: translations.personTypes.events,
                                 addContactFromCasesScreen: true,
@@ -429,9 +397,8 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 caseAddress: dataToForward?.address,
                                 singleCase: dataToForward,
                                 refresh: this.refresh
-                            }
-                        }
-                    })
+                         });
+                    }
                 } else {
                     let dataToForwardType = 'contact';
                     if (forwardScreen && dataToForwardType && dataToForward) {
@@ -439,14 +406,13 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         if (screenType === constants.appScreens.contactsOfContactsScreen) {
                             type = "ContactOfContact";
                         }
-                        Navigation.showModal(createStackFromComponent({
-                            name: forwardScreen,
-                            passProps: {
+                        if (this.props.navigation) {
+                            this.props.navigation.navigate(forwardScreen, {
                                 [dataToForwardType]: dataToForward,
                                 type: type,
                                 refresh: this.refresh
-                            }
-                        }))
+                            });
+                        }
                     }
                 }
             };
@@ -454,23 +420,18 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
             onPressCenterButton = (caseData) => {
                 let forwardScreen = this.computeForwardScreen('onPressCenterButton');
                 if (screenType === 'CasesScreen' || screenType === 'EventsScreen') {
-                    Navigation.push(this.props.componentId,{
-                        component:{
-                            name: forwardScreen,
-                            passProps: {
-                                isNew: false,
-                                refresh: this.refresh,
-                                case: caseData,
-                                index: 3
-                            }
-                        }
-                    })
+                    if (this.props.navigation) {
+                        this.props.navigation.navigate(forwardScreen, {
+                             isNew: false,
+                             refresh: this.refresh,
+                             case: caseData,
+                             index: 3
+                        });
+                    }
                 }
                 if (screenType === 'ContactsScreen') {
-                    Navigation.push(this.props.componentId,{
-                        component:{
-                            name: forwardScreen,
-                            passProps: {
+                    if (this.props.navigation) {
+                        this.props.navigation.navigate(forwardScreen, {
                                 isNew: true,
                                 type: 'ContactOfContact',
                                 addContactFromCasesScreen: true,
@@ -478,22 +439,18 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                 caseAddress: extractMainAddress(get(caseData, 'addresses', [])),
                                 singleCase: caseData,
                                 refresh: this.refresh
-                            }
-                        }
-                    })
+                        });
+                    }
                 }
                 if (screenType === constants.appScreens.contactsOfContactsScreen) {
-                    Navigation.push(this.props.componentId, {
-                        component: {
-                            name: forwardScreen,
-                            passProps: {
+                    if (this.props.navigation) {
+                         this.props.navigation.navigate(forwardScreen, {
                                 isNew: false,
                                 isEditMode: true,
                                 contact: caseData,
                                 refresh: this.refresh
-                            }
-                        }
-                    })
+                         });
+                    }
                 }
             };
 
@@ -542,7 +499,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 }
 
                 if (forwardScreen) {
-                    screenTransition(this.props.componentId, 'push', forwardScreen, forwardedProps, this.props.role, requiredPermissions);
+                    screenTransition(this.props.navigation, 'push', forwardScreen, forwardedProps, this.props.role, requiredPermissions);
                 }
             };
 
@@ -569,7 +526,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         };
                     }
 
-                    screenTransition(this.props.componentId, 'push', forwardScreen, forwardProps, this.props.role, requiredPermissions);
+                    screenTransition(this.props.navigation, 'push', forwardScreen, forwardProps, this.props.role, requiredPermissions);
                 }
             };
 

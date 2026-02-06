@@ -5,14 +5,15 @@ import {Platform} from 'react-native';
 import PouchDB from 'pouchdb-react-native';
 import SQLite, {encodeName} from 'react-native-sqlcipher-2';
 import SQLiteAdapterFactory from 'pouchdb-adapter-react-native-sqlite';
-import RNFetchBlobFS from 'rn-fetch-blob/fs';
+import RNFetchBlobFS from 'react-native-blob-util/fs';
+
 import PouchUpsert from 'pouchdb-upsert';
 import PouchFind from 'pouchdb-find';
 import RNFS from 'react-native-fs';
 import _ from 'lodash';
-import config from './../utils/config';
+import config from '../utils/config';
 import Database from './databaseController';
-import {extractIdFromPouchId} from './../utils/functions';
+import {extractIdFromPouchId} from '../utils/functions';
 
 export let database = null;
 let databaseCache = null;

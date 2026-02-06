@@ -4,7 +4,7 @@
 import React, {PureComponent} from 'react';
 import {View, Text, Platform, ScrollView, Modal} from 'react-native';
 import {Button} from 'react-native-material-ui';
-import styles from './../styles';
+import styles from '../styles';
 
 class ModalSyncStatus extends PureComponent {
 

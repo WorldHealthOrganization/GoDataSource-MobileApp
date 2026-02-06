@@ -7,21 +7,21 @@ import React, {Component} from 'react';
 import geolocation from '@react-native-community/geolocation';
 import {Alert, Animated, BackHandler, Dimensions, Keyboard, Platform, StyleSheet, View, Text} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import NavBarCustom from './../components/NavBarCustom';
-import ViewHOC from './../components/ViewHOC';
-import config from './../utils/config';
+import NavBarCustom from '../components/NavBarCustom';
+import ViewHOC from '../components/ViewHOC';
+import config from '../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
-import ContactsSingleAddress from './../containers/ContactsSingleAddress';
-import ContactsSingleRelationship from './../containers/ContactsSingleRelationship';
-import ContactsSinglePersonal from './../containers/ContactsSinglePersonal';
-import RelationshipScreen from './../screens/RelationshipScreen';
-import Breadcrumb from './../components/Breadcrumb';
+import ContactsSingleAddress from '../containers/ContactsSingleAddress';
+import ContactsSingleRelationship from '../containers/ContactsSingleRelationship';
+import ContactsSinglePersonal from '../containers/ContactsSinglePersonal';
+import RelationshipScreen from './RelationshipScreen';
+import Breadcrumb from '../components/Breadcrumb';
 import Ripple from 'react-native-material-ripple';
-import {addFollowUp, updateFollowUpAndContact} from './../actions/followUps';
-import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from './../actions/contacts';
-import {removeErrors} from './../actions/errors';
+import {addFollowUp, updateFollowUpAndContact} from '../actions/followUps';
+import {addContact, checkForNameDuplicated, getExposuresForContact, updateContact} from '../actions/contacts';
+import {removeErrors} from '../actions/errors';
 import _, {findIndex, remove} from 'lodash';
 import {
     calculateDimension,
@@ -31,22 +31,21 @@ import {
     getTranslation,
     navigation,
     updateRequiredFields
-} from './../utils/functions';
+} from '../utils/functions';
 import moment from 'moment/min/moment.min';
-import translations from './../utils/translations';
+import translations from '../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import lodashIntersect from 'lodash/intersection';
-import {addContactOfContact, updateContactOfContact} from './../actions/contactsOfContacts';
+import {addContactOfContact, updateContactOfContact} from '../actions/contactsOfContacts';
 import contactsOfContactsScreen from "../utils/translations";
-import {checkValidEmails, prepareFields, prepareFieldsAndRoutes} from './../utils/formValidators';
+import {checkValidEmails, prepareFields, prepareFieldsAndRoutes} from '../utils/formValidators';
 import {validateRequiredFields} from "../utils/formValidators";
-import {Navigation} from "react-native-navigation";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import Menu, {MenuItem} from "react-native-material-menu";
 import PermissionComponent from "../components/PermissionComponent";
-import styles from './../styles';
+import styles from '../styles';
 import colors from "../styles/colors";
 
 const initialLayout = {
@@ -154,15 +153,14 @@ class ContactsOfContactsSingleScreen extends Component {
     };
 
     // Please add here the react lifecycle methods that you need
+    // Please add here the react lifecycle methods that you need
     componentDidMount() {
-        const listener = {
-            componentDidAppear: () => {
-                this.props.setDisableOutbreakChange(true);
-            }
-        };
-        // Register the listener to all events related to our component
-        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        if (this.props.navigation) {
+             this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+                 this.props.setDisableOutbreakChange(true);
+             });
+        }
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
         if (!this.props.isNew) {
             let ageClone = {years: 0, months: 0};
             let updateAge = false;
@@ -225,8 +223,10 @@ class ContactsOfContactsSingleScreen extends Component {
     };
 
     componentWillUnmount() {
-        this.navigationListener.remove();
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+        if (this.unsubscribeFocus) {
+             this.unsubscribeFocus();
+        }
+        if (this.backHandler) this.backHandler.remove();
     };
 
     handleBackButtonClick() {
@@ -235,7 +235,7 @@ class ContactsOfContactsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        Navigation.pop(this.props.componentId)
+                        if (this.props.navigation) this.props.navigation.goBack();
                     }
                 },
                 {
@@ -245,7 +245,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 }
             ])
         } else {
-            Navigation.pop(this.props.componentId);
+            if (this.props.navigation) this.props.navigation.goBack();
         }
         return true;
     };
@@ -356,13 +356,9 @@ class ContactsOfContactsSingleScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        Navigation.mergeOptions(this.props.componentId, {
-            sideMenu: {
-                left: {
-                    visible: true,
-                },
-            },
-        });
+        if (this.props.navigation) {
+            this.props.navigation.openDrawer();
+        }
     };
 
     handleOnPressDelete = () => {
@@ -633,6 +629,7 @@ class ContactsOfContactsSingleScreen extends Component {
             case 'exposures':
                 return (
                     <ContactsSingleRelationship
+                        navigation={this.props.navigation}
                         type={translations.personTypes.contactsOfContacts}
                         preparedFields={this.preparedFieldsRelationship}
                         relationshipType={constants.RELATIONSHIP_TYPE.exposure}
@@ -684,7 +681,7 @@ class ContactsOfContactsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        Navigation.pop(this.props.componentId)
+                        if (this.props.navigation) this.props.navigation.goBack();
                     }
                 },
                 {
@@ -694,7 +691,7 @@ class ContactsOfContactsSingleScreen extends Component {
                 }
             ])
         } else {
-            Navigation.pop(this.props.componentId)
+            if (this.props.navigation) this.props.navigation.goBack();
         }
     };
 

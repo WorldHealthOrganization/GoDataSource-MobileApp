@@ -8,7 +8,7 @@ import LocalButton from './Button';
 import SelectMultiple from 'react-native-select-multiple';
 import {useSelector} from "react-redux";
 import {calculateDimension, getTranslation} from "../utils/functions";
-import {selectScreenSize, selectTranslations} from './../utils/selectors';
+import {selectScreenSize, selectTranslations} from '../utils/selectors';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import translations from "../utils/translations";
 import styles from "../styles";

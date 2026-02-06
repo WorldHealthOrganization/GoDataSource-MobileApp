@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 01/08/2018.
  */
-import {ACTION_TYPE_ADD_ERROR, ACTION_TYPE_REMOVE_ERRORS} from './../utils/enums';
+import {ACTION_TYPE_ADD_ERROR, ACTION_TYPE_REMOVE_ERRORS} from '../utils/enums';
 
 // Do not add unnecessary business logic in the reducer. Here should only be updated the store
 export default function (state=null, action) {

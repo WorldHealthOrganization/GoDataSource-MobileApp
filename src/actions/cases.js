@@ -8,7 +8,7 @@ import sqlConstants from "../queries/sqlTools/constants";
 import constants from "../utils/constants";
 import get from 'lodash/get';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import {getPersonWithRelationsForOutbreakId} from './../queries/sqlTools/sqlQueryInterface';
+import {getPersonWithRelationsForOutbreakId} from '../queries/sqlTools/sqlQueryInterface';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function getCasesForOutbreakId({outbreakId, casesFilter, searchText, lastElement, offset}, computeCount) {

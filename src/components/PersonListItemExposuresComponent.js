@@ -5,13 +5,13 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import translations from './../utils/translations'
-import {calculateDimension, getTranslation} from './../utils/functions';
+import translations from '../utils/translations'
+import {calculateDimension, getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
-import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
+import {checkArrayAndLength} from '../utils/typeCheckingFunctions';
 import lodashGet from 'lodash/get';
-import styles from './../styles';
+import styles from '../styles';
 
 class PersonListItemNameAndAddressComponent extends PureComponent {
     constructor(props) {

@@ -1,9 +1,9 @@
 /**
  * Created by mobileclarisoft on 05/12/2018.
  */
-import {ACTION_TYPE_STORE_HELP_ITEM} from './../utils/enums';
+import {ACTION_TYPE_STORE_HELP_ITEM} from '../utils/enums';
 import {getHelpItemRequest} from '../queries/helpItem';
-import errorTypes from './../utils/errorTypes';
+import errorTypes from '../utils/errorTypes';
 
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory

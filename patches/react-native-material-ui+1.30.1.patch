@@ -1,0 +1,348 @@
+diff --git a/node_modules/react-native-material-ui/src/ActionButton/ActionButton.react.js b/node_modules/react-native-material-ui/src/ActionButton/ActionButton.react.js
+index 6a8a118..a8cb4ea 100755
+--- a/node_modules/react-native-material-ui/src/ActionButton/ActionButton.react.js
++++ b/node_modules/react-native-material-ui/src/ActionButton/ActionButton.react.js
+@@ -10,6 +10,7 @@ import {
+   Animated,
+ } from 'react-native';
+ import PropTypes from 'prop-types';
++import { TextPropTypes } from 'deprecated-react-native-prop-types';
+ import { ViewPropTypes } from '../utils';
+ /* eslint-enable import/no-unresolved, import/extensions */
+ import Icon from '../Icon';
+@@ -71,7 +72,7 @@ const propTypes = {
+    */
+   style: PropTypes.shape({
+     container: ViewPropTypes.style,
+-    icon: Text.propTypes.style, // eslint-disable-line
++    icon: TextPropTypes.style, // eslint-disable-line
+   }),
+ };
+ const defaultProps = {
+diff --git a/node_modules/react-native-material-ui/src/Avatar/Avatar.react.js b/node_modules/react-native-material-ui/src/Avatar/Avatar.react.js
+index 3ffacee..c4735d3 100644
+--- a/node_modules/react-native-material-ui/src/Avatar/Avatar.react.js
++++ b/node_modules/react-native-material-ui/src/Avatar/Avatar.react.js
+@@ -1,6 +1,7 @@
+ /* eslint-disable import/no-unresolved, import/extensions */
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
++import { TextPropTypes } from 'deprecated-react-native-prop-types';
+ import { View, Text, StyleSheet } from 'react-native';
+ import { ViewPropTypes } from '../utils';
+ /* eslint-enable import/no-unresolved, import/extensions */
+@@ -37,7 +38,7 @@ const propTypes = {
+    */
+   style: PropTypes.shape({
+     container: ViewPropTypes.style,
+-    content: Text.propTypes.style, // eslint-disable-line
++    content: TextPropTypes.style, // eslint-disable-line
+   }),
+   iconSet: PropTypes.string,
+   /**
+@@ -59,6 +60,7 @@ const defaultProps = {
+ function getStyles(props) {
+   const { size, theme } = props;
+   const { avatar } = theme;
++  const style = props.style || {};
+ 
+   const local = {};
+ 
+@@ -69,10 +71,9 @@ function getStyles(props) {
+       borderRadius: size / 2,
+     };
+   }
+-
+   return {
+-    container: [avatar.container, local.container, props.style.container],
+-    content: [avatar.content, local.content, props.style.content],
++    container: [avatar.container, local.container, style.container],
++    content: [avatar.content, local.content, style.content],
+   };
+ }
+ 
+diff --git a/node_modules/react-native-material-ui/src/Badge/Badge.react.js b/node_modules/react-native-material-ui/src/Badge/Badge.react.js
+index 05a9ae5..df264a1 100644
+--- a/node_modules/react-native-material-ui/src/Badge/Badge.react.js
++++ b/node_modules/react-native-material-ui/src/Badge/Badge.react.js
+@@ -2,6 +2,7 @@
+ import { Text, View } from 'react-native';
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
++import { TextPropTypes } from 'deprecated-react-native-prop-types';
+ /* eslint-enable import/no-unresolved, import/extensions */
+ import Icon from '../Icon';
+ import { ViewPropTypes } from '../utils';
+@@ -42,7 +43,7 @@ const propTypes = {
+     PropTypes.shape({
+       container: ViewPropTypes.style,
+       strokeContainer: ViewPropTypes.style,
+-      content: Text.propTypes.style, // eslint-disable-line
++      content: TextPropTypes.style, // eslint-disable-line
+     }),
+     PropTypes.array,
+   ]),
+diff --git a/node_modules/react-native-material-ui/src/BottomNavigation/BottomNavigationAction.react.js b/node_modules/react-native-material-ui/src/BottomNavigation/BottomNavigationAction.react.js
+index 9ec679a..5e2a09c 100644
+--- a/node_modules/react-native-material-ui/src/BottomNavigation/BottomNavigationAction.react.js
++++ b/node_modules/react-native-material-ui/src/BottomNavigation/BottomNavigationAction.react.js
+@@ -1,6 +1,7 @@
+ /* eslint-disable import/no-unresolved, import/extensions */
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
++import { TextPropTypes } from 'deprecated-react-native-prop-types';
+ import { StyleSheet, View, Text } from 'react-native';
+ import { ViewPropTypes } from '../utils';
+ /* eslint-enable import/no-unresolved, import/extensions */
+@@ -38,8 +39,8 @@ const propTypes = {
+    */
+   style: PropTypes.shape({
+     container: ViewPropTypes.style,
+-    active: Text.propTypes.style, // eslint-disable-line
+-    disabled: Text.propTypes.style, // eslint-disable-line
++    active: TextPropTypes.style, // eslint-disable-line
++    disabled: TextPropTypes.style, // eslint-disable-line
+   }),
+   disabled: PropTypes.bool,
+ };
+diff --git a/node_modules/react-native-material-ui/src/Button/Button.react.js b/node_modules/react-native-material-ui/src/Button/Button.react.js
+index 325ae78..02a4ca1 100755
+--- a/node_modules/react-native-material-ui/src/Button/Button.react.js
++++ b/node_modules/react-native-material-ui/src/Button/Button.react.js
+@@ -2,6 +2,7 @@
+ import { View, Text, StyleSheet } from 'react-native';
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
++import { TextPropTypes } from 'deprecated-react-native-prop-types';
+ import { ViewPropTypes } from '../utils';
+ /* eslint-enable import/no-unresolved, import/extensions */
+ import Icon from '../Icon';
+@@ -50,7 +51,7 @@ const propTypes = {
+    */
+   style: PropTypes.shape({
+     container: ViewPropTypes.style,
+-    text: Text.propTypes.style, // eslint-disable-line
++    text: TextPropTypes.style, // eslint-disable-line
+   }),
+   primary: PropTypes.bool,
+   accent: PropTypes.bool,
+diff --git a/node_modules/react-native-material-ui/src/Checkbox/Checkbox.react.js b/node_modules/react-native-material-ui/src/Checkbox/Checkbox.react.js
+index 651d09a..c7980ad 100644
+--- a/node_modules/react-native-material-ui/src/Checkbox/Checkbox.react.js
++++ b/node_modules/react-native-material-ui/src/Checkbox/Checkbox.react.js
+@@ -2,6 +2,7 @@
+ import { StyleSheet, Text, View } from 'react-native';
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
++import { TextPropTypes } from 'deprecated-react-native-prop-types';
+ /* eslint-enable import/no-unresolved, import/extensions */
+ import IconToggle from '../IconToggle';
+ import RippleFeedback from '../RippleFeedback';
+@@ -45,7 +46,7 @@ const propTypes = {
+     container: ViewPropTypes.style,
+     // FIXME:
+     icon: PropTypes.any, // eslint-disable-line
+-    label: Text.propTypes.style, // eslint-disable-line
++    label: TextPropTypes.style, // eslint-disable-line
+   }),
+   /**
+    * Size of icon
+diff --git a/node_modules/react-native-material-ui/src/Dialog/Title.react.js b/node_modules/react-native-material-ui/src/Dialog/Title.react.js
+index 1c9076a..29ef670 100644
+--- a/node_modules/react-native-material-ui/src/Dialog/Title.react.js
++++ b/node_modules/react-native-material-ui/src/Dialog/Title.react.js
+@@ -2,6 +2,7 @@
+ import { View, Text } from 'react-native';
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
++import { TextPropTypes } from 'deprecated-react-native-prop-types';
+ /* eslint-enable import/no-unresolved, import/extensions */
+ import { ViewPropTypes } from '../utils';
+ import withTheme from '../styles/withTheme';
+@@ -10,7 +11,7 @@ const propTypes = {
+   children: PropTypes.node.isRequired,
+   style: PropTypes.shape({
+     titleContainer: ViewPropTypes.style,
+-    titleText: Text.propTypes.style, // eslint-disable-line
++    titleText: TextPropTypes.style, // eslint-disable-line
+   }),
+ };
+ const defaultProps = {
+diff --git a/node_modules/react-native-material-ui/src/Drawer/Section.react.js b/node_modules/react-native-material-ui/src/Drawer/Section.react.js
+index d2956ea..4f1347e 100644
+--- a/node_modules/react-native-material-ui/src/Drawer/Section.react.js
++++ b/node_modules/react-native-material-ui/src/Drawer/Section.react.js
+@@ -1,6 +1,7 @@
+ /* eslint-disable import/no-unresolved, import/extensions */
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
++import { TextPropTypes } from 'deprecated-react-native-prop-types';
+ import { View, Text } from 'react-native';
+ /* eslint-enable import/no-unresolved, import/extensions */
+ import Subheader from '../Subheader';
+@@ -28,9 +29,9 @@ const propTypes = {
+     container: ViewPropTypes.style,
+     item: ViewPropTypes.style,
+     subheader: ViewPropTypes.style,
+-    icon: Text.propTypes.style, // eslint-disable-line
+-    value: Text.propTypes.style, // eslint-disable-line
+-    label: Text.propTypes.style, // eslint-disable-line
++    icon: TextPropTypes.style, // eslint-disable-line
++    value: TextPropTypes.style, // eslint-disable-line
++    label: TextPropTypes.style, // eslint-disable-line
+   }),
+   key: PropTypes.string,
+   /**
+diff --git a/node_modules/react-native-material-ui/src/IconToggle/IconToggle.react.js b/node_modules/react-native-material-ui/src/IconToggle/IconToggle.react.js
+index 72c9cf9..61b692a 100644
+--- a/node_modules/react-native-material-ui/src/IconToggle/IconToggle.react.js
++++ b/node_modules/react-native-material-ui/src/IconToggle/IconToggle.react.js
+@@ -10,7 +10,7 @@ import {
+ } from 'react-native';
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
+-/* eslint-enable import/no-unresolved, import/extensions */
++import { TextPropTypes } from 'deprecated-react-native-prop-types';/* eslint-enable import/no-unresolved, import/extensions */
+ import Color from 'color';
+ 
+ import withTheme from '../styles/withTheme';
+@@ -60,7 +60,7 @@ const propTypes = {
+   style: PropTypes.oneOfType([
+     PropTypes.shape({
+       container: ViewPropTypes.style,
+-      icon: Text.propTypes.style, // eslint-disable-line
++      icon: TextPropTypes.style, // eslint-disable-line
+     }),
+     PropTypes.array,
+   ]),
+diff --git a/node_modules/react-native-material-ui/src/ListItem/ListItem.react.js b/node_modules/react-native-material-ui/src/ListItem/ListItem.react.js
+index ca957d6..96bcc92 100644
+--- a/node_modules/react-native-material-ui/src/ListItem/ListItem.react.js
++++ b/node_modules/react-native-material-ui/src/ListItem/ListItem.react.js
+@@ -1,6 +1,7 @@
+ /* eslint-disable import/no-unresolved, import/extensions */
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
++import { TextPropTypes } from 'deprecated-react-native-prop-types';
+ import {
+   StyleSheet,
+   View,
+@@ -43,14 +44,14 @@ const propTypes = {
+     leftElementContainer: ViewPropTypes.style,
+     centerElementContainer: ViewPropTypes.style,
+     textViewContainer: ViewPropTypes.style,
+-    primaryText: Text.propTypes.style, // eslint-disable-line
++    primaryText: TextPropTypes.style, // eslint-disable-line
+     firstLine: ViewPropTypes.style,
+-    primaryTextContainer: Text.propTypes.style, // eslint-disable-line
+-    secondaryText: Text.propTypes.style, // eslint-disable-line
+-    tertiaryText: Text.propTypes.style, // eslint-disable-line
++    primaryTextContainer: TextPropTypes.style, // eslint-disable-line
++    secondaryText: TextPropTypes.style, // eslint-disable-line
++    tertiaryText: TextPropTypes.style, // eslint-disable-line
+     rightElementContainer: ViewPropTypes.style,
+-    leftElement: PropTypes.style,
+-    rightElement: PropTypes.style,
++    leftElement: ViewPropTypes.style,
++    rightElement: ViewPropTypes.style,
+   }),
+ 
+   // left side
+diff --git a/node_modules/react-native-material-ui/src/Subheader/Subheader.react.js b/node_modules/react-native-material-ui/src/Subheader/Subheader.react.js
+index d246563..8dd79c3 100644
+--- a/node_modules/react-native-material-ui/src/Subheader/Subheader.react.js
++++ b/node_modules/react-native-material-ui/src/Subheader/Subheader.react.js
+@@ -2,6 +2,7 @@
+ import { View, Text } from 'react-native';
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
++import { TextPropTypes } from 'deprecated-react-native-prop-types';
+ /* eslint-enable import/no-unresolved, import/extensions */
+ import { ViewPropTypes } from '../utils';
+ import withTheme from '../styles/withTheme';
+@@ -12,7 +13,7 @@ const propTypes = {
+   lines: PropTypes.number,
+   style: PropTypes.shape({
+     contaienr: ViewPropTypes.style,
+-    text: Text.propTypes.style, // eslint-disable-line
++    text: TextPropTypes.style, // eslint-disable-line
+   }),
+ };
+ const defaultProps = {
+diff --git a/node_modules/react-native-material-ui/src/Toolbar/CenterElement.react.js b/node_modules/react-native-material-ui/src/Toolbar/CenterElement.react.js
+index c2a2879..cba4054 100644
+--- a/node_modules/react-native-material-ui/src/Toolbar/CenterElement.react.js
++++ b/node_modules/react-native-material-ui/src/Toolbar/CenterElement.react.js
+@@ -1,6 +1,11 @@
+ /* eslint-disable import/no-unresolved, import/extensions */
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
++import {
++  TextPropTypes,
++  TextInputPropTypes,
++} from 'deprecated-react-native-prop-types';
++
+ import {
+   Animated,
+   TouchableWithoutFeedback,
+@@ -17,7 +22,7 @@ const propTypes = {
+   searchValue: PropTypes.string.isRequired,
+   searchable: PropTypes.shape({
+     autoFocus: PropTypes.bool,
+-    autoCapitalize: TextInput.propTypes.autoCapitalize, // eslint-disable-line
++    autoCapitalize: TextInputPropTypes.autoCapitalize, // eslint-disable-line
+     autoCorrect: PropTypes.bool,
+     onChangeText: PropTypes.func,
+     onSubmitEditing: PropTypes.func,
+@@ -25,7 +30,7 @@ const propTypes = {
+   }),
+   style: PropTypes.shape({
+     centerElementContainer: ViewPropTypes.style,
+-    titleText: Text.propTypes.style, // eslint-disable-line
++    titleText: TextPropTypes.style, // eslint-disable-line
+   }),
+   centerElement: PropTypes.node,
+   onPress: PropTypes.func,
+diff --git a/node_modules/react-native-material-ui/src/Toolbar/LeftElement.react.js b/node_modules/react-native-material-ui/src/Toolbar/LeftElement.react.js
+index c649042..2c0b6cd 100644
+--- a/node_modules/react-native-material-ui/src/Toolbar/LeftElement.react.js
++++ b/node_modules/react-native-material-ui/src/Toolbar/LeftElement.react.js
+@@ -1,6 +1,7 @@
+ /* eslint-disable import/no-unresolved, import/extensions */
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
++import { TextPropTypes } from 'deprecated-react-native-prop-types';
+ import { Animated, Easing, StyleSheet, Text } from 'react-native';
+ /* eslint-enable import/no-unresolved, import/extensions */
+ import { ViewPropTypes } from '../utils';
+@@ -13,7 +14,7 @@ const propTypes = {
+   isSearchActive: PropTypes.bool.isRequired,
+   style: PropTypes.shape({
+     leftElementContainer: ViewPropTypes.style,
+-    leftElement: Text.propTypes.style, // eslint-disable-line
++    leftElement: TextPropTypes.style, // eslint-disable-line
+   }),
+   size: PropTypes.number,
+   leftElement: PropTypes.node,
+diff --git a/node_modules/react-native-material-ui/src/Toolbar/Toolbar.react.js b/node_modules/react-native-material-ui/src/Toolbar/Toolbar.react.js
+index 2c22248..57a75a4 100644
+--- a/node_modules/react-native-material-ui/src/Toolbar/Toolbar.react.js
++++ b/node_modules/react-native-material-ui/src/Toolbar/Toolbar.react.js
+@@ -1,6 +1,8 @@
+ /* eslint-disable import/no-unresolved, import/extensions */
+ import React, { PureComponent } from 'react';
+ import PropTypes from 'prop-types';
++import {TextPropTypes} from 'deprecated-react-native-prop-types';
++
+ import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+ import { ViewPropTypes, BackAndroid } from '../utils';
+ /* eslint-enable import/no-unresolved, import/extensions */
+@@ -69,7 +71,7 @@ const propTypes = {
+     // FIXME
+     leftElement: PropTypes.any, // eslint-disable-line
+     centerElementContainer: ViewPropTypes.style,
+-    titleText: Text.propTypes.style, // eslint-disable-line
++    titleText: TextPropTypes.style, // eslint-disable-line
+     rightElementContainer: ViewPropTypes.style,
+     rightElement: PropTypes.any, // eslint-disable-line
+   }),

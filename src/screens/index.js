@@ -1,35 +1,6 @@
 /**
  * Created by florinpopa on 14/06/2018.
  */
-import {Navigation} from 'react-native-navigation';
-import constants from './../utils/constants';
-import LoginScreen from './LoginScreen';
-import FirstConfigScreen from './FirstConfigScreen';
-import ManualConfigScreen from './ManualConfigScreen';
-import NavigationDrawer from './NavigationDrawer';
-import FollowUpsScreen from './FollowUpsScreen';
-import AddFollowUpScreen from './AddFollowUpScreen';
-import FilterScreen from './FilterScreen';
-import FollowUpsSingleScreen from './FollowUpsSingleScreen';
-import CasesScreen from './CasesScreen';
-import CaseSingleScreen from './CaseSingleScreen';
-import EventsScreen from "./EventsScreen";
-import EventSingleScreen from "./EventSingleScreen";
-import ContactsScreen from './ContactsScreen';
-import ContactsSingleScreen from './ContactsSingleScreen';
-import ContactsOfContactsScreen from './ContactsOfContactsScreen';
-import ContactsOfContactsSingleScreen from './ContactsOfContactsSingleScreen';
-import InAppNotificationScreen from './InAppNotificationScreen';
-import RelationshipScreen from './RelationshipScreen';
-import HelpScreen from './HelpScreen';
-import HelpSingleScreen from './HelpSingleScreen';
-import QRScanScreen from './QRScanScreen';
-import HubConfigScreen from './HubConfigScreen';
-import UsersScreen  from "./UsersScreen";
-import React from "react";
-import LabResultsScreen from "./LabResultsScreen";
-import LabResultsSingleScreen from "./LabResultsSingleScreen";
-
 const screens = [
     {screen: constants.appScreens.loginScreen, component: LoginScreen},
     {screen: constants.appScreens.firstConfigScreen, component: FirstConfigScreen},
@@ -59,20 +30,6 @@ const screens = [
 ];
 
 export function registerScreens(store, Provider) {
-    screens.forEach((screen) => {
-        Navigation.registerComponent(screen.screen,
-            () => {
-                if(store && Provider){
-                    const Screen = screen.component;
-                    console.log("Judge", screen.screen, Screen);
-                    return (props)=>
-                        <Provider store={store}>
-                            <Screen {...props}/>
-                        </Provider>
-                } else {
-                    return screen.component;
-                }
-            },
-            ()=>screen.component);
-    });
+    // Legacy RNN registration
+    console.log("Screens registration skipped (React Navigation migration)");
 }

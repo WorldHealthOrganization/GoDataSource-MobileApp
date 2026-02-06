@@ -9,9 +9,8 @@ import {Icon} from 'react-native-material-ui';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {calculateDimension, getTranslation} from './../utils/functions';
-import {Navigation} from "react-native-navigation";
-import styles from './../styles';
+import {calculateDimension, getTranslation} from '../utils/functions';
+import styles from '../styles';
 
 const Crumb = ({isCrumbActive, index, text, numberOfEntities, crumbPress, translation}) => {
     return (
@@ -80,7 +79,7 @@ class Breadcrumb extends PureComponent {
                 if(this.props.onPress){
                     this.props.onPress();
                 }else {
-                    Navigation.pop(this.props.componentId);
+                     if (this.props.navigation) this.props.navigation.goBack();
                 }
             }
         });

@@ -1,4 +1,4 @@
-import {handleResponse} from './../utils/functions';
+import {handleResponse} from '../utils/functions';
 
     export function getHelpItemsRequest(requestUrl, authorization, filter, callback) {
     requestUrl = `${requestUrl}${filter ? `?filter=${JSON.stringify(filter)}` : ``}`;

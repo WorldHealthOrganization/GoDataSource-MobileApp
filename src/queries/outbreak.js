@@ -2,7 +2,7 @@
  * Created by florinpopa on 13/09/2018.
  */
 import {getDatabase} from './database';
-import config from './../utils/config';
+import config from '../utils/config';
 
 // Credentials: {email, encryptedPassword}
 export function getOutbreakByIdRequest(outbreakId, token, callback) {

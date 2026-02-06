@@ -5,21 +5,20 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Animated, FlatList, InteractionManager, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {calculateDimension, computeFullName, createStackFromComponent, getTranslation} from './../utils/functions';
+import {calculateDimension, computeFullName, createStackFromComponent, getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import GeneralListItem from '../components/GeneralListItem';
-import Button from './../components/Button';
+import Button from '../components/Button';
 import moment from 'moment-timezone';
-import translations from './../utils/translations';
-import config from './../utils/config';
+import translations from '../utils/translations';
+import config from '../utils/config';
 import get from 'lodash/get';
 import TopContainerButtons from "../components/TopContainerButtons";
-import PermissionComponent from './../components/PermissionComponent';
-import constants from "./../utils/constants";
-import {Navigation} from "react-native-navigation";
-import styles from './../styles';
+import PermissionComponent from '../components/PermissionComponent';
+import constants from "../utils/constants";
+import styles from '../styles';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -192,16 +191,15 @@ class EventSingleRelationshipContainer extends Component {
     };
 
     onPressAddExposure = () => {
-        Navigation.showModal(createStackFromComponent({
-            name: "RelationshipScreen",
-            passProps: {
+        if (this.props.navigation) {
+            this.props.navigation.navigate("RelationshipScreen", {
                 event: this.props.event,
                 type: 'Event',
                 saveExposure: this.props.saveExposure,
                 refreshRelations: this.props.refreshRelations,
                 relationshipType: this.props.relationshipType
-            }
-        }))
+            });
+        }
     };
 }
 

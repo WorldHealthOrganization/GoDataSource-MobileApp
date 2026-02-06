@@ -4,15 +4,15 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {useRef} from 'react';
-import {calculateDimension, getTranslation} from './../utils/functions';
-import config from './../utils/config';
+import {calculateDimension, getTranslation} from '../utils/functions';
+import config from '../utils/config';
 import {useSelector} from "react-redux";
 import {createSelector} from 'reselect';
 import ElevatedView from 'react-native-elevated-view';
 import ButtonWithIcons from './ButtonWithIcons';
 import {Dropdown} from 'react-native-material-dropdown';
 import lodashGet from 'lodash/get';
-import styles from './../styles';
+import styles from '../styles';
 
 const selectValuePickerReduxData = createSelector(
     state => lodashGet(state, 'referenceData', []),

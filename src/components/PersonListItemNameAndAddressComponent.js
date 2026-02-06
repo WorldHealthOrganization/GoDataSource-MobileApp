@@ -5,11 +5,11 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {Image, StyleSheet, Text, View, Linking} from 'react-native';
-import translations from './../utils/translations'
-import {calculateDimension, callPhone, getTranslation} from './../utils/functions';
+import translations from '../utils/translations'
+import {calculateDimension, callPhone, getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
-import styles from './../styles';
+import styles from '../styles';
 import { RFC_2822 } from 'moment';
 
 class PersonListItemNameAndAddressComponent extends PureComponent {

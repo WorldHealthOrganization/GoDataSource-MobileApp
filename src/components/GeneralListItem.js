@@ -10,8 +10,8 @@ import {StyleSheet, Text, View} from 'react-native';
 // the material ui library, since it provides design and animations out of the box
 import ElevatedView from 'react-native-elevated-view';
 import ActionsBar from './ActionsBar';
-import {checkPermissions, getTranslation} from './../utils/functions';
-import styles from './../styles';
+import {checkPermissions, getTranslation} from '../utils/functions';
+import styles from '../styles';
 import {ISO_8601} from 'moment';
 import PermissionComponent from "./PermissionComponent";
 import lodashGet from "lodash/get";

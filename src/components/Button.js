@@ -8,7 +8,7 @@ import {StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import { RaisedTextButton } from 'react-native-material-buttons';
 import {connect} from "react-redux";
-import {getTranslation} from './../utils/functions';
+import {getTranslation} from '../utils/functions';
 
 class Button extends PureComponent {
 

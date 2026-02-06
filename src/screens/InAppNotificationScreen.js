@@ -3,7 +3,7 @@
  */
 import React, {Component} from 'react';
 import {Dimensions, Platform, Text, View} from 'react-native';
-import styles from './../styles';
+import styles from '../styles';
 
 
 class InAppNotificationScreen extends Component {

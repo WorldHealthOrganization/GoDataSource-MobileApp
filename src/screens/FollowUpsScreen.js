@@ -9,34 +9,32 @@
 import React, {Component} from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import NavBarCustom from './../components/NavBarCustom';
-import CalendarPicker from './../components/CalendarPicker';
-import config from './../utils/config';
+import NavBarCustom from '../components/NavBarCustom';
+import CalendarPicker from '../components/CalendarPicker';
+import config from '../utils/config';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {compose} from 'redux';
-import AnimatedListView from './../components/AnimatedListView';
-import Breadcrumb from './../components/Breadcrumb';
-import ValuePicker from './../components/ValuePicker';
-import {getFollowUpsForOutbreakId} from './../actions/followUps';
+import AnimatedListView from '../components/AnimatedListView';
+import Breadcrumb from '../components/Breadcrumb';
+import ValuePicker from '../components/ValuePicker';
+import {getFollowUpsForOutbreakId} from '../actions/followUps';
 import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
-import {calculateDimension, createDate, createStackFromComponent, getTranslation} from './../utils/functions';
-import ViewHOC from './../components/ViewHOC';
+import {calculateDimension, createDate, createStackFromComponent, getTranslation} from '../utils/functions';
+import ViewHOC from '../components/ViewHOC';
 import {Popup} from 'react-native-map-link';
-import translations from './../utils/translations'
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
-import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
+import translations from '../utils/translations'
+import {pushNewEditScreen} from '../utils/screenTransitionFunctions';
+import {enhanceListWithGetData} from '../components/higherOrderComponents/withListData';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {bindActionCreators} from "redux";
-import {setLoaderState} from './../actions/app';
-import {setDisableOutbreakChange} from './../actions/outbreak'
-import PermissionComponent from './../components/PermissionComponent';
+import {setLoaderState} from '../actions/app';
+import {setDisableOutbreakChange} from '../actions/outbreak'
+import PermissionComponent from '../components/PermissionComponent';
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
-import withPincode from './../components/higherOrderComponents/withPincode';
-import {Navigation} from "react-native-navigation";
-import styles from './../styles';
+import withPincode from '../components/higherOrderComponents/withPincode';
+import styles from '../styles';
 
 class FollowUpsScreen extends Component {
 
@@ -72,17 +70,17 @@ class FollowUpsScreen extends Component {
     componentDidMount = () => {
         this.setColors();
 
-        const listener = {
-            componentDidAppear: () => {
-                this.props.setDisableOutbreakChange(false);
-            }
-        };
-        // Register the listener to all events related to our component
-        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+        if (this.props.navigation) {
+             this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+                 this.props.setDisableOutbreakChange(false);
+             });
+        }
     };
 
     componentWillUnmount() {
-        this.navigationListener.remove();
+        if (this.unsubscribeFocus) {
+            this.unsubscribeFocus();
+        }
     }
 
     // The render method should have at least business logic as possible,
@@ -121,7 +119,7 @@ class FollowUpsScreen extends Component {
                             </View>
                             <View style={style.headerButtonSpacing}>
                                 <Ripple style={style.headerButtonInner} onPress={this.handleOnPressQRCode}>
-                                    <MaterialCommunityIcons name="qrcode-scan" color={styles.textColor} size={24} />
+                                    <Icon name="center-focus-strong" color={styles.textColor} size={24} />
                                 </Ripple>
                             </View>
                             <View>
@@ -250,13 +248,9 @@ class FollowUpsScreen extends Component {
         this.setState({
             calendarPickerOpen: false
         }, () => {
-            Navigation.mergeOptions(this.props.componentId, {
-                sideMenu: {
-                    left: {
-                        visible: true,
-                    },
-                },
-            });
+            if (this.props.navigation) {
+                this.props.navigation.openDrawer();
+            }
         })
     };
 
@@ -293,23 +287,21 @@ class FollowUpsScreen extends Component {
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'followUps';
-        Navigation.showModal(createStackFromComponent({
-            name: 'HelpScreen',
-            passProps: {
+        if (this.props.navigation) {
+            this.props.navigation.navigate('HelpScreen', {
                 pageAskingHelpFrom: pageAskingHelpFrom
-            }
-        }));
+            });
+        }
     };
 
     handleOnPressQRCode = () => {
         // console.log('handleOnPressQRCode');
 
-        Navigation.showModal(createStackFromComponent({
-            name: 'QRScanScreen',
-            passProps: {
+        if (this.props.navigation) {
+            this.props.navigation.navigate('QRScanScreen', {
                 pushNewScreen: this.pushNewEditScreenLocal
-            }
-        }))
+            });
+        }
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {

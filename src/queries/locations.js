@@ -1,5 +1,5 @@
 import {executeQuery} from "./sqlTools/helperMethods";
-import config from './../utils/config';
+import config from '../utils/config';
 import {rawSQLQuery} from './sqlHelper';
 
 export function getLocationsByOutbreakIdRequest (outbreakResponse, callback) {

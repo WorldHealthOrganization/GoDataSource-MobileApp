@@ -5,20 +5,19 @@ import {Icon} from 'react-native-material-ui';
 import {Alert, StyleSheet, Text, View} from 'react-native';
 import {connect} from "react-redux";
 import _, {sortBy, isEqual} from 'lodash';
-import {calculateDimension, getTranslation} from './../utils/functions';
-import translations from './../utils/translations';
+import {calculateDimension, getTranslation} from '../utils/functions';
+import translations from '../utils/translations';
 import ElevatedView from 'react-native-elevated-view';
-import config from './../utils/config';
-import QuestionCardContent from './../components/QuestionCardContent';
+import config from '../utils/config';
+import QuestionCardContent from './QuestionCardContent';
 import cloneDeep from "lodash/cloneDeep";
 import get from 'lodash/get';
 import set from 'lodash/set';
-import ViewHOC from './../components/ViewHOC';
+import ViewHOC from './ViewHOC';
 import {extractAllQuestions} from "../utils/functions";
 import Ripple from 'react-native-material-ripple';
 import uniqueId from "lodash/uniqueId";
-import {Navigation} from "react-native-navigation";
-import styles from './../styles';
+import styles from '../styles';
 
 class PreviousAnswers extends Component {
 
@@ -122,7 +121,7 @@ class PreviousAnswers extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        Navigation.dismissModal(this.props.componentId);
+        if (this.props.navigation) this.props.navigation.goBack();
     };
 
     renderListOfPreviousAnswers = (previousAnswer, index) => {

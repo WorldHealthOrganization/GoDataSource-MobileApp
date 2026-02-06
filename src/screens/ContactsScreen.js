@@ -5,35 +5,33 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
-import NavBarCustom from './../components/NavBarCustom';
+import NavBarCustom from '../components/NavBarCustom';
 import ElevatedView from 'react-native-elevated-view';
 import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
-import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
+import {calculateDimension, createStackFromComponent, getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
-import AnimatedListView from './../components/AnimatedListView';
-import {getContactsForOutbreakId} from './../actions/contacts';
-import ViewHOC from './../components/ViewHOC';
+import AnimatedListView from '../components/AnimatedListView';
+import {getContactsForOutbreakId} from '../actions/contacts';
+import ViewHOC from '../components/ViewHOC';
 import {Popup} from 'react-native-map-link';
-import translations from './../utils/translations';
-import config from './../utils/config';
-import Breadcrumb from './../components/Breadcrumb';
+import translations from '../utils/translations';
+import config from '../utils/config';
+import Breadcrumb from '../components/Breadcrumb';
 import {setDisableOutbreakChange} from "../actions/outbreak";
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
-import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
+import {pushNewEditScreen} from '../utils/screenTransitionFunctions';
+import {enhanceListWithGetData} from '../components/higherOrderComponents/withListData';
 import get from "lodash/get";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import {bindActionCreators} from "redux";
 import {setLoaderState} from "../actions/app";
-import PermissionComponent from './../components/PermissionComponent';
+import PermissionComponent from '../components/PermissionComponent';
 import withPincode from "../components/higherOrderComponents/withPincode";
 import {getFollowUpsForOutbreakId} from "../actions/followUps";
 import {compose} from "redux";
-import {Navigation} from "react-native-navigation";
 import constants from "../utils/constants";
-import styles from './../styles';
+import styles from '../styles';
 
 class ContactsScreen extends Component {
 
@@ -65,18 +63,22 @@ class ContactsScreen extends Component {
         })
 
 
-        const listener = {
-            componentDidAppear: () => {
-                console.log("Outbreak stuff Contact did appear")
-                this.props.setDisableOutbreakChange(false);
-            }
-        };
-        // Register the listener to all events related to our component
-        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+        this.setState({
+            riskColors: riskColors
+        })
+
+
+        if (this.props.navigation) {
+             this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+                 this.props.setDisableOutbreakChange(false);
+             });
+        }
     }
 
     componentWillUnmount() {
-        this.navigationListener.remove();
+        if (this.unsubscribeFocus) {
+            this.unsubscribeFocus();
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -128,7 +130,7 @@ class ContactsScreen extends Component {
                             </View>
                             <View style={style.headerButtonSpacing}>
                                 <Ripple style={style.headerButtonInner} onPress={this.handleOnPressQRCode}>
-                                    <MaterialCommunityIcons name="qrcode-scan" color={styles.textColor} size={24} />
+                                    <Icon name="center-focus-strong" color={styles.textColor} size={24} />
                                 </Ripple>
                             </View>
 
@@ -233,17 +235,14 @@ class ContactsScreen extends Component {
     };
 
     goToScreen = (contactData, index) => {
-        Navigation.push(this.props.componentId,{
-            component:{
-                name: constants.appScreens.contactSingleScreen,
-                passProps: {
-                    isNew: false,
-                    refresh: this.refresh,
-                    contact: contactData,
-                    index
-                }
-            }
-        })
+        if (this.props.navigation) {
+            this.props.navigation.navigate(constants.appScreens.contactSingleScreen, {
+                isNew: false,
+                refresh: this.refresh,
+                contact: contactData,
+                index
+            });
+        }
     }
 
     handleOnPressMap = (dataFromMapHandler) => {
@@ -258,34 +257,28 @@ class ContactsScreen extends Component {
     };
 
     handlePressNavbarButton = () => {
-        Navigation.mergeOptions(this.props.componentId, {
-            sideMenu: {
-                left: {
-                    visible: true,
-                },
-            },
-        });
+        if (this.props.navigation) {
+            this.props.navigation.openDrawer();
+        }
     };
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'contacts';
-        Navigation.showModal(createStackFromComponent({
-            name: 'HelpScreen',
-            passProps: {
+        if (this.props.navigation) {
+            this.props.navigation.navigate('HelpScreen', {
                 pageAskingHelpFrom: pageAskingHelpFrom
-            }
-        }));
+            });
+        }
     };
 
     handleOnPressQRCode = () => {
         console.log('handleOnPressQRCode');
 
-        Navigation.showModal(createStackFromComponent({
-            name: 'QRScanScreen',
-            passProps: {
+        if (this.props.navigation) {
+            this.props.navigation.navigate('QRScanScreen', {
                 pushNewScreen: this.pushNewEditScreenLocal
-            }
-        }))
+            });
+        }
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {

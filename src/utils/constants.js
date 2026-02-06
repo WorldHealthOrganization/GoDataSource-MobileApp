@@ -1,4 +1,5 @@
-import RNFetchBlobFS from 'rn-fetch-blob/fs';
+import RNFetchBlobFS from 'react-native-blob-util/fs';
+
 
 const appScreens = {
     loginScreen: 'LoginScreen',

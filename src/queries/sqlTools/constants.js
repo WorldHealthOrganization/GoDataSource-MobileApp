@@ -1,7 +1,7 @@
 // Here will be stored different values in relation to the sql structure
-import translations from './../../utils/translations';
+import translations from '../../utils/translations';
 import get from 'lodash/get';
-import {checkArrayAndLength} from './../../utils/typeCheckingFunctions';
+import {checkArrayAndLength} from '../../utils/typeCheckingFunctions';
 
 const databaseTables = ['person', 'followUp', 'relationship', 'languageToken', 'labResult'];
 const tableStructure = {

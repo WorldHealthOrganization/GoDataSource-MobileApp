@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-camera/src/RNCamera.js b/node_modules/react-native-camera/src/RNCamera.js
+index b7a271a..3588e29 100644
+--- a/node_modules/react-native-camera/src/RNCamera.js
++++ b/node_modules/react-native-camera/src/RNCamera.js
+@@ -394,7 +394,6 @@ export default class Camera extends React.Component<PropsType, StateType> {
+   };
+ 
+   static propTypes = {
+-    ...ViewPropTypes,
+     zoom: PropTypes.number,
+     useNativeZoom: PropTypes.bool,
+     maxZoom: PropTypes.number,

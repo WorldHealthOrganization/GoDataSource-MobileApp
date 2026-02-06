@@ -6,11 +6,11 @@
 import React, {PureComponent} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, getTranslation} from '../utils/functions';
 import Ripple from 'react-native-material-ripple';
 import IconMaterial from 'react-native-vector-icons/MaterialCommunityIcons';
 import {connect} from "react-redux";
-import styles from './../styles';
+import styles from '../styles';
 
 class ButtonWithIcons extends PureComponent {
 

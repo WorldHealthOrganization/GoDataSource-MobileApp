@@ -15,11 +15,11 @@ import {
     ACTION_TYPE_SET_LOADER_STATE,
     ACTION_TYPE_SET_LOGIN_STATE,
     ACTION_TYPE_SET_SYNC_STATE, ACTION_TYPE_SET_TIMEZONE
-} from './../utils/enums';
-import config from './../utils/config';
+} from '../utils/enums';
+import config from '../utils/config';
 import {Dimensions, Platform} from 'react-native';
-import {getAvailableLanguagesRequest, getTranslationRequest} from './../queries/translation';
-import {getDatabaseSnapshotRequestNew, postDatabaseSnapshotRequest} from './../requests/sync';
+import {getAvailableLanguagesRequest, getTranslationRequest} from '../queries/translation';
+import {getDatabaseSnapshotRequestNew, postDatabaseSnapshotRequest} from '../requests/sync';
 import {getInternetCredentials, setInternetCredentials} from 'react-native-keychain';
 import {
     createDate,
@@ -32,19 +32,20 @@ import {
     readDir,
     setNumberOfFilesProcessed,
     unzipFile
-} from './../utils/functions';
-import RNFetchBlobFs from 'rn-fetch-blob/fs';
-import {createDatabase, DATABASE_VERSION, getDatabase} from './../queries/database';
-import AsyncStorage from '@react-native-community/async-storage';
+} from '../utils/functions';
+import RNFetchBlobFS from 'react-native-blob-util/fs';
+
+import {createDatabase, DATABASE_VERSION, getDatabase} from '../queries/database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserById} from './user';
 import get from 'lodash/get';
 import lodashIntersection from 'lodash/intersection';
-import {getSyncEncryptPassword} from './../utils/encryption';
+import {getSyncEncryptPassword} from '../utils/encryption';
 import errorTypes from "../utils/errorTypes";
-import constants from './../utils/constants';
+import constants from '../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import sqlConstants from './../queries/sqlTools/constants';
-import {initTables} from './../queries/sqlTools/helperMethods';
+import sqlConstants from '../queries/sqlTools/constants';
+import {initTables} from '../queries/sqlTools/helperMethods';
 import {initIndexes} from "../queries/sqlTools/helperMethods";
 import DeviceInfo from "react-native-device-info";
 
@@ -743,18 +744,20 @@ export function appInitialized(nativeEventEmitter) {
                                     } else {
                                         console.log('Database does not exist');
                                         dispatch(changeAppRoot('config'));
-                                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
-                                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
-                                        if (nativeEventEmitter && typeof nativeEventEmitter.appLoaded === 'function') {
-                                            dispatch(middlewareFunction(nativeEventEmitter));
+                                        if (nativeEventEmitter) {
+                                            console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                            // console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
+                                            if (typeof nativeEventEmitter.appLoaded === 'function') {
+                                                dispatch(middlewareFunction(nativeEventEmitter));
+                                            }
                                         }
                                     }
                                 } catch (errorCreateDatabase) {
                                     console.log('errorCreateDatabase: ', errorCreateDatabase);
                                     dispatch(changeAppRoot('config'));
-                                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
-                                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
                                     if (nativeEventEmitter) {
+                                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                        // console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
                                         dispatch(middlewareFunction(nativeEventEmitter));
                                     }
                                 }
@@ -762,36 +765,36 @@ export function appInitialized(nativeEventEmitter) {
                             } else {
                                 console.log("Don't have database credentials, but have active database and logged user. Proceed to config screen");
                                 dispatch(changeAppRoot('config'));
-                                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
-                                console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
                                 if (nativeEventEmitter) {
+                                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                    // console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
                                     dispatch(middlewareFunction(nativeEventEmitter));
                                 }
                             }
                         } catch (errorGetDatabaseCredentials) {
                             console.log("Don't have database credentials, but have active database and logged user and error. Proceed to config screen: ", errorGetDatabaseCredentials);
                             dispatch(changeAppRoot('config'));
-                            console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
-                            console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
                             if (nativeEventEmitter) {
+                                console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                                // console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
                                 dispatch(middlewareFunction(nativeEventEmitter));
                             }
                         }
                     } else {
                         console.log("Don't have an active database but we have a logged user. Proceed to config screen");
                         dispatch(changeAppRoot('config'));
-                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
-                        console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
                         if (nativeEventEmitter) {
+                            console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                            // console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
                             dispatch(middlewareFunction(nativeEventEmitter));
                         }
                     }
                 } catch (errorGetActiveDatabase) {
                     console.log("We have an error at getting the active database, but we have logged user. Proceed to config screen: ", errorGetActiveDatabase)
                     dispatch(changeAppRoot('config'));
-                    console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
-                    console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
                     if (nativeEventEmitter) {
+                        console.log('NativeEventEmitter: ', typeof nativeEventEmitter, nativeEventEmitter);
+                        // console.log("Typeof nativeEventEmitter: ", typeof nativeEventEmitter.appLoaded);
                         dispatch(middlewareFunction(nativeEventEmitter));
                     }
                 }

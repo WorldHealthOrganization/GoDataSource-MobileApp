@@ -1,12 +1,12 @@
 /**
  * Created by florinpopa on 18/09/2018.
  */
-import config from './../utils/config';
+import config from '../utils/config';
 import {rawSQLQuery} from './sqlHelper';
 import {executeQuery} from './sqlTools/helperMethods';
 import {getDatabase} from "./database";
 import {extractIdFromPouchId} from "../utils/functions";
-import appConfig from './../../app.config';
+import appConfig from '../../app.config';
 
 
 // This method will extract both all the languages available on API and the ones on mobile and will do a diff

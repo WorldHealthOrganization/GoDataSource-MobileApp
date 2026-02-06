@@ -1,4 +1,4 @@
-import translations from './../../utils/translations';
+import translations from '../../utils/translations';
 import {executeQuery} from './helperMethods';
 import lodashGet from 'lodash/get';
 import lodashSet from 'lodash/set';

@@ -1,16 +1,16 @@
 import React, {PureComponent} from 'react';
 import {FlatList, Modal, Text, TextInput, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import config from './../utils/config';
+import config from '../utils/config';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension} from '../utils/functions';
 import ElevatedView from 'react-native-elevated-view';
 import Button from './Button';
 import SectionedMultiSelectListItem from './SectionedMultiSelectListItem';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
-import styles from './../styles';
+import styles from '../styles';
 
 class SectionedMultiSelect extends PureComponent {
 
@@ -33,7 +33,7 @@ class SectionedMultiSelect extends PureComponent {
     }
 
     // Since this.props.selectedItems is just an array of ids, we want to map them to the internal structure of the component
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         let selectedItems = [];
         if (this.props.selectedItems && Array.isArray(this.props.selectedItems) && this.props.selectedItems.length > 0) {
             selectedItems = this.extractSelectedItems(this.props.allItems, this.props.selectedItems, '_id');

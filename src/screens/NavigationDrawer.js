@@ -1,39 +1,29 @@
-/**
- * Created by florinpopa on 03/07/2018.
- */
+import {CommonActions} from '@react-navigation/native';
 import React, {Component} from 'react';
 import {Platform, ScrollView, StyleSheet, Text, View, Linking} from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
-import NavigationDrawerListItem from './../components/NavigationDrawerListItem';
-import config, {sideMenuKeys} from './../utils/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NavigationDrawerListItem from '../components/NavigationDrawerListItem';
+import config, {sideMenuKeys} from '../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {computeOutbreakSwitch, logoutUser, updateUser} from './../actions/user';
-import {changeAppRoot, getTranslationsAsync, saveSelectedScreen, sendDatabaseToServer} from './../actions/app';
+import {computeOutbreakSwitch, logoutUser, updateUser} from '../actions/user';
+import {changeAppRoot, getTranslationsAsync, saveSelectedScreen, sendDatabaseToServer} from '../actions/app';
 import {Icon, ListItem} from 'react-native-material-ui';
-import DropdownInput from './../components/DropdownInput';
 import {
-    createStackFromComponent,
     getTranslation,
     mapSideMenuKeysToScreenName,
     updateRequiredFields
-} from './../utils/functions';
-import translations from './../utils/translations';
+} from '../utils/functions';
+import translations from '../utils/translations';
 import VersionNumber from 'react-native-version-number';
-import PermissionComponent from './../components/PermissionComponent';
+import PermissionComponent from '../components/PermissionComponent';
 import constants from "../utils/constants";
 import lodashGet from 'lodash/get';
-import isNumber from 'lodash/isNumber';
 import LanguageComponent from "../components/LanguageComponent";
-import {Navigation} from "react-native-navigation";
 import {Dropdown} from "react-native-material-dropdown";
 import {getAllOutbreaks} from "../queries/outbreak";
 import {storeOutbreak} from "../actions/outbreak";
-import styles from './../styles';
-import {backgroundColor} from "react-native-calendars/src/style";
-
-// Since this app is based around the material ui is better to use the components from
-// the material ui library, since it provides design and animations out of the box
+import styles from '../styles';
 
 class NavigationDrawer extends Component {
 
@@ -49,7 +39,7 @@ class NavigationDrawer extends Component {
     }
 
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.populateOutbreakDropdown();
     }
 
@@ -181,19 +171,6 @@ class NavigationDrawer extends Component {
                                     style={{width: '90%'}}
                                     componentId={this.props.componentId}
                                 />
-
-                                //<DropdownInput
-                                //  id="test"
-                                //label={getTranslation(translations.navigationDrawer.languagesLabel, this.props.translation)}
-                                //value={this.props.availableLanguages && this.props.user && this.props.user.languageId && this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)] ? this.props.availableLanguages[this.props.availableLanguages.map((e) => {return e.value}).indexOf(this.props.user.languageId)].label : null}
-                                // data={this.props.availableLanguages}
-                                // isEditMode={true}
-                                // isRequired={false}
-                                // onChange={this.handleOnChangeLanguage}
-                                // style={{width: '90%'}}
-                                // translation={this.props.translation}
-                                // screenSize={this.props.screenSize}
-                                // />
                             )}
                             permissionsList={[
                                 constants.PERMISSIONS_USER.userAll,
@@ -260,20 +237,13 @@ class NavigationDrawer extends Component {
         this.setState({
             selectedScreen: index
         }, () => {
-            Navigation.setStackRoot('CenterStack', {
-                component: {
-                    name: mapSideMenuKeysToScreenName(index).screenToSwitchTo,
-                    options: {
-                        sideMenu: {
-                            left: {
-                                visible: false
-                            }
-                        }
-                    }
-                }
-            });
+             const targetScreen = mapSideMenuKeysToScreenName(index).screenToSwitchTo;
+             // Reset the stack to this screen
+             if (this.props.navigation) {
+                 this.props.navigation.navigate(targetScreen);
+                 this.props.navigation.closeDrawer();
+             }
         });
-
     };
 
     handleCommunity = async () => {
@@ -286,33 +256,28 @@ class NavigationDrawer extends Component {
         this.setState({
             selectedScreen: key
         }, () => {
+            let targetScreen = '';
+            let passProps = {
+                 isNew: true,
+                 isAddFromNavigation: true,
+                 refresh: () => {
+                     console.log('Default refresh')
+                 }
+            };
+            
             switch (key) {
                 case 'contacts':
                 case 'cases':
-                    console.log("Here");
-                    Navigation.push('CenterStack', {
-                        component: {
-                            name: mapSideMenuKeysToScreenName(`${key}-add`).screenToSwitchTo,
-                            options: {
-                                sideMenu: {
-                                    left: {
-                                        visible: false
-                                    }
-                                }
-                            },
-                            passProps: {
-                                isNew: true,
-                                isAddFromNavigation: true,
-                                refresh: () => {
-                                    console.log('Default refresh')
-                                }
-                            }
-                        }
-                    });
+                    targetScreen = mapSideMenuKeysToScreenName(`${key}-add`).screenToSwitchTo;
                     break;
                 default:
                     console.log('Add something from drawer');
                     break;
+            }
+
+            if (targetScreen && this.props.navigation) {
+                this.props.navigation.navigate(targetScreen, passProps);
+                this.props.navigation.closeDrawer();
             }
         });
 
@@ -335,31 +300,18 @@ class NavigationDrawer extends Component {
     }
 
     handleOnPressSync = () => {
-        Navigation.mergeOptions(this.props.componentId, {
-            sideMenu: {
-                left: {
-                    visible: false,
-                },
-            },
-        });
+        if (this.props.navigation) this.props.navigation.closeDrawer();
         this.props.sendDatabaseToServer();
     };
 
     handleOnPressChangeHubConfig = () => {
         console.log("Pressed it");
-        Navigation.mergeOptions(this.props.componentId, {
-            sideMenu: {
-                left: {
-                    visible: false,
-                },
-            },
-        });
-        Navigation.showModal(createStackFromComponent({
-            name: 'HubConfigScreen',
-            passProps: {
-                stackComponentId: this.props.componentId
-            }
-        }))
+        if (this.props.navigation) this.props.navigation.closeDrawer();
+        if (this.props.navigation) {
+            this.props.navigation.navigate('HubConfigScreen', {
+                stackComponentId: this.props.componentId 
+            });
+        }
     };
 
     handleOnChangeLanguage = (value, label) => {

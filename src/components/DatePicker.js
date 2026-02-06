@@ -6,13 +6,13 @@
 import React, {useState, useRef} from 'react';
 import {View, Text, StyleSheet, TouchableWithoutFeedback} from 'react-native';
 import PropTypes from 'prop-types';
-import {TextField} from 'react-native-material-textfield';
+import { TextField } from 'react-native-material-textfield';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import Ripple from 'react-native-material-ripple';
 import moment from 'moment-timezone';
-import {getTranslation, getTooltip, createDate} from './../utils/functions';
+import {getTranslation, getTooltip, createDate} from '../utils/functions';
 import TooltipComponent from './TooltipComponent';
-import stylesGlobal from './../styles';
+import stylesGlobal from '../styles';
 import {useSelector} from "react-redux";
 import {Button, Icon} from "react-native-material-ui";
 import colors from "../styles/colors";

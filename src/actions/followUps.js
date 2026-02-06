@@ -2,10 +2,10 @@
  * Created by florinpopa on 19/07/2018.
  */
 import get from 'lodash/get';
-import {createDate} from './../utils/functions';
-import {executeQuery, insertOrUpdate} from './../queries/sqlTools/helperMethods';
+import {createDate} from '../utils/functions';
+import {executeQuery, insertOrUpdate} from '../queries/sqlTools/helperMethods';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
-import translations from './../utils/translations';
+import translations from '../utils/translations';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function getFollowUpsForOutbreakId({outbreakId, followUpFilter, userTeams, contactsFilter, exposureFilter, lastElement, offset}, computeCount) {

@@ -5,12 +5,12 @@ import {
     ACTION_TYPE_STORE_LOCATIONS,
     ACTION_TYPE_STORE_OUTBREAK,
     ACTION_TYPE_STORE_USER_LOCATIONS
-} from './../utils/enums';
-import errorTypes from './../utils/errorTypes';
-import {getLocationsByOutbreakIdRequest} from './../queries/locations'
-import {mapLocations} from './../utils/functions'
+} from '../utils/enums';
+import errorTypes from '../utils/errorTypes';
+import {getLocationsByOutbreakIdRequest} from '../queries/locations'
+import {mapLocations} from '../utils/functions'
 import {extractIdFromPouchId} from "../utils/functions";
-import AsyncStorage from "@react-native-community/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Add here only the actions, not also the requests that are executed. For that purpose is the requests directory
 export function storeOutbreak(outbreak) {

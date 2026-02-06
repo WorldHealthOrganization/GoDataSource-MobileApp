@@ -10,11 +10,11 @@ import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import Ripple from 'react-native-material-ripple';
-import {getTranslation} from './../utils/functions';
-import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
+import {getTranslation} from '../utils/functions';
+import {checkArrayAndLength} from '../utils/typeCheckingFunctions';
 import PermissionComponent from './PermissionComponent';
 import {Icon} from 'react-native-material-ui';
-import styles from './../styles';
+import styles from '../styles';
 
 ActionsBar = React.memo(({textsArray, addressIndex, textsStyleArray, onPressArray, arrayPermissions, outbreakPermissions, onPermissionDisable, hasBorder, borderColor, containerStyle, containerTextStyle, isEditMode, translation, iconArray}) => (
     <View style={[style.containerStyle, containerStyle]}>

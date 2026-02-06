@@ -8,20 +8,20 @@ import {InteractionManager, StyleSheet, View} from 'react-native';
 import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
 import {LoaderScreen} from 'react-native-ui-lib';
-import FollowUpAgenda from './../components/FollowUpAgenda';
+import FollowUpAgenda from '../components/FollowUpAgenda';
 import get from 'lodash/get';
 import moment from 'moment/min/moment.min';
-import TopContainerButtons from "./../components/TopContainerButtons";
-import PermissionComponent from './../components/PermissionComponent';
-import constants from "./../utils/constants";
-import config from "./../utils/config";
+import TopContainerButtons from "../components/TopContainerButtons";
+import PermissionComponent from '../components/PermissionComponent';
+import constants from "../utils/constants";
+import config from "../utils/config";
 import {
     PERMISSION_CREATE_CONTACT,
     PERMISSION_CREATE_CONTACT_OF_CONTACT,
     PERMISSION_EDIT_CONTACT, PERMISSION_EDIT_CONTACT_OF_CONTACT
 } from "../utils/constants";
 import translations from "../utils/translations";
-import styles from './../styles';
+import styles from '../styles';
 
 class ContactsSingleCalendar extends Component {
 

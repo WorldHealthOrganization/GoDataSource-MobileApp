@@ -5,12 +5,12 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {StyleSheet} from 'react-native';
-import {createDate, checkIfSameDay, getTranslation} from './../utils/functions';
+import {createDate, checkIfSameDay, getTranslation} from '../utils/functions';
 import CalendarPickerView from './CalendarPickerView';
 import ButtonWithIcons from './ButtonWithIcons';
 import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
-import translations from './../utils/translations';
+import translations from '../utils/translations';
 import moment from "moment-timezone";
 
 class CalendarPicker extends PureComponent {

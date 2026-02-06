@@ -6,33 +6,31 @@
 import React, {Component} from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import NavBarCustom from './../components/NavBarCustom';
-import {calculateDimension, createStackFromComponent, getTranslation} from './../utils/functions';
+import NavBarCustom from '../components/NavBarCustom';
+import {calculateDimension, createStackFromComponent, getTranslation} from '../utils/functions';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import ElevatedView from 'react-native-elevated-view';
-import Breadcrumb from './../components/Breadcrumb';
-import {setLoaderState} from './../actions/app';
-import {setDisableOutbreakChange} from './../actions/outbreak';
-import AnimatedListView from './../components/AnimatedListView';
-import ViewHOC from './../components/ViewHOC';
-import translations from './../utils/translations';
-import config from './../utils/config';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {pushNewEditScreen} from './../utils/screenTransitionFunctions';
-import {enhanceListWithGetData} from './../components/higherOrderComponents/withListData';
+import Breadcrumb from '../components/Breadcrumb';
+import {setLoaderState} from '../actions/app';
+import {setDisableOutbreakChange} from '../actions/outbreak';
+import AnimatedListView from '../components/AnimatedListView';
+import ViewHOC from '../components/ViewHOC';
+import translations from '../utils/translations';
+import config from '../utils/config';
+import {pushNewEditScreen} from '../utils/screenTransitionFunctions';
+import {enhanceListWithGetData} from '../components/higherOrderComponents/withListData';
 import get from "lodash/get";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {Popup} from 'react-native-map-link';
-import PermissionComponent from './../components/PermissionComponent';
+import PermissionComponent from '../components/PermissionComponent';
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import withPincode from "../components/higherOrderComponents/withPincode";
 import {getContactsForOutbreakId} from "../actions/contacts";
 import {compose} from "redux";
-import {Navigation} from "react-native-navigation";
 import {getAllLabResultsForOutbreak} from "../actions/labResults";
-import styles from './../styles';
+import styles from '../styles';
 
 class LabResultsScreen extends Component {
 
@@ -68,17 +66,17 @@ class LabResultsScreen extends Component {
         // this.props.setMainFilter()
 
 
-        const listener = {
-            componentDidAppear: () => {
-                this.props.setDisableOutbreakChange(false);
-            }
-        };
-        // Register the listener to all events related to our component
-        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
+        if (this.props.navigation) {
+             this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+                 this.props.setDisableOutbreakChange(false);
+             });
+        }
     }
 
     componentWillUnmount() {
-        this.navigationListener.remove();
+        if (this.unsubscribeFocus) {
+            this.unsubscribeFocus();
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -129,7 +127,7 @@ class LabResultsScreen extends Component {
                             </View>
                             <View style={style.headerButtonSpacing}>
                                 <Ripple style={style.headerButtonInner} onPress={this.handleOnPressQRCode}>
-                                    <MaterialCommunityIcons name="qrcode-scan" color={styles.textColor} size={24} />
+                                    <Icon name="center-focus-strong" color={styles.textColor} size={24} />
                                 </Ripple>
                             </View>
 
@@ -223,13 +221,9 @@ class LabResultsScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        Navigation.mergeOptions(this.props.componentId, {
-            sideMenu: {
-                left: {
-                    visible: true,
-                },
-            },
-        });
+        if (this.props.navigation) {
+            this.props.navigation.openDrawer();
+        }
     };
 
     handleOnPressMap = (dataFromMapHandler) => {
@@ -255,23 +249,21 @@ class LabResultsScreen extends Component {
 
     goToHelpScreen = () => {
         let pageAskingHelpFrom = 'labResults';
-        Navigation.showModal(createStackFromComponent({
-            name: 'HelpScreen',
-            passProps: {
+        if (this.props.navigation) {
+            this.props.navigation.navigate('HelpScreen', {
                 pageAskingHelpFrom: pageAskingHelpFrom
-            }
-        }));
+            });
+        }
     };
 
     handleOnPressQRCode = () => {
         // console.log('handleOnPressQRCode');
 
-        Navigation.showModal(createStackFromComponent({
-            name: 'QRScanScreen',
-            passProps: {
+        if (this.props.navigation) {
+            this.props.navigation.navigate('QRScanScreen', {
                 pushNewScreen: this.pushNewEditScreenLocal
-            }
-        }))
+            });
+        }
     };
 
     pushNewEditScreenLocal = (QRCodeInfo) => {

@@ -5,34 +5,33 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {Component} from 'react';
 import {Alert, StyleSheet, Text, View} from 'react-native';
-import constants from "./../utils/constants";
-import Button from './../components/Button';
+import constants from "../utils/constants";
+import Button from '../components/Button';
 import {Icon} from 'react-native-material-ui';
-import ViewHOC from './../components/ViewHOC';
+import ViewHOC from '../components/ViewHOC';
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
-import {addExposureForContact, updateExposureForContact} from './../actions/contacts';
-import {addExposureForContactOfContact, updateExposureForContactOfContact} from './../actions/contactsOfContacts';
-import NavBarCustom from './../components/NavBarCustom';
-import config from './../utils/config';
+import {addExposureForContact, updateExposureForContact} from '../actions/contacts';
+import {addExposureForContactOfContact, updateExposureForContactOfContact} from '../actions/contactsOfContacts';
+import NavBarCustom from '../components/NavBarCustom';
+import config from '../utils/config';
 import Ripple from 'react-native-material-ripple';
-import {removeErrors} from './../actions/errors';
+import {removeErrors} from '../actions/errors';
 import {
     calculateDimension,
     createStackFromComponent,
     extractIdFromPouchId,
     getTranslation,
     updateRequiredFields
-} from './../utils/functions';
-import translations from './../utils/translations'
+} from '../utils/functions';
+import translations from '../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
 import RelationshipContainer from '../containers/RelationshipContainer';
 import get from 'lodash/get';
 import {insertOrUpdateExposure} from "../actions/exposure";
-import withPincode from './../components/higherOrderComponents/withPincode';
-import {Navigation} from "react-native-navigation";
+import withPincode from '../components/higherOrderComponents/withPincode';
 import _ from "lodash";
-import styles from './../styles';
+import styles from '../styles';
 import {prepareFields, prepareFieldsAndRoutes} from "../utils/formValidators";
 
 class RelationshipScreen extends Component {
@@ -69,7 +68,7 @@ class RelationshipScreen extends Component {
     // Please add here the react lifecycle methods that you need
     componentDidUpdate(prevProps) {
         if (this.state.savePressed) {
-            Navigation.dismissModal(this.props.componentId);
+            if (this.props.navigation) this.props.navigation.goBack();
         }
     }
 
@@ -164,7 +163,7 @@ class RelationshipScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        Navigation.dismissModal(this.props.componentId);
+                        if (this.props.navigation) this.props.navigation.goBack();
                     }
                 },
                 {
@@ -174,7 +173,7 @@ class RelationshipScreen extends Component {
                 }
             ])
         } else {
-            Navigation.dismissModal(this.props.componentId);
+            if (this.props.navigation) this.props.navigation.goBack();
         }
     };
 
@@ -340,7 +339,7 @@ class RelationshipScreen extends Component {
                             this.setState(prevState => ({
                                 exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
                             }), async () => {
-                                await Navigation.dismissModal(this.props.componentId);
+                                if (this.props.navigation) this.props.navigation.goBack();
                                 this.props.saveExposure(this.state.exposure, true);
                             })
                         } else {
@@ -354,7 +353,7 @@ class RelationshipScreen extends Component {
                             Promise.all([promise])
                                 .then((result) => {
                                     this.props.refreshRelations();
-                                    Navigation.dismissModal(this.props.componentId);
+                                    if (this.props.navigation) this.props.navigation.goBack();
                                 })
                         }
                     } else {
@@ -362,7 +361,7 @@ class RelationshipScreen extends Component {
                             this.setState(prevState => ({
                                 exposure: Object.assign({}, prevState.exposure, {updatedAt: new Date().toISOString(), updatedBy: this.props.user._id.split('_')[this.props.user._id.split('_').length - 1]})
                             }), async () => {
-                              await Navigation.dismissModal(this.props.componentId);
+                              if (this.props.navigation) this.props.navigation.goBack();
                                 this.props.saveExposure(this.state.exposure);
                             })
                         } else {
@@ -377,7 +376,7 @@ class RelationshipScreen extends Component {
                                 .then((result) => {
                                     console.log('Successful at adding exposures');
                                     this.props.refreshRelations();
-                                    Navigation.dismissModal(this.props.componentId);
+                                    if (this.props.navigation) this.props.navigation.goBack();
                                 })
                                 .catch((errorAddExposure) => {
                                     console.log("ErrorInsertUpdateExposure contact: ",errorAddExposure)
@@ -390,7 +389,7 @@ class RelationshipScreen extends Component {
                     insertOrUpdateExposure(exposure)
                         .then((resultInsertUpdateExposure) => {
                             this.props.refreshRelations();
-                            Navigation.dismissModal(this.props.componentId);
+                            if (this.props.navigation) this.props.navigation.goBack();
                         })
                         .catch((errorInsertUpdateExposure) => {
                             console.log('ErrorInsertUpdateExposure: ', errorInsertUpdateExposure);
@@ -438,12 +437,11 @@ class RelationshipScreen extends Component {
             pageAskingHelpFrom = 'exposureAdd'
         }
 
-        Navigation.showModal(createStackFromComponent({
-            name: 'HelpScreen',
-            passProps: {
+        if (this.props.navigation) {
+            this.props.navigation.navigate('HelpScreen', {
                 pageAskingHelpFrom: pageAskingHelpFrom
-            }
-        }));
+            });
+        }
     };
 }
 

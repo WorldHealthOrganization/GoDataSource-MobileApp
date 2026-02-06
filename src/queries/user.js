@@ -2,8 +2,8 @@
  * Created by florinpopa on 31/08/2018.
  */
 import {getDatabase} from './database';
-import {comparePasswords} from './../utils/functions';
-import config from './../utils/config';
+import {comparePasswords} from '../utils/functions';
+import config from '../utils/config';
 
 // Credentials: {email, encryptedPassword}
 export function loginUserRequest (credentials, callback) {

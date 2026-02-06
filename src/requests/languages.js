@@ -1,4 +1,4 @@
-import {handleResponse} from './../utils/functions';
+import {handleResponse} from '../utils/functions';
 
 export function getAvailableLanguages(url, authorization) {
     return fetch(url, {

@@ -7,17 +7,17 @@ import React, {Component} from 'react';
 import geolocation from '@react-native-community/geolocation';
 import {Alert, Animated, BackHandler, Platform, StyleSheet, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import NavBarCustom from './../components/NavBarCustom';
-import config from './../utils/config';
+import NavBarCustom from '../components/NavBarCustom';
+import config from '../utils/config';
 import {connect} from "react-redux";
 import {bindActionCreators, compose} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
-import LabResultsSingleContainer from './../containers/LabResultsSingleContainer';
-import LabResultsSingleQuestionnaireContainer from './../containers/LabResultsSingleQuestionnaireContainer';
-import Breadcrumb from './../components/Breadcrumb';
+import LabResultsSingleContainer from '../containers/LabResultsSingleContainer';
+import LabResultsSingleQuestionnaireContainer from '../containers/LabResultsSingleQuestionnaireContainer';
+import Breadcrumb from '../components/Breadcrumb';
 import Menu, {MenuItem} from 'react-native-material-menu';
 import Ripple from 'react-native-material-ripple';
-import {updateLabResultAndContact} from './../actions/labResults';
+import {updateLabResultAndContact} from '../actions/labResults';
 import _, {cloneDeep, sortBy} from 'lodash';
 import {
     calculateDimension,
@@ -26,20 +26,19 @@ import {
     mapAnswers,
     reMapAnswers,
     updateRequiredFields
-} from './../utils/functions';
-import translations from './../utils/translations'
+} from '../utils/functions';
+import translations from '../utils/translations'
 import ElevatedView from 'react-native-elevated-view';
-import ViewHOC from './../components/ViewHOC';
-import PermissionComponent from './../components/PermissionComponent';
+import ViewHOC from '../components/ViewHOC';
+import PermissionComponent from '../components/PermissionComponent';
 import moment from 'moment/min/moment.min';
-import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
+import {checkArrayAndLength} from '../utils/typeCheckingFunctions';
 import {checkRequiredQuestions, extractAllQuestions} from "../utils/functions";
-import constants from './../utils/constants';
-import withPincode from './../components/higherOrderComponents/withPincode';
-import {Navigation} from "react-native-navigation";
+import constants from '../utils/constants';
+import withPincode from '../components/higherOrderComponents/withPincode';
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import {setDisableOutbreakChange} from "../actions/outbreak";
-import styles from './../styles';
+import styles from '../styles';
 import colors from "../styles/colors";
 import {prepareFieldsAndRoutes} from "../utils/formValidators";
 
@@ -72,14 +71,12 @@ class LabResultsSingleScreen extends Component {
     }
 
     componentDidMount() {
-        const listener = {
-            componentDidAppear: () => {
-                this.props.setDisableOutbreakChange(true);
-            }
-        };
-        // Register the listener to all events related to our component
-        this.navigationListener = Navigation.events().registerComponentListener(listener, this.props.componentId);
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
+        if (this.props.navigation) {
+             this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+                 this.props.setDisableOutbreakChange(true);
+             });
+        }
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
 
         let isEditMode = _.get(this.props, 'isEditMode', true);
 
@@ -119,8 +116,10 @@ class LabResultsSingleScreen extends Component {
     }
 
     componentWillUnmount() {
-        this.navigationListener.remove();
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
+        if (this.unsubscribeFocus) {
+             this.unsubscribeFocus();
+        }
+        if (this.backHandler) this.backHandler.remove();
     }
 
     handleBackButtonClick() {
@@ -129,7 +128,7 @@ class LabResultsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        Navigation.pop(this.props.componentId)
+                        if (this.props.navigation) this.props.navigation.goBack();
                     }
                 },
                 {
@@ -139,7 +138,7 @@ class LabResultsSingleScreen extends Component {
                 }
             ])
         } else {
-            Navigation.pop(this.props.componentId)
+            if (this.props.navigation) this.props.navigation.goBack();
         }
         return true;
     }
@@ -258,13 +257,9 @@ class LabResultsSingleScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        Navigation.mergeOptions(this.props.componentId, {
-            sideMenu: {
-                left: {
-                    visible: true,
-                },
-            },
-        });
+        if (this.props.navigation) {
+            this.props.navigation.openDrawer();
+        }
     };
 
     handleOnIndexChange = _.throttle((index) => {
@@ -421,7 +416,7 @@ class LabResultsSingleScreen extends Component {
             Alert.alert("", 'You have unsaved data. Are you sure you want to leave this page and lose all changes?', [
                 {
                     text: 'Yes', onPress: () => {
-                        Navigation.pop(this.props.componentId)
+                        if (this.props.navigation) this.props.navigation.goBack();
                     }
                 },
                 {
@@ -431,7 +426,7 @@ class LabResultsSingleScreen extends Component {
                 }
             ])
         } else {
-            Navigation.pop(this.props.componentId);
+            if (this.props.navigation) this.props.navigation.goBack();
         }
     };
 
@@ -681,19 +676,9 @@ class LabResultsSingleScreen extends Component {
                                 .then((responseCreateLabResult) => {
                                     console.log("The response from update lab result", responseCreateLabResult);
                                     // this.props.refresh();
-                                    Navigation.setStackRoot(this.props.componentId,
-                                        {
-                                            component:{
-                                                name: this.props.personType === translations.personTypes.cases ? 'CasesScreen' : 'ContactsScreen',
-                                                options:{
-                                                    animations:{
-                                                        pop: fadeOutAnimation,
-                                                        push: fadeInAnimation
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    )
+                                    if (this.props.navigation) {
+                                        this.props.navigation.navigate(this.props.personType === translations.personTypes.cases ? 'CasesScreen' : 'ContactsScreen');
+                                    }
                                 })
                                 .catch((errorCreateLabResult) => {
                                     console.log("Error create lab result",errorCreateLabResult);
@@ -709,7 +694,7 @@ class LabResultsSingleScreen extends Component {
                             updateLabResultAndContact(labResultClone)
                                 .then((responseUpdateLabResult) => {
                                     this.props.refresh();
-                                    Navigation.pop(this.props.componentId)
+                                    if (this.props.navigation) this.props.navigation.goBack();
                                 })
                                 .catch((errorUpdateLabResult) => {
                                     console.log(errorUpdateLabResult);
@@ -790,16 +775,13 @@ class LabResultsSingleScreen extends Component {
     handleEditContact = () => {
         this.hideMenu();
 
-        Navigation.push(this.props.componentId,{
-            component:{
-                name: 'ContactsSingleScreen',
-                passProps: {
-                    contact: this.state.contact,
-                    handleUpdateContactFromLabResult: this.handleUpdateContactFromLabResult,
-                    refresh: this.props.refresh
-                }
-            }
-        })
+        if (this.props.navigation) {
+            this.props.navigation.navigate('ContactsSingleScreen', {
+                contact: this.state.contact,
+                handleUpdateContactFromLabResult: this.handleUpdateContactFromLabResult,
+                refresh: this.props.refresh
+            });
+        }
     };
 
     handleUpdateContactFromLabResult = (updatedContact) => {

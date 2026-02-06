@@ -6,12 +6,12 @@
 import React, {Component} from 'react';
 import {Animated, StyleSheet, View} from 'react-native';
 import ElevatedView from 'react-native-elevated-view';
-import {calculateDimension} from './../utils/functions';
+import {calculateDimension} from '../utils/functions';
 import {connect} from "react-redux";
 import PropTypes from 'prop-types';
 import IconButton from './ButtonWithIcons';
 import TextInputWithIcon from './TextInputWithIcon';
-import styles from './../styles';
+import styles from '../styles';
 
 class SearchFilterView extends Component {
     searchRef = React.createRef();

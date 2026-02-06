@@ -5,9 +5,9 @@ import React, {PureComponent} from 'react';
 import {View, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
 import SwitchSelector from 'react-native-switch-selector';
-import config from './../utils/config'
-import {getTranslation} from './../utils/functions';
-import styles from './../styles';
+import config from '../utils/config'
+import {getTranslation} from '../utils/functions';
+import styles from '../styles';
 
 class TextSwitchSelector extends PureComponent {
 

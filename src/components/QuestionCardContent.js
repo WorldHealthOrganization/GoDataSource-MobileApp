@@ -13,8 +13,8 @@ import get from 'lodash/get';
 import Ripple from 'react-native-material-ripple';
 import {Icon} from 'react-native-material-ui';
 import uniqueId from "lodash/uniqueId";
-import {checkArrayAndLength} from './../utils/typeCheckingFunctions';
-import styles from './../styles';
+import {checkArrayAndLength} from '../utils/typeCheckingFunctions';
+import styles from '../styles';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 class QuestionCardContent extends PureComponent {

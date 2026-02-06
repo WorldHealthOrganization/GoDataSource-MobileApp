@@ -4,7 +4,7 @@
 import {
   ACTION_TYPE_STORE_OUTBREAK,
   ACTION_TYPE_OUTBREAK_CHANGE,
-} from "./../utils/enums";
+} from "../utils/enums";
 
 // Do not add unnecessary business logic in the reducer. Here should only be updated the store
 export default function (state=null, action) {

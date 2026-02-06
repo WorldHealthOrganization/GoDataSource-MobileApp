@@ -6,14 +6,14 @@
 import React, {Component} from 'react';
 import {Text, View, StyleSheet} from 'react-native';
 import PropTypes from 'prop-types';
-import {getTooltip, getTranslation} from './../utils/functions';
+import {getTooltip, getTranslation} from '../utils/functions';
 import {TextField} from 'react-native-material-textfield';
 import TooltipComponent from './TooltipComponent';
 import lodashGet from 'lodash/get';
 import lodashDebounce from 'lodash/debounce';
 import Ripple from "react-native-material-ripple";
 import translations from "../utils/translations";
-import styles from './../styles';
+import styles from '../styles';
 
 class TextInput extends Component {
     fieldRef = React.createRef();

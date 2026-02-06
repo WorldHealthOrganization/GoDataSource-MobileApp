@@ -6,12 +6,12 @@
 import React, {PureComponent} from 'react';
 import {InteractionManager, StyleSheet, Text, View} from 'react-native';
 import {ListItem} from 'react-native-material-ui';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
-import translations from './../utils/translations';
-import styles from './../styles';
+import translations from '../utils/translations';
+import styles from '../styles';
 
 class HelpListItem extends PureComponent {
 

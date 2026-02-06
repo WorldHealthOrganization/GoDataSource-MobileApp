@@ -5,37 +5,35 @@
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
 import {Alert, Image, Platform, StyleSheet, Text, View} from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Button, Icon} from 'react-native-material-ui';
 import {TextField} from 'react-native-material-textfield';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {loginUser} from './../actions/user';
-import {removeErrors} from './../actions/errors';
+import {loginUser} from '../actions/user';
+import {removeErrors} from '../actions/errors';
 import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scroll-view';
-import url from './../utils/url';
-import {changeAppRoot, setSyncState, storeHubConfigurationNew} from './../actions/app';
+import url from '../utils/url';
+import {changeAppRoot, setSyncState, storeHubConfigurationNew} from '../actions/app';
 import Ripple from 'react-native-material-ripple';
 import ElevatedView from 'react-native-elevated-view';
 import Modal from 'react-native-modal';
-import {calculateDimension, generateId, getTranslation} from './../utils/functions';
-import translations from './../utils/translations';
-import SwitchInput from './../components/SwitchInput';
+import {calculateDimension, generateId, getTranslation} from '../utils/functions';
+import translations from '../utils/translations';
+import SwitchInput from '../components/SwitchInput';
 import {getInternetCredentials} from 'react-native-keychain';
-import ModalSyncStatus from './../components/ModalSyncStatus';
+import ModalSyncStatus from '../components/ModalSyncStatus';
 import VersionNumber from 'react-native-version-number';
-import IntervalPicker from './../components/IntervalPicker';
-import constants from './../utils/constants';
-import config from './../utils/config';
+import IntervalPicker from '../components/IntervalPicker';
+import constants from '../utils/constants';
+import config from '../utils/config';
 import lodashGet from 'lodash/get';
-import {getAvailableLanguages} from './../requests/languages';
+import {getAvailableLanguages} from '../requests/languages';
 import base64 from 'base-64';
-import DropdownInput from './../components/DropdownInput';
-import appConfig from './../../app.config';
-import LocalButton from './../components/Button';
-import {Navigation} from "react-native-navigation";
-import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
-import styles from './../styles';
+import DropdownInput from '../components/DropdownInput';
+import appConfig from '../../app.config';
+import LocalButton from '../components/Button';
+import styles from '../styles';
 
 class ManualConfigScreen extends PureComponent {
     nameRef = React.createRef();
@@ -53,7 +51,7 @@ class ManualConfigScreen extends PureComponent {
             clientId: appConfig.env === 'development' ? config.whocdCredentials.clientId : '',
             clientSecret: appConfig.env === 'development' ? config.whocdCredentials.clientSecret : '',
             userEmail: appConfig.env === 'development' ? config.whocdCredentials.userEmail : '',
-            apiKey: appConfig.env === 'development' ? config.whocdCredentials.apiKey : '',
+            apiKey: appConfig.env === 'development' ? config.whocdCredentials.apiKey : 'your_api_key_here',
             encryptedData: appConfig.env === 'development' ? config.whocdCredentials.encryptedConnection : true,
             chunkSize: appConfig.env === 'development' ? config.whocdCredentials.numberOfData : 2500,
             hasAlert: false,
@@ -122,7 +120,7 @@ class ManualConfigScreen extends PureComponent {
                                     this.clientIdRef.current.setValue(this.state.clientId);
                                     this.clientSecretRef.current.setValue(this.state.clientSecret);
                                     this.userEmailRef.current.setValue(this.state.userEmail);
-                                    this.apiKeyref.current.setValue(this.state.apiKey);
+                                    this.apiKeyRef.current.setValue(this.state.apiKey);
                                 })
                             } else {
                                 console.log("No active database found");
@@ -178,17 +176,7 @@ class ManualConfigScreen extends PureComponent {
                 this.props.changeAppRoot('login');
             } else {
                 // console.log('TestQRCode go to login without app root');
-                Navigation.push(this.props.componentId,{
-                    component:{
-                        name: 'LoginScreen',
-                        options:{
-                            animations:{
-                                push: fadeInAnimation,
-                                pop: fadeOutAnimation
-                            }
-                        }
-                    }
-                })
+                this.props.changeAppRoot('login');
             }
         }
         return (
@@ -430,33 +418,31 @@ class ManualConfigScreen extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleOnPressBack = () => {
+        console.log('Handle on press back');
         if (this.props && this.props.allowBack) {
-            Navigation.pop(this.props.componentId);
+            if (this.props.navigation) {
+                this.props.navigation.goBack();
+            }
         } else {
-            Navigation.setStackRoot(this.props.componentId,{
-                component:{
-                    name: 'FirstConfigScreen',
-                    passProps: {
-                        allowBack: this.props.allowBack,
-                        skipEdit: this.props.skipEdit,
-                        isMultipleHub: this.props.isMultipleHub
-                    }
-                }
-            });
+            // Reset to FirstConfigScreen
+            if (this.props.navigation) {
+                this.props.navigation.reset({
+                    index: 0,
+                    routes: [{
+                        name: 'FirstConfigScreen',
+                        params: {
+                            allowBack: this.props.allowBack,
+                            skipEdit: this.props.skipEdit,
+                            isMultipleHub: this.props.isMultipleHub
+                        }
+                    }]
+                });
+            }
         }
     };
 
     handleOnPressForward = () => {
-        Navigation.push(this.props.componentId,{
-            component:{
-                name: 'LoginScreen',
-                passProps: {
-                    allowBack: this.props.allowBack,
-                    skipEdit: this.props.skipEdit,
-                    isMultipleHub: this.props.isMultipleHub
-                }
-            }
-        })
+        this.props.changeAppRoot('login');
     };
 
     checkFields = (nextFunction, validateUrl) => {

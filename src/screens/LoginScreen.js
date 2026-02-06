@@ -9,22 +9,21 @@ import {Button, Icon} from 'react-native-material-ui';
 import {TextField} from 'react-native-material-textfield';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {cleanDataAfterLogout, loginUser} from './../actions/user';
-import {removeErrors} from './../actions/errors';
-import {changeAppRoot, setSyncState} from './../actions/app';
+import {cleanDataAfterLogout, loginUser} from '../actions/user';
+import {removeErrors} from '../actions/errors';
+import {changeAppRoot, setSyncState} from '../actions/app';
 import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scroll-view';
 import {LoaderScreen} from 'react-native-ui-lib';
 import Ripple from 'react-native-material-ripple';
 import lodashGet from 'lodash/get';
-import translations from './../utils/translations';
-import config from './../utils/config';
-import {getTranslation} from './../utils/functions';
+import translations from '../utils/translations';
+import config from '../utils/config';
+import {getTranslation} from '../utils/functions';
 import VersionNumber from 'react-native-version-number';
-import appConfig from './../../app.config';
+import appConfig from '../../app.config';
 import withPincode from "../components/higherOrderComponents/withPincode";
 import {compose} from "redux";
-import {Navigation} from "react-native-navigation";
-import styles from './../styles';
+import styles from '../styles';
 
 class LoginScreen extends Component {
 
@@ -177,15 +176,7 @@ class LoginScreen extends Component {
 
     handleOnPressBack = () => {
         this.props.setSyncState(null);
-        Navigation.setStackRoot(this.props.componentId,{
-            component:{
-                name: this.props.activeDatabase ? 'ManualConfigScreen' : 'FirstConfigScreen',
-                passProps: {
-                    allowBack: this.props.allowBack,
-                    isMultipleHub: this.props.isMultipleHub
-                }
-            }
-        })
+        this.props.changeAppRoot('config');
     }
 }
 

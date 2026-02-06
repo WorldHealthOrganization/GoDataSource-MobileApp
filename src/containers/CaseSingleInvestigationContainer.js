@@ -14,9 +14,9 @@ import uniqueId from 'lodash/uniqueId';
 import ElevatedView from 'react-native-elevated-view';
 import get from 'lodash/get';
 import TopContainerButtons from "../components/TopContainerButtons";
-import PermissionComponent from './../components/PermissionComponent';
-import constants from "./../utils/constants";
-import config from "./../utils/config";
+import PermissionComponent from '../components/PermissionComponent';
+import constants from "../utils/constants";
+import config from "../utils/config";
 import styles from '../styles';
 import Section from "../components/Section";
 

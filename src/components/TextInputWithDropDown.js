@@ -3,15 +3,15 @@
  */
 import React, {Component} from 'react';
 import {Text, View, StyleSheet} from 'react-native';
-import config from './../utils/config'
+import config from '../utils/config'
 import PropTypes from 'prop-types';
 import {TextField} from 'react-native-material-textfield';
 import {Dropdown} from 'react-native-material-dropdown';
-import translations from './../utils/translations';
-import {getDropDownInputDisplayParameters, getTooltip, getTranslation} from './../utils/functions';
+import translations from '../utils/translations';
+import {getDropDownInputDisplayParameters, getTooltip, getTranslation} from '../utils/functions';
 import TooltipComponent from './TooltipComponent';
 import get from 'lodash/get';
-import styles from './../styles';
+import styles from '../styles';
 
 class TextInputWithDropDown extends Component {
 

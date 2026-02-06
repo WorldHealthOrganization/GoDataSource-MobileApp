@@ -6,12 +6,12 @@ import {StyleSheet, Text, View} from 'react-native';
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import {Icon} from 'react-native-material-ui';
-import {calculateDimension, getTranslation} from './../utils/functions';
+import {calculateDimension, getTranslation} from '../utils/functions';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import Modal from 'react-native-modal';
 import ElevatedView from "react-native-elevated-view";
-import styles from './../styles';
+import styles from '../styles';
 
 class TooltipComponent extends PureComponent {
 

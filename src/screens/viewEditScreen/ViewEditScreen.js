@@ -9,9 +9,9 @@ import {LoaderScreen} from 'react-native-ui-lib';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import ViewHOC from './../../components/ViewHOC';
-import NavBarCustom from './../../components/NavBarCustom';
-import Breadcrumb from './../../components/Breadcrumb';
+import ViewHOC from '../../components/ViewHOC';
+import NavBarCustom from '../../components/NavBarCustom';
+import Breadcrumb from '../../components/Breadcrumb';
 import {enhanceTabsWithDataHandling} from './withDataHandling';
 import {
     calculateDimension,
@@ -26,12 +26,11 @@ import {
 } from "../../utils/functions";
 import translations from "../../utils/translations";
 import config from "../../utils/config";
-import constants from './../../utils/constants';
+import constants from '../../utils/constants';
 import lodashGet from "lodash/get";
 import _ from "lodash";
 import {checkArrayAndLength} from "../../utils/typeCheckingFunctions";
-import FollowUpsSingleContainer from './../../containers/FollowUpsSingleContainer';
-import {Navigation} from "react-native-navigation";
+import FollowUpsSingleContainer from '../../containers/FollowUpsSingleContainer';
 import {fadeInAnimation, fadeOutAnimation} from "../../utils/animations";
 import ContactsSingleRelationship from "../../containers/ContactsSingleRelationship";
 import styles from "../../styles";
@@ -170,7 +169,7 @@ class ViewEditScreen extends Component {
                     ) : null
                 );
             case 'contact':
-                let AddFollowUpScreen = require('./../AddFollowUpScreen').default;
+                let AddFollowUpScreen = require('../AddFollowUpScreen').default;
                 let DateTimePicker = require('react-native-modal-datetime-picker').default;
                 return (
                     this.props.role && this.props.role.find((e) => e === config.userPermissions.writeContact) !== undefined ? (
@@ -239,13 +238,9 @@ class ViewEditScreen extends Component {
 
     // Please write here all the methods that are not react native lifecycle methods
     handlePressNavbarButton = () => {
-        Navigation.mergeOptions(this.props.componentId, {
-            sideMenu: {
-                left: {
-                    visible: true,
-                },
-            },
-        });
+        if (this.props.navigation) {
+            this.props.navigation.openDrawer();
+        }
     };
 
     //Index change for TabBar
@@ -345,7 +340,7 @@ class ViewEditScreen extends Component {
                             />
                         );
                     case 'quest':
-                        let FollowUpsSingleQuestionnaireContainer = require('./../../containers/FollowUpsSingleQuestionnaireContainer').default;
+                        let FollowUpsSingleQuestionnaireContainer = require('../../containers/FollowUpsSingleQuestionnaireContainer').default;
                         return (
                             <FollowUpsSingleQuestionnaireContainer
                                 item={this.props.element}
@@ -377,7 +372,7 @@ class ViewEditScreen extends Component {
             case 'contact':
                 switch (lodashGet(route, 'key', 'personal')) {
                     case 'personal':
-                        let ContactsSinglePersonal = require('./../../containers/ContactsSinglePersonal').default;
+                        let ContactsSinglePersonal = require('../../containers/ContactsSinglePersonal').default;
                         return (
                             <ContactsSinglePersonal
                                 isNew={this.props.isNew}
@@ -412,7 +407,7 @@ class ViewEditScreen extends Component {
                             />
                         );
                     case 'address':
-                    let ContactsSingleAddress = require('./../../containers/ContactsSingleAddress').default;
+                    let ContactsSingleAddress = require('../../containers/ContactsSingleAddress').default;
                         return (
                             <ContactsSingleAddress
                                 isNew={this.props.isNew}
@@ -442,7 +437,7 @@ class ViewEditScreen extends Component {
                             />
                         );
                     case 'exposures':
-                    let ContactsSingleRelationship = require('./../../containers/ContactsSingleRelationship').default;
+                    let ContactsSingleRelationship = require('../../containers/ContactsSingleRelationship').default;
                         return (
                             <ContactsSingleRelationship
                                 preparedFields={this.props.preparedFields}
@@ -473,7 +468,7 @@ class ViewEditScreen extends Component {
                             />
                         );
                     case 'calendar':
-                    let ContactsSingleCalendar = require('./../../containers/ContactsSingleCalendar').default;
+                    let ContactsSingleCalendar = require('../../containers/ContactsSingleCalendar').default;
                         return (
                             <ContactsSingleCalendar
                                 isNew={this.props.isNew}
@@ -494,7 +489,7 @@ class ViewEditScreen extends Component {
             case 'case':
                 switch (lodashGet(route, 'key', 'personal')) {
                     case 'personal':
-                        let CaseSinglePersonalContainer = require('./../../containers/CaseSinglePersonalContainer').default;
+                        let CaseSinglePersonalContainer = require('../../containers/CaseSinglePersonalContainer').default;
                         return (
                             <CaseSinglePersonalContainer
                                 isNew={this.props.isNew}
@@ -758,27 +753,16 @@ class ViewEditScreen extends Component {
             showAddFollowUpScreen: !this.state.showAddFollowUpScreen
         }, () => {
             this.hideMenu();
-            Navigation.push(this.props.componentId, {
-                component:{
-                    name: constants.appScreens.viewEditScreen,
-                    options:{
-                        animations: {
-                            push: fadeInAnimation,
-                            pop: fadeOutAnimation
-                        }
-                    },
-                    passProps: {
-                        isNew: true,
-                        isEditMode: true,
-                        element: followUp,
-                        elementType: 'followUp',
-                        additionalId: this.props.element._id,
-                        previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
-                        // contact: this.props.element,
-                        // item: followUp
-                    }
-                }
-            });
+            if (this.props.navigation) {
+                this.props.navigation.navigate(constants.appScreens.viewEditScreen, {
+                    isNew: true,
+                    isEditMode: true,
+                    element: followUp,
+                    elementType: 'followUp',
+                    additionalId: this.props.element._id,
+                    previousScreen: getTranslation(translations.contactSingleScreen.addContactTitle, this.props.translation),
+                });
+            }
         });
     };
 

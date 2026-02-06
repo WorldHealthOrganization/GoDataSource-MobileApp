@@ -6,11 +6,11 @@
 import React, {Component} from 'react';
 import {StyleSheet, TextInput, View} from 'react-native';
 import {Icon} from 'react-native-material-ui';
-import {getTranslation} from './../utils/functions';
+import {getTranslation} from '../utils/functions';
 import {connect} from "react-redux";
-import translations from './../utils/translations';
+import translations from '../utils/translations';
 import get from 'lodash/get';
-import styles from './../styles';
+import styles from '../styles';
 import colors from "../styles/colors";
 
 class TextInputWithIcon extends Component {

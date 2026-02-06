@@ -1,19 +1,17 @@
-import { Navigation} from 'react-native-navigation';
 import {Provider} from 'react-redux';
 import {applyMiddleware, createStore} from 'redux';
 import {enableBatching} from 'redux-batched-actions';
-import thunk from 'redux-thunk';
+import {thunk} from 'redux-thunk';
 import promise from 'redux-promise';
 import {DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform} from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
-import RNFetchBlobFS from 'rn-fetch-blob/fs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import RNFetchBlobFS from 'react-native-blob-util/fs';
+
 import RNFS from 'react-native-fs';
 import {getInternetCredentials, resetInternetCredentials} from 'react-native-keychain';
 import {wipeCompleteRequest} from './requests/wipeData';
 import appReducers from './reducers';
 import appActions from './actions';
-//here
-import {registerScreens} from './screens';
 import config, {sideMenuKeys} from './utils/config';
 import {checkDeviceStatus} from "./requests/deviceStatus";
 import isNumber from 'lodash/isNumber';
@@ -27,11 +25,6 @@ export const store = createStore(
   applyMiddleware(thunk, promise)
 );
 
-registerScreens(store, Provider);
-
-
-
-
 export default class App {
 
     constructor() {
@@ -41,6 +34,22 @@ export default class App {
         } else {
             ParseNativeModule = DeviceEventEmitter;
         }
+
+        // Initialize Parse
+        let ParseReceiverModule;
+        if (Platform.OS === 'ios') {
+            ParseReceiverModule = NativeModules.APNSEventEmitter
+        } else {
+            ParseReceiverModule = NativeModules.ParseReceiver
+        }
+        
+        if (ParseReceiverModule && ParseReceiverModule.initParse) {
+             console.log('~~~ Calling native module ready to start init parse ~~~');
+             ParseReceiverModule.initParse()
+        } else {
+            console.log("WARNING: ParseNativeModule or initParse missing");
+        }
+
         ParseNativeModule.addListener('onParseInit', (item) => {
             console.log('~~~ TODO save installation Id onParseInit ~~~', item);
             AsyncStorage.setItem('installationId', item.installationId);
@@ -113,195 +122,11 @@ export default class App {
                     console.log('Error device id: ', errorInstallationId);
                 })
         });
-        store.subscribe(this.onStoreUpdate);
+
         console.log('Proceed to initialize the app');
         this.checkDevice(() => {
             store.dispatch(appActions.appInitialized(Platform.OS === 'ios' ? NativeModules.APNSEventEmitter : NativeModules.ParseReceiver));
         })
-    };
-
-    onStoreUpdate = () => {
-        const { root, selectedScreen } = store.getState().app;
-        const oldRoot = this.currentRoot;
-        console.log("Store has updated", root, oldRoot, selectedScreen);
-        if (this.currentRoot !== root) {
-            this.currentRoot = root;
-            console.log("Register listener");
-            // this.appLaunchedListener = Navigation.events().registerAppLaunchedListener(() => {
-            //     console.log("app launched listener");
-            //     // Each time the event is received you should call Navigation.setRoot
-            //     this.startApp(root, oldRoot, selectedScreen);
-            // });
-            this.startApp(root, oldRoot, selectedScreen);
-        }
-    };
-
-    startApp = (root, oldRoot, selectedScreens) => {
-        let isAppInitialize = false;
-        console.log('Update root start app: ', root, oldRoot);
-        if (!oldRoot) {
-            let ParseNativeModule;
-            if (Platform.OS === 'ios') {
-                ParseNativeModule = NativeModules.APNSEventEmitter
-            } else {
-                ParseNativeModule = NativeModules.ParseReceiver
-            }
-            console.log('~~~ Calling native module ready to start init parse ~~~');
-            isAppInitialize = true;
-            ParseNativeModule.initParse()
-        }
-
-        let screen;
-        switch (selectedScreens) {
-            case sideMenuKeys[1]:
-                screen = constants.appScreens.contactsScreen;
-                break;
-            case sideMenuKeys[2]:
-                screen = constants.appScreens.contactsOfContactsScreen;
-                break;
-            case sideMenuKeys[3]:
-                screen = constants.appScreens.casesScreen;
-                break;
-            case sideMenuKeys[4]:
-                screen = constants.appScreens.labResultsScreen;
-                break;
-            case sideMenuKeys[5]:
-                screen = constants.appScreens.eventsScreen;
-                break;
-            default:
-                screen = constants.appScreens.followUpScreen;
-                break;
-        }
-
-        let componentObject = {
-            passProps: {
-                isAppInitialize: isAppInitialize
-            },
-            options:{
-                sideMenu:{
-                    left:{
-                        visible: false
-                    }
-                }
-            }
-        };
-        let rootObject = null;
-
-        switch (root) {
-            case 'config':
-                componentObject = Object.assign({}, componentObject,
-                    {
-                            name: 'FirstConfigScreen'
-                    });
-                break;
-            case 'login':
-                componentObject = Object.assign({}, componentObject,
-                    {
-                            name: 'LoginScreen'
-                    });
-                break;
-            case 'after-login':
-                componentObject = {
-                    name: screen,
-                    options: {
-                        sideMenu:{
-                            left: {
-                                name: 'NavigationDrawer',
-                                visible: false
-                            },
-                        },
-                        animations: {
-                            push: slideInAnimation,
-                            pop: slideOutAnimation
-                        }
-                    },
-                    passProps: {
-                        isAppInitialize: isAppInitialize
-                    },
-                    animationType: 'slide-down'
-                };
-                break;
-            default:
-                componentObject = Object.assign({}, componentObject,
-                    {
-                            name: 'FirstConfigScreen'
-                    });
-        }
-
-        console.log("Nav set root", componentObject);
-            rootObject = {
-                root: {
-                    stack: {
-                        id: "CenterStack",
-                        children: [{component: componentObject}],
-                        options: {
-                            layout: {
-                                orientation: ['portrait']
-                            },
-                            topBar: {
-                                visible: false,
-                                drawBehind: true,
-                                animate: false
-                            }
-                        }
-                    }
-                }
-            }
-            if(root === 'after-login'){
-                rootObject = {
-                    root: {
-                        sideMenu:{
-                            left:{
-                                component:{
-                                    name: 'NavigationDrawer',
-                                    options:{
-                                        animations: {
-                                            push: slideInAnimation,
-                                            pop: slideOutAnimation
-                                        },
-                                        sideMenu:{
-                                            left:{
-                                                visible: false
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            center:{
-                                stack: {
-                                    id: "CenterStack",
-                                    children: [{component: componentObject}],
-                                    options: {
-                                        layout: {
-                                            orientation: ['portrait']
-                                        },
-                                        topBar: {
-                                            visible: false,
-                                            drawBehind: true,
-                                            animate: false
-                                        },
-                                        sideMenu:{
-                                            left:{
-                                                visible: false
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }}
-            }
-
-        console.log("Root object", rootObject);
-        Navigation.setRoot(rootObject)
-            .then((onfulfilled)=>{
-                console.log("On fulfilled", onfulfilled);
-            },(onrejected)=>{
-                console.log("On rejected", onrejected);
-            })
-            .catch((onreject2)=>{
-                console.log("Catch onreject", onreject2);
-            });
     };
 
     // Checks device status if exists, and if the status is pending wipe, removes everything
