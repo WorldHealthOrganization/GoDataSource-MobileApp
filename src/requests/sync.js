@@ -1,7 +1,7 @@
 /**
  * Created by florinpopa on 29/08/2018.
  */
-import RNFetchBlob from 'rn-fetch-blob';
+import RNFetchBlob from 'react-native-blob-util';
 import base64 from 'base-64';
 import {Platform} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';

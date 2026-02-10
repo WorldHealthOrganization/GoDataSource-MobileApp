@@ -15,11 +15,11 @@
 #import "APNSEventManager.h"
 
 
-#if __has_include(<React/RNSentry.h>)
-#import <React/RNSentry.h> // This is used for versions of react >= 0.40
-#else
-#import "RNSentry.h" // This is used for versions of react < 0.40
-#endif
+// #if __has_include(<React/RNSentry.h>)
+// #import <React/RNSentry.h> // This is used for versions of react >= 0.40
+// #else
+// #import "RNSentry.h" // This is used for versions of react < 0.40
+// #endif
 
 #import <UserNotifications/UserNotifications.h>
 #import <Parse.h>
@@ -97,7 +97,7 @@ static void InitializeFlipper(UIApplication *application) {
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
   #if DEBUG
-    return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
   #else
     return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
   #endif

@@ -1,0 +1,26 @@
+diff --git a/node_modules/react-native-material-buttons/src/components/raised-text-button/index.js b/node_modules/react-native-material-buttons/src/components/raised-text-button/index.js
+index 54cf4b9..d7fd4fa 100644
+--- a/node_modules/react-native-material-buttons/src/components/raised-text-button/index.js
++++ b/node_modules/react-native-material-buttons/src/components/raised-text-button/index.js
+@@ -16,7 +16,7 @@ export default class RaisedTextButton extends PureComponent {
+ 
+     title: PropTypes.string.isRequired,
+     titleColor: PropTypes.string,
+-    titleStyle: Text.propTypes.style,
++    titleStyle: PropTypes.any,
+     disabledTitleColor: PropTypes.string,
+   };
+ 
+diff --git a/node_modules/react-native-material-buttons/src/components/text-button/index.js b/node_modules/react-native-material-buttons/src/components/text-button/index.js
+index 8b26f47..e397333 100644
+--- a/node_modules/react-native-material-buttons/src/components/text-button/index.js
++++ b/node_modules/react-native-material-buttons/src/components/text-button/index.js
+@@ -21,7 +21,7 @@ export default class TextButton extends PureComponent {
+ 
+     title: PropTypes.string.isRequired,
+     titleColor: PropTypes.string,
+-    titleStyle: Text.propTypes.style,
++    titleStyle: PropTypes.any,
+     disabledTitleColor: PropTypes.string,
+   };
+ 
