@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Platform } from 'react-native';
 import { Provider } from 'react-redux';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -19,7 +20,7 @@ export default function Root() {
   return (
     <SafeAreaProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
+            <SafeAreaView style={{ flex: 1 }} edges={Platform.OS === 'android' ? ['top', 'left', 'right']: ['left', 'right']}>
                 <Provider store={store}>
                     <RootNavigator navigationRef={navRef} />
                 </Provider>
