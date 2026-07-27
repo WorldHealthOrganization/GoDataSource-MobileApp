@@ -36,7 +36,8 @@ import {storePermissions} from './role';
 import {getLocations} from './locations';
 import get from 'lodash/get';
 import lodashIntersection from 'lodash/intersection';
-import {filterByUser} from '../utils/functions';
+import {filterByUser, getTranslation} from '../utils/functions';
+import translations from '../utils/translations';
 import constants, {PERMISSIONS_CONTACT_OF_CONTACT} from '../utils/constants';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import {updateRequiredFields} from "../utils/functions";
@@ -62,9 +63,17 @@ export function loginUser(credentials) {
         dispatch(setLoginState('Loading....'));
         loginUserRequest(credentials, async (errorLogin, user) => {
             if (errorLogin) {
-                let error = null;
-                if (error === 'There is no active Outbreak configured for your user. You have to configure an active Outbreak for your user from the web portal and resync the data with the hub') {
-                    error = {type: 'Login error', message: error};
+                // errorLogin is produced locally by loginUserRequest (offline login):
+                // "Passwords don't match" for wrong email/password, the outbreak string
+                // when the account has no active outbreak, or a raw error otherwise.
+                let error;
+                if (errorLogin === 'There is no active Outbreak configured for your user. You have to configure an active Outbreak for your user from the web portal and resync the data with the hub') {
+                    error = {type: 'Login error', message: errorLogin};
+                } else if (errorLogin === "Passwords don't match") {
+                    error = {
+                        type: errorTypes.ERROR_LOGIN.type,
+                        message: getTranslation(translations.alertMessages.invalidCredentials, getState().app.translation)
+                    };
                 } else {
                     error = errorTypes.ERROR_LOGIN;
                 }

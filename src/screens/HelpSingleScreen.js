@@ -15,6 +15,7 @@ import {removeErrors} from '../actions/errors';
 import {getTranslation} from '../utils/functions';
 import translations from '../utils/translations';
 import withPincode from '../components/higherOrderComponents/withPincode';
+import {withNavigationParams} from '../components/higherOrderComponents/withNavigationParams';
 import ViewHOC from "../components/ViewHOC";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import styles from '../styles';
@@ -141,6 +142,7 @@ function matchDispatchProps(dispatch) {
 }
 
 export default compose(
+    withNavigationParams,
     withPincode(),
     connect(mapStateToProps, matchDispatchProps)
 )(HelpSingleScreen);

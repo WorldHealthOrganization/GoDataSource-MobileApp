@@ -25,7 +25,7 @@ index 35d3264..adffa3c 100644
  
    render() {
 diff --git a/node_modules/react-native-material-textfield/src/components/field/index.js b/node_modules/react-native-material-textfield/src/components/field/index.js
-index 494bbaa..c3dcc1d 100644
+index 494bbaa..33e454f 100644
 --- a/node_modules/react-native-material-textfield/src/components/field/index.js
 +++ b/node_modules/react-native-material-textfield/src/components/field/index.js
 @@ -83,9 +83,9 @@ export default class TextField extends PureComponent {
@@ -52,6 +52,33 @@ index 494bbaa..c3dcc1d 100644
    };
  
    static inputContainerStyle = styles.inputContainer;
+@@ -450,7 +450,25 @@ export default class TextField extends PureComponent {
+   inputProps() {
+     let store = {};
+ 
+-    for (let key in TextInput.propTypes) {
++    // RN >= 0.68 removed `propTypes` from core components, so the original
++    // `for (let key in TextInput.propTypes)` iterated over `undefined` and
++    // silently dropped every passthrough prop (secureTextEntry, keyboardType,
++    // autoCapitalize, autoCorrect, placeholder, ...). Fall back to an explicit
++    // list of TextInput props so those keep working.
++    let passthroughKeys = TextInput.propTypes
++      ? Object.keys(TextInput.propTypes)
++      : [
++          'secureTextEntry', 'keyboardType', 'keyboardAppearance', 'autoCapitalize',
++          'autoCorrect', 'autoComplete', 'autoFocus', 'blurOnSubmit', 'caretHidden',
++          'contextMenuHidden', 'enablesReturnKeyAutomatically', 'importantForAutofill',
++          'inputMode', 'maxLength', 'multiline', 'numberOfLines', 'onSubmitEditing',
++          'onEndEditing', 'onKeyPress', 'placeholder', 'placeholderTextColor',
++          'returnKeyLabel', 'returnKeyType', 'selectTextOnFocus', 'spellCheck',
++          'textContentType', 'passwordRules', 'clearButtonMode', 'clearTextOnFocus',
++          'dataDetectorTypes', 'scrollEnabled', 'textAlign',
++        ];
++
++    for (let key of passthroughKeys) {
+       if ('defaultValue' === key) {
+         continue;
+       }
 diff --git a/node_modules/react-native-material-textfield/src/components/helper/index.js b/node_modules/react-native-material-textfield/src/components/helper/index.js
 index 6060f9f..857b30d 100644
 --- a/node_modules/react-native-material-textfield/src/components/helper/index.js

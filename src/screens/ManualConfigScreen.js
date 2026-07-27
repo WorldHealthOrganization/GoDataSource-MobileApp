@@ -9,7 +9,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Button, Icon} from 'react-native-material-ui';
 import {TextField} from 'react-native-material-textfield';
 import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
+import {bindActionCreators, compose} from 'redux';
+import {withNavigationParams} from '../components/higherOrderComponents/withNavigationParams';
 import {loginUser} from '../actions/user';
 import {removeErrors} from '../actions/errors';
 import {KeyboardAwareScrollView} from '@codler/react-native-keyboard-aware-scroll-view';
@@ -54,6 +55,7 @@ class ManualConfigScreen extends PureComponent {
             apiKey: appConfig.env === 'development' ? config.whocdCredentials.apiKey : 'your_api_key_here',
             encryptedData: appConfig.env === 'development' ? config.whocdCredentials.encryptedConnection : true,
             chunkSize: appConfig.env === 'development' ? config.whocdCredentials.numberOfData : 2500,
+            secureClientSecret: true,
             hasAlert: false,
             syncState: [
                 {id: 'testApi', name: 'Test API', status: '...'},
@@ -166,6 +168,26 @@ class ManualConfigScreen extends PureComponent {
         ];
     }
 
+    toggleClientSecretVisibility = () => {
+        this.setState((prevState) => ({secureClientSecret: !prevState.secureClientSecret}));
+    };
+
+    renderClientSecretAccessory = () => {
+        return (
+            <Ripple
+                onPress={this.toggleClientSecretVisibility}
+                style={style.eyeAccessory}
+                hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            >
+                <Icon
+                    name={this.state.secureClientSecret ? 'visibility-off' : 'visibility'}
+                    color={styles.secondaryColor}
+                    size={22}
+                />
+            </Ripple>
+        );
+    };
+
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
     // and can slow down the app
@@ -259,7 +281,8 @@ class ManualConfigScreen extends PureComponent {
                             containerStyle={style.textInput}
                             onChangeText={this.handleTextChange}
                             label={getTranslation(translations.manualConfigScreen.clientSecretPass, null)}
-                            secureTextEntry={true}
+                            secureTextEntry={this.state.secureClientSecret}
+                            renderRightAccessory={this.renderClientSecretAccessory}
                             autoCapitalize={'none'}
                             tintColor={styles.primaryColor}
                             baseColor={styles.secondaryColor}
@@ -720,6 +743,12 @@ const style = StyleSheet.create({
         alignSelf: 'center',
         width: '100%'
     },
+    eyeAccessory: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 4,
+        paddingVertical: 4
+    },
     switchInput: {
         marginVertical: 16,
         width: '100%'
@@ -848,4 +877,7 @@ function matchDispatchToProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchToProps)(ManualConfigScreen);
+export default compose(
+    withNavigationParams,
+    connect(mapStateToProps, matchDispatchToProps),
+)(ManualConfigScreen);

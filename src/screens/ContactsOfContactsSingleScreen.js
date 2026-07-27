@@ -1,3 +1,4 @@
+import Navigation from '../navigation/wixNavigationShim';
 /**
  * Created by florinpopa on 21/08/2018.
  */
@@ -11,6 +12,8 @@ import NavBarCustom from '../components/NavBarCustom';
 import ViewHOC from '../components/ViewHOC';
 import config from '../utils/config';
 import {connect} from "react-redux";
+import {compose} from "redux";
+import {withNavigationParams} from '../components/higherOrderComponents/withNavigationParams';
 import {bindActionCreators} from "redux";
 import {PagerScroll, TabBar, TabView} from 'react-native-tab-view';
 import ContactsSingleAddress from '../containers/ContactsSingleAddress';
@@ -1942,4 +1945,7 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 };
 
-export default connect(mapStateToProps, matchDispatchProps)(ContactsOfContactsSingleScreen);
+export default compose(
+    withNavigationParams,
+    connect(mapStateToProps, matchDispatchProps)
+)(ContactsOfContactsSingleScreen);

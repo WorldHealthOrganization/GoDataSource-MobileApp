@@ -2,6 +2,7 @@
  * Created by florinpopa on 19/07/2018.
  */
 import get from 'lodash/get';
+import moment from 'moment-timezone';
 import {createDate} from '../utils/functions';
 import {executeQuery, insertOrUpdate} from '../queries/sqlTools/helperMethods';
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
@@ -189,9 +190,14 @@ function createConditionFollowUps (outbreakId, followUpFilter, userTeams, dataTy
         condition[`${aliasFollowUps}.outbreakId`] = outbreakId;
     }
     if (followUpFilter.date) {
+        // createDate(x, true) does NOT mean "end of day" - the 2nd param is a moment
+        // format string, not a boolean flag, so passing `true` there was a no-op and
+        // $gte/$lte ended up being the exact same instant (a zero-width range that only
+        // ever matched a follow-up stored at that exact millisecond). Compute the real
+        // start/end of the selected day instead.
         condition[`${aliasFollowUps}.date`] = {
-            '$gte': `${createDate(followUpFilter.date).toISOString()}`,
-            '$lte': `${createDate(followUpFilter.date, true).toISOString()}`
+            '$gte': `${moment.utc(createDate(followUpFilter.date)).startOf('day').toISOString()}`,
+            '$lte': `${moment.utc(createDate(followUpFilter.date)).endOf('day').toISOString()}`
         };
     }
     if (followUpFilter.statusId) {

@@ -1,3 +1,4 @@
+import Navigation from '../navigation/wixNavigationShim';
 /**
  * Created by florinpopa on 21/08/2018.
  */
@@ -778,6 +779,7 @@ class ContactsSingleScreen extends Component {
             case 'exposures':
                 return (
                     <ContactsSingleRelationship
+                        navigation={this.props.navigation}
                         preparedFields={this.preparedFieldsRelationship}
                         routeKey={this.state.routes[this.state.index].key}
                         relationshipType={constants.RELATIONSHIP_TYPE.exposure}
@@ -810,6 +812,7 @@ class ContactsSingleScreen extends Component {
             case 'contacts':
                 return (
                     <ContactsSingleRelationship
+                        navigation={this.props.navigation}
                         preparedFields={this.preparedFieldsRelationship}
                         routeKey={this.state.routes[this.state.index].key}
                         contact={this.state.contact}

@@ -30,6 +30,7 @@ import RelationshipContainer from '../containers/RelationshipContainer';
 import get from 'lodash/get';
 import {insertOrUpdateExposure} from "../actions/exposure";
 import withPincode from '../components/higherOrderComponents/withPincode';
+import {withNavigationParams} from '../components/higherOrderComponents/withNavigationParams';
 import _ from "lodash";
 import styles from '../styles';
 import {prepareFields, prepareFieldsAndRoutes} from "../utils/formValidators";
@@ -504,6 +505,7 @@ function matchDispatchProps(dispatch) {
 }
 
 export default compose(
+    withNavigationParams,
     withPincode(),
     connect(mapStateToProps, matchDispatchProps)
 )(RelationshipScreen);

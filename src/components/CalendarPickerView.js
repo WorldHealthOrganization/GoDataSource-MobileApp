@@ -4,10 +4,9 @@
 // Since this app is based around the material ui is better to use the components from
 // the material ui library, since it provides design and animations out of the box
 import React, {PureComponent} from 'react';
-import {StyleSheet, Platform} from 'react-native';
+import {StyleSheet, Platform, Modal, TouchableWithoutFeedback, View} from 'react-native';
 import {calculateDimension} from '../utils/functions';
 import Calendar from "react-native-calendars/src/calendar/index";
-import Modal from 'react-native-root-modal';
 import {connect} from "react-redux";
 import ElevatedView from 'react-native-elevated-view';
 import moment from 'moment-timezone';
@@ -35,14 +34,20 @@ class CalendarPickerView extends PureComponent {
         console.log("selected date: ", this.state.selectedDate);
         return (
             <Modal
+                transparent
                 visible={this.props.showPicker}
-                style={[style.container, {
-                    top: this.calculateTop(),
-                    left: calculateDimension(16, false, this.props.screenSize),
-                    width: this.props.width
-                }, Platform.OS === 'android' && {elevation: 2}]}
+                animationType="fade"
+                onRequestClose={this.props.onClose}
             >
-                <ElevatedView elevation={4} style={style.calendarWrapper}>
+                <TouchableWithoutFeedback onPress={this.props.onClose}>
+                    <View style={style.backdrop}>
+                        <TouchableWithoutFeedback onPress={() => {}}>
+                            <View style={[style.container, {
+                                top: this.calculateTop(),
+                                left: calculateDimension(16, false, this.props.screenSize),
+                                width: this.props.width
+                            }, Platform.OS === 'android' && {elevation: 2}]}>
+                                <ElevatedView elevation={4} style={style.calendarWrapper}>
                     <Calendar
                         current={ this.state.selectedDate }
                         markedDates={{[this.state.selectedDate]: {selected: true, selectedColor: styles.primaryColor}}}
@@ -67,7 +72,11 @@ class CalendarPickerView extends PureComponent {
                             weekVerticalMargin: 4
                         }}
                     />
-                </ElevatedView>
+                                </ElevatedView>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </View>
+                </TouchableWithoutFeedback>
             </Modal>
         );
     }
@@ -78,7 +87,8 @@ class CalendarPickerView extends PureComponent {
     };
 
     parseDate = (date) => {
-        return moment.tz(date, this.props.timezone).format('YYYY-MM-DD');
+        const m = moment.tz(date, this.props.timezone);
+        return (m.isValid() ? m : moment.tz(this.props.timezone)).format('YYYY-MM-DD');
     };
 
     handleDateChanged = (date) => {
@@ -92,12 +102,17 @@ class CalendarPickerView extends PureComponent {
 
 CalendarPickerView.defaultProps = {
     showPicker: false,
-    width: 343
+    width: 343,
+    onClose: () => {}
 };
 
 // Create style outside the class, or for components that will be used by other components (buttons),
 // make a global style in the config directory
 const style = StyleSheet.create({
+    backdrop: {
+        flex: 1,
+        backgroundColor: 'transparent'
+    },
     container: {
         borderRadius: 4,
         position: 'absolute'

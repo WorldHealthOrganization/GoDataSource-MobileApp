@@ -24,6 +24,14 @@ export function loginUserRequest (credentials, callback) {
                 .then((resultFind) => {
                     console.log("Result for find time for find user: ", new Date().getTime() - start);
 
+                    // No user matched this email. Treat it like a wrong password so the
+                    // UI shows a single "Invalid credentials" message (and to avoid a
+                    // TypeError on resultFind.docs[0] below when docs is empty).
+                    if (!resultFind || !resultFind.docs || resultFind.docs.length === 0) {
+                        callback("Passwords don't match");
+                        return;
+                    }
+
                     comparePasswords(credentials.password, resultFind.docs[0].password, (error, isMatch) => {
                         if (error) {
                             console.log("Error at comparing passwords: ", error);

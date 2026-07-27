@@ -1,3 +1,4 @@
+import Navigation from '../navigation/wixNavigationShim';
 /**
  * Created by mobileclarisoft on 23/07/2018.
  */
@@ -643,6 +644,7 @@ class CaseSingleScreen extends Component {
             case 'exposures':
                 return (
                     <CaseSingleRelationshipContainer
+                        navigation={this.props.navigation}
                         routeKey={this.state.routes[this.state.index].key}
                         relationshipType={constants.RELATIONSHIP_TYPE.exposure}
                         case={this.state.case}
@@ -666,6 +668,7 @@ class CaseSingleScreen extends Component {
             case 'contacts':
                 return (
                     <CaseSingleRelationshipContainer
+                        navigation={this.props.navigation}
                         routeKey={this.state.routes[this.state.index].key}
                         relationshipType={constants.RELATIONSHIP_TYPE.contact}
                         case={this.state.case}
@@ -1042,7 +1045,10 @@ class CaseSingleScreen extends Component {
     };
     onPressSaveEdit = () => {
         Keyboard.dismiss();
-        if (this.state.isModified) {
+        // A new case must always go through the save/validation path — otherwise
+        // (when isModified was never set) the else branch below only flashes the
+        // loader and exits edit mode without saving.
+        if (this.state.isModified || this.props.isNew) {
             this.setState({
                 saveFromEditPressed: true,
                 selectedItemIndexForTextSwitchSelectorForAge: this.state.case.dob !== null ? 1 : 0,

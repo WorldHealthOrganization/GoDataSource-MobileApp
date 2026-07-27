@@ -48,7 +48,7 @@ const DatePicker = React.memo(({
                 nDate = new Date(value);
             }
             if (fieldRef.current) {
-                fieldRef.current.setValue(nDate ? moment.tz(nDate, timezone).format('MM/DD/YYYY') : '');
+                fieldRef.current.setValue(nDate && moment.tz(nDate, timezone).isValid() ? moment.tz(nDate, timezone).format('MM/DD/YYYY') : '');
             }
             setDate(newDate);
         }
@@ -69,7 +69,7 @@ const DatePicker = React.memo(({
                                 label={isRequired ? getTranslation(label, translation) + ' * ' : getTranslation(label, translation)}
                                 textColor={stylesGlobal.textColor}
                                 fontSize={14}
-                                value={date ? moment.tz(newDate, timezone).format('MM/DD/YYYY') : null}
+                                value={date && moment.tz(newDate, timezone).isValid() ? moment.tz(newDate, timezone).format('MM/DD/YYYY') : null}
                                 ref={fieldRef}
                                 labelTextStyle={{fontFamily: 'Roboto-Regular'}}
                                 tintColor={stylesGlobal.primaryColor}
@@ -84,13 +84,7 @@ const DatePicker = React.memo(({
                             onConfirm={handleDatePicked}
                             onCancel={handleDateCancelled}
                             isDarkModeEnabled={false}
-                            date={value ? new Date(
-                                Date.parse(
-                                    moment.tz(new Date(value), 'DD/MM/YYYY', timezone).format(
-                                        'ddd MMM DD YYYY HH:mm:ss ZZ',
-                                    ),
-                                ),
-                            ) : new Date()}
+                            date={value && moment.tz(value, timezone).isValid() ? moment.tz(value, timezone).toDate() : new Date()}
                         />
                     </View>
                 </TouchableWithoutFeedback>
@@ -154,7 +148,7 @@ const DatePicker = React.memo(({
                         )
                     }
                     <Text style={customStyles.datePickerValue}>
-                        {value !== null && value !== undefined && value !== '' ? moment.tz(value, timezone).format('MM/DD/YYYY') : ''}
+                        {value !== null && value !== undefined && value !== '' && moment.tz(value, timezone).isValid() ? moment.tz(value, timezone).format('MM/DD/YYYY') : ''}
                     </Text>
                 </View>
                 {

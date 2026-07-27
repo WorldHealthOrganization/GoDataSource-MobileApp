@@ -22,6 +22,7 @@ import config from '../utils/config';
 import {createStackFromComponent, getTranslation} from '../utils/functions';
 import VersionNumber from 'react-native-version-number';
 import withPincode from "../components/higherOrderComponents/withPincode";
+import {withNavigationParams} from "../components/higherOrderComponents/withNavigationParams";
 import {compose} from "redux";
 import styles from '../styles';
 
@@ -265,6 +266,7 @@ function matchDispatchToProps(dispatch) {
 
 // export default connect(mapStateToProps, matchDispatchToProps)(FirstConfigScreen);
 export default compose(
+    withNavigationParams,
     withPincode(),
     connect(mapStateToProps, matchDispatchToProps),
 )(FirstConfigScreen)

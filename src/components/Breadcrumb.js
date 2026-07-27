@@ -9,7 +9,9 @@ import {Icon} from 'react-native-material-ui';
 import Ripple from 'react-native-material-ripple';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import {StackActions} from '@react-navigation/native';
 import {calculateDimension, getTranslation} from '../utils/functions';
+import {navigationRef} from '../Root';
 import styles from '../styles';
 
 const Crumb = ({isCrumbActive, index, text, numberOfEntities, crumbPress, translation}) => {
@@ -71,15 +73,36 @@ class Breadcrumb extends PureComponent {
 
     // Please write here all the methods that are not react native lifecycle methods
     handleCrumbPress = (index) => {
-        // this.setState({
-        //     index
-        // })
         InteractionManager.runAfterInteractions(() => {
-            if (index === 0) {
-                if(this.props.onPress){
-                    this.props.onPress();
-                }else {
-                     if (this.props.navigation) this.props.navigation.goBack();
+            const lastIndex = this.props.entities.length - 1;
+            // The last crumb is the current screen — tapping it does nothing.
+            if (index >= lastIndex) {
+                return;
+            }
+            // Let a host screen override navigation if it supplied a handler.
+            if (this.props.onPress) {
+                this.props.onPress(index);
+                return;
+            }
+            // Fall back to the global navigation ref when the screen didn't pass
+            // its own navigation prop (many callers don't).
+            const nav = this.props.navigation ||
+                (navigationRef && navigationRef.isReady && navigationRef.isReady() ? navigationRef : null);
+            // Guard canGoBack so we never trigger Android's default back (which
+            // would send the app to the background).
+            if (!nav || !nav.canGoBack || !nav.canGoBack()) {
+                return;
+            }
+            const steps = lastIndex - index;
+            try {
+                if (steps <= 1) {
+                    nav.goBack();
+                } else {
+                    nav.dispatch(StackActions.pop(steps));
+                }
+            } catch (e) {
+                if (nav.canGoBack()) {
+                    nav.goBack();
                 }
             }
         });

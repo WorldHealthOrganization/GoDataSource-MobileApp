@@ -1,5 +1,5 @@
 'use strict';
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import {connect} from 'react-redux';
 import NavBarCustom from '../components/NavBarCustom';
 import {getTranslation} from '../utils/functions';
@@ -8,9 +8,15 @@ import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import lodashGet from 'lodash/get';
 import styles from '../styles';
 
-import {Camera, useCameraDevice, useCodeScanner} from 'react-native-vision-camera';
+import {Camera, useCameraDevice, useCodeScanner, useCameraPermission} from 'react-native-vision-camera';
 
 function VisionQRScanner({onRead, style}) {
+  // Reactive permission hook: re-renders this component as soon as the user
+  // grants access, so the camera activates on the first visit. Using the
+  // fire-and-forget Camera.requestCameraPermission() in componentDidMount did
+  // not trigger a re-render, so on a fresh install the scanner stayed black
+  // until the user backed out and re-entered (the "need to click twice" bug).
+  const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');
 
   const codeScanner = useCodeScanner({
@@ -22,7 +28,13 @@ function VisionQRScanner({onRead, style}) {
     },
   });
 
-  if (!device) return null;
+  useEffect(() => {
+    if (!hasPermission) {
+      requestPermission();
+    }
+  }, [hasPermission, requestPermission]);
+
+  if (!hasPermission || !device) return null;
 
   return (
     <Camera
@@ -37,9 +49,6 @@ function VisionQRScanner({onRead, style}) {
 class QRScanScreen extends Component {
   constructor(props) {
     super(props);
-  }
-  async componentDidMount() {
-    await Camera.requestCameraPermission();
   }
 
   render() {

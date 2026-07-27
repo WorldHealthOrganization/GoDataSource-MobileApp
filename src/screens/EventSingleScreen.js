@@ -1,3 +1,4 @@
+import Navigation from '../navigation/wixNavigationShim';
 /**
  * Created by mobileclarisoft on 23/07/2018.
  */
@@ -46,6 +47,7 @@ import lodashGet from 'lodash/get';
 import constants from "../utils/constants";
 import {checkArrayAndLength} from "../utils/typeCheckingFunctions";
 import withPincode from '../components/higherOrderComponents/withPincode';
+import {withNavigationParams} from '../components/higherOrderComponents/withNavigationParams';
 import {checkValidEmails, prepareFieldsAndRoutes, validateRequiredFields} from '../utils/formValidators';
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import Menu, {MenuItem} from "react-native-material-menu";
@@ -568,6 +570,7 @@ class EventSingleScreen extends Component {
             case 'exposures':
                 return (
                     <EventSingleRelationshipContainer
+                        navigation={this.props.navigation}
                         routeKey={this.state.routes[this.state.index].key}
                         relationshipType={constants.RELATIONSHIP_TYPE.exposure}
                         event={this.state.event}
@@ -591,6 +594,7 @@ class EventSingleScreen extends Component {
             case 'contacts':
                 return (
                     <EventSingleRelationshipContainer
+                        navigation={this.props.navigation}
                         routeKey={this.state.routes[this.state.index].key}
                         relationshipType={constants.RELATIONSHIP_TYPE.contact}
                         event={this.state.event}
@@ -2036,6 +2040,7 @@ function matchDispatchProps(dispatch) {
 }
 
 export default compose(
+    withNavigationParams,
     withPincode(),
     connect(mapStateToProps, matchDispatchProps)
 )(EventSingleScreen);

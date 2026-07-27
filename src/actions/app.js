@@ -205,7 +205,7 @@ export function storeHubConfigurationNew(hubConfiguration) {
         console.log('Hub credentials: ', hubConfiguration);
 
         Promise.resolve()
-            .then(() => RNFetchBlobFs.unlink(`${constants.DATABASE_LOCATIONS}`))
+            .then(() => RNFetchBlobFS.unlink(`${constants.DATABASE_LOCATIONS}`))
             .catch((errorDelete) => {
                 console.log('error delete who_databases: ', errorDelete);
                 return Promise.resolve();
@@ -594,7 +594,7 @@ export function sendDatabaseToServer () {
                         }
                     }
 
-                    let promise = skipZip ? Promise.resolve() : createZipFileAtPath(`${RNFetchBlobFs.dirs.DocumentDir}/who_files`, `${RNFetchBlobFs.dirs.DocumentDir}/${activeDatabase.replace(/\/|\.|\:/g, '')}.zip`)
+                    let promise = skipZip ? Promise.resolve() : createZipFileAtPath(`${RNFetchBlobFS.dirs.DocumentDir}/who_files`, `${RNFetchBlobFS.dirs.DocumentDir}/${activeDatabase.replace(/\/|\.|\:/g, '')}.zip`)
 
                     if (skipZip) {
                         dispatch(setSyncState({id: 'getData', status: 'No data to send'}));

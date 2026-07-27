@@ -13,6 +13,7 @@ import FiltersContainer from '../containers/FiltersContainer';
 import SortContainer from '../containers/SortContainer';
 import translations from '../utils/translations';
 import throttle from 'lodash/throttle';
+import {withNavigationParams} from '../components/higherOrderComponents/withNavigationParams';
 import styles from '../styles';
 
 class FilterScreen extends Component {
@@ -532,4 +533,4 @@ function matchDispatchProps(dispatch) {
     }, dispatch);
 }
 
-export default connect(mapStateToProps, matchDispatchProps)(FilterScreen);
+export default withNavigationParams(connect(mapStateToProps, matchDispatchProps)(FilterScreen));

@@ -5,6 +5,7 @@ import lodashSet from 'lodash/set';
 import {checkArrayAndLength} from "../../utils/typeCheckingFunctions";
 import get from "lodash/get";
 import {createDate} from "../../utils/functions";
+import moment from "moment-timezone";
 var jsonSql = require('json-sql')();
 jsonSql.configure({separatedValues: false});
 
@@ -251,8 +252,12 @@ function createGeneralQuery ({outbreakId, innerFilter, search, lastElement, offs
                     ['$lte']: get(innerFilter, 'selectedIndexDay[1]', 150)
                 },
                 'FollowUp.date': {
-                    ['$gte']: {expression: `"${createDate(new Date()).toISOString()}"`},
-                    ['$lte']: {expression: `"${createDate(new Date(), true).toISOString()}"`}
+                    // createDate(x, true)'s 2nd param is a moment format string, not a
+                    // "utc"/"end of day" flag - passing `true` there was a no-op, so this
+                    // used to produce a zero-width range (the exact same instant for both
+                    // bounds) that only matched a follow-up stored at that precise millisecond.
+                    ['$gte']: {expression: `"${moment.utc(createDate(new Date())).startOf('day').toISOString()}"`},
+                    ['$lte']: {expression: `"${moment.utc(createDate(new Date())).endOf('day').toISOString()}"`}
                 }
             }
         };

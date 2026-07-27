@@ -1,0 +1,80 @@
+diff --git a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/affix/index.js b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/affix/index.js
+index d6c9d64..549cf4a 100644
+--- a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/affix/index.js
++++ b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/affix/index.js
+@@ -24,7 +24,7 @@ export default class Affix extends PureComponent {
+     baseColor: PropTypes.string.isRequired,
+     animationDuration: PropTypes.number.isRequired,
+ 
+-    style: Animated.Text.propTypes.style,
++    style: PropTypes.any,
+ 
+     children: PropTypes.oneOfType([
+       PropTypes.arrayOf(PropTypes.node),
+diff --git a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/counter/index.js b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/counter/index.js
+index ad6e313..cac5712 100644
+--- a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/counter/index.js
++++ b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/counter/index.js
+@@ -14,7 +14,7 @@ export default class Counter extends PureComponent {
+     baseColor: PropTypes.string.isRequired,
+     errorColor: PropTypes.string.isRequired,
+ 
+-    style: Text.propTypes.style,
++    style: PropTypes.any,
+   };
+ 
+   render() {
+diff --git a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/field/index.js b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/field/index.js
+index 52c1868..7be9475 100644
+--- a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/field/index.js
++++ b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/field/index.js
+@@ -63,9 +63,9 @@ export default class TextField extends PureComponent {
+     labelPadding: PropTypes.number,
+     inputContainerPadding: PropTypes.number,
+ 
+-    labelTextStyle: Text.propTypes.style,
+-    titleTextStyle: Text.propTypes.style,
+-    affixTextStyle: Text.propTypes.style,
++    labelTextStyle: PropTypes.any,
++    titleTextStyle: PropTypes.any,
++    affixTextStyle: PropTypes.any,
+ 
+     tintColor: PropTypes.string,
+     textColor: PropTypes.string,
+@@ -91,8 +91,8 @@ export default class TextField extends PureComponent {
+     prefix: PropTypes.string,
+     suffix: PropTypes.string,
+ 
+-    containerStyle: (ViewPropTypes || View.propTypes).style,
+-    inputContainerStyle: (ViewPropTypes || View.propTypes).style,
++    containerStyle: null,
++    inputContainerStyle: null,
+   };
+ 
+   constructor(props) {
+diff --git a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/helper/index.js b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/helper/index.js
+index 60184ea..5fae1c4 100644
+--- a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/helper/index.js
++++ b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/helper/index.js
+@@ -10,7 +10,7 @@ export default class Helper extends PureComponent {
+   };
+ 
+   static propTypes = {
+-    style: Animated.Text.propTypes.style,
++    style: PropTypes.any,
+     children: PropTypes.oneOfType([
+       PropTypes.arrayOf(PropTypes.node),
+       PropTypes.node,
+diff --git a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/label/index.js b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/label/index.js
+index ac3ed53..b9fee76 100644
+--- a/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/label/index.js
++++ b/node_modules/react-native-material-dropdown/node_modules/react-native-material-textfield/src/components/label/index.js
+@@ -29,7 +29,7 @@ export default class Label extends PureComponent {
+ 
+     animationDuration: PropTypes.number.isRequired,
+ 
+-    style: Animated.Text.propTypes.style,
++    style: PropTypes.any,
+ 
+     children: PropTypes.oneOfType([
+       PropTypes.arrayOf(PropTypes.node),

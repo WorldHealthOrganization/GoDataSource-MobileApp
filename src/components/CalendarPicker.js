@@ -18,7 +18,7 @@ class CalendarPicker extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            label: checkIfSameDay(new Date(this.props.value), new Date()) ? getTranslation(translations.generalLabels.today, this.props.translation) : new Date(this.props.value).toLocaleDateString()
+            label: (!this.props.value || isNaN(new Date(this.props.value).getTime()) || checkIfSameDay(new Date(this.props.value), new Date())) ? getTranslation(translations.generalLabels.today, this.props.translation) : new Date(this.props.value).toLocaleDateString()
         };
 
         this.handleDateChanged = this.handleDateChanged.bind(this);
@@ -47,6 +47,7 @@ class CalendarPicker extends PureComponent {
                     showPicker={this.props.pickerOpen}
                     width={2.1 * this.props.width}
                     dateChanged={this.handleDateChanged}
+                    onClose={this.props.openCalendarModal}
                     value={this.props.value}
                 />
             </ElevatedView>

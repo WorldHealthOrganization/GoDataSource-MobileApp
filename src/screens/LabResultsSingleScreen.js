@@ -1,3 +1,4 @@
+import Navigation from '../navigation/wixNavigationShim';
 /**
  * Created by florinpopa on 25/07/2018.
  */
@@ -36,6 +37,7 @@ import {checkArrayAndLength} from '../utils/typeCheckingFunctions';
 import {checkRequiredQuestions, extractAllQuestions} from "../utils/functions";
 import constants from '../utils/constants';
 import withPincode from '../components/higherOrderComponents/withPincode';
+import {withNavigationParams} from '../components/higherOrderComponents/withNavigationParams';
 import {fadeInAnimation, fadeOutAnimation} from "../utils/animations";
 import {setDisableOutbreakChange} from "../actions/outbreak";
 import styles from '../styles';
@@ -1044,6 +1046,7 @@ function matchDispatchProps(dispatch) {
 };
 
 export default compose(
+    withNavigationParams,
     withPincode(),
     connect(mapStateToProps, matchDispatchProps)
 )(LabResultsSingleScreen);

@@ -2,11 +2,18 @@ import React, {useState, useEffect, useRef} from 'react';
 import {View, AppState} from 'react-native';
 import PINCode, {deleteUserPinCode, resetPinCodeInternalStates} from '@haskkor/react-native-pincode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {logoutUser} from '../../actions/user';
 import appConfig from '../../../app.config';
 import {LoaderScreen} from 'react-native-ui-lib';
 import styles from '../../styles';
+
+// True only for the very first withPincode-wrapped screen mounted after a cold
+// launch, then flipped for the rest of the JS runtime's life. This restores the
+// pre-React-Navigation behavior where App.js set isAppInitialize=true only on the
+// first navigation root (`!oldRoot`) and passed it via passProps. On app kill +
+// relaunch the module reloads and this resets to false, re-arming the gate.
+let appHasInitialized = false;
 
 export default function withPincode() {
     return function withPincodeFunction (WrappedComponent) {
@@ -17,10 +24,23 @@ export default function withPincode() {
             const DELAY_BETWEEN_ATTEMPTS = 500;
             const INACTIVE_TIMEOUT = 1000 * 20 * 60; // Wait for 20 mins of inactivity
 
+            const dispatch = useDispatch();
+            const root = useSelector((state) => state.app.root);
             const [validPinCode, setValidPinCode] = useState(false);
             const [status, setStatus] = useState(null);
             const [retries, setRetries] = useState(NUMBER_OF_ATTEMPTS);
-            const dispatch = useDispatch();
+            // Consume the "first screen after launch" signal exactly once, and
+            // only once a real navigation root exists. `root` starts undefined
+            // and the app briefly renders a splash (also FirstConfigScreen) before
+            // App.js dispatches changeAppRoot(...); skipping that phase mirrors the
+            // old `!oldRoot` check so the gate lands on the first *real* root screen.
+            const [isAppInitialize] = useState(() => {
+                if (appHasInitialized || !root) {
+                    return false;
+                }
+                appHasInitialized = true;
+                return true;
+            });
             const appStateStatus = useRef(AppState.currentState);
             const appStateStatusTimer = useRef(0);
 
@@ -31,14 +51,14 @@ export default function withPincode() {
                     checkFirstInstall()
                         .then((resp) => AsyncStorage.getItem('wasPinSet'))
                         .then((hasPin) => {
-                            if (props.isAppInitialize) {
+                            if (isAppInitialize) {
                                 // Lock drawer if needed, but for now we set status
                                 setStatus(hasPin ? 'enter' : 'choose');
                             } else {
                                 setValidPinCode(true);
                             }
 
-                            if (hasPin || props.isAppInitialize) {
+                            if (hasPin || isAppInitialize) {
                                 const subscription = AppState.addEventListener('change', handleAppStateChange);
                                 appStateStatus.current = AppState.currentState;
 

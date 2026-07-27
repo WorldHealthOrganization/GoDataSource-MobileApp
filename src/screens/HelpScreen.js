@@ -24,6 +24,7 @@ import ViewHOC from '../components/ViewHOC';
 import translations from '../utils/translations'
 import RNExitApp from 'react-native-exit-app';
 import withPincode from '../components/higherOrderComponents/withPincode';
+import {withNavigationParams} from '../components/higherOrderComponents/withNavigationParams';
 import config from "../utils/config";
 import PermissionComponent from '../components/PermissionComponent';
 import styles from '../styles';
@@ -527,6 +528,7 @@ function matchDispatchProps(dispatch) {
 }
 
 export default compose(
+    withNavigationParams,
     withPincode(),
     connect(mapStateToProps, matchDispatchProps)
 )(HelpScreen);

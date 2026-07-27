@@ -12,6 +12,7 @@ import TooltipComponent from './TooltipComponent';
 import lodashGet from 'lodash/get';
 import lodashDebounce from 'lodash/debounce';
 import Ripple from "react-native-material-ripple";
+import {Icon} from 'react-native-material-ui';
 import translations from "../utils/translations";
 import styles from '../styles';
 
@@ -22,7 +23,8 @@ class TextInput extends Component {
         super(props);
         this.state = {
             value: lodashGet(this.props, 'value', ' '),
-            maskError: false
+            maskError: false,
+            secureVisible: false
         };
 
         this.handleSubmitEditingDB = lodashDebounce(this.handleSubmitEditing, 300);
@@ -66,6 +68,29 @@ class TextInput extends Component {
         }
     }
 
+    toggleSecureVisible = () => {
+        this.setState((prevState) => ({secureVisible: !prevState.secureVisible}));
+    };
+
+    renderSecureAccessory = () => {
+        if (!this.props.secureTextEntry) {
+            return null;
+        }
+        return (
+            <Ripple
+                onPress={this.toggleSecureVisible}
+                style={style.eyeAccessory}
+                hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            >
+                <Icon
+                    name={this.state.secureVisible ? 'visibility' : 'visibility-off'}
+                    color={styles.secondaryColor}
+                    size={22}
+                />
+            </Ripple>
+        );
+    };
+
     // Please write here all the methods that are not react native lifecycle methods
     editInput = () => {
         let tooltip = getTooltip(this.props.label, this.props.translation);
@@ -95,7 +120,8 @@ class TextInput extends Component {
                         multiline={this.props.multiline !== undefined ? this.props.multiline : false}
                         keyboardType={this.props.keyboardType ? this.props.keyboardType : 'default'}
                         formatText={this.formatForNumeric}
-                        secureTextEntry={this.props.secureTextEntry}
+                        secureTextEntry={this.props.secureTextEntry && !this.state.secureVisible}
+                        renderRightAccessory={this.props.secureTextEntry ? this.renderSecureAccessory : undefined}
                         lineWidth={1}
                         lineType={'solid'}
                         activeLineWidth={2}
@@ -215,6 +241,12 @@ class TextInput extends Component {
 const style = StyleSheet.create({
     textInput: {
         flexDirection: 'row'
+    },
+    eyeAccessory: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 4,
+        paddingVertical: 4
     },
     textInputLabel: {
         color: styles.secondaryColor,

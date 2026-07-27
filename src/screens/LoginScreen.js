@@ -35,6 +35,7 @@ class LoginScreen extends Component {
         this.state = {
             email: appConfig.env === 'development' ? 'andrei.postelnicu@clarisoft.com' : '',
             password: appConfig.env === 'development' ? '123123123123' : '',
+            securePassword: true,
             hasAlert: false
         };
         // Bind here methods, or at least don't declare methods in the render method
@@ -50,6 +51,26 @@ class LoginScreen extends Component {
             this.props.cleanDataAfterLogout();
         }, 500);
     }
+
+    togglePasswordVisibility = () => {
+        this.setState((prevState) => ({securePassword: !prevState.securePassword}));
+    };
+
+    renderPasswordAccessory = () => {
+        return (
+            <Ripple
+                onPress={this.togglePasswordVisibility}
+                style={style.eyeAccessory}
+                hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            >
+                <Icon
+                    name={this.state.securePassword ? 'visibility-off' : 'visibility'}
+                    color={styles.secondaryColor}
+                    size={22}
+                />
+            </Ripple>
+        );
+    };
 
     // The render method should have at least business logic as possible,
     // because this will be called whenever there is a new setState call
@@ -120,7 +141,8 @@ class LoginScreen extends Component {
                         containerStyle={style.textInput}
                         onChangeText={this.handleTextChange}
                         label={getTranslation(translations.loginScreen.passwordLabel, this.props && this.props.translation ? this.props.translation : null)}
-                        secureTextEntry={true}
+                        secureTextEntry={this.state.securePassword}
+                        renderRightAccessory={this.renderPasswordAccessory}
                         autoCapitalize={'none'}
                         tintColor={styles.primaryColor}
                         baseColor={styles.secondaryColor}
@@ -239,6 +261,12 @@ const style = StyleSheet.create({
     textInput: {
         alignSelf: 'center',
         width: '100%'
+    },
+    eyeAccessory: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 4,
+        paddingVertical: 4
     },
     version: {
         color: styles.secondaryColor,

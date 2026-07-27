@@ -12,7 +12,7 @@ const Stack = createNativeStackNavigator();
 function MainStack() {
   return (
     <Stack.Navigator 
-        initialRouteName={constants.appScreens.casesScreen} // Default start
+        initialRouteName={constants.appScreens.followUpScreen} // Default start
         screenOptions={{ 
             headerShown: false,
             animation: 'slide_from_right'

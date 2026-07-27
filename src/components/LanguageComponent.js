@@ -14,7 +14,7 @@ import {selectTranslations, selectUserLanguage, selectUser, selectAllLanguages, 
 import {useSetStateWithCallback} from "../utils/hooks";
 import translations from '../utils/translations';
 import styles from '../styles';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, DrawerActions } from '@react-navigation/native';
 
 const selectReduxDataForLanguageComponent = createSelector(
     [selectTranslations, selectUserLanguage, selectAllLanguages, selectUser, selectOutbreak],
@@ -40,7 +40,11 @@ const LanguageComponent = React.memo(({style, componentId}) => {
     function setUserLanguage(value) {
         // console.log('value', value)
         if (value === 'addLanguagePack') {
-            navigation.closeDrawer();
+            try {
+                navigation.dispatch(DrawerActions.closeDrawer());
+            } catch (e) {
+                // Drawer may not be in scope — safe to ignore, the modal still opens.
+            }
             //Timeout?
             setTimeout(() => {
                 setShowModal(true);
