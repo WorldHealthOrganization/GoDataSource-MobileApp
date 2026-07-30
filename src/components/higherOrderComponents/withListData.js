@@ -52,6 +52,16 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                         this.getData(true);
                     }
                 }
+                // Refetch whenever this list screen regains focus (e.g. returning from
+                // a detail screen after adding a relationship) so card counts like
+                // "Contacts (N)" / "Exposures (N)" stay current without requiring a
+                // manual pull-to-refresh. The initial load above already covers first
+                // mount; any extra fetch this causes on first mount is harmless.
+                if (this.props.navigation) {
+                    this.unsubscribeListDataFocus = this.props.navigation.addListener('focus', () => {
+                        this.refresh();
+                    });
+                }
             }
 
             componentDidUpdate(prevProps) {
@@ -62,6 +72,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
 
             componentWillUnmount() {
                 if (this.backHandler) this.backHandler.remove();
+                if (this.unsubscribeListDataFocus) this.unsubscribeListDataFocus();
             };
 
             handleBackButtonClick() {
@@ -215,6 +226,16 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                     } else {
                         doAction = this.state.data.length % 10 === 0 && this.state.data.length !== this.state.dataCount;
                     }
+                    if (doAction === true && this.getDataInprogress) {
+                        // A fetch is already in flight (e.g. two refreshes fired close
+                        // together, like the focus-listener refetch racing a filter
+                        // apply) - don't drop this one silently, run it again once the
+                        // in-flight fetch finishes so its filters/state aren't lost.
+                        if (isRefresh === true) {
+                            this.pendingRefresh = true;
+                            this.pendingRefreshAfterSync = isRefreshAfterSync;
+                        }
+                    }
                     if (doAction === true
                         && !this.getDataInprogress
                     ) {
@@ -251,6 +272,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                         }
                                     }, ()=>{
                                         this.getDataInprogress = false;
+                                        this.runPendingRefreshIfAny();
                                     })
                                 })
                                 .catch((errorGetData) => {
@@ -259,6 +281,7 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                                         loadMore: false
                                     }, () => {
                                         this.getDataInprogress = false;
+                                        this.runPendingRefreshIfAny();
                                         this.props.setLoaderState(false);
                                         Alert.alert('Error', 'An error occurred while getting data', [
                                             {
@@ -284,6 +307,15 @@ export function enhanceListWithGetData(methodForGettingData, screenType) {
                 }, () => {
                     this.getData(true, isRefreshAfterSync)
                 })
+            };
+
+            runPendingRefreshIfAny = () => {
+                if (this.pendingRefresh) {
+                    const isRefreshAfterSync = this.pendingRefreshAfterSync;
+                    this.pendingRefresh = false;
+                    this.pendingRefreshAfterSync = undefined;
+                    this.refresh(isRefreshAfterSync);
+                }
             };
 
             setSearchText = (text) => {

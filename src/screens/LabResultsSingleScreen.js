@@ -73,6 +73,12 @@ class LabResultsSingleScreen extends Component {
     }
 
     componentDidMount() {
+        // Call this directly (not just inside the 'focus' listener below) because on
+        // a screen's very first mount/push, React Navigation's initial 'focus' event
+        // can fire before this listener finishes registering - the listener alone is
+        // reliable for *returning* to an already-mounted screen, but not for the
+        // first push.
+        this.props.setDisableOutbreakChange(true);
         if (this.props.navigation) {
              this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
                  this.props.setDisableOutbreakChange(true);
@@ -696,7 +702,15 @@ class LabResultsSingleScreen extends Component {
                             updateLabResultAndContact(labResultClone)
                                 .then((responseUpdateLabResult) => {
                                     this.props.refresh();
-                                    if (this.props.navigation) this.props.navigation.goBack();
+                                    if (this.state.deletePressed === true && this.props.navigation) {
+                                        // Always return to the owning Case/Contact's screen after a
+                                        // delete, rather than going back to whatever screen this lab
+                                        // result happened to be opened from - same target the create
+                                        // branch above already navigates to.
+                                        this.props.navigation.navigate(this.props.personType === translations.personTypes.cases ? 'CasesScreen' : 'ContactsScreen');
+                                    } else if (this.props.navigation) {
+                                        this.props.navigation.goBack();
+                                    }
                                 })
                                 .catch((errorUpdateLabResult) => {
                                     console.log(errorUpdateLabResult);

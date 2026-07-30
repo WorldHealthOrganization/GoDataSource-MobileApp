@@ -147,6 +147,12 @@ class EventSingleScreen extends Component {
     }
 
     componentDidMount() {
+        // Call this directly (not just inside the 'focus' listener below) because on
+        // a screen's very first mount/push, React Navigation's initial 'focus' event
+        // can fire before this listener finishes registering - the listener alone is
+        // reliable for *returning* to an already-mounted screen, but not for the
+        // first push.
+        this.props.setDisableOutbreakChange(true);
         if (this.props.navigation) {
              this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
                  this.props.setDisableOutbreakChange(true);
@@ -825,6 +831,11 @@ class EventSingleScreen extends Component {
                                                 }
                                             }
                                         })
+                                    } else if (this.state.deletePressed === true && this.props.navigation) {
+                                        // Always return to the Events list after a delete, rather than
+                                        // popping back to whatever screen this event happened to be
+                                        // opened from.
+                                        this.props.navigation.navigate(constants.appScreens.eventsScreen);
                                     } else {
                                         Navigation.pop(this.props.componentId)
                                     }

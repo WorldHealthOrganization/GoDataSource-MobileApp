@@ -27,6 +27,7 @@ import {Popup} from 'react-native-map-link';
 import PermissionComponent from '../components/PermissionComponent';
 import {handleQRSearchTransition} from "../utils/screenTransitionFunctions";
 import withPincode from "../components/higherOrderComponents/withPincode";
+import {withNavigationParams} from "../components/higherOrderComponents/withNavigationParams";
 import {getContactsForOutbreakId} from "../actions/contacts";
 import {compose} from "redux";
 import {getAllLabResultsForOutbreak} from "../actions/labResults";
@@ -355,6 +356,7 @@ function matchDispatchProps(dispatch) {
 
 // export default connect(mapStateToProps, matchDispatchProps)(enhanceListWithGetData(getCasesForOutbreakId, 'LabResultsScreen')(LabResultsScreen));
 export default compose(
+    withNavigationParams,
     withPincode(),
     connect(mapStateToProps, matchDispatchProps),
     enhanceListWithGetData(getAllLabResultsForOutbreak, 'LabResultsScreen')

@@ -35,6 +35,12 @@ class HelpSingleScreen extends Component {
     }
 
     componentDidMount() {
+        // Call this directly (not just inside the 'focus' listener below) because on
+        // a screen's very first mount/push, React Navigation's initial 'focus' event
+        // can fire before this listener finishes registering - the listener alone is
+        // reliable for *returning* to an already-mounted screen, but not for the
+        // first push.
+        this.props.setDisableOutbreakChange(true);
         if (this.props.navigation) {
              this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
                  this.props.setDisableOutbreakChange(true);

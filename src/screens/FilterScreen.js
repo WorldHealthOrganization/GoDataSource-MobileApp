@@ -411,10 +411,14 @@ class FilterScreen extends Component {
         }
 
         addFilterForScreen(screen, filterClone);
+        // Apply the new filter to the underlying list screen BEFORE navigating back -
+        // the list screen's 'focus' listener (withListData.js) refetches as soon as it
+        // regains focus, so if goBack() ran first that refetch would race ahead of this
+        // filter update and read the stale (previous) filter value.
+        onApplyFilters(filterClone);
         if (this.props.navigation) {
             this.props.navigation.goBack();
         }
-        onApplyFilters(filterClone)
     };
 
 

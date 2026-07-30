@@ -185,6 +185,12 @@ class CaseSingleScreen extends Component {
     }
 
     componentDidMount() {
+        // Call this directly (not just inside the 'focus' listener below) because on
+        // a screen's very first mount/push, React Navigation's initial 'focus' event
+        // can fire before this listener finishes registering - the listener alone is
+        // reliable for *returning* to an already-mounted screen, but not for the
+        // first push.
+        this.props.setDisableOutbreakChange(true);
         if (this.props.navigation) {
              this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
                  this.props.setDisableOutbreakChange(true);
@@ -988,7 +994,10 @@ class CaseSingleScreen extends Component {
                                     if (_.isFunction(this.props.refresh)) {
                                         this.props.refresh();
                                     }
-                                    if (this.props.isAddFromNavigation) {
+                                    if (this.props.isAddFromNavigation || this.state.deletePressed === true) {
+                                         // Always return to the Cases list after a delete (or after adding
+                                         // from navigation), rather than going back to whatever screen this
+                                         // case happened to be opened from.
                                          if (this.props.navigation) this.props.navigation.navigate('CasesScreen');
                                     } else {
                                          if (this.props.navigation) this.props.navigation.goBack();

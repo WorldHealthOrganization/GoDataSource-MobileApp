@@ -158,6 +158,12 @@ class ContactsOfContactsSingleScreen extends Component {
     // Please add here the react lifecycle methods that you need
     // Please add here the react lifecycle methods that you need
     componentDidMount() {
+        // Call this directly (not just inside the 'focus' listener below) because on
+        // a screen's very first mount/push, React Navigation's initial 'focus' event
+        // can fire before this listener finishes registering - the listener alone is
+        // reliable for *returning* to an already-mounted screen, but not for the
+        // first push.
+        this.props.setDisableOutbreakChange(true);
         if (this.props.navigation) {
              this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
                  this.props.setDisableOutbreakChange(true);
@@ -1542,7 +1548,14 @@ class ContactsOfContactsSingleScreen extends Component {
                                 if (_.isFunction(this.props.refresh)) {
                                     this.props.refresh();
                                 }
-                                Navigation.pop(this.props.componentId)
+                                if (this.state.deletePressed === true && this.props.navigation) {
+                                    // Always return to the Contacts-of-Contacts list after a delete,
+                                    // rather than popping back to whatever screen this record happened
+                                    // to be opened from.
+                                    this.props.navigation.navigate(constants.appScreens.contactsOfContactsScreen);
+                                } else {
+                                    Navigation.pop(this.props.componentId)
+                                }
                             })
                             .catch((errorUpdateContact) => {
                                 console.log('errorUpdateCase', errorUpdateContact);
